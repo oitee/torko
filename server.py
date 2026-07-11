@@ -10,6 +10,7 @@ Run: source .venv/bin/activate && python3 server.py
 from flask import Flask, jsonify, request, send_from_directory
 
 from debate_fetch import fetch_debate, split_by_speaker, speaker_distribution
+from debate_fetch_legacy import looks_legacy, split_by_speaker_legacy
 
 app = Flask(__name__, static_folder="static", static_url_path="")
 
@@ -38,13 +39,15 @@ def api_distribution():
         return jsonify({"error": "No transcript (debateDesc) found for this debate item."}), 404
 
     mp_part_detail_list = data.get("mpPartDetailList", [])
-    segments = split_by_speaker(html, mp_part_detail_list)
+    legacy = looks_legacy(html)
+    segments = split_by_speaker_legacy(html, mp_part_detail_list) if legacy else split_by_speaker(html, mp_part_detail_list)
     dist = speaker_distribution(segments)
 
     return jsonify(
         {
             "debateDate": data.get("debateDate"),
             "debateType": data.get("debateType"),
+            "format": "legacy" if legacy else "modern",
             "totalSegments": len(segments),
             "distribution": dist,
             "segments": segments,

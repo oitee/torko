@@ -5,5 +5,5 @@ server.log
 .claude/launch.json
 
 # docs — not tracked yet
-PARSING_STRATEGY.md
 SANSAD_API_FINDINGS.md
+PARSING_STRATEGY.md
