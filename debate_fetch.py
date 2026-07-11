@@ -46,7 +46,8 @@ def _normalize_name(label: str) -> list[str]:
     # A ministerial title keeps the name in brackets, led by an honorific.
     for inside in _PAREN_RE.findall(label):
         head = re.sub(r"[^\w\s]", " ", inside).lower().split()
-        if head and head[0] in _HONORIFICS:
+        # A group that holds only an honorific, as in "Dr. (Smt.) V. Saroja", is not a title.
+        if head and head[0] in _HONORIFICS and any(t not in _HONORIFICS for t in head):
             label = inside
             break
     label = _PAREN_RE.sub(" ", label)  # drop remaining (constituency)
@@ -95,7 +96,7 @@ def resolve_speaker(label: str, index: dict) -> tuple[str | None, dict | None]:
     cands = {
         id(m): m
         for s, m in index["tokenised"]
-        if tset and (tset <= s or s <= tset)
+        if tset and s and (tset <= s or s <= tset)
     }
     # Count people, not entries, because one entry can appear twice.
     codes = {m["mpCode"] for m in cands.values()}
