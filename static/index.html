@@ -1,0 +1,386 @@
+<title>Lok Sabha Debate — Speaker Distribution</title>
+<style>
+  :root {
+    --page-plane:     #f9f9f7;
+    --surface-1:      #fcfcfb;
+    --text-primary:   #0b0b0b;
+    --text-secondary: #52514e;
+    --text-muted:     #898781;
+    --gridline:       #e1e0d9;
+    --baseline:       #c3c2b7;
+    --series-1:       #2a78d6;
+    --border:         rgba(11,11,11,0.10);
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --page-plane:     #0d0d0d;
+      --surface-1:      #1a1a19;
+      --text-primary:   #ffffff;
+      --text-secondary: #c3c2b7;
+      --text-muted:     #898781;
+      --gridline:       #2c2c2a;
+      --baseline:       #383835;
+      --series-1:       #3987e5;
+      --border:         rgba(255,255,255,0.10);
+    }
+  }
+
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    background: var(--page-plane);
+    color: var(--text-primary);
+    font-family: system-ui, -apple-system, "Segoe UI", sans-serif;
+  }
+  .wrap { max-width: 880px; margin: 0 auto; padding: 32px 20px 80px; }
+  h1 { font-size: 20px; margin: 0 0 4px; }
+  .subtitle { color: var(--text-secondary); font-size: 14px; margin-bottom: 24px; }
+
+  form {
+    display: flex;
+    gap: 12px;
+    align-items: flex-end;
+    flex-wrap: wrap;
+    background: var(--surface-1);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 16px;
+    margin-bottom: 28px;
+  }
+  .field { display: flex; flex-direction: column; gap: 4px; }
+  .field label { font-size: 12px; color: var(--text-secondary); }
+  .field input {
+    width: 130px;
+    padding: 8px 10px;
+    border-radius: 6px;
+    border: 1px solid var(--border);
+    background: var(--page-plane);
+    color: var(--text-primary);
+    font-size: 14px;
+  }
+  button {
+    padding: 9px 18px;
+    border-radius: 6px;
+    border: none;
+    background: var(--series-1);
+    color: #fff;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+  }
+  button:disabled { opacity: 0.5; cursor: default; }
+
+  .meta { color: var(--text-secondary); font-size: 13px; margin-bottom: 18px; }
+  .error { color: #d03b3b; font-size: 14px; margin-bottom: 18px; }
+
+  .viz-root { background: var(--surface-1); border: 1px solid var(--border); border-radius: 10px; padding: 20px; }
+  .chart-title { font-size: 14px; font-weight: 600; margin: 0 0 2px; }
+  .chart-sub { font-size: 12px; color: var(--text-muted); margin: 0 0 16px; }
+
+  .bar-row { display: grid; grid-template-columns: 200px 1fr 70px; align-items: center; gap: 10px; margin-bottom: 2px; }
+  .bar-label {
+    font-size: 13px;
+    color: var(--text-primary);
+    text-align: right;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  .bar-track { position: relative; height: 24px; border-bottom: 1px solid var(--baseline); }
+  .bar-fill {
+    position: absolute;
+    left: 0; bottom: 0;
+    height: 20px;
+    background: var(--series-1);
+    border-radius: 4px 4px 0 0;
+    cursor: default;
+  }
+  .bar-value { font-size: 12px; color: var(--text-secondary); font-variant-numeric: tabular-nums; }
+
+  .tooltip {
+    position: fixed;
+    pointer-events: none;
+    background: var(--text-primary);
+    color: var(--surface-1);
+    font-size: 12px;
+    padding: 6px 9px;
+    border-radius: 6px;
+    display: none;
+    z-index: 10;
+    white-space: nowrap;
+  }
+
+  table { width: 100%; border-collapse: collapse; margin-top: 28px; font-size: 13px; }
+  th, td { text-align: left; padding: 7px 10px; border-bottom: 1px solid var(--gridline); }
+  th { color: var(--text-muted); font-weight: 600; font-size: 12px; }
+  td:nth-child(2), td:nth-child(3), td:nth-child(4) { font-variant-numeric: tabular-nums; text-align: right; }
+  th:nth-child(2), th:nth-child(3), th:nth-child(4) { text-align: right; }
+
+  .section-title { font-size: 14px; font-weight: 600; margin: 0 0 10px; }
+
+  /* Verification badge — shows which speaker names were normalised to the
+     official MP list vs. left as raw transcript labels. */
+  .badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 3px;
+    font-size: 10.5px;
+    font-weight: 600;
+    line-height: 1;
+    padding: 2px 6px 2px 4px;
+    border-radius: 999px;
+    vertical-align: middle;
+    margin-left: 6px;
+    cursor: help;
+    white-space: nowrap;
+  }
+  .badge svg { width: 11px; height: 11px; display: block; }
+  .badge.verified {
+    color: #1a7f4b;
+    background: rgba(26,127,75,0.12);
+    border: 1px solid rgba(26,127,75,0.25);
+  }
+  .badge.unverified {
+    color: var(--text-muted);
+    background: rgba(137,135,129,0.10);
+    border: 1px solid rgba(137,135,129,0.28);
+  }
+  @media (prefers-color-scheme: dark) {
+    .badge.verified { color: #57d493; background: rgba(87,212,147,0.14); border-color: rgba(87,212,147,0.30); }
+  }
+  td .badge { margin-left: 8px; }
+
+  .transcript-header { display: flex; align-items: baseline; justify-content: space-between; gap: 12px; margin-top: 28px; margin-bottom: 12px; flex-wrap: wrap; }
+  .transcript-header select {
+    padding: 6px 8px;
+    border-radius: 6px;
+    border: 1px solid var(--border);
+    background: var(--surface-1);
+    color: var(--text-primary);
+    font-size: 13px;
+    max-width: 260px;
+  }
+  .transcript-list { display: flex; flex-direction: column; gap: 10px; }
+  .transcript-item {
+    background: var(--surface-1);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 12px 14px;
+  }
+  .transcript-speaker {
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--text-primary);
+    margin-bottom: 4px;
+  }
+  .transcript-index { color: var(--text-muted); font-weight: 400; font-size: 12px; margin-left: 6px; }
+  .transcript-text {
+    font-size: 13.5px;
+    line-height: 1.5;
+    color: var(--text-secondary);
+    white-space: pre-wrap;
+    max-height: 4.5em;
+    overflow: hidden;
+  }
+  .transcript-text.expanded { max-height: none; }
+  .transcript-toggle {
+    background: none;
+    border: none;
+    padding: 6px 0 0;
+    color: var(--series-1);
+    font-size: 12px;
+    font-weight: 600;
+    cursor: pointer;
+  }
+</style>
+
+<div class="wrap">
+  <h1>Lok Sabha Debate — Speaker Distribution</h1>
+  <div class="subtitle">Enter a debate reference to fetch its transcript from sansad.in and see who spoke how much.</div>
+
+  <form id="debate-form">
+    <div class="field">
+      <label for="loksabha">Lok Sabha</label>
+      <input type="number" id="loksabha" value="18" min="1" required>
+    </div>
+    <div class="field">
+      <label for="session">Session</label>
+      <input type="number" id="session" value="3" min="1" required>
+    </div>
+    <div class="field">
+      <label for="dbslno">Debate Serial No. (dbSlno)</label>
+      <input type="number" id="dbslno" value="1758" min="1" required>
+    </div>
+    <button type="submit" id="submit-btn">Fetch</button>
+  </form>
+
+  <div id="meta" class="meta"></div>
+  <div id="error" class="error" style="display:none"></div>
+  <div id="results"></div>
+</div>
+
+<div class="tooltip" id="tooltip"></div>
+
+<script>
+const form = document.getElementById('debate-form');
+const submitBtn = document.getElementById('submit-btn');
+const metaEl = document.getElementById('meta');
+const errorEl = document.getElementById('error');
+const resultsEl = document.getElementById('results');
+const tooltip = document.getElementById('tooltip');
+
+const TOP_N = 15;
+
+form.addEventListener('submit', async (e) => {
+  e.preventDefault();
+  const loksabha = document.getElementById('loksabha').value;
+  const session = document.getElementById('session').value;
+  const dbslno = document.getElementById('dbslno').value;
+
+  submitBtn.disabled = true;
+  submitBtn.textContent = 'Loading…';
+  errorEl.style.display = 'none';
+  metaEl.textContent = '';
+  resultsEl.innerHTML = '';
+
+  try {
+    const resp = await fetch(`/api/distribution?loksabha=${loksabha}&session=${session}&dbslno=${dbslno}`);
+    const data = await resp.json();
+    if (!resp.ok) throw new Error(data.error || 'Request failed');
+    render(data);
+  } catch (err) {
+    errorEl.textContent = err.message;
+    errorEl.style.display = 'block';
+  } finally {
+    submitBtn.disabled = false;
+    submitBtn.textContent = 'Fetch';
+  }
+});
+
+function render(data) {
+  metaEl.textContent = `${data.debateType || ''} · ${data.debateDate || ''} · ${data.totalSegments} interventions · ${data.distribution.length} speakers`;
+
+  const dist = data.distribution;
+  const top = dist.slice(0, TOP_N);
+  const maxWords = Math.max(...top.map(d => d.words), 1);
+
+  const chart = document.createElement('div');
+  chart.className = 'viz-root';
+  chart.innerHTML = `
+    <p class="chart-title">Words spoken, top ${top.length} of ${dist.length} speakers</p>
+    <p class="chart-sub">Ranked by total word count across all interventions</p>
+    <div id="bars"></div>
+  `;
+  resultsEl.appendChild(chart);
+
+  const bars = chart.querySelector('#bars');
+  top.forEach(d => {
+    const pct = (d.words / maxWords) * 100;
+    const row = document.createElement('div');
+    row.className = 'bar-row';
+    row.innerHTML = `
+      <div class="bar-label" title="${escapeHtml(d.mpName)}">${escapeHtml(d.mpName)}</div>
+      <div class="bar-track"><div class="bar-fill" style="width:${pct}%"></div></div>
+      <div class="bar-value">${d.words.toLocaleString()}</div>
+    `;
+    const fillEl = row.querySelector('.bar-fill');
+    fillEl.addEventListener('mousemove', (e) => showTooltip(e, d));
+    fillEl.addEventListener('mouseleave', hideTooltip);
+    bars.appendChild(row);
+  });
+
+  const tableWrap = document.createElement('div');
+  tableWrap.innerHTML = `<p class="section-title" style="margin-top:28px;">All speakers</p>`;
+  const table = document.createElement('table');
+  table.innerHTML = `
+    <thead><tr><th>Speaker</th><th>Interventions</th><th>Words</th><th>Characters</th></tr></thead>
+    <tbody>
+      ${dist.map(d => `<tr><td>${escapeHtml(d.mpName)}${badge(d.verified ? (d.nameSource || 'anchor') : 'unresolved')}</td><td>${d.interventions}</td><td>${d.words.toLocaleString()}</td><td>${d.chars.toLocaleString()}</td></tr>`).join('')}
+    </tbody>
+  `;
+  tableWrap.appendChild(table);
+  resultsEl.appendChild(tableWrap);
+
+  renderTranscript(data.segments || []);
+}
+
+function renderTranscript(segments) {
+  const wrap = document.createElement('div');
+
+  const speakerNames = [...new Set(segments.map(s => s.mpName || '(unattributed)'))];
+
+  const header = document.createElement('div');
+  header.className = 'transcript-header';
+  header.innerHTML = `
+    <p class="section-title" style="margin:0;">What each speaker said (${segments.length} interventions, in order)</p>
+    <select id="speaker-filter">
+      <option value="">All speakers</option>
+      ${speakerNames.map(n => `<option value="${escapeHtml(n)}">${escapeHtml(n)}</option>`).join('')}
+    </select>
+  `;
+  wrap.appendChild(header);
+
+  const list = document.createElement('div');
+  list.className = 'transcript-list';
+  wrap.appendChild(list);
+  resultsEl.appendChild(wrap);
+
+  function draw(filterName) {
+    list.innerHTML = '';
+    segments.forEach((seg, i) => {
+      const name = seg.mpName || '(unattributed)';
+      if (filterName && name !== filterName) return;
+
+      const item = document.createElement('div');
+      item.className = 'transcript-item';
+      item.innerHTML = `
+        <div class="transcript-speaker">${escapeHtml(name)}${badge(seg.nameSource)}<span class="transcript-index">#${i + 1}</span></div>
+        <div class="transcript-text">${escapeHtml(seg.text)}</div>
+        <button type="button" class="transcript-toggle">Show more</button>
+      `;
+      const textEl = item.querySelector('.transcript-text');
+      const toggleEl = item.querySelector('.transcript-toggle');
+      toggleEl.addEventListener('click', () => {
+        const expanded = textEl.classList.toggle('expanded');
+        toggleEl.textContent = expanded ? 'Show less' : 'Show more';
+      });
+      list.appendChild(item);
+    });
+  }
+
+  header.querySelector('#speaker-filter').addEventListener('change', (e) => draw(e.target.value));
+  draw('');
+}
+
+function showTooltip(e, d) {
+  tooltip.textContent = `${d.mpName}: ${d.words.toLocaleString()} words · ${d.interventions} interventions`;
+  tooltip.style.display = 'block';
+
+  const ttWidth = tooltip.offsetWidth;
+  let left = e.clientX + 14;
+  if (left + ttWidth > window.innerWidth - 10) {
+    left = e.clientX - ttWidth - 14;
+  }
+  tooltip.style.left = left + 'px';
+  tooltip.style.top = (e.clientY + 14) + 'px';
+}
+function hideTooltip() { tooltip.style.display = 'none'; }
+
+// A speaker is "verified" when its name was normalised to the official MP
+// list. nameSource records how (anchor / name-exact / name-join / name-partial),
+// or "unresolved" when we kept the raw transcript label.
+function isVerified(source) {
+  return !!source && source !== 'unresolved';
+}
+function badge(source) {
+  if (isVerified(source)) {
+    return `<span class="badge verified" title="Normalised to official MP list (${escapeHtml(source)})">`
+      + `<svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 8.5l3.5 3.5L13 4.5"/></svg>Verified</span>`;
+  }
+  return `<span class="badge unverified" title="Raw transcript label — not matched to the MP list">Unverified</span>`;
+}
+
+function escapeHtml(s) {
+  return (s || '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+}
+</script>
