@@ -4,6 +4,5 @@ __pycache__/
 server.log
 .claude/launch.json
 
-# docs — not tracked yet
-SANSAD_API_FINDINGS.md
-PARSING_STRATEGY.md
+# internal docs
+internal_docs/
