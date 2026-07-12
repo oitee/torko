@@ -38,6 +38,7 @@ from debate_fetch import (
     fetch_debate,
     speaker_distribution,
 )
+from legacy_hindi import decode_legacy_hindi
 
 # Modern anchors are "mpCode*partCode" ("3972*1"). Legacy anchors are the bare mpCode ("209").
 MODERN_ANCHOR_RE = re.compile(r'<A\s+name="\d+\*\d+"', re.IGNORECASE)
@@ -165,6 +166,12 @@ def split_by_speaker_legacy(html: str, mp_part_detail_list: list[dict]) -> list[
 
     segments = [s for s in segments if s["text"] or s["speakerLabel"]]
     annotate_speakers(segments, mp_part_detail_list)
+
+    # Hindi arrives in a legacy font encoding, for example "<ºÉBÉEä ¤ÉÉ®ä àÉå". Decode it to Unicode.
+    for seg in segments:
+        seg["text"] = decode_legacy_hindi(seg["text"])
+        seg["speakerLabel"] = decode_legacy_hindi(seg["speakerLabel"] or "") or None
+        seg["mpName"] = decode_legacy_hindi(seg["mpName"] or "") or None
     return segments
 
 
