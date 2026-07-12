@@ -38,6 +38,7 @@ from debate_fetch import (
     fetch_debate,
     speaker_distribution,
 )
+from legacy_hindi import decode_legacy_hindi
 
 # Modern anchors are "mpCode*partCode" (e.g. "3972*1"); legacy anchors carry
 # no partCode at all (e.g. "209").
@@ -186,6 +187,16 @@ def split_by_speaker_legacy(html: str, mp_part_detail_list: list[dict]) -> list[
 
     segments = [s for s in segments if s["text"] or s["speakerLabel"]]
     annotate_speakers(segments, mp_part_detail_list)
+
+    # Legacy transcripts carry their Hindi in a pre-Unicode CDAC-GIST/ISFOC font
+    # encoding (see legacy_hindi.py), so the extracted text is glyph "gibberish"
+    # like "<ºÉBÉEä ¤ÉÉ®ä àÉå". Decode it to real Devanagari now that the blocks are
+    # plain text — decoding is a no-op on already-clean English/Unicode, and
+    # Latin runs (English speech, roster names) pass through untouched.
+    for seg in segments:
+        seg["text"] = decode_legacy_hindi(seg["text"])
+        seg["speakerLabel"] = decode_legacy_hindi(seg["speakerLabel"] or "") or None
+        seg["mpName"] = decode_legacy_hindi(seg["mpName"] or "") or None
     return segments
 
 
