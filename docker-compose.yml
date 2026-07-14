@@ -1,0 +1,26 @@
+services:
+  db:
+    # pgvector image = Postgres 16 + `vector` extension, and `pg_trgm` ships
+    # with contrib. Both are enabled by the init script below.
+    image: pgvector/pgvector:pg16
+    container_name: torko_db
+    environment:
+      - POSTGRES_USER=${POSTGRES_USER:-postgres}
+      - POSTGRES_DB=${POSTGRES_DB:-torko}
+      - POSTGRES_HOST_AUTH_METHOD=trust
+    ports:
+      - "${POSTGRES_PORT:-5432}:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+      # This is a powerful command - runs the sql files in alphatical order inside db/init folder:
+      # For now commenting out so that we are manually setting up things. Will un-comment later
+      # so that users can use this out-of-the-box
+      #- ./db/init:/docker-entrypoint-initdb.d:ro
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-postgres} -d ${POSTGRES_DB:-torko}"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+volumes:
+  pgdata:
