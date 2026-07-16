@@ -87,8 +87,16 @@ def _folded_key(name: str) -> str:
     return "".join(sorted(full))
 
 
-def anchor_agrees_with_label(label: str, roster_name: str) -> bool:
-    """Whether an anchor's roster name names the same person as the label.
+def _name_agreement(label: str, roster_name: str) -> bool | None:
+    """Do these two names refer to the same person? None when there's no evidence.
+
+    True/False are verdicts. **None means neither name yielded a usable word, so
+    nothing was actually compared** — and the two callers below need opposite
+    answers in that case, which is why this returns three states rather than
+    two. Collapsing it to a bool is what caused a real misattribution:
+    "no evidence" was returned as True,
+    every caller read that as "same person", and one arbitrary name was stamped
+    onto an entire debate.
 
     A roster word may appear in the label as an initial ("Salarapatty Kuppusamy
     Kharventhan" / "S.K. KHARVENTHAN"), which counts towards coverage — but
@@ -98,7 +106,7 @@ def anchor_agrees_with_label(label: str, roster_name: str) -> bool:
     lab_full, lab_initials = _name_parts(label)
     ros_full, _ = _name_parts(roster_name)
     if not ros_full or not (lab_full or lab_initials):
-        return True  # no usable name on one side: nothing to contradict
+        return None  # nothing usable on one side: no evidence either way
 
     strong = covered = 0
     for r in ros_full:
@@ -108,6 +116,17 @@ def anchor_agrees_with_label(label: str, roster_name: str) -> bool:
         elif r[0] in lab_initials:
             covered += 1
     return strong >= 1 and covered / len(ros_full) >= ANCHOR_COVERAGE_MIN
+
+
+def anchor_contradicts_label(label: str, roster_name: str) -> bool:
+    return _name_agreement(label, roster_name) is False
+
+
+def labels_name_same_person(label_a: str, label_b: str) -> bool:
+    return (
+        _name_agreement(label_a, label_b) is True
+        and _name_agreement(label_b, label_a) is True
+    )
 
 
 def _folded_lookup(mp_part_detail_list: list[dict]) -> dict[str, dict]:
@@ -246,14 +265,6 @@ def annotate_speakers(
 
 
 def reuse_anchors(segments: list[dict]) -> list[dict]:
-    """Propagate each anchored speaker's mpCode to their unanchored turns.
-
-    sansad.in anchors a speaker only on their first turn, so their later turns
-    arrive unresolved under the same name. First collect every anchored
-    (mpCode, mpName), then attach it to any still-unresolved turn whose label
-    names the same person. A label anchored to two different people in one
-    debate is ambiguous and left untouched.
-    """
     resolved: dict[str, tuple[str, str]] = {}
     ambiguous: set[str] = set()
     for seg in segments:
@@ -280,9 +291,7 @@ def reuse_anchors(segments: list[dict]) -> list[dict]:
         for anchored_label, (code, name) in resolved.items():
             if anchored_label in ambiguous:
                 continue
-            if anchor_agrees_with_label(label, anchored_label) and anchor_agrees_with_label(
-                anchored_label, label
-            ):
+            if labels_name_same_person(label, anchored_label):
                 seg["mpCode"] = code
                 seg["mpName"] = name
                 seg["nameSource"] = "anchor-reuse"
@@ -397,7 +406,7 @@ def split_by_speaker(
             label = body = None
 
         rejected = None
-        if carried and mp_code and not anchor_agrees_with_label(label, code_to_name.get(mp_code, "")):
+        if carried and mp_code and anchor_contradicts_label(label, code_to_name.get(mp_code, "")):
             rejected = mp_code
             mp_code = mp_part_code = None
             if colon is None:
