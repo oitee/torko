@@ -197,23 +197,84 @@ def swallowed_labels(segments: list[dict]) -> list[str]:
     return found
 
 
+def unfounded_attributions(segments: list[dict]) -> list[str]:
+    """Anchor-reuse labels that name nobody -- attributions with no foundation.
+
+    `reuse_anchors` (debate_fetch.py) mints a segment's `mpCode` purely from
+    `labels_name_same_person`, comparing the segment's raw `speakerLabel`
+    against an already-resolved label. That comparison works only on each
+    label's usable whole words (`debate_fetch._name_parts`); when a label
+    strips down to none, there is nothing left to compare. Commit `5f9bd3c`
+    (see internal_docs/019_WORK_IN_FLIGHT.md, "We found, and fixed, the first
+    real misattribution") is the record of what happens when "nothing was
+    compared" gets read as "same person" anyway: 303 turns in one debate
+    stamped with one arbitrary name. This is the regression guard for that
+    exact class of bug: it re-runs the same `_name_parts` call the production
+    comparison runs, on the same field, and flags any anchor-reuse label that
+    would come back empty -- an attribution built on a comparison that had
+    nothing to compare.
+
+    Scope, by `nameSource`:
+      * "anchor-reuse" is the only source examined. It is the only one whose
+        `mpCode` was minted by comparing this label, raw, against another
+        label via `labels_name_same_person` -- the exact function and the
+        exact shape of input responsible for `5f9bd3c`.
+      * "anchor" is exempt: that `mpCode` came from an ID tag the source
+        itself printed, not from comparing this label against anything, so
+        an anchored turn with an unreadable label is not this bug.
+      * "name-exact" / "name-join" / "name-partial" (`resolve_speaker`) match
+        by direct token overlap against a roster entry and already refuse to
+        run on an empty token list -- a different code path with its own
+        guard, not `_name_agreement`, so this probe does not apply to them.
+      * "name-translit" / "name-db" decode or transliterate the label
+        internally (via `decode_legacy_hindi` / `_folded_key`) before
+        matching, so `_name_parts` on the *raw*, undecoded label is not the
+        condition those tiers actually ran under -- testing the raw string
+        would flag real, decoded matches as unfounded. Checked directly
+        against LS14/5/2711, LS18/3/1758 and LS14/12/9000: restricting to
+        "anchor-reuse" alone reproduces the reference counts, so widening
+        scope to these two tiers was not needed and was deliberately left out
+        rather than guessed at.
+
+    Unlike `swallowed_labels`, this is not a *lower* bound: it is the same
+    function, on the same field, that the production comparison itself runs,
+    so there is no additional blind spot on top of whatever `_name_parts`
+    itself misses. Zero means no anchor-reuse attribution in this batch of
+    segments rests on an empty comparison -- not "no misattributions", only
+    "none of *this* specific, previously-real class."
+    """
+    found: list[str] = []
+    for seg in segments:
+        if seg.get("nameSource") != "anchor-reuse":
+            continue
+        label = seg.get("speakerLabel") or ""
+        full, _ = debate_fetch._name_parts(label)
+        if not full:
+            found.append(label)
+    return found
+
+
 def speakers_from_debate(
     ref: dict, era: str
-) -> tuple[list[dict], list[dict], list[dict], list[dict], int]:
+) -> tuple[list[dict], list[dict], list[dict], list[dict], list[dict], int]:
     """Fetch+parse one debate.
 
     Returns (unverified examples, resolved speakers, presiding rows, swallowed
-    rows, number of parsed segments). Unverified examples are distinct speaker
-    labels with no `mpCode`; resolved speakers are one row per distinct
-    `mpCode`, with how that code was matched and how many turns it covers.
-    Presiding rows are one per distinct label tagged `nameSource` "presiding"
-    by the parser (a chair label, classified as a role rather than an
-    unverified example), with its turn count. Swallowed rows are one per
-    distinct label found *inside* another turn's text (see `swallowed_labels`)
-    -- turns the splitter never opened, and so the one failure the other three
-    counts structurally cannot see. The segment count lets the caller tell a
-    genuinely clean debate (parsed fine, every speaker resolved or presiding)
-    apart from one the parser simply couldn't read.
+    rows, unfounded rows, number of parsed segments). Unverified examples are
+    distinct speaker labels with no `mpCode`; resolved speakers are one row
+    per distinct `mpCode`, with how that code was matched and how many turns
+    it covers. Presiding rows are one per distinct label tagged `nameSource`
+    "presiding" by the parser (a chair label, classified as a role rather
+    than an unverified example), with its turn count. Swallowed rows are one
+    per distinct label found *inside* another turn's text (see
+    `swallowed_labels`) -- turns the splitter never opened, and so the one
+    failure the other three counts structurally cannot see. Unfounded rows
+    are one per distinct label that carries an "anchor-reuse" `mpCode` but
+    names nobody (see `unfounded_attributions`) -- the misattribution class
+    fixed in `5f9bd3c`, guarded here so it cannot come back invisibly. The
+    segment count lets the caller tell a genuinely clean debate (parsed fine,
+    every speaker resolved or presiding) apart from one the parser simply
+    couldn't read.
     """
     ls, session, db_slno = ref["loksabha"], ref["session"], ref["dbSlno"]
     payload = debate_fetch.fetch_debate(ls, session, db_slno)
@@ -222,6 +283,22 @@ def speakers_from_debate(
     swallowed_by_label: dict[str, dict] = {}
     for label in swallowed_labels(segments):
         row = swallowed_by_label.setdefault(
+            label,
+            {
+                "loksabha": ls,
+                "session": session,
+                "dbSlno": db_slno,
+                "era": era,
+                "speaker": label,
+                "turns": 0,
+                "url": debate_url(ls, session, db_slno),
+            },
+        )
+        row["turns"] += 1
+
+    unfounded_by_label: dict[str, dict] = {}
+    for label in unfounded_attributions(segments):
+        row = unfounded_by_label.setdefault(
             label,
             {
                 "loksabha": ls,
@@ -304,6 +381,7 @@ def speakers_from_debate(
         list(resolved_by_code.values()),
         list(presiding_by_label.values()),
         list(swallowed_by_label.values()),
+        list(unfounded_by_label.values()),
         len(segments),
     )
 
@@ -323,6 +401,7 @@ def write_outputs(
     resolved: list[dict] | None = None,
     presiding: list[dict] | None = None,
     swallowed: list[dict] | None = None,
+    unfounded: list[dict] | None = None,
     draw_note: str | None = None,
 ) -> None:
     """Write this run's self-contained rollup to a fresh markdown + JSONL pair.
@@ -336,20 +415,25 @@ def write_outputs(
     not unverified). When `swallowed` is given, those rows go to a
     `*_swallowed.jsonl` and a section reports labels found inside another
     turn's text — turns the splitter never opened, which every other count on
-    this page is blind to by construction. `draw_note`, when given, is a
-    one-line record of how the sample was drawn (debate count, era split, seed,
-    seed file) so a later reader doesn't have to reconstruct it from the CLI
-    invocation. Run files are immutable: writing refuses to touch a path that
-    already exists.
+    this page is blind to by construction. When `unfounded` is given, those
+    rows go to a `*_unfounded.jsonl` and a section reports anchor-reuse labels
+    that name nobody (see `unfounded_attributions`) — this must always read
+    zero; anything else is the misattribution class fixed in `5f9bd3c` back.
+    `draw_note`, when given, is a one-line record of how the sample was drawn
+    (debate count, era split, seed, seed file) so a later reader doesn't have
+    to reconstruct it from the CLI invocation. Run files are immutable:
+    writing refuses to touch a path that already exists.
     """
     out_resolved = out_md.with_name(out_md.stem + "_resolved.jsonl")
     out_presiding = out_md.with_name(out_md.stem + "_presiding.jsonl")
     out_swallowed = out_md.with_name(out_md.stem + "_swallowed.jsonl")
+    out_unfounded = out_md.with_name(out_md.stem + "_unfounded.jsonl")
     paths = (
         [out_md, out_jsonl]
         + ([out_resolved] if resolved is not None else [])
         + ([out_presiding] if presiding is not None else [])
         + ([out_swallowed] if swallowed is not None else [])
+        + ([out_unfounded] if unfounded is not None else [])
     )
     for path in paths:
         if path.exists():
@@ -373,6 +457,11 @@ def write_outputs(
     if swallowed is not None:
         with out_swallowed.open("w", encoding="utf-8") as f:
             for row in swallowed:
+                f.write(json.dumps({"run": stamp, **row}, ensure_ascii=False) + "\n")
+
+    if unfounded is not None:
+        with out_unfounded.open("w", encoding="utf-8") as f:
+            for row in unfounded:
                 f.write(json.dumps({"run": stamp, **row}, ensure_ascii=False) + "\n")
 
     by_cat = Counter(ex["category"] for ex in examples)
@@ -477,6 +566,36 @@ def write_outputs(
         ]
         if swallowed:
             worst = sorted(swallowed, key=lambda r: -r["turns"])
+            for i, row in enumerate(worst, 1):
+                key = f"{row['loksabha']}/{row['session']}/{row['dbSlno']}"
+                lines.append(
+                    f"| {i} | {row['era']} | {key} | [view]({row['url']}) "
+                    f"| {_md_cell(row['speaker'])} | {row['turns']} |"
+                )
+        else:
+            lines.append("| _(none this run)_ | | | | | |")
+        lines.append("")
+
+    if unfounded is not None:
+        n_turns = sum(row["turns"] for row in unfounded)
+        by_debate = Counter(
+            (row["loksabha"], row["session"], row["dbSlno"]) for row in unfounded
+        )
+        lines += [
+            "### Unfounded attributions (misattribution guard)",
+            "",
+            f"> {n_turns} turns across {len(by_debate)} debates carry an "
+            '"anchor-reuse" `mpCode` whose label names nobody -- the exact '
+            "misattribution class fixed in `5f9bd3c` (303 turns credited to "
+            "the wrong MP in one debate). This must always read zero; a "
+            "nonzero count here means that class of bug is back. Full rows "
+            f"in `{out_unfounded.name}`.",
+            "",
+            "| # | era | LS/sess/db | source | label | turns |",
+            "| --- | --- | --- | --- | --- | --- |",
+        ]
+        if unfounded:
+            worst = sorted(unfounded, key=lambda r: -r["turns"])
             for i, row in enumerate(worst, 1):
                 key = f"{row['loksabha']}/{row['session']}/{row['dbSlno']}"
                 lines.append(
@@ -610,23 +729,24 @@ def sample_debate_refs(
 
 def collect_refs(
     refs: list[dict],
-) -> tuple[list[dict], list[dict], list[dict], list[dict], list[dict]]:
+) -> tuple[list[dict], list[dict], list[dict], list[dict], list[dict], list[dict]]:
     """Fetch+parse an explicit list of debates (no sampling, no target cap).
 
     Returns (unverified examples, clean debates, resolved speakers, presiding
-    rows, swallowed rows).
+    rows, swallowed rows, unfounded rows).
     """
     examples: list[dict] = []
     clean_debates: list[dict] = []
     resolved: list[dict] = []
     presiding: list[dict] = []
     swallowed: list[dict] = []
+    unfounded: list[dict] = []
 
     for i, ref in enumerate(refs, 1):
         key = (ref["loksabha"], ref["session"], ref["dbSlno"])
         era = ref["era"]
         try:
-            found, solved, chairs, eaten, n_segments = speakers_from_debate(ref, era)
+            found, solved, chairs, eaten, baseless, n_segments = speakers_from_debate(ref, era)
         except requests.RequestException as e:
             print(f"  fetch error {key}: {e}; skipping", file=sys.stderr)
             time.sleep(2)
@@ -636,35 +756,40 @@ def collect_refs(
         resolved.extend(solved)
         presiding.extend(chairs)
         swallowed.extend(eaten)
+        unfounded.extend(baseless)
         if not found and n_segments:
             clean_debates.append({**ref, "segments": n_segments})
         n_eaten = sum(r["turns"] for r in eaten)
+        n_baseless = sum(r["turns"] for r in baseless)
         print(
             f"  [{i}/{len(refs)}] {key} -> {len(found)} unverified, "
             f"{len(chairs)} presiding, {len(solved)} resolved, {n_segments} segments"
             + (f", {n_eaten} SWALLOWED" if n_eaten else "")
+            + (f", {n_baseless} UNFOUNDED" if n_baseless else "")
         )
 
-    return examples, clean_debates, resolved, presiding, swallowed
+    return examples, clean_debates, resolved, presiding, swallowed, unfounded
 
 
 def collect(
     target: int,
-) -> tuple[list[dict], list[dict], list[dict], list[dict], list[dict]]:
+) -> tuple[list[dict], list[dict], list[dict], list[dict], list[dict], list[dict]]:
     """Sample debates until `target` examples are gathered.
 
-    Returns (examples, clean_debates, resolved, presiding, swallowed) where
-    clean_debates are debates that parsed into segments but yielded zero
-    unverified speakers — the false-positive check — resolved lists every
-    speaker tied to an `mpCode`, presiding lists every chair label the parser
-    tagged `nameSource` "presiding", and swallowed lists every label found
-    inside another turn's text.
+    Returns (examples, clean_debates, resolved, presiding, swallowed,
+    unfounded) where clean_debates are debates that parsed into segments but
+    yielded zero unverified speakers — the false-positive check — resolved
+    lists every speaker tied to an `mpCode`, presiding lists every chair
+    label the parser tagged `nameSource` "presiding", swallowed lists every
+    label found inside another turn's text, and unfounded lists every
+    anchor-reuse label that names nobody (see `unfounded_attributions`).
     """
     examples: list[dict] = []
     clean_debates: list[dict] = []
     resolved: list[dict] = []
     presiding: list[dict] = []
     swallowed: list[dict] = []
+    unfounded: list[dict] = []
     visited: set[tuple] = set()
     era_names = list(STRATA)
     turn = 0
@@ -688,7 +813,7 @@ def collect(
                 continue
             visited.add(key)
             try:
-                found, solved, chairs, eaten, n_segments = speakers_from_debate(ref, era)
+                found, solved, chairs, eaten, baseless, n_segments = speakers_from_debate(ref, era)
             except requests.RequestException as e:
                 print(f"  fetch error {key}: {e}; skipping", file=sys.stderr)
                 time.sleep(2)
@@ -697,6 +822,7 @@ def collect(
             resolved.extend(solved)
             presiding.extend(chairs)
             swallowed.extend(eaten)
+            unfounded.extend(baseless)
             if found:
                 got_any = True
                 examples.extend(found)
@@ -717,7 +843,7 @@ def collect(
 
         empty_streak = 0 if got_any else empty_streak + 1
 
-    return examples[:target], clean_debates, resolved, presiding, swallowed
+    return examples[:target], clean_debates, resolved, presiding, swallowed, unfounded
 
 
 def main() -> None:
@@ -813,25 +939,26 @@ def main() -> None:
             return
 
         print(f"Parsing {len(refs)} debates ({draw_note})")
-        examples, clean_debates, resolved, presiding, swallowed = collect_refs(refs)
+        examples, clean_debates, resolved, presiding, swallowed, unfounded = collect_refs(refs)
         replay_of = None
     elif args.replay_file:
         refs = refs_from_file(args.replay_file)
         print(f"Replaying {len(refs)} debates from {args.replay_file}")
-        examples, clean_debates, resolved, presiding, swallowed = collect_refs(refs)
+        examples, clean_debates, resolved, presiding, swallowed, unfounded = collect_refs(refs)
         replay_of = args.replay_file.name
     else:
-        examples, clean_debates, resolved, presiding, swallowed = collect(args.target)
+        examples, clean_debates, resolved, presiding, swallowed, unfounded = collect(args.target)
         replay_of = None
 
     write_outputs(
         out_md, out_jsonl, stamp, examples, clean_debates,
         replay_of=replay_of, resolved=resolved, presiding=presiding,
-        swallowed=swallowed, draw_note=draw_note,
+        swallowed=swallowed, unfounded=unfounded, draw_note=draw_note,
     )
     print(
         f"\nWrote {len(examples)} examples ({len(presiding)} presiding, "
-        f"{sum(r['turns'] for r in swallowed)} swallowed) "
+        f"{sum(r['turns'] for r in swallowed)} swallowed, "
+        f"{sum(r['turns'] for r in unfounded)} unfounded) "
         f"({len(clean_debates)} clean debates) to {out_md} and {out_jsonl}"
     )
 

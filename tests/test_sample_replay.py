@@ -70,30 +70,30 @@ REFS = [
 
 class TestCollectRefs:
     def test_unverified_count_does_not_exceed_baseline(self, fake_api):
-        examples, _, _, _, _ = sample_unverified.collect_refs(REFS)
+        examples, _, _, _, _, _ = sample_unverified.collect_refs(REFS)
         assert len(examples) <= BASELINE_UNVERIFIED
 
     def test_presiding_officer_is_not_an_unverified_example(self, fake_api):
         # "SHRI NEW MEMBER" resolves via anchor-reuse; "MR. SPEAKER" is
         # presiding-tagged by the parser, so no unverified examples remain.
-        examples, _, _, _, _ = sample_unverified.collect_refs(REFS)
+        examples, _, _, _, _, _ = sample_unverified.collect_refs(REFS)
         assert examples == []
 
     def test_presiding_officers_are_classified(self, fake_api):
-        _, _, _, presiding, _ = sample_unverified.collect_refs(REFS)
+        _, _, _, presiding, _, _ = sample_unverified.collect_refs(REFS)
         assert len(presiding) == 2
         for row in presiding:
             assert row["speaker"] == "MR. SPEAKER"
             assert row["turns"] == 1
 
     def test_debates_with_only_presiding_left_count_as_clean(self, fake_api):
-        _, clean_debates, _, _, _ = sample_unverified.collect_refs(REFS)
+        _, clean_debates, _, _, _, _ = sample_unverified.collect_refs(REFS)
         assert len(clean_debates) == 2
 
     def test_resolved_speakers_are_recorded_per_debate(self, fake_api):
         # "SHRI NEW MEMBER" is anchored once and reused once -> one resolved
         # row per debate, covering both turns, with both name sources noted.
-        _, _, resolved, _, _ = sample_unverified.collect_refs(REFS)
+        _, _, resolved, _, _, _ = sample_unverified.collect_refs(REFS)
         assert len(resolved) == 2  # one row per debate for mpCode 500
         for row in resolved:
             assert row["mp_code"] == "500"
@@ -135,7 +135,7 @@ class TestDbRosterIsWiredIn:
             "load_db_roster",
             lambda term: [{"mpCode": "777", "mpName": "Shri New Member"}],
         )
-        _, _, resolved, _, _ = sample_unverified.collect_refs(REFS)
+        _, _, resolved, _, _, _ = sample_unverified.collect_refs(REFS)
         assert [r["mp_code"] for r in resolved] == ["500", "500"]
         for row in resolved:
             assert row["turns"] == 2
@@ -158,7 +158,7 @@ class TestDbRosterIsWiredIn:
         # load_db_roster swallows a dead DB into []; the tier must then no-op
         # and leave the sampler's output exactly as the no_db baseline.
         monkeypatch.setattr(sample_unverified, "load_db_roster", lambda term: [])
-        examples, clean, resolved, presiding, _ = sample_unverified.collect_refs(REFS)
+        examples, clean, resolved, presiding, _, _ = sample_unverified.collect_refs(REFS)
         assert examples == []
         assert len(clean) == 2
         assert len(resolved) == 2
@@ -335,6 +335,123 @@ class TestSwallowedLabels:
         assert sample_unverified.swallowed_labels(segments) == []
 
 
+# Raw, undecoded labels pulled from LS14/5/2711 -- the debate credited 303
+# turns to Shri Mohan Singh before 5f9bd3c. Each strips to zero usable whole
+# words under debate_fetch._name_parts: three are CDAC legacy-font gibberish
+# (only single-letter "initials" survive folding) and the fourth is an Urdu
+# label that transliteration cannot turn into Latin word tokens at all.
+REAL_UNREADABLE_LABELS = [
+    "gÉÉÒ àÉÉäcxÉ ÉËºÉc (nä´ÉÉÊ®ªÉÉ)",
+    "gÉÉÒ xÉÉÒiÉÉÒ¶É BÉÖEàÉÉ®",
+    "+ÉvªÉFÉ àÉcÉänªÉ",
+    "جناب اسدالدین اویسی ( حیدرآباد )",
+]
+
+
+class TestUnfoundedAttributions:
+    """The misattribution guard: no anchor-reuse mpCode may rest on a label
+    that names nobody.
+
+    `reuse_anchors` mints "anchor-reuse" purely from comparing one label
+    against another (`labels_name_same_person`). If a label strips to zero
+    usable whole words, the comparison had nothing to compare -- which is
+    exactly what happened in 5f9bd3c, when a name-comparison bug read "no
+    evidence" as "same person" and stamped one name across 303 turns. This
+    class pins that this cannot happen invisibly again.
+    """
+
+    def test_flags_real_unreadable_labels_that_drove_the_original_bug(self):
+        segments = [
+            {"speakerLabel": label, "nameSource": "anchor-reuse", "mpCode": "9999"}
+            for label in REAL_UNREADABLE_LABELS
+        ]
+        assert sample_unverified.unfounded_attributions(segments) == REAL_UNREADABLE_LABELS
+
+    def test_a_readable_anchor_reuse_label_is_not_flagged(self):
+        segments = [
+            {"speakerLabel": "SHRI E. PONNUSWAMY", "nameSource": "anchor-reuse", "mpCode": "500"}
+        ]
+        assert sample_unverified.unfounded_attributions(segments) == []
+
+    def test_anchor_is_exempt_even_with_the_same_unreadable_label(self):
+        # An anchor's mpCode came from the source's own ID tag, not from a
+        # name comparison, so an unreadable label on an "anchor" segment is
+        # not this bug -- only "anchor-reuse" is in scope.
+        segments = [
+            {
+                "speakerLabel": REAL_UNREADABLE_LABELS[0],
+                "nameSource": "anchor",
+                "mpCode": "500",
+            }
+        ]
+        assert sample_unverified.unfounded_attributions(segments) == []
+
+    def test_accepted_blind_spot_other_name_sources_are_out_of_scope(self):
+        # This probe only ever looks at "anchor-reuse". A foundation-less
+        # match minted under any other nameSource tag -- here name-translit,
+        # which decodes/transliterates internally before matching, so a raw
+        # label with zero _name_parts is not evidence of a bad match there --
+        # is structurally invisible to this check. Pinned deliberately rather
+        # than hidden: if this exact class of bug ever appears under a
+        # different nameSource, this probe will not catch it.
+        segments = [
+            {
+                "speakerLabel": REAL_UNREADABLE_LABELS[0],
+                "nameSource": "name-translit",
+                "mpCode": "500",
+            }
+        ]
+        assert sample_unverified.unfounded_attributions(segments) == []
+
+    def test_counts_every_occurrence_not_distinct_labels(self):
+        segments = [
+            {"speakerLabel": REAL_UNREADABLE_LABELS[0], "nameSource": "anchor-reuse", "mpCode": "1"},
+            {"speakerLabel": REAL_UNREADABLE_LABELS[0], "nameSource": "anchor-reuse", "mpCode": "1"},
+        ]
+        assert sample_unverified.unfounded_attributions(segments) == [
+            REAL_UNREADABLE_LABELS[0],
+            REAL_UNREADABLE_LABELS[0],
+        ]
+
+    def test_reproduces_the_original_bug_end_to_end_via_reuse_anchors(self, monkeypatch):
+        # Simulates the exact mechanism behind 5f9bd3c: an anchored turn with
+        # an unreadable (legacy-gibberish) label, followed by an unresolved
+        # turn under the *same* unreadable label. Under the lenient
+        # pre-5f9bd3c comparison (both directions merely "not False", so "no
+        # evidence" reads as "same person"), reuse_anchors wrongly claims the
+        # second turn -- and this probe catches it. Under the real, current
+        # comparison, the claim never happens and the probe reports nothing.
+        label = REAL_UNREADABLE_LABELS[0]
+        segments = [
+            {"speakerLabel": label, "mpCode": "500", "mpName": "Shri Mohan Singh", "nameSource": "anchor"},
+            {"speakerLabel": label, "mpCode": None, "nameSource": "unresolved"},
+        ]
+
+        def lenient(a, b):
+            return (
+                debate_fetch._name_agreement(a, b) is not False
+                and debate_fetch._name_agreement(b, a) is not False
+            )
+
+        monkeypatch.setattr(debate_fetch, "labels_name_same_person", lenient)
+        debate_fetch.reuse_anchors(segments)
+        assert segments[1]["nameSource"] == "anchor-reuse"
+        assert sample_unverified.unfounded_attributions(segments) == [label]
+
+    def test_the_real_fixed_comparison_never_reproduces_the_bug(self):
+        # Same setup, no monkeypatch: the strict, currently-shipped
+        # `labels_name_same_person` refuses to match on "no evidence", so the
+        # second turn stays unresolved and the probe finds nothing to flag.
+        label = REAL_UNREADABLE_LABELS[0]
+        segments = [
+            {"speakerLabel": label, "mpCode": "500", "mpName": "Shri Mohan Singh", "nameSource": "anchor"},
+            {"speakerLabel": label, "mpCode": None, "nameSource": "unresolved"},
+        ]
+        debate_fetch.reuse_anchors(segments)
+        assert segments[1]["nameSource"] == "unresolved"
+        assert sample_unverified.unfounded_attributions(segments) == []
+
+
 class TestSplitCounts:
     def test_splits_sum_to_n(self):
         assert sample_unverified.split_counts(10, 0.67) == (7, 3)
@@ -411,11 +528,11 @@ class TestMainCliWiring:
     def _stub_everything(self, monkeypatch, calls):
         monkeypatch.setattr(
             sample_unverified, "collect",
-            lambda target: (calls.setdefault("collect_target", target), [], [], [], [], [])[1:],
+            lambda target: (calls.setdefault("collect_target", target), [], [], [], [], [], [])[1:],
         )
         monkeypatch.setattr(
             sample_unverified, "collect_refs",
-            lambda refs: (calls.setdefault("collect_refs_refs", refs), [], [], [], [], [])[1:],
+            lambda refs: (calls.setdefault("collect_refs_refs", refs), [], [], [], [], [], [])[1:],
         )
         monkeypatch.setattr(sample_unverified, "write_outputs", lambda *a, **k: None)
 
