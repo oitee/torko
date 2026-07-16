@@ -153,6 +153,32 @@ def resolve_speaker(label: str, index: dict) -> tuple[str | None, dict | None]:
     return None, None
 
 
+_PRESIDING_RE = re.compile(
+    # "deputy" matches only next to "speaker", so "Deputy Minister" is not caught.
+    r"\bspeaker\b|\bchair(?:man|person)\b|deputy[-\s]*speaker"
+    # Devanagari: अध्यक्ष and उपाध्यक्ष both contain ध्यक्ष.
+    r"|ध्यक्ष|सभापति",
+    re.IGNORECASE,
+)
+
+
+def is_presiding_label(label: str) -> bool:
+    """Return True when a speaker label names a presiding officer (the Chair).
+
+    Covers English chair titles (Speaker, Deputy-Speaker, Chairman,
+    Chairperson) and their Devanagari equivalents (अध्यक्ष, उपाध्यक्ष,
+    सभापति). Crowd labels such as "SEVERAL HON. MEMBERS" or "अनेक माननीय
+    सदस्य" are deliberately not matched: they are anonymous interjections,
+    not the Chair.
+
+    Args:
+        label: the raw speaker label as printed in the transcript.
+    """
+    if not label:
+        return False
+    return bool(_PRESIDING_RE.search(label))
+
+
 def annotate_speakers(segments: list[dict], mp_part_detail_list: list[dict]) -> list[dict]:
     """
     Fill each segment's canonical mpName + nameSource tag.
@@ -169,6 +195,10 @@ def annotate_speakers(segments: list[dict], mp_part_detail_list: list[dict]) -> 
             continue
         if not seg.get("speakerLabel"):
             seg["nameSource"] = None
+            continue
+        if is_presiding_label(seg["speakerLabel"]):
+            seg["nameSource"] = "presiding"
+            seg["mpName"] = seg["speakerLabel"]
             continue
         source, entry = resolve_speaker(seg["speakerLabel"], index)
         if entry:
@@ -202,6 +232,8 @@ def reuse_anchors(segments: list[dict]) -> list[dict]:
 
     for seg in segments:
         if seg.get("mpCode") or not seg.get("speakerLabel"):
+            continue
+        if seg.get("nameSource") == "presiding":
             continue
         label = seg["speakerLabel"]
         for anchored_label, (code, name) in resolved.items():
