@@ -69,6 +69,70 @@ class TestReuseAnchors:
         reuse_anchors(segs)
         assert segs[1]["mpCode"] is None
 
+    def test_this_debates_anchor_beats_a_last_resort_name_db_match(self):
+        # annotate_speakers runs before this pass, so the "name-db" tier can
+        # claim a turn that an anchor printed in this very debate also names.
+        # The anchor is the stronger evidence and must win.
+        segs = [
+            {
+                "mpCode": "500",
+                "speakerLabel": "SHRI NEW MEMBER",
+                "mpName": "Shri New Member",
+                "nameSource": "anchor",
+            },
+            {
+                "mpCode": "777",
+                "speakerLabel": "SHRI NEW MEMBER",
+                "mpName": "Shri New Member",
+                "nameSource": "name-db",
+            },
+        ]
+        reuse_anchors(segs)
+        assert segs[1]["mpCode"] == "500"
+        assert segs[1]["nameSource"] == "anchor-reuse"
+
+    def test_a_name_db_match_never_makes_a_label_look_ambiguous(self):
+        # A name-db guess must not seed the anchored-label map: if it did, the
+        # label would look anchored to two people and reuse would bail out,
+        # silently costing a resolution the anchor alone would have made.
+        segs = [
+            {
+                "mpCode": "500",
+                "speakerLabel": "SHRI NEW MEMBER",
+                "mpName": "Shri New Member",
+                "nameSource": "anchor",
+            },
+            {
+                "mpCode": "777",
+                "speakerLabel": "SHRI NEW MEMBER",
+                "mpName": "Shri New Member",
+                "nameSource": "name-db",
+            },
+            {"mpCode": None, "speakerLabel": "SHRI NEW MEMBER", "mpName": "SHRI NEW MEMBER"},
+        ]
+        reuse_anchors(segs)
+        assert segs[2]["mpCode"] == "500"
+
+    def test_an_earlier_tiers_match_is_never_overridden(self):
+        # Only "name-db" is reconsidered; a name-exact answer keeps its code.
+        segs = [
+            {
+                "mpCode": "500",
+                "speakerLabel": "SHRI NEW MEMBER",
+                "mpName": "Shri New Member",
+                "nameSource": "anchor",
+            },
+            {
+                "mpCode": "600",
+                "speakerLabel": "SHRI NEW MEMBER",
+                "mpName": "Shri New Member",
+                "nameSource": "name-exact",
+            },
+        ]
+        reuse_anchors(segs)
+        assert segs[1]["mpCode"] == "600"
+        assert segs[1]["nameSource"] == "name-exact"
+
 
 class TestCarriedAnchor:
     """An anchor alone in an empty <p> attaches to the next paragraph with text."""

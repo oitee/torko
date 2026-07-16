@@ -118,14 +118,18 @@ def _anchor_id(para_soup) -> str | None:
     return None
 
 
-def split_by_speaker_legacy(html: str, mp_part_detail_list: list[dict]) -> list[dict]:
+def split_by_speaker_legacy(
+    html: str, mp_part_detail_list: list[dict], db_roster: list[dict] | None = None
+) -> list[dict]:
     """
     Split a legacy-format transcript into per-intervention segments.
 
     Structurally the same walk as debate_fetch.split_by_speaker (open a new
     turn on a label-colon or an anchor, otherwise glue the block onto the
     current turn), but over <p>+<h6> blocks, a partCode-less anchor, and the
-    bold-or-ALL-CAPS label test above.
+    bold-or-ALL-CAPS label test above. `db_roster`, when given, backs the
+    last-resort "name-db" tier in `annotate_speakers` -- legacy debates are
+    exactly where mpPartDetailList is thinnest, so this tier matters most here.
     """
     code_to_name = {str(m["mpCode"]): m["mpName"] for m in mp_part_detail_list}
     soup = BeautifulSoup(_sanitize_legacy_html(html), "lxml")
@@ -188,7 +192,7 @@ def split_by_speaker_legacy(html: str, mp_part_detail_list: list[dict]) -> list[
         seg["text"] = "\n\n".join(par for par in seg.pop("paras") if par)
 
     segments = [s for s in segments if s["text"] or s["speakerLabel"]]
-    annotate_speakers(segments, mp_part_detail_list)
+    annotate_speakers(segments, mp_part_detail_list, db_roster)
 
     # Legacy transcripts carry their Hindi in a pre-Unicode CDAC-GIST/ISFOC font
     # encoding (see legacy_hindi.py), so the extracted text is glyph "gibberish"
@@ -230,7 +234,10 @@ def main():
 
     print(f"Format: {'legacy' if looks_legacy(html) else 'modern'}")
     mp_part_detail_list = data.get("mpPartDetailList", [])
-    segments = split_by_speaker_legacy(html, mp_part_detail_list)
+    from db_roster import load_db_roster
+
+    db_roster = load_db_roster(args.loksabha)
+    segments = split_by_speaker_legacy(html, mp_part_detail_list, db_roster)
 
     print(f"Debate date: {data.get('debateDate')}  |  Type: {data.get('debateType')}")
     print(f"Segments found: {len(segments)}")

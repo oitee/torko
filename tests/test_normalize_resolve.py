@@ -66,9 +66,16 @@ class TestNormalizeName:
 class TestBuildSpeakerIndex:
     """§3.2: the four pre-built lookup tables."""
 
-    def test_exposes_all_five_lookup_tables(self):
+    def test_exposes_all_six_lookup_tables(self):
         idx = build_speaker_index(ROSTER)
-        assert set(idx) == {"by_str", "by_join_ordered", "by_join_sorted", "tokenised", "by_folded"}
+        assert set(idx) == {
+            "by_str",
+            "by_join_ordered",
+            "by_join_sorted",
+            "tokenised",
+            "by_folded",
+            "by_folded_db",
+        }
 
     def test_by_str_keys_on_space_joined_tokens(self):
         idx = build_speaker_index(ROSTER)
@@ -215,6 +222,59 @@ class TestResolveTranslit:
 
     def test_all_honorific_devanagari_label_never_wildcards(self, index):
         assert resolve_speaker("श्री", index) == (None, None)
+
+
+class TestResolveDb:
+    """The name-db tier: a last-resort DB roster for debates whose own
+    mpPartDetailList is too thin to match against (see internal_docs/006_SCHEMA.md
+    and 016_COLLISION_BASELINE.md for the identity model + collision guard this
+    tier reuses).
+    """
+
+    def test_fires_only_after_every_other_tier_fails(self):
+        # "Shri Mohan Singh" is absent from the debate's own roster but present
+        # in the DB roster: nothing above name-db can match it, so it falls
+        # all the way through to the last resort.
+        idx = build_speaker_index(
+            [{"mpName": "Shri Someone Else", "mpCode": 1, "mpPartCode": 1}],
+            db_roster=[{"mpCode": 9, "mpName": "Shri Mohan Singh"}],
+        )
+        source, entry = resolve_speaker("SHRI MOHAN SINGH", idx)
+        assert source == "name-db"
+        assert entry["mpCode"] == 9
+
+    def test_never_overrides_an_earlier_tier(self):
+        # The debate's own roster already has an exact match; a DB roster entry
+        # for the same folded key must not steal the earlier tier's answer.
+        idx = build_speaker_index(
+            [{"mpName": "Shri Mohan Singh", "mpCode": 1, "mpPartCode": 1}],
+            db_roster=[{"mpCode": 9, "mpName": "Shri Mohan Singh"}],
+        )
+        source, entry = resolve_speaker("SHRI MOHAN SINGH", idx)
+        assert source == "name-exact"
+        assert entry["mpCode"] == 1
+
+    def test_collision_in_db_roster_is_dropped_never_guessed(self):
+        # Two different people fold to the same key in the DB roster: the key
+        # is dropped at index-build time, same guard as by_folded, so the label
+        # resolves to nobody rather than an arbitrary pick.
+        idx = build_speaker_index(
+            [],
+            db_roster=[
+                {"mpCode": 1, "mpName": "Shri Rakesh Singh"},
+                {"mpCode": 2, "mpName": "Shri Rakesh Sinha"},
+            ],
+        )
+        assert idx["by_folded_db"] == {}
+        assert resolve_speaker("श्री राकेश सिंह", idx) == (None, None)
+
+    def test_db_roster_none_reproduces_todays_behaviour(self):
+        # No db_roster passed at all: by_folded_db is empty and a label absent
+        # from the debate's own roster stays unmatched, exactly as before this
+        # tier existed.
+        idx = build_speaker_index([{"mpName": "Shri Someone Else", "mpCode": 1, "mpPartCode": 1}])
+        assert idx["by_folded_db"] == {}
+        assert resolve_speaker("SHRI MOHAN SINGH", idx) == (None, None)
 
 
 class TestAnnotateSpeakers:

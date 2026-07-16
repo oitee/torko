@@ -51,6 +51,7 @@ import requests
 import debate_fetch
 import debate_fetch_legacy
 import legacy_hindi
+from db_roster import load_db_roster
 
 SEARCH_API = "https://sansad.in/api_ls/debate/debate-search"
 # Human-facing debate page, e.g.
@@ -121,15 +122,35 @@ def random_debate_refs(loksabha: int, k: int) -> list[dict]:
     return records[:k]
 
 
-def parse_segments(payload: dict) -> list[dict]:
+# The sampler walks ~62 debates but only six Lok Sabha terms, so loading the DB
+# roster per debate would fire the same query dozens of times. Cache it per
+# term for the life of the run.
+#
+# The cache is here rather than on `load_db_roster` itself deliberately: this
+# script is short-lived and its DB either is or isn't up for the whole run, so
+# caching a `[]` (no Postgres) is right here -- it stops 62 connection attempts
+# from timing out one by one. Caching that same `[]` inside `load_db_roster`
+# would poison the long-lived server.py process, where Postgres coming back up
+# later must be picked up. `load_db_roster` stays uncached and side-effect free.
+_DB_ROSTER_CACHE: dict[int, list[dict]] = {}
+
+
+def db_roster_for(term: int) -> list[dict]:
+    """The DB roster for a Lok Sabha term, loaded at most once per run."""
+    if term not in _DB_ROSTER_CACHE:
+        _DB_ROSTER_CACHE[term] = load_db_roster(term)
+    return _DB_ROSTER_CACHE[term]
+
+
+def parse_segments(payload: dict, db_roster: list[dict] | None = None) -> list[dict]:
     """Run the era-appropriate parser and return its speaker segments."""
     html = payload.get("debateDesc") or ""
     mp_list = payload.get("mpPartDetailList", []) or []
     if not html:
         return []
     if debate_fetch_legacy.looks_legacy(html):
-        return debate_fetch_legacy.split_by_speaker_legacy(html, mp_list)
-    return debate_fetch.split_by_speaker(html, mp_list)
+        return debate_fetch_legacy.split_by_speaker_legacy(html, mp_list, db_roster)
+    return debate_fetch.split_by_speaker(html, mp_list, db_roster)
 
 
 def speakers_from_debate(
@@ -149,7 +170,7 @@ def speakers_from_debate(
     """
     ls, session, db_slno = ref["loksabha"], ref["session"], ref["dbSlno"]
     payload = debate_fetch.fetch_debate(ls, session, db_slno)
-    segments = parse_segments(payload)
+    segments = parse_segments(payload, db_roster_for(ls))
 
     seen: set[str] = set()
     examples: list[dict] = []
