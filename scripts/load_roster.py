@@ -19,9 +19,9 @@ Design decisions (see internal_docs/006_SCHEMA.md and 001_SANSAD_API_FINDINGS.md
 * Idempotent: safe to re-run. persons upsert on sansad_id; speakers on
   (lok_sabha_term, person_id).
 
-Run (with the DB up and db/init/*.sql applied):
+Run from the repo root (with the DB up and db/init/*.sql applied):
 
-    python load_roster.py
+    python -m scripts.load_roster
 """
 from __future__ import annotations
 
