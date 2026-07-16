@@ -128,12 +128,15 @@ def parse_segments(payload: dict) -> list[dict]:
     return debate_fetch.split_by_speaker(html, mp_list)
 
 
-def unverified_from_debate(ref: dict, era: str) -> tuple[list[dict], int]:
+def speakers_from_debate(ref: dict, era: str) -> tuple[list[dict], list[dict], int]:
     """Fetch+parse one debate.
 
-    Returns (distinct unverified-speaker examples, number of parsed segments).
-    The segment count lets the caller tell a genuinely clean debate (parsed fine,
-    every speaker resolved) apart from one the parser simply couldn't read.
+    Returns (unverified examples, resolved speakers, number of parsed segments).
+    Unverified examples are distinct speaker labels with no `mpCode`; resolved
+    speakers are one row per distinct `mpCode`, with how that code was matched
+    and how many turns it covers. The segment count lets the caller tell a
+    genuinely clean debate (parsed fine, every speaker resolved) apart from one
+    the parser simply couldn't read.
     """
     ls, session, db_slno = ref["loksabha"], ref["session"], ref["dbSlno"]
     payload = debate_fetch.fetch_debate(ls, session, db_slno)
@@ -141,9 +144,31 @@ def unverified_from_debate(ref: dict, era: str) -> tuple[list[dict], int]:
 
     seen: set[str] = set()
     examples: list[dict] = []
+    resolved_by_code: dict[str, dict] = {}
     for seg in segments:
         label = seg.get("speakerLabel")
-        if seg.get("mpCode") or not label or label in seen:
+        code = seg.get("mpCode")
+        if code:
+            row = resolved_by_code.setdefault(
+                code,
+                {
+                    "loksabha": ls,
+                    "session": session,
+                    "dbSlno": db_slno,
+                    "era": era,
+                    "mp_code": code,
+                    "mp_name": seg.get("mpName"),
+                    "speaker_raw": label,
+                    "name_sources": [],
+                    "turns": 0,
+                },
+            )
+            row["turns"] += 1
+            source = seg.get("nameSource")
+            if source and source not in row["name_sources"]:
+                row["name_sources"].append(source)
+            continue
+        if not label or label in seen:
             continue
         seen.add(label)
         # Decode legacy CDAC-font names to Unicode Hindi so the label is readable
@@ -165,7 +190,7 @@ def unverified_from_debate(ref: dict, era: str) -> tuple[list[dict], int]:
                 "url": debate_url(ls, session, db_slno),
             }
         )
-    return examples, len(segments)
+    return examples, list(resolved_by_code.values()), len(segments)
 
 
 def _md_cell(text: str) -> str:
@@ -180,13 +205,19 @@ def write_outputs(
     examples: list[dict],
     clean_debates: list[dict],
     replay_of: str | None = None,
+    resolved: list[dict] | None = None,
 ) -> None:
     """Write this run's self-contained rollup to a fresh markdown + JSONL pair.
 
     `stamp` is the run's single canonical timestamp (it also names the files).
-    Run files are immutable: writing refuses to touch a path that already exists.
+    When `resolved` is given, those rows go to a `*_resolved.jsonl` beside the
+    markdown and a summary section is added to it — the regression baseline for
+    "verified speakers never go down". Run files are immutable: writing refuses
+    to touch a path that already exists.
     """
-    for path in (out_md, out_jsonl):
+    out_resolved = out_md.with_name(out_md.stem + "_resolved.jsonl")
+    paths = [out_md, out_jsonl] + ([out_resolved] if resolved is not None else [])
+    for path in paths:
         if path.exists():
             raise SystemExit(f"{path} already exists; run files are immutable")
     out_md.parent.mkdir(parents=True, exist_ok=True)
@@ -194,6 +225,11 @@ def write_outputs(
     with out_jsonl.open("w", encoding="utf-8") as f:
         for ex in examples:
             f.write(json.dumps({"run": stamp, **ex}, ensure_ascii=False) + "\n")
+
+    if resolved is not None:
+        with out_resolved.open("w", encoding="utf-8") as f:
+            for row in resolved:
+                f.write(json.dumps({"run": stamp, **row}, ensure_ascii=False) + "\n")
 
     by_cat = Counter(ex["category"] for ex in examples)
     by_era = Counter(ex["era"] for ex in examples)
@@ -229,6 +265,28 @@ def write_outputs(
         "",
         f"By era: legacy={by_era['legacy']}, modern={by_era['modern']}",
         "",
+    ]
+
+    if resolved is not None:
+        by_source = Counter(
+            (row["name_sources"] or ["unknown"])[0] for row in resolved
+        )
+        distinct_codes = len({row["mp_code"] for row in resolved})
+        lines += [
+            "### Resolved speakers (regression baseline)",
+            "",
+            f"> {len(resolved)} resolved speaker rows (one per debate+mpCode), "
+            f"{distinct_codes} distinct mpCodes. Full rows in "
+            f"`{out_resolved.name}`. Any future run over the same debates must "
+            "not lose any of these.",
+            "",
+            "| primary nameSource | rows |",
+            "| --- | --- |",
+        ]
+        lines += [f"| {src} | {n} |" for src, n in by_source.most_common()]
+        lines.append("")
+
+    lines += [
         "### Examples",
         "",
         "| # | era | LS/sess/db | source | category | speaker | nameSource |",
@@ -290,37 +348,47 @@ def refs_from_file(run_file: Path) -> list[dict]:
     return list(refs.values())
 
 
-def collect_refs(refs: list[dict]) -> tuple[list[dict], list[dict]]:
-    """Fetch+parse an explicit list of debates (no sampling, no target cap)."""
+def collect_refs(refs: list[dict]) -> tuple[list[dict], list[dict], list[dict]]:
+    """Fetch+parse an explicit list of debates (no sampling, no target cap).
+
+    Returns (unverified examples, clean debates, resolved speakers).
+    """
     examples: list[dict] = []
     clean_debates: list[dict] = []
+    resolved: list[dict] = []
 
     for i, ref in enumerate(refs, 1):
         key = (ref["loksabha"], ref["session"], ref["dbSlno"])
         era = ref["era"]
         try:
-            found, n_segments = unverified_from_debate(ref, era)
+            found, solved, n_segments = speakers_from_debate(ref, era)
         except requests.RequestException as e:
             print(f"  fetch error {key}: {e}; skipping", file=sys.stderr)
             time.sleep(2)
             continue
         time.sleep(REQUEST_DELAY_S)
         examples.extend(found)
+        resolved.extend(solved)
         if not found and n_segments:
             clean_debates.append({**ref, "segments": n_segments})
-        print(f"  [{i}/{len(refs)}] {key} -> {len(found)} unverified, {n_segments} segments")
+        print(
+            f"  [{i}/{len(refs)}] {key} -> {len(found)} unverified, "
+            f"{len(solved)} resolved, {n_segments} segments"
+        )
 
-    return examples, clean_debates
+    return examples, clean_debates, resolved
 
 
-def collect(target: int) -> tuple[list[dict], list[dict]]:
+def collect(target: int) -> tuple[list[dict], list[dict], list[dict]]:
     """Sample debates until `target` examples are gathered.
 
-    Returns (examples, clean_debates) where clean_debates are debates that parsed
-    into segments but yielded zero unverified speakers — the false-positive check.
+    Returns (examples, clean_debates, resolved) where clean_debates are debates
+    that parsed into segments but yielded zero unverified speakers — the
+    false-positive check — and resolved lists every speaker tied to an `mpCode`.
     """
     examples: list[dict] = []
     clean_debates: list[dict] = []
+    resolved: list[dict] = []
     visited: set[tuple] = set()
     era_names = list(STRATA)
     turn = 0
@@ -344,12 +412,13 @@ def collect(target: int) -> tuple[list[dict], list[dict]]:
                 continue
             visited.add(key)
             try:
-                found, n_segments = unverified_from_debate(ref, era)
+                found, solved, n_segments = speakers_from_debate(ref, era)
             except requests.RequestException as e:
                 print(f"  fetch error {key}: {e}; skipping", file=sys.stderr)
                 time.sleep(2)
                 continue
             time.sleep(REQUEST_DELAY_S)
+            resolved.extend(solved)
             if found:
                 got_any = True
                 examples.extend(found)
@@ -370,7 +439,7 @@ def collect(target: int) -> tuple[list[dict], list[dict]]:
 
         empty_streak = 0 if got_any else empty_streak + 1
 
-    return examples[:target], clean_debates
+    return examples[:target], clean_debates, resolved
 
 
 def main() -> None:
@@ -404,13 +473,16 @@ def main() -> None:
     if args.replay_file:
         refs = refs_from_file(args.replay_file)
         print(f"Replaying {len(refs)} debates from {args.replay_file}")
-        examples, clean_debates = collect_refs(refs)
+        examples, clean_debates, resolved = collect_refs(refs)
         replay_of = args.replay_file.name
     else:
-        examples, clean_debates = collect(args.target)
+        examples, clean_debates, resolved = collect(args.target)
         replay_of = None
 
-    write_outputs(out_md, out_jsonl, stamp, examples, clean_debates, replay_of=replay_of)
+    write_outputs(
+        out_md, out_jsonl, stamp, examples, clean_debates,
+        replay_of=replay_of, resolved=resolved,
+    )
     print(
         f"\nWrote {len(examples)} examples "
         f"({len(clean_debates)} clean debates) to {out_md} and {out_jsonl}"

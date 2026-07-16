@@ -51,18 +51,28 @@ REFS = [
 
 class TestCollectRefs:
     def test_unverified_count_does_not_exceed_baseline(self, fake_api):
-        examples, _ = sample_unverified.collect_refs(REFS)
+        examples, _, _ = sample_unverified.collect_refs(REFS)
         assert len(examples) <= BASELINE_UNVERIFIED
 
     def test_anchor_reuse_leaves_only_the_presiding_officer(self, fake_api):
         # "SHRI NEW MEMBER" resolves via anchor-reuse; only "MR. SPEAKER" remains
-        examples, _ = sample_unverified.collect_refs(REFS)
+        examples, _, _ = sample_unverified.collect_refs(REFS)
         speakers = {ex["speaker"] for ex in examples}
         assert speakers == {"MR. SPEAKER"}
 
     def test_presiding_officers_are_classified(self, fake_api):
-        examples, _ = sample_unverified.collect_refs(REFS)
+        examples, _, _ = sample_unverified.collect_refs(REFS)
         assert all(ex["category"] == "presiding_officer" for ex in examples)
+
+    def test_resolved_speakers_are_recorded_per_debate(self, fake_api):
+        # "SHRI NEW MEMBER" is anchored once and reused once -> one resolved
+        # row per debate, covering both turns, with both name sources noted.
+        _, _, resolved = sample_unverified.collect_refs(REFS)
+        assert len(resolved) == 2  # one row per debate for mpCode 500
+        for row in resolved:
+            assert row["mp_code"] == "500"
+            assert row["turns"] == 2
+            assert row["name_sources"] == ["anchor", "anchor-reuse"]
 
 
 class TestDefaultOutPath:
@@ -105,6 +115,27 @@ class TestWriteOutputs:
         text = out_md.read_text(encoding="utf-8")
         assert "MR. SPEAKER" in text
         assert "2026-07-15 14:30:05" in text  # the canonical stamp is in the file
+
+    def test_writes_resolved_rows_and_baseline_section_when_given(self, tmp_path):
+        out_md = tmp_path / "run.md"
+        out_jsonl = out_md.with_suffix(".jsonl")
+        resolved_row = {
+            "loksabha": 15, "session": 1, "dbSlno": 1001, "era": "modern",
+            "mp_code": "500", "mp_name": "Shri New Member",
+            "speaker_raw": "SHRI NEW MEMBER",
+            "name_sources": ["anchor", "anchor-reuse"], "turns": 2,
+        }
+        sample_unverified.write_outputs(
+            out_md, out_jsonl, "2026-07-15 14:30:05", [_example()],
+            clean_debates=[], resolved=[resolved_row],
+        )
+
+        out_resolved = tmp_path / "run_resolved.jsonl"
+        assert out_resolved.exists()
+        assert '"mp_code": "500"' in out_resolved.read_text(encoding="utf-8")
+        text = out_md.read_text(encoding="utf-8")
+        assert "Resolved speakers (regression baseline)" in text
+        assert "| anchor | 1 |" in text
 
     def test_refuses_to_overwrite_an_existing_run_file(self, tmp_path):
         out_md = tmp_path / "run.md"
