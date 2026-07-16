@@ -109,25 +109,87 @@ ISFOC_MAP = {
 _SORTED_KEYS = sorted(ISFOC_MAP, key=len, reverse=True)
 _REPH = ""
 
-# Signature of the legacy encoding: Latin-1 supplement letters/symbols the font
-# uses as glyph indices. Real Unicode Devanagari (U+0900+) and plain ASCII
-# English never contain these, so this cheaply tells encoded text apart from
-# text that is already clean.
-_ENCODED_SIGNATURE = re.compile(r"[¡-ÿ]")
+# Signature of the legacy encoding. This used to be "any Latin-1 supplement
+# character", on the theory that Unicode Devanagari and plain ASCII never
+# contain one. That's true of genuinely-encoded input, but not of decoder
+# *output*: a glyph with no ISFOC_MAP entry survives a decode untranslated and
+# sits in the result as leftover Latin-1 residue (e.g. "Ê", "Ò" in the CDAC
+# "EN" font). Residue alone then pinned looks_encoded True forever, so a
+# second decode pass ran on already-correct text and re-triggered the
+# visual-to-logical matra reordering below -- which is NOT safe to run twice
+# (it can swap an already-correct "...िण" back into "...णि").
+#
+# So the signature now requires an actual encoded *sequence*: a literal
+# ISFOC_MAP key, not just any character that happens to occur inside one. A
+# lone unmapped residue glyph -- one with no ISFOC_MAP entry at all, like the
+# bare "Ê"/"Ò" above -- can never equal a full key on its own, so it can't
+# falsely re-arm the decoder. That holds regardless of which glyphs
+# ISFOC_MAP does or doesn't cover yet.
+#
+# That alone isn't quite enough, though: a handful of ISFOC_MAP's own keys
+# (e.g. "®" -> र, "°" -> रू, "à"/"è"/"é"/"ç" for various half-consonants) are
+# ordinary Latin-1 punctuation or loanword letters that show up in genuine
+# English -- a trademark mark, a degree sign, a citation -- and residue left
+# behind by the *English-protection* skip below (an unmapped glyph next to an
+# ASCII letter, classified as "English" and passed through untouched) can
+# leave one sitting right next to real Devanagari, e.g. "n®" surviving in the
+# middle of an otherwise-decoded sentence. So the signature is evaluated
+# per-token using the exact same English/Hindi split decode_legacy_hindi
+# uses: a token skipped there because its letters are all ASCII can never be
+# touched by a second decode pass either, so it must not count as evidence
+# that one is needed.
+#
+# The keys considered are further limited to ones containing an actual
+# Latin-1 supplement character. Plenty of ISFOC_MAP keys are pure ASCII
+# (e.g. "*" -> "।", used for redaction markers) and appear constantly in
+# ordinary English transcript text that has nothing to do with this font;
+# without this restriction, a bare "*" on its own line would arm the decoder
+# for a passage that was never encoded to begin with.
+_ENCODED_SIGNATURE = re.compile(
+    "|".join(
+        re.escape(k) for k in _SORTED_KEYS if any("¡" <= ch <= "ÿ" for ch in k)
+    )
+)
+
+
+def _is_protected_english_token(token: str) -> bool:
+    """True for a whitespace-delimited run decode_legacy_hindi leaves alone.
+
+    Judged by LETTERS only (see decode_legacy_hindi) so English wrapped in
+    non-ASCII punctuation, e.g. the ellipsis in "…(Interruptions)", still
+    counts as English.
+    """
+    letters = [c for c in token if c.isalpha()]
+    return bool(letters) and all(ord(c) < 128 for c in letters)
 
 
 def looks_encoded(text: str) -> bool:
-    """True if `text` still carries legacy-font glyphs (so decoding is needed)."""
-    return bool(text) and bool(_ENCODED_SIGNATURE.search(text))
+    """True if `text` still carries legacy-font glyphs (so decoding is needed).
+
+    Checked token-by-token, skipping the same English-classified tokens
+    decode_legacy_hindi itself skips -- see _ENCODED_SIGNATURE for why.
+    """
+    if not text:
+        return False
+    return any(
+        not _is_protected_english_token(token) and _ENCODED_SIGNATURE.search(token)
+        for token in re.split(r"(\s+)", text)
+    )
 
 
 def decode_legacy_hindi(text: str) -> str:
     """
     Convert one run of legacy CDAC-GIST/ISFOC "gibberish" into Unicode Hindi.
 
-    Idempotent and safe on mixed content: text with no legacy signature (already
-    Unicode, or pure English) is returned unchanged, and Latin-letter words are
-    preserved verbatim even inside otherwise-Hindi passages.
+    Safe to call twice: the visual-to-logical matra reordering below is a
+    one-way transform, not an involution, so re-running it on already-decoded
+    text can corrupt it (e.g. a correct "...िण" reordered back into
+    "...णि"). What makes repeat calls safe is looks_encoded refusing to fire
+    on decoded output -- see _ENCODED_SIGNATURE -- so a second call is a
+    no-op rather than a second transform. Also safe on mixed content: text
+    with no legacy signature (already Unicode, or pure English) is returned
+    unchanged, and Latin-letter words are preserved verbatim even inside
+    otherwise-Hindi passages.
     """
     if not looks_encoded(text):
         return text
@@ -147,11 +209,7 @@ def decode_legacy_hindi(text: str) -> str:
     # -- Substitution, protecting Latin words ----------------------------
     out = []
     for token in re.split(r"(\s+)", text):
-        letters = [c for c in token if c.isalpha()]
-        # An English word may be wrapped in non-ASCII punctuation (e.g. the
-        # ellipsis in "…(Interruptions)"); judge by its LETTERS only so the
-        # word is left intact rather than decoded into "…(Iदterruptत्oदs)".
-        if letters and all(ord(c) < 128 for c in letters):
+        if _is_protected_english_token(token):
             out.append(token.replace("*", "।"))
             continue
         for key in _SORTED_KEYS:
