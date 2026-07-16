@@ -1,24 +1,7 @@
-"""
-Whole-roster collision baseline for `fold`.
-
-`_folded_key` squashes a name into a spelling-insensitive key so a Devanagari
-label and a romanised roster name meet. Every rule added to `fold` widens that
-squash, and a wider squash risks the opposite failure: two *different* people
-landing on one key.
-
-This pins the collision set over the real roster (2177 members, snapshotted from
-the persons table into data/persons_roster.tsv). It is a baseline, not a
-judgement -- every group below has been looked at and accepted. When a fold rule
-changes, this test either stays green (the rule was safe) or names the exact
-people it merged, so the call is made deliberately rather than discovered later
-in a sample.
-
-Note these keys are all *guarded*: build_speaker_index drops any folded key
-naming more than one mpCode, so a collision here costs recall (those members
-stop resolving via the translit tier), never a misattribution.
-"""
 import collections
 import pathlib
+
+import pytest
 
 import debate_fetch
 
@@ -109,11 +92,22 @@ class TestRosterCollisions:
         )
         assert actual == EXPECTED_COLLISIONS
 
-    def test_every_collision_is_guarded_by_the_index(self):
-        """A collision must cost recall, never resolve to the wrong person."""
+    @pytest.mark.parametrize("table_name", ["by_folded", "by_folded_db"])
+    def test_every_collision_is_guarded_by_the_index(self, table_name):
         roster = [
             {"mpCode": str(sansad_id), "mpName": name} for sansad_id, name in _roster()
         ]
-        by_folded = debate_fetch.build_speaker_index(roster)["by_folded"]
+        index = debate_fetch.build_speaker_index(roster, db_roster=roster)
+        table = index[table_name]
         for key in EXPECTED_COLLISIONS:
-            assert key not in by_folded, f"{key!r} resolves despite naming two members"
+            assert key not in table, f"{key!r} resolves despite naming two members"
+
+    def test_resolve_speaker_refuses_a_db_only_collision(self):
+        db_roster = [
+            {"mpCode": "1", "mpName": "Bhola Singh"},
+            {"mpCode": "2", "mpName": "Bhola Singh"},
+        ]
+        index = debate_fetch.build_speaker_index([], db_roster=db_roster)
+        assert index["by_folded_db"] == {}
+        result = debate_fetch.resolve_speaker("Bhola Singh", index)
+        assert result == (None, None)
