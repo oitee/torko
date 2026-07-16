@@ -36,6 +36,7 @@ from debate_fetch import (
     _leading_bold,
     annotate_speakers,
     fetch_debate,
+    reuse_anchors,
     speaker_distribution,
 )
 from legacy_hindi import decode_legacy_hindi
@@ -197,6 +198,9 @@ def split_by_speaker_legacy(html: str, mp_part_detail_list: list[dict]) -> list[
         seg["text"] = decode_legacy_hindi(seg["text"])
         seg["speakerLabel"] = decode_legacy_hindi(seg["speakerLabel"] or "") or None
         seg["mpName"] = decode_legacy_hindi(seg["mpName"] or "") or None
+
+    # after decoding, so labels compare in the same (Devanagari) script
+    reuse_anchors(segments)
     return segments
 
 

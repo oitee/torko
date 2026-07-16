@@ -8,11 +8,20 @@ Usage:
 import argparse
 import re
 import sys
+from difflib import SequenceMatcher
 
 import requests
 from bs4 import BeautifulSoup
 
+import translit
+
 API_URL = "https://sansad.in/api_ls/debate/debate-details"
+
+# Thresholds for accepting a carried anchor: how close two name tokens must be
+# to count as the same token, and what share of the roster name's tokens must be
+# found in the label before we believe they name the same person.
+ANCHOR_TOKEN_MIN = 0.8
+ANCHOR_COVERAGE_MIN = 0.6
 
 # Matches the speaker anchors sansad.in embeds in the transcript HTML, e.g.
 # <A name="3972*1">  ->  mpCode=3972, mpPartCode=1
@@ -61,6 +70,47 @@ def _normalize_name(label: str) -> list[str]:
     label = _PAREN_RE.sub(" ", label)  # drop remaining (constituency)
     label = re.sub(r"[^\w\s]", " ", label.lower())
     return [tok for tok in label.split() if tok and tok not in _HONORIFICS]
+
+
+# Honorifics as they look *after* transliteration+folding: श्री -> "shree" -> "shri",
+# डॉ -> "do", प्रो -> "pro". _HONORIFICS holds the romanised spellings; this set holds
+# the folded forms so honorifics are dropped from Devanagari labels too.
+_FOLDED_HONORIFICS = {
+    "shri", "shrimati", "smt", "sushri", "km", "kumari", "ku", "dr", "do", "da",
+    "prof", "pro", "adv", "advocate", "mr", "mrs", "ms", "sardar", "sarvashri",
+}
+
+
+def _name_parts(name: str) -> tuple[list[str], set[str]]:
+    """Folded name tokens, script-agnostic, split into full words and initials."""
+    toks = [translit.fold(t) for t in _normalize_name(translit.to_latin(name or ""))]
+    toks = [t for t in toks if t and t not in _FOLDED_HONORIFICS]
+    full = [t for t in toks if len(t) >= 3]
+    initials = {t[0] for t in toks if 0 < len(t) < 3}
+    return full, initials
+
+
+def anchor_agrees_with_label(label: str, roster_name: str) -> bool:
+    """Whether an anchor's roster name names the same person as the label.
+
+    A roster word may appear in the label as an initial ("Salarapatty Kuppusamy
+    Kharventhan" / "S.K. KHARVENTHAN"), which counts towards coverage — but
+    initials are weak evidence, so at least one whole word must also match
+    outright before the two names are treated as the same person.
+    """
+    lab_full, lab_initials = _name_parts(label)
+    ros_full, _ = _name_parts(roster_name)
+    if not ros_full or not (lab_full or lab_initials):
+        return True  # no usable name on one side: nothing to contradict
+
+    strong = covered = 0
+    for r in ros_full:
+        if any(SequenceMatcher(None, r, l).ratio() >= ANCHOR_TOKEN_MIN for l in lab_full):
+            strong += 1
+            covered += 1
+        elif r[0] in lab_initials:
+            covered += 1
+    return strong >= 1 and covered / len(ros_full) >= ANCHOR_COVERAGE_MIN
 
 
 def build_speaker_index(mp_part_detail_list: list[dict]) -> dict:
@@ -137,6 +187,43 @@ def annotate_speakers(segments: list[dict], mp_part_detail_list: list[dict]) -> 
             seg["nameSource"] = source
         else:
             seg["nameSource"] = "unresolved"
+    return segments
+
+
+def reuse_anchors(segments: list[dict]) -> list[dict]:
+    """Propagate each anchored speaker's mpCode to their unanchored turns.
+
+    sansad.in anchors a speaker only on their first turn, so their later turns
+    arrive unresolved under the same name. First collect every anchored
+    (mpCode, mpName), then attach it to any still-unresolved turn whose label
+    names the same person. A label anchored to two different people in one
+    debate is ambiguous and left untouched.
+    """
+    resolved: dict[str, tuple[str, str]] = {}
+    ambiguous: set[str] = set()
+    for seg in segments:
+        code, label = seg.get("mpCode"), seg.get("speakerLabel")
+        if not code or not label:
+            continue
+        prior = resolved.get(label)
+        if prior and prior[0] != code:
+            ambiguous.add(label)
+        resolved.setdefault(label, (code, seg.get("mpName") or label))
+
+    for seg in segments:
+        if seg.get("mpCode") or not seg.get("speakerLabel"):
+            continue
+        label = seg["speakerLabel"]
+        for anchored_label, (code, name) in resolved.items():
+            if anchored_label in ambiguous:
+                continue
+            if anchor_agrees_with_label(label, anchored_label) and anchor_agrees_with_label(
+                anchored_label, label
+            ):
+                seg["mpCode"] = code
+                seg["mpName"] = name
+                seg["nameSource"] = "anchor-reuse"
+                break
     return segments
 
 
@@ -235,27 +322,59 @@ def split_by_speaker(html: str, mp_part_detail_list: list[dict]) -> list[dict]:
 
     segments: list[dict] = []
     current: dict | None = None
+    # An anchor often sits alone in an otherwise empty <p> —
+    # <p><A name="4444*1"></p> — with the speech starting in the next block, so
+    # carry it forward to the first paragraph that has text.
+    pending_code: str | None = None
+    pending_part: str | None = None
 
     for p in soup.find_all("p"):
         plain = _clean_inline(p.get_text(" "))
+        anchor_code, anchor_part = _anchor_id(p)
         if not plain:
+            if anchor_code:
+                pending_code, pending_part = anchor_code, anchor_part
             continue
 
+        mp_code, mp_part_code = anchor_code, anchor_part
+        carried = mp_code is None and pending_code is not None
+        if carried:
+            mp_code, mp_part_code = pending_code, pending_part
+        # A carried anchor is spent on the first paragraph with text, whatever
+        # that turns out to be; it must never reach a second one.
+        pending_code = pending_part = None
+
         colon = _label_colon_pos(p, plain)
-        mp_code, mp_part_code = _anchor_id(p)
+        # Some anchored labels aren't bold, so with an anchor in hand the colon
+        # alone may delimit the label.
+        if colon is None and mp_code is not None:
+            c = plain.find(":")
+            if 0 < c <= LABEL_MAX_CHARS:
+                colon = c
+
         # An anchor is itself definitive proof of a turn start, so open a new
-        # turn on either signal — this recovers the handful of anchored turns
+        # turn on either signal — a colon-delimited label or a bare anchor
         # whose label has no colon or has leaked text before the bold name.
-        if colon is not None or mp_code is not None:
-            if colon is not None:
-                label = STAR_PREFIX_RE.sub("", plain[:colon]).strip()
-                body = plain[colon + 1 :].strip()
-            else:
-                # anchor without a clean colon-label: fall back to the bold lead
-                # (or canonical name) for the label and keep the rest as body.
-                lead = _leading_bold(p, plain) or code_to_name.get(mp_code, "")
-                label = STAR_PREFIX_RE.sub("", lead).strip()
-                body = plain[len(lead):].strip() if lead and plain.startswith(lead) else plain
+        if colon is not None:
+            label = STAR_PREFIX_RE.sub("", plain[:colon]).strip()
+            body = plain[colon + 1 :].strip()
+        elif mp_code is not None:
+            # anchor without a clean colon-label: fall back to the bold lead
+            # (or canonical name) for the label and keep the rest as body.
+            lead = _leading_bold(p, plain) or code_to_name.get(mp_code, "")
+            label = STAR_PREFIX_RE.sub("", lead).strip()
+            body = plain[len(lead):].strip() if lead and plain.startswith(lead) else plain
+        else:
+            label = body = None
+
+        rejected = None
+        if carried and mp_code and not anchor_agrees_with_label(label, code_to_name.get(mp_code, "")):
+            rejected = mp_code
+            mp_code = mp_part_code = None
+            if colon is None:
+                label = body = None  # no label of its own: not a turn after all
+
+        if label is not None:
             current = {
                 "mpCode": mp_code,
                 "mpPartCode": mp_part_code,
@@ -263,6 +382,8 @@ def split_by_speaker(html: str, mp_part_detail_list: list[dict]) -> list[dict]:
                 "mpName": code_to_name.get(mp_code, label) if mp_code else label,
                 "paras": [body] if body else [],
             }
+            if rejected:
+                current["anchorRejected"] = rejected
             segments.append(current)
         else:
             # continuation of the current turn (or unattributed preamble)
@@ -282,6 +403,7 @@ def split_by_speaker(html: str, mp_part_detail_list: list[dict]) -> list[dict]:
 
     segments = [s for s in segments if s["text"] or s["speakerLabel"]]
     annotate_speakers(segments, mp_part_detail_list)
+    reuse_anchors(segments)
     return segments
 
 
