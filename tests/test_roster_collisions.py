@@ -15,11 +15,24 @@ in a sample.
 
 Note these keys are all *guarded*: build_speaker_index drops any folded key
 naming more than one mpCode, so a collision here costs recall (those members
-stop resolving via the translit tier), never a misattribution. See
-internal_docs/014_MODE_B_FOLD_REFINEMENTS.md.
+stop resolving) but never causes a misattribution. That applies to both folded
+tables -- `by_folded` (the debate's own member list, via name-translit) and
+`by_folded_db` (the wide DB roster, via name-db) -- because both are built by
+the same `_folded_lookup`. The guard test below is parametrised over both so
+that shared guarantee is proven rather than assumed: name-db is the only tier
+that ever matches against all 2177 names at once, so it is the one where a
+dropped guard would cost most. See internal_docs/014_MODE_B_FOLD_REFINEMENTS.md
+and 016_COLLISION_BASELINE.md.
+
+Measured against the live persons table (2177 rows, matching this snapshot):
+the guard drops 26 keys covering 57 people. That is the price of never
+guessing, and internal_docs/018_WHERE_THINGS_STAND.md §6.5 is where it gets
+weighed.
 """
 import collections
 import pathlib
+
+import pytest
 
 import debate_fetch
 
@@ -113,11 +126,39 @@ class TestRosterCollisions:
         )
         assert actual == EXPECTED_COLLISIONS
 
-    def test_every_collision_is_guarded_by_the_index(self):
-        """A collision must cost recall, never resolve to the wrong person."""
+    @pytest.mark.parametrize("table_name", ["by_folded", "by_folded_db"])
+    def test_every_collision_is_guarded_by_the_index(self, table_name):
+        """A collision must cost recall, never resolve to the wrong person.
+
+        `by_folded` (fed by a debate's own mpPartDetailList, via the
+        name-translit tier) and `by_folded_db` (fed by the wide DB roster, via
+        the last-resort name-db tier) are built by two separate calls to
+        `_folded_lookup`. Both must honour the "never guess" rule -- if the
+        DB-roster call were ever specialised to skip the multi-mpCode filter,
+        this is the case that would catch it.
+        """
         roster = [
             {"mpCode": str(sansad_id), "mpName": name} for sansad_id, name in _roster()
         ]
-        by_folded = debate_fetch.build_speaker_index(roster)["by_folded"]
+        index = debate_fetch.build_speaker_index(roster, db_roster=roster)
+        table = index[table_name]
         for key in EXPECTED_COLLISIONS:
-            assert key not in by_folded, f"{key!r} resolves despite naming two members"
+            assert key not in table, f"{key!r} resolves despite naming two members"
+
+    def test_resolve_speaker_refuses_a_db_only_collision(self):
+        """Pin the consequence, not just the table contents.
+
+        A name that collides in the DB roster and is absent from the debate's
+        own member list must come back unresolved from resolve_speaker, not
+        silently attributed to whichever of the two people happened to be
+        inserted first. This is the assertion that would actually catch a
+        misattribution if `by_folded_db` ever stopped being guarded.
+        """
+        db_roster = [
+            {"mpCode": "1", "mpName": "Bhola Singh"},
+            {"mpCode": "2", "mpName": "Bhola Singh"},
+        ]
+        index = debate_fetch.build_speaker_index([], db_roster=db_roster)
+        assert index["by_folded_db"] == {}
+        result = debate_fetch.resolve_speaker("Bhola Singh", index)
+        assert result == (None, None)
