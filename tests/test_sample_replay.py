@@ -48,26 +48,26 @@ REFS = [
 
 class TestCollectRefs:
     def test_unverified_count_does_not_exceed_baseline(self, fake_api):
-        examples, _, _, _, _ = sample_unverified.collect_refs(REFS)
+        examples, _, _, _, _, _ = sample_unverified.collect_refs(REFS)
         assert len(examples) <= BASELINE_UNVERIFIED
 
     def test_presiding_officer_is_not_an_unverified_example(self, fake_api):
-        examples, _, _, _, _ = sample_unverified.collect_refs(REFS)
+        examples, _, _, _, _, _ = sample_unverified.collect_refs(REFS)
         assert examples == []
 
     def test_presiding_officers_are_classified(self, fake_api):
-        _, _, _, presiding, _ = sample_unverified.collect_refs(REFS)
+        _, _, _, presiding, _, _ = sample_unverified.collect_refs(REFS)
         assert len(presiding) == 2
         for row in presiding:
             assert row["speaker"] == "MR. SPEAKER"
             assert row["turns"] == 1
 
     def test_debates_with_only_presiding_left_count_as_clean(self, fake_api):
-        _, clean_debates, _, _, _ = sample_unverified.collect_refs(REFS)
+        _, clean_debates, _, _, _, _ = sample_unverified.collect_refs(REFS)
         assert len(clean_debates) == 2
 
     def test_resolved_speakers_are_recorded_per_debate(self, fake_api):
-        _, _, resolved, _, _ = sample_unverified.collect_refs(REFS)
+        _, _, resolved, _, _, _ = sample_unverified.collect_refs(REFS)
         assert len(resolved) == 2  # one row per debate for mpCode 500
         for row in resolved:
             assert row["mp_code"] == "500"
@@ -101,7 +101,7 @@ class TestDbRosterIsWiredIn:
             "load_db_roster",
             lambda term: [{"mpCode": "777", "mpName": "Shri New Member"}],
         )
-        _, _, resolved, _, _ = sample_unverified.collect_refs(REFS)
+        _, _, resolved, _, _, _ = sample_unverified.collect_refs(REFS)
         assert [r["mp_code"] for r in resolved] == ["500", "500"]
         for row in resolved:
             assert row["turns"] == 2
@@ -124,7 +124,7 @@ class TestDbRosterIsWiredIn:
         # load_db_roster swallows a dead DB into []; the tier must then no-op
         # and leave the sampler's output exactly as the no_db baseline.
         monkeypatch.setattr(sample_unverified, "load_db_roster", lambda term: [])
-        examples, clean, resolved, presiding, _ = sample_unverified.collect_refs(REFS)
+        examples, clean, resolved, presiding, _, _ = sample_unverified.collect_refs(REFS)
         assert examples == []
         assert len(clean) == 2
         assert len(resolved) == 2
@@ -290,6 +290,93 @@ class TestSwallowedLabels:
         assert sample_unverified.swallowed_labels(segments) == []
 
 
+# Raw labels from LS14/5/2711. Each has zero usable whole words under _name_parts.
+REAL_UNREADABLE_LABELS = [
+    "gÉÉÒ àÉÉäcxÉ ÉËºÉc (nä´ÉÉÊ®ªÉÉ)",
+    "gÉÉÒ xÉÉÒiÉÉÒ¶É BÉÖEàÉÉ®",
+    "+ÉvªÉFÉ àÉcÉänªÉ",
+    "جناب اسدالدین اویسی ( حیدرآباد )",
+]
+
+
+class TestUnfoundedAttributions:
+    def test_flags_real_unreadable_labels_that_drove_the_original_bug(self):
+        segments = [
+            {"speakerLabel": label, "nameSource": "anchor-reuse", "mpCode": "9999"}
+            for label in REAL_UNREADABLE_LABELS
+        ]
+        assert sample_unverified.unfounded_attributions(segments) == REAL_UNREADABLE_LABELS
+
+    def test_a_readable_anchor_reuse_label_is_not_flagged(self):
+        segments = [
+            {"speakerLabel": "SHRI E. PONNUSWAMY", "nameSource": "anchor-reuse", "mpCode": "500"}
+        ]
+        assert sample_unverified.unfounded_attributions(segments) == []
+
+    def test_anchor_is_exempt_even_with_the_same_unreadable_label(self):
+        # An anchor mpCode comes from the source ID tag, so only "anchor-reuse" is in scope.
+        segments = [
+            {
+                "speakerLabel": REAL_UNREADABLE_LABELS[0],
+                "nameSource": "anchor",
+                "mpCode": "500",
+            }
+        ]
+        assert sample_unverified.unfounded_attributions(segments) == []
+
+    def test_accepted_blind_spot_other_name_sources_are_out_of_scope(self):
+        # The probe checks only "anchor-reuse". Other nameSource tags, such as name-translit, are invisible to it.
+        segments = [
+            {
+                "speakerLabel": REAL_UNREADABLE_LABELS[0],
+                "nameSource": "name-translit",
+                "mpCode": "500",
+            }
+        ]
+        assert sample_unverified.unfounded_attributions(segments) == []
+
+    def test_counts_every_occurrence_not_distinct_labels(self):
+        segments = [
+            {"speakerLabel": REAL_UNREADABLE_LABELS[0], "nameSource": "anchor-reuse", "mpCode": "1"},
+            {"speakerLabel": REAL_UNREADABLE_LABELS[0], "nameSource": "anchor-reuse", "mpCode": "1"},
+        ]
+        assert sample_unverified.unfounded_attributions(segments) == [
+            REAL_UNREADABLE_LABELS[0],
+            REAL_UNREADABLE_LABELS[0],
+        ]
+
+    def test_reproduces_the_original_bug_end_to_end_via_reuse_anchors(self, monkeypatch):
+        # An anchored turn with an unreadable label, then an unresolved turn with the same label.
+        # The lenient comparison treats "no evidence" as the same person.
+        label = REAL_UNREADABLE_LABELS[0]
+        segments = [
+            {"speakerLabel": label, "mpCode": "500", "mpName": "Shri Mohan Singh", "nameSource": "anchor"},
+            {"speakerLabel": label, "mpCode": None, "nameSource": "unresolved"},
+        ]
+
+        def lenient(a, b):
+            return (
+                debate_fetch._name_agreement(a, b) is not False
+                and debate_fetch._name_agreement(b, a) is not False
+            )
+
+        monkeypatch.setattr(debate_fetch, "labels_name_same_person", lenient)
+        debate_fetch.reuse_anchors(segments)
+        assert segments[1]["nameSource"] == "anchor-reuse"
+        assert sample_unverified.unfounded_attributions(segments) == [label]
+
+    def test_the_real_fixed_comparison_never_reproduces_the_bug(self):
+        # No patch: the strict comparison refuses "no evidence", so nothing is flagged.
+        label = REAL_UNREADABLE_LABELS[0]
+        segments = [
+            {"speakerLabel": label, "mpCode": "500", "mpName": "Shri Mohan Singh", "nameSource": "anchor"},
+            {"speakerLabel": label, "mpCode": None, "nameSource": "unresolved"},
+        ]
+        debate_fetch.reuse_anchors(segments)
+        assert segments[1]["nameSource"] == "unresolved"
+        assert sample_unverified.unfounded_attributions(segments) == []
+
+
 class TestSplitCounts:
     def test_splits_sum_to_n(self):
         assert sample_unverified.split_counts(10, 0.67) == (7, 3)
@@ -356,11 +443,11 @@ class TestMainCliWiring:
     def _stub_everything(self, monkeypatch, calls):
         monkeypatch.setattr(
             sample_unverified, "collect",
-            lambda target: (calls.setdefault("collect_target", target), [], [], [], [], [])[1:],
+            lambda target: (calls.setdefault("collect_target", target), [], [], [], [], [], [])[1:],
         )
         monkeypatch.setattr(
             sample_unverified, "collect_refs",
-            lambda refs: (calls.setdefault("collect_refs_refs", refs), [], [], [], [], [])[1:],
+            lambda refs: (calls.setdefault("collect_refs_refs", refs), [], [], [], [], [], [])[1:],
         )
         monkeypatch.setattr(sample_unverified, "write_outputs", lambda *a, **k: None)
 
