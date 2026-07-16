@@ -29,8 +29,9 @@ _PAYLOADS = {
     (16, 2, 2002): {"debateDesc": _DEBATE_HTML, "mpPartDetailList": []},
 }
 
-# Two debates, one presiding officer each once anchor-reuse resolves the member.
-BASELINE_UNVERIFIED = 2
+# Two debates: the member resolves by anchor-reuse and MR. SPEAKER is now
+# presiding-tagged by the parser, so nothing is left unverified.
+BASELINE_UNVERIFIED = 0
 
 
 @pytest.fixture
@@ -51,23 +52,30 @@ REFS = [
 
 class TestCollectRefs:
     def test_unverified_count_does_not_exceed_baseline(self, fake_api):
-        examples, _, _ = sample_unverified.collect_refs(REFS)
+        examples, _, _, _ = sample_unverified.collect_refs(REFS)
         assert len(examples) <= BASELINE_UNVERIFIED
 
-    def test_anchor_reuse_leaves_only_the_presiding_officer(self, fake_api):
-        # "SHRI NEW MEMBER" resolves via anchor-reuse; only "MR. SPEAKER" remains
-        examples, _, _ = sample_unverified.collect_refs(REFS)
-        speakers = {ex["speaker"] for ex in examples}
-        assert speakers == {"MR. SPEAKER"}
+    def test_presiding_officer_is_not_an_unverified_example(self, fake_api):
+        # "SHRI NEW MEMBER" resolves via anchor-reuse; "MR. SPEAKER" is
+        # presiding-tagged by the parser, so no unverified examples remain.
+        examples, _, _, _ = sample_unverified.collect_refs(REFS)
+        assert examples == []
 
     def test_presiding_officers_are_classified(self, fake_api):
-        examples, _, _ = sample_unverified.collect_refs(REFS)
-        assert all(ex["category"] == "presiding_officer" for ex in examples)
+        _, _, _, presiding = sample_unverified.collect_refs(REFS)
+        assert len(presiding) == 2
+        for row in presiding:
+            assert row["speaker"] == "MR. SPEAKER"
+            assert row["turns"] == 1
+
+    def test_debates_with_only_presiding_left_count_as_clean(self, fake_api):
+        _, clean_debates, _, _ = sample_unverified.collect_refs(REFS)
+        assert len(clean_debates) == 2
 
     def test_resolved_speakers_are_recorded_per_debate(self, fake_api):
         # "SHRI NEW MEMBER" is anchored once and reused once -> one resolved
         # row per debate, covering both turns, with both name sources noted.
-        _, _, resolved = sample_unverified.collect_refs(REFS)
+        _, _, resolved, _ = sample_unverified.collect_refs(REFS)
         assert len(resolved) == 2  # one row per debate for mpCode 500
         for row in resolved:
             assert row["mp_code"] == "500"
@@ -136,6 +144,41 @@ class TestWriteOutputs:
         text = out_md.read_text(encoding="utf-8")
         assert "Resolved speakers (regression baseline)" in text
         assert "| anchor | 1 |" in text
+
+    def test_writes_presiding_rows_and_section_when_given(self, tmp_path):
+        out_md = tmp_path / "run.md"
+        out_jsonl = out_md.with_suffix(".jsonl")
+        presiding_row = {
+            "loksabha": 15, "session": 1, "dbSlno": 1001, "era": "modern",
+            "speaker": "MR. SPEAKER", "turns": 3,
+            "url": "https://example/x",
+        }
+        sample_unverified.write_outputs(
+            out_md, out_jsonl, "2026-07-15 14:30:05", [],
+            clean_debates=[], presiding=[presiding_row],
+        )
+
+        out_presiding = tmp_path / "run_presiding.jsonl"
+        assert out_presiding.exists()
+        assert "MR. SPEAKER" in out_presiding.read_text(encoding="utf-8")
+        text = out_md.read_text(encoding="utf-8")
+        assert "Presiding officers (classified)" in text
+        assert "1 chair rows (one per debate + label), 1 distinct labels" in text
+
+    def test_untagged_chair_label_still_surfaces_as_leakage(self, tmp_path):
+        # The parser tags genuine chair labels, so anything the SAMPLER's own
+        # PRESIDING_RE still catches among the examples is a gap in
+        # is_presiding_label — the leakage signal the category now carries.
+        out_md = tmp_path / "run.md"
+        leak = _example(speaker="THE PANEL OF CHAIRMEN CONVENOR",
+                        category=sample_unverified.classify("THE PANEL OF CHAIRMEN CONVENOR"))
+        assert leak["category"] == "presiding_officer"
+        sample_unverified.write_outputs(
+            out_md, out_md.with_suffix(".jsonl"), "2026-07-15 14:30:05", [leak],
+            clean_debates=[], presiding=[],
+        )
+        text = out_md.read_text(encoding="utf-8")
+        assert "| presiding_officer | 1 |" in text
 
     def test_refuses_to_overwrite_an_existing_run_file(self, tmp_path):
         out_md = tmp_path / "run.md"
