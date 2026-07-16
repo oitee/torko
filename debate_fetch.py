@@ -109,8 +109,16 @@ def _folded_key(name: str) -> str:
     return "".join(sorted(full))
 
 
-def anchor_agrees_with_label(label: str, roster_name: str) -> bool:
-    """Whether an anchor's roster name names the same person as the label.
+def _name_agreement(label: str, roster_name: str) -> bool | None:
+    """Do these two names refer to the same person? None when there's no evidence.
+
+    True/False are verdicts. **None means neither name yielded a usable word, so
+    nothing was actually compared** — and the two callers below need opposite
+    answers in that case, which is why this returns three states rather than
+    two. Collapsing it to a bool is what caused the misattribution recorded in
+    internal_docs/019_WORK_IN_FLIGHT.md: "no evidence" was returned as True,
+    every caller read that as "same person", and one arbitrary name was stamped
+    onto an entire debate.
 
     A roster word may appear in the label as an initial ("Salarapatty Kuppusamy
     Kharventhan" / "S.K. KHARVENTHAN"), which counts towards coverage — but
@@ -120,7 +128,7 @@ def anchor_agrees_with_label(label: str, roster_name: str) -> bool:
     lab_full, lab_initials = _name_parts(label)
     ros_full, _ = _name_parts(roster_name)
     if not ros_full or not (lab_full or lab_initials):
-        return True  # no usable name on one side: nothing to contradict
+        return None  # nothing usable on one side: no evidence either way
 
     strong = covered = 0
     for r in ros_full:
@@ -130,6 +138,37 @@ def anchor_agrees_with_label(label: str, roster_name: str) -> bool:
         elif r[0] in lab_initials:
             covered += 1
     return strong >= 1 and covered / len(ros_full) >= ANCHOR_COVERAGE_MIN
+
+
+def anchor_contradicts_label(label: str, roster_name: str) -> bool:
+    """Does this paragraph's label positively contradict a carried anchor?
+
+    Lenient on purpose, and only for *rejecting* an anchor the source itself
+    printed. An anchor is the strongest evidence we have, so it is discarded
+    only on a positive disagreement: no evidence is not a contradiction, and
+    the anchor stands. Never use this to *claim* two names are one person —
+    that is the opposite question, and `labels_name_same_person` answers it.
+    """
+    return _name_agreement(label, roster_name) is False
+
+
+def labels_name_same_person(label_a: str, label_b: str) -> bool:
+    """Are these two labels the same person? Strict: no evidence means no.
+
+    Used to claim one speaker's later turns, which mints an attribution out of
+    nothing but a name comparison. So the burden of proof runs the other way
+    from `anchor_contradicts_label`: both directions must agree outright, and a
+    name that yields no usable word matches nobody rather than everybody.
+
+    `_folded_key` already takes this stance for the key-matching path -- it
+    returns "" for an unusable name precisely so it cannot wildcard into the
+    lookup table. This is the same rule for the comparison path, which never
+    got it.
+    """
+    return (
+        _name_agreement(label_a, label_b) is True
+        and _name_agreement(label_b, label_a) is True
+    )
 
 
 def _folded_lookup(mp_part_detail_list: list[dict]) -> dict[str, dict]:
@@ -293,13 +332,20 @@ def annotate_speakers(
 
 
 def reuse_anchors(segments: list[dict]) -> list[dict]:
-    """Propagate each anchored speaker's mpCode to their unanchored turns.
+    """Propagate each already-identified speaker's mpCode to their other turns.
 
     sansad.in anchors a speaker only on their first turn, so their later turns
-    arrive unresolved under the same name. First collect every anchored
-    (mpCode, mpName), then attach it to any still-unresolved turn whose label
-    names the same person. A label anchored to two different people in one
-    debate is ambiguous and left untouched.
+    arrive unresolved under the same name. First collect every (mpCode, mpName)
+    this debate has already established, then attach it to any still-unresolved
+    turn whose label names the same person. A label tied to two different people
+    in one debate is ambiguous and left untouched.
+
+    Despite the name, the seed map is *not* only anchors: every tier except
+    name-db seeds it, so a name-translit match propagates too. That is
+    deliberate -- a name matched against this debate's own member list is still
+    this debate's evidence -- but it means a wrong seed spreads as far as a
+    wrong anchor would, which is why `labels_name_same_person` (not the lenient
+    `anchor_contradicts_label`) is the test used below.
     """
     resolved: dict[str, tuple[str, str]] = {}
     ambiguous: set[str] = set()
@@ -333,9 +379,7 @@ def reuse_anchors(segments: list[dict]) -> list[dict]:
         for anchored_label, (code, name) in resolved.items():
             if anchored_label in ambiguous:
                 continue
-            if anchor_agrees_with_label(label, anchored_label) and anchor_agrees_with_label(
-                anchored_label, label
-            ):
+            if labels_name_same_person(label, anchored_label):
                 seg["mpCode"] = code
                 seg["mpName"] = name
                 seg["nameSource"] = "anchor-reuse"
@@ -516,7 +560,7 @@ def split_by_speaker(
             label = body = None
 
         rejected = None
-        if carried and mp_code and not anchor_agrees_with_label(label, code_to_name.get(mp_code, "")):
+        if carried and mp_code and anchor_contradicts_label(label, code_to_name.get(mp_code, "")):
             rejected = mp_code
             mp_code = mp_part_code = None
             if colon is None:
