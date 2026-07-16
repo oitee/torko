@@ -19,9 +19,9 @@ Design decisions:
 * Idempotent: safe to re-run. persons upsert on sansad_id; speakers on
   (lok_sabha_term, person_id).
 
-Run (with the DB up and db/init/*.sql applied):
+Run from the repo root (with the DB up and db/init/*.sql applied):
 
-    python load_roster.py
+    python -m scripts.load_roster
 """
 from __future__ import annotations
 
@@ -33,11 +33,11 @@ from sqlalchemy import text
 from db import get_engine
 
 MEMBER_API = "https://sansad.in/api_ls/member"
+# The member directory spans terms 1 to 18. The corpus starts at term 13, so members whose last term is earlier are skipped.
 COVERED_TERMS = {13, 14, 15, 16, 17, 18}
 
 
 def fetch_all_members() -> list[dict]:
-    """Fetch the entire member directory in one call."""
     resp = requests.get(MEMBER_API, params={"size": 5427, "page": 1}, timeout=60)
     resp.raise_for_status()
     return resp.json().get("membersDtoList", [])
@@ -63,8 +63,7 @@ def load(members: list[dict]) -> None:
                 skipped += 1
                 continue
 
-            # Upsert the person; RETURNING gives us the id whether we inserted or
-            # collided (DO UPDATE is a no-op touch just to force a row back).
+            # DO UPDATE forces RETURNING to give the id on a conflict. xmax = 0 marks a new row.
             person_id = conn.execute(
                 text(
                     """
