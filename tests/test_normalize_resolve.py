@@ -165,12 +165,13 @@ class TestResolveTranslit:
         assert source == "name-translit"
         assert entry["mpCode"] == 501
 
-    def test_known_gap_inherent_a_inside_clusters_does_not_yet_match(self, index):
-        # KNOWN LIMITATION, pinned: the roster spelling "Meenakashi" folds to
-        # "minakashi" but Devanagari मीनाक्षी folds to "minakshi" — fold() does
-        # not yet normalise the inherent "a" inside consonant clusters, so this
-        # pair stays unmatched. Flip this test when fold() learns that rule.
-        assert resolve_speaker("श्रीमती मीनाक्षी लेखी ( नई दिल्ली )", index) == (None, None)
+    def test_inherent_a_inside_clusters_matches(self, index):
+        # fold() drops the optional inherent "a" a roman spelling writes inside
+        # a consonant cluster, so roster "Meenakashi" and Devanagari मीनाक्षी
+        # now converge on the same folded key and the label resolves.
+        source, entry = resolve_speaker("श्रीमती मीनाक्षी लेखी ( नई दिल्ली )", index)
+        assert source == "name-translit"
+        assert entry["mpCode"] == 502
 
     def test_latin_exact_match_still_wins_the_earlier_tier(self, index):
         # the new tier is last: a plain roster-identical label keeps name-exact
@@ -180,14 +181,37 @@ class TestResolveTranslit:
     def test_presiding_devanagari_label_stays_unmatched(self, index):
         assert resolve_speaker("माननीय सभापति", index) == (None, None)
 
+    def test_singh_spelling_is_bridged_across_scripts(self):
+        # "सिंह" transliterates to "sinha"; folding must reach the roster's
+        # "Singh". This is the corpus's most common surname, so it carries a
+        # large share of the Devanagari labels.
+        idx = build_speaker_index([{"mpName": "Shri Mohan Singh", "mpCode": 9, "mpPartCode": 1}])
+        source, entry = resolve_speaker("श्री मोहन सिंह", idx)
+        assert source == "name-translit"
+        assert entry["mpCode"] == 9
+
     def test_folded_collision_between_two_mps_is_rejected(self):
-        # two people whose names fold to the same key: never guess
+        # Singh and Sinha both fold to "sinh" — an unavoidable price of bridging
+        # सिंह to "Singh". When one debate's roster holds both, the shared key is
+        # dropped at index-build time, so the label matches nobody: never guess.
         roster = [
-            {"mpName": "Shri Mohan Singh", "mpCode": 1, "mpPartCode": 1},
-            {"mpName": "Shri Mohun Singh", "mpCode": 2, "mpPartCode": 1},
+            {"mpName": "Shri Rakesh Singh", "mpCode": 1, "mpPartCode": 1},
+            {"mpName": "Shri Rakesh Sinha", "mpCode": 2, "mpPartCode": 1},
         ]
         idx = build_speaker_index(roster)
-        assert resolve_speaker("श्री मोहन सिंह", idx) == (None, None)
+        assert idx["by_folded"] == {}
+        assert resolve_speaker("श्री राकेश सिंह", idx) == (None, None)
+
+    def test_distinct_names_do_not_collide_after_cluster_folding(self):
+        # The cluster-"a" rule shortens keys, so check it does not merge two
+        # genuinely different people: both stay resolvable to themselves.
+        roster = [
+            {"mpName": "Shri Sharad Yadav", "mpCode": 11, "mpPartCode": 1},
+            {"mpName": "Shri Sharda Yadav", "mpCode": 12, "mpPartCode": 1},
+        ]
+        idx = build_speaker_index(roster)
+        assert len(idx["by_folded"]) == 2  # no key was poisoned
+        assert resolve_speaker("श्री शरद यादव", idx)[1]["mpCode"] == 11
 
     def test_all_honorific_devanagari_label_never_wildcards(self, index):
         assert resolve_speaker("श्री", index) == (None, None)

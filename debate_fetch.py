@@ -77,10 +77,12 @@ def _normalize_name(label: str) -> list[str]:
 
 # Honorifics as they look *after* transliteration+folding: श्री -> "shree" -> "shri",
 # डॉ -> "do", प्रो -> "pro". _HONORIFICS holds the romanised spellings; this set holds
-# the folded forms so honorifics are dropped from Devanagari labels too.
+# the folded forms so honorifics are dropped from Devanagari labels too; the
+# cluster-"a" rule also folds "sardar" -> "srdar" and "sarvashri" -> "srvshri".
 _FOLDED_HONORIFICS = {
     "shri", "shrimati", "smt", "sushri", "km", "kumari", "ku", "dr", "do", "da",
     "prof", "pro", "adv", "advocate", "mr", "mrs", "ms", "sardar", "sarvashri",
+    "srdar", "srvshri",
 }
 
 

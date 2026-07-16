@@ -76,17 +76,35 @@ def to_latin(text: str) -> str:
     return "".join(out)
 
 
+# Latin consonants (no vowels, no w/z/x — fold() has already swapped w->v and
+# z->j by the time these are used). _CLUSTER_A_RE finds an optional inherent "a"
+# a roman spelling writes between a consonant and a consonant cluster (two
+# consonants, or a consonant+h digraph).
+_CONSONANTS_LATIN = "bcdfghjklmnpqrstvy"
+_CLUSTER_A_RE = re.compile(
+    r"(?<=[" + _CONSONANTS_LATIN + r"])a(?=(?:[bcdfgjkptv]h|[" + _CONSONANTS_LATIN + r"]{2}))"
+)
+
+
 def fold(token: str) -> str:
     """Squash a Latin token into a spelling-insensitive key.
 
     Collapses the long/short vowel pairs transliteration produces, the v/w and
     z/j swaps common in romanised Indian names, and the trailing inherent 'a'
     that English spellings drop ("yaadava" -> "yadav", "Yadav" -> "yadav").
+    Collapses the anusvara-nasal "ngh" and roman "nh" spellings so "Singh" and
+    "सिंह" produce the same key. Drops the optional inherent 'a' a roman
+    spelling writes inside a consonant cluster ("Meenakashi" vs "मीनाक्षी").
     """
     t = re.sub(r"[^a-z]", "", token.lower())
     for a, b in (("aa", "a"), ("ee", "i"), ("ii", "i"), ("oo", "u"), ("uu", "u")):
         t = t.replace(a, b)
     t = t.replace("w", "v").replace("z", "j")
+    t = t.replace("ngh", "nh")
+    prev = None
+    while prev != t:            # one removal can expose the next cluster
+        prev = t
+        t = _CLUSTER_A_RE.sub("", t)
     t = re.sub(r"(.)\1+", r"\1", t)     # doubled letters carry no signal here
     if len(t) > 2 and t.endswith("a"):
         t = t[:-1]

@@ -56,3 +56,22 @@ class TestFold:
 
     def test_strips_non_letters(self):
         assert fold("S.K.") == "sk"
+
+    def test_nasal_ngh_folds_to_nh(self):
+        # "सिंह" transliterates to "sinha"; the roman spelling writes "ngh"
+        assert fold("Singh") == fold(to_latin("सिंह")) == "sinh"
+
+    def test_inherent_a_inside_a_cluster_is_dropped(self):
+        # a roman spelling may write the inherent "a" a conjunct implies
+        assert fold("Meenakashi") == fold(to_latin("मीनाक्षी"))
+        assert fold("Mahant") == fold(to_latin("महंत"))
+
+    def test_inherent_a_is_kept_when_no_cluster_follows(self):
+        # plain consonant-vowel syllables are never touched: "Yadav" keeps both
+        # a's because each is followed by a consonant + vowel, not a cluster
+        assert fold("Yadav") == "yadav"
+        assert fold("Sharad") == "sharad"
+
+    def test_cluster_folding_keeps_different_names_apart(self):
+        assert fold("Sharad") != fold("Sharda")
+        assert fold("Karan") != fold("Karn")
