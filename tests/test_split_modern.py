@@ -40,22 +40,44 @@ class TestLeadingBold:
 
 
 class TestLabelColonPos:
-    """A bold label ending in a colon within the 200-char window."""
-
     def test_detects_bold_label_colon(self):
         p = first_block("<p><b>SHRI X (PLACE):</b> what they said</p>")
         plain = "SHRI X (PLACE): what they said"
         assert _label_colon_pos(p, plain) == plain.index(":")
 
-    def test_no_bold_means_no_label_even_with_a_colon(self):
+    def test_detects_an_unbolded_caps_label(self):
+        # LS14/12/9000 bolds only its Hindi labels and prints the English ones as plain text.
+        plain = "SHRIMATI MANEKA GANDHI (PILIBHIT): Thank you for the opportunity."
+        p = first_block(f"<p>{plain}</p>")
+        assert _label_colon_pos(p, plain) == plain.index(":")
+
+    def test_lowercase_prose_with_a_colon_is_not_a_label(self):
         # a mid-sentence colon in plain text must not look like a label
         p = first_block("<p>the ratio was 3:1 in favour</p>")
         assert _label_colon_pos(p, "the ratio was 3:1 in favour") is None
+
+    def test_a_bold_devanagari_label_still_opens_a_turn(self):
+        # The caps test is Latin-only, so bold is the only signal for a Hindi label.
+        plain = "सभापति महोदया : कृपया समाप्त करें।"
+        p = first_block(f"<p><b>सभापति महोदया :</b> कृपया समाप्त करें।</p>")
+        assert _label_colon_pos(p, plain) == plain.index(":")
+
+    def test_unbolded_devanagari_prose_is_not_a_label(self):
+        # "No lowercase ASCII" is true of every Hindi line, so the caps test needs the letter check.
+        plain = "मैं यह कहना चाहता हूं: यह विधेयक अच्छा है।"
+        p = first_block(f"<p>{plain}</p>")
+        assert _label_colon_pos(p, plain) is None
 
     def test_colon_beyond_the_window_is_ignored(self):
         long_prefix = "A" * 250
         p = first_block(f"<p><b>{long_prefix}: tail</b></p>")
         assert _label_colon_pos(p, f"{long_prefix}: tail") is None
+
+    def test_caps_colon_beyond_the_window_is_ignored(self):
+        # the window applies to the caps signal too, not just the bold one
+        plain = "SHRI " + "X" * 250 + ": tail"
+        p = first_block(f"<p>{plain}</p>")
+        assert _label_colon_pos(p, plain) is None
 
 
 class TestAnchorId:
@@ -85,6 +107,28 @@ class TestSplitBySpeaker:
         )
         (seg,) = split_by_speaker(html, ROSTER)
         assert seg["text"] == "First para.\n\nSecond para."
+
+    def test_an_unbolded_caps_label_is_not_swallowed_by_the_previous_turn(self):
+        # Shape of LS14/12/9000: the Hindi label is bold and the English label after it is plain text.
+        html = (
+            "<p><b>सभापति महोदया :</b> कृपया बोलिए।</p>"
+            "<p>SHRI KODIKUNNIL SURESH: Suresh speaks.</p>"
+        )
+        hindi, suresh = split_by_speaker(html, ROSTER)
+        assert hindi["speakerLabel"] == "सभापति महोदया"
+        assert hindi["text"] == "कृपया बोलिए।"          # nothing extra glued on
+        assert suresh["speakerLabel"] == "SHRI KODIKUNNIL SURESH"
+        assert suresh["text"] == "Suresh speaks."
+        assert suresh["mpCode"] == "100"                # and it still resolves
+
+    def test_unbolded_prose_after_a_turn_is_still_a_continuation(self):
+        # the caps rule must not turn ordinary sentences into phantom turns
+        html = (
+            '<p><b><a name="344*24"></a>SHRI A. RAJA:</b> First para.</p>'
+            "<p>I would say this: the Bill is good.</p>"
+        )
+        (seg,) = split_by_speaker(html, ROSTER)
+        assert seg["text"] == "First para.\n\nI would say this: the Bill is good."
 
     def test_anchorless_bold_label_opens_a_new_turn(self):
         # Signal B: the one-third of turns with no anchor still split

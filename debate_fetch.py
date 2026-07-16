@@ -327,20 +327,17 @@ def _leading_bold(para_soup, plain: str) -> str:
     return ""
 
 
-def _label_colon_pos(para_soup, plain: str) -> int | None:
-    """
-    If this paragraph opens a new speaker turn via a bold label, return the
-    index of the colon that terminates the label; otherwise None.
+def _is_caps_label(text: str) -> bool:
+    return bool(re.search(r"[A-Za-z]", text)) and not re.search(r"[a-z]", text)
 
-    A turn opens when the paragraph *starts* with bold text and a colon appears
-    within LABEL_MAX_CHARS. The <A name> anchors only cover ~2/3 of turns, so
-    this bold-label test — script-agnostic, keyed on the colon — is the primary
-    boundary signal; anchors are used only to attach an authoritative ID.
-    """
-    if not _leading_bold(para_soup, plain):
-        return None
+
+def _label_colon_pos(para_soup, plain: str) -> int | None:
     colon = plain.find(":")
-    if 0 < colon <= LABEL_MAX_CHARS:
+    if not (0 < colon <= LABEL_MAX_CHARS):
+        return None
+    if _leading_bold(para_soup, plain):
+        return colon
+    if _is_caps_label(plain[:colon]):
         return colon
     return None
 
