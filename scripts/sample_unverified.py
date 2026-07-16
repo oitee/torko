@@ -28,11 +28,20 @@ decoded to Unicode Hindi, each row links to its source debate, and debates that
 parsed but had no unverified speakers are tabled separately as a false-positive
 check.
 
+Once a benchmark's name-resolution failures hit zero (every remaining example
+is a presiding officer, as happened to the 62-debate `008` sample), targeting
+examples no longer shows headroom -- there's nothing left to draw. `--debates`
+switches the sampling unit to debates instead, with an explicit era split, and
+can seed itself from an existing run so the old benchmark stays a strict
+subset of the new one.
+
 Run from the repo root:
     python -m scripts.sample_unverified                       # 100 examples (default)
     python -m scripts.sample_unverified --target 50
     python -m scripts.sample_unverified --out reports/today.md    # explicit path
     python -m scripts.sample_unverified --replay-file <prior_run.md>  # re-parse a run
+    python -m scripts.sample_unverified --debates 100 --legacy-frac 0.67 --seed 1
+    python -m scripts.sample_unverified --debates 100 --include-file internal_docs/008_UNVERIFIED_SPEAKERS_SAMPLE.md
 """
 from __future__ import annotations
 
@@ -258,6 +267,7 @@ def write_outputs(
     replay_of: str | None = None,
     resolved: list[dict] | None = None,
     presiding: list[dict] | None = None,
+    draw_note: str | None = None,
 ) -> None:
     """Write this run's self-contained rollup to a fresh markdown + JSONL pair.
 
@@ -267,8 +277,10 @@ def write_outputs(
     "verified speakers never go down". When `presiding` is given, those rows
     go to a `*_presiding.jsonl` beside the markdown and a section is added
     listing chair labels the parser tagged `nameSource` "presiding" (classified,
-    not unverified). Run files are immutable: writing refuses to touch a path
-    that already exists.
+    not unverified). `draw_note`, when given, is a one-line record of how the
+    sample was drawn (debate count, era split, seed, seed file) so a later
+    reader doesn't have to reconstruct it from the CLI invocation. Run files
+    are immutable: writing refuses to touch a path that already exists.
     """
     out_resolved = out_md.with_name(out_md.stem + "_resolved.jsonl")
     out_presiding = out_md.with_name(out_md.stem + "_presiding.jsonl")
@@ -318,6 +330,9 @@ def write_outputs(
             "clean-debates table should grow.",
             "",
         ]
+
+    if draw_note:
+        lines += [f"> {draw_note}", ""]
 
     lines += [
         "### Breakdown by category",
@@ -436,6 +451,65 @@ def refs_from_file(run_file: Path) -> list[dict]:
     return list(refs.values())
 
 
+def split_counts(n: int, legacy_frac: float) -> tuple[int, int]:
+    """How many of n debates come from legacy vs modern, summing exactly to n.
+
+    `round()` on the legacy share and subtracting from n (rather than rounding
+    both shares independently) is what guarantees the sum is exact.
+    """
+    n_legacy = round(n * legacy_frac)
+    return n_legacy, n - n_legacy
+
+
+def sample_debate_refs(
+    n_debates: int, legacy_frac: float, exclude: set[tuple] | None = None
+) -> list[dict]:
+    """Draw n_debates fresh debate refs, split legacy/modern per legacy_frac.
+
+    Unlike `collect`, the unit here is debates, not unverified examples: this
+    draws exactly n_debates refs (era-split, not stopping early) and does no
+    fetching or parsing -- that's `collect_refs`'s job once the ref list is
+    final. `exclude` is a set of (loksabha, session, dbSlno) keys that must
+    never be drawn, so a debate already pulled in via --include-file is never
+    drawn a second time.
+    """
+    n_legacy, n_modern = split_counts(n_debates, legacy_frac)
+    targets = {"legacy": n_legacy, "modern": n_modern}
+    visited: set[tuple] = set(exclude or ())
+    drawn: dict[str, list[dict]] = {"legacy": [], "modern": []}
+    era_names = list(STRATA)
+    turn = 0
+    empty_streak = 0
+
+    while sum(len(v) for v in drawn.values()) < n_debates and empty_streak < 40:
+        era = era_names[turn % len(era_names)]
+        turn += 1
+        if len(drawn[era]) >= targets[era]:
+            continue
+        ls = random.choice(STRATA[era])
+        try:
+            refs = random_debate_refs(ls, k=3)
+        except requests.RequestException as e:
+            print(f"  search error (LS{ls}): {e}; backing off", file=sys.stderr)
+            time.sleep(2)
+            empty_streak += 1
+            continue
+
+        got_any = False
+        for ref in refs:
+            key = (ref["loksabha"], ref["session"], ref["dbSlno"])
+            if key in visited:
+                continue
+            visited.add(key)
+            drawn[era].append({**ref, "era": era})
+            got_any = True
+            if len(drawn[era]) >= targets[era]:
+                break
+        empty_streak = 0 if got_any else empty_streak + 1
+
+    return drawn["legacy"] + drawn["modern"]
+
+
 def collect_refs(
     refs: list[dict],
 ) -> tuple[list[dict], list[dict], list[dict], list[dict]]:
@@ -541,7 +615,36 @@ def collect(target: int) -> tuple[list[dict], list[dict], list[dict], list[dict]
 
 def main() -> None:
     ap = argparse.ArgumentParser(description=__doc__)
-    ap.add_argument("--target", type=int, default=100, help="how many examples")
+    target_group = ap.add_mutually_exclusive_group()
+    target_group.add_argument(
+        "--target", type=int, default=None,
+        help="how many unverified examples to gather (default 100 if neither "
+        "--target nor --debates is given). Obsolete for benchmarks that have "
+        "hit zero name-resolution failures -- see --debates.",
+    )
+    target_group.add_argument(
+        "--debates", type=int, default=None,
+        help="sample exactly this many debates (unit = debates, not examples), "
+        "split by era per --legacy-frac",
+    )
+    ap.add_argument(
+        "--legacy-frac", type=float, default=0.67,
+        help="fraction of --debates drawn from the legacy strata (LS13-14); "
+        "the rest come from modern (LS15-18). Default 0.67. Ignored without "
+        "--debates.",
+    )
+    ap.add_argument(
+        "--include-file", type=Path, metavar="PATH", default=None,
+        help="seed the sample with every debate ref already linked from PATH "
+        "(a prior run .md, or 008_UNVERIFIED_SPEAKERS_SAMPLE.md) in addition "
+        "to --debates N; deduped against the newly drawn refs so no debate is "
+        "parsed twice. Requires --debates.",
+    )
+    ap.add_argument(
+        "--dry-run", action="store_true",
+        help="with --debates, print the chosen refs and exit without "
+        "fetching or parsing any of them",
+    )
     ap.add_argument("--seed", type=int, default=None, help="RNG seed (reproducible)")
     ap.add_argument(
         "--out",
@@ -559,6 +662,11 @@ def main() -> None:
     )
     args = ap.parse_args()
 
+    if args.include_file and args.debates is None:
+        ap.error("--include-file requires --debates")
+    if args.target is None and args.debates is None:
+        args.target = 100
+
     now = datetime.now()
     out_md = args.out or default_out_path(now)
     out_jsonl = out_md.with_suffix(".jsonl")
@@ -567,7 +675,40 @@ def main() -> None:
     if args.seed is not None:
         random.seed(args.seed)
 
-    if args.replay_file:
+    draw_note = None
+
+    if args.debates is not None:
+        seed_refs = refs_from_file(args.include_file) if args.include_file else []
+        exclude = {(r["loksabha"], r["session"], r["dbSlno"]) for r in seed_refs}
+        n_legacy_target, n_modern_target = split_counts(args.debates, args.legacy_frac)
+        drawn = sample_debate_refs(args.debates, args.legacy_frac, exclude=exclude)
+        refs = seed_refs + drawn
+
+        n_legacy_drawn = sum(1 for r in drawn if r["era"] == "legacy")
+        n_modern_drawn = len(drawn) - n_legacy_drawn
+        draw_note = (
+            f"Drew {args.debates} debates (target legacy={n_legacy_target}/"
+            f"modern={n_modern_target}, legacy_frac={args.legacy_frac}; actual "
+            f"legacy={n_legacy_drawn}/modern={n_modern_drawn}), seed={args.seed}."
+        )
+        if args.include_file:
+            draw_note += (
+                f" Seeded {len(seed_refs)} refs from {args.include_file.name}; "
+                f"combined sample is {len(refs)} debates."
+            )
+
+        if args.dry_run:
+            print(draw_note)
+            for r in refs:
+                key = f"{r['loksabha']}/{r['session']}/{r['dbSlno']}"
+                print(f"  {r['era']:7s} {key}")
+            print(f"\n{len(refs)} refs selected ({len(seed_refs)} seeded, {len(drawn)} drawn); dry run, nothing parsed")
+            return
+
+        print(f"Parsing {len(refs)} debates ({draw_note})")
+        examples, clean_debates, resolved, presiding = collect_refs(refs)
+        replay_of = None
+    elif args.replay_file:
         refs = refs_from_file(args.replay_file)
         print(f"Replaying {len(refs)} debates from {args.replay_file}")
         examples, clean_debates, resolved, presiding = collect_refs(refs)
@@ -579,6 +720,7 @@ def main() -> None:
     write_outputs(
         out_md, out_jsonl, stamp, examples, clean_debates,
         replay_of=replay_of, resolved=resolved, presiding=presiding,
+        draw_note=draw_note,
     )
     print(
         f"\nWrote {len(examples)} examples ({len(presiding)} presiding) "

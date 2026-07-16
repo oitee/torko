@@ -10,6 +10,9 @@ The count acts as a regression baseline: an improvement to normalisation should
 keep the number of unverified speakers at or below BASELINE_UNVERIFIED — never
 above it. Bring the baseline down when a change genuinely resolves more speakers.
 """
+import random
+import sys
+
 import pytest
 
 import debate_fetch
@@ -267,6 +270,176 @@ class TestWriteOutputs:
             sample_unverified.write_outputs(
                 out_md, out_jsonl, "2026-07-15 14:30:05", [_example()], clean_debates=[]
             )
+
+
+class TestSplitCounts:
+    def test_splits_sum_to_n(self):
+        assert sample_unverified.split_counts(10, 0.67) == (7, 3)
+
+    def test_rounds_the_legacy_share(self):
+        # 100 * 0.67 = 67.0 exactly; no rounding surprises here
+        assert sample_unverified.split_counts(100, 0.67) == (67, 33)
+
+
+class TestSampleDebateRefs:
+    """Drawing a fixed number of debates, era-split, with no fetching/parsing."""
+
+    def _fake_search(self, monkeypatch, per_ls_records):
+        """Stub random_debate_refs to hand back a fresh slice of canned records
+        per loksabha on each call -- real `random_debate_refs` draws a random
+        page each time, so a stub returning the same first-k every call would
+        make every debate after the first k look already-visited and starve
+        the draw loop."""
+        queues = {ls: list(records) for ls, records in per_ls_records.items()}
+
+        def fake(loksabha, k):
+            batch = queues[loksabha][:k]
+            queues[loksabha] = queues[loksabha][k:] + batch
+            return batch
+
+        monkeypatch.setattr(sample_unverified, "random_debate_refs", fake)
+
+    def test_draws_n_debates_split_by_era(self, monkeypatch):
+        random.seed(1)
+        per_ls = {
+            13: [{"loksabha": 13, "session": 1, "dbSlno": i} for i in range(1, 20)],
+            14: [{"loksabha": 14, "session": 1, "dbSlno": i} for i in range(20, 40)],
+            15: [{"loksabha": 15, "session": 1, "dbSlno": i} for i in range(40, 60)],
+            16: [{"loksabha": 16, "session": 1, "dbSlno": i} for i in range(60, 80)],
+            17: [{"loksabha": 17, "session": 1, "dbSlno": i} for i in range(80, 100)],
+            18: [{"loksabha": 18, "session": 1, "dbSlno": i} for i in range(100, 120)],
+        }
+        self._fake_search(monkeypatch, per_ls)
+
+        refs = sample_unverified.sample_debate_refs(10, 0.67)
+
+        assert len(refs) == 10
+        n_legacy = sum(1 for r in refs if r["era"] == "legacy")
+        n_modern = sum(1 for r in refs if r["era"] == "modern")
+        assert (n_legacy, n_modern) == (7, 3)
+        # no duplicate debates within the drawn set
+        keys = [(r["loksabha"], r["session"], r["dbSlno"]) for r in refs]
+        assert len(keys) == len(set(keys))
+
+    def test_excludes_given_keys(self, monkeypatch):
+        random.seed(1)
+        per_ls = {
+            13: [{"loksabha": 13, "session": 1, "dbSlno": i} for i in range(1, 5)],
+            14: [{"loksabha": 14, "session": 1, "dbSlno": i} for i in range(20, 24)],
+            15: [{"loksabha": 15, "session": 1, "dbSlno": i} for i in range(40, 44)],
+            16: [{"loksabha": 16, "session": 1, "dbSlno": i} for i in range(60, 64)],
+            17: [{"loksabha": 17, "session": 1, "dbSlno": i} for i in range(80, 84)],
+            18: [{"loksabha": 18, "session": 1, "dbSlno": i} for i in range(100, 104)],
+        }
+        self._fake_search(monkeypatch, per_ls)
+        exclude = {(13, 1, 1), (13, 1, 2), (13, 1, 3)}
+
+        refs = sample_unverified.sample_debate_refs(4, 1.0, exclude=exclude)
+
+        keys = {(r["loksabha"], r["session"], r["dbSlno"]) for r in refs}
+        assert keys.isdisjoint(exclude)
+        assert len(refs) == 4
+
+
+class TestMainCliWiring:
+    """`main()`'s argument handling, with collect/collect_refs/write_outputs
+    stubbed out so these stay unit tests, not end-to-end runs."""
+
+    def _stub_everything(self, monkeypatch, calls):
+        monkeypatch.setattr(
+            sample_unverified, "collect",
+            lambda target: (calls.setdefault("collect_target", target), [], [], [], [])[1:],
+        )
+        monkeypatch.setattr(
+            sample_unverified, "collect_refs",
+            lambda refs: (calls.setdefault("collect_refs_refs", refs), [], [], [], [])[1:],
+        )
+        monkeypatch.setattr(sample_unverified, "write_outputs", lambda *a, **k: None)
+
+    def test_target_mode_defaults_to_100_and_calls_collect(self, monkeypatch, tmp_path):
+        calls: dict = {}
+        self._stub_everything(monkeypatch, calls)
+        monkeypatch.setattr(
+            sys, "argv", ["sample_unverified", "--out", str(tmp_path / "run.md")]
+        )
+        sample_unverified.main()
+        assert calls["collect_target"] == 100
+
+    def test_target_flag_is_passed_through_unchanged(self, monkeypatch, tmp_path):
+        calls: dict = {}
+        self._stub_everything(monkeypatch, calls)
+        monkeypatch.setattr(
+            sys, "argv",
+            ["sample_unverified", "--target", "5", "--out", str(tmp_path / "run.md")],
+        )
+        sample_unverified.main()
+        assert calls["collect_target"] == 5
+
+    def test_target_and_debates_are_mutually_exclusive(self, monkeypatch, tmp_path):
+        monkeypatch.setattr(
+            sys, "argv",
+            ["sample_unverified", "--target", "5", "--debates", "3",
+             "--out", str(tmp_path / "run.md")],
+        )
+        with pytest.raises(SystemExit):
+            sample_unverified.main()
+
+    def test_include_file_without_debates_is_rejected(self, monkeypatch, tmp_path):
+        monkeypatch.setattr(
+            sys, "argv",
+            ["sample_unverified", "--include-file", "internal_docs/008_UNVERIFIED_SPEAKERS_SAMPLE.md",
+             "--out", str(tmp_path / "run.md")],
+        )
+        with pytest.raises(SystemExit):
+            sample_unverified.main()
+
+    def test_debates_mode_draws_and_dedupes_against_include_file(self, monkeypatch, tmp_path):
+        calls: dict = {}
+        self._stub_everything(monkeypatch, calls)
+        seed_refs = [
+            {"loksabha": 13, "session": 13, "dbSlno": 5789, "era": "legacy"},
+            {"loksabha": 15, "session": 10, "dbSlno": 6531, "era": "modern"},
+        ]
+        monkeypatch.setattr(sample_unverified, "refs_from_file", lambda path: seed_refs)
+        drawn = [
+            {"loksabha": 13, "session": 13, "dbSlno": 5789, "era": "legacy"},  # dup of seed
+            {"loksabha": 14, "session": 1, "dbSlno": 999, "era": "legacy"},
+        ]
+        monkeypatch.setattr(
+            sample_unverified, "sample_debate_refs",
+            lambda n, frac, exclude=None: drawn,
+        )
+        monkeypatch.setattr(
+            sys, "argv",
+            ["sample_unverified", "--debates", "2", "--include-file", "some_run.md",
+             "--out", str(tmp_path / "run.md")],
+        )
+        sample_unverified.main()
+        refs = calls["collect_refs_refs"]
+        # seed_refs are kept in full (the stub is what dedupes against them via
+        # `exclude`, exercised separately by TestSampleDebateRefs), plus the
+        # freshly drawn refs alongside them
+        assert refs == seed_refs + drawn
+
+    def test_dry_run_does_not_call_collect_refs(self, monkeypatch, tmp_path, capsys):
+        calls: dict = {}
+        self._stub_everything(monkeypatch, calls)
+        monkeypatch.setattr(sample_unverified, "refs_from_file", lambda path: [])
+        monkeypatch.setattr(
+            sample_unverified, "sample_debate_refs",
+            lambda n, frac, exclude=None: [
+                {"loksabha": 13, "session": 1, "dbSlno": 1, "era": "legacy"},
+            ],
+        )
+        monkeypatch.setattr(
+            sys, "argv",
+            ["sample_unverified", "--debates", "1", "--dry-run",
+             "--out", str(tmp_path / "run.md")],
+        )
+        sample_unverified.main()
+        assert "collect_refs_refs" not in calls
+        out = capsys.readouterr().out
+        assert "13/1/1" in out
 
 
 class TestRefsFromFile:
