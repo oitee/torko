@@ -39,6 +39,19 @@ class TestDecodeLegacyHindi:
     def test_star_becomes_danda_in_hindi_run(self):
         assert decode_legacy_hindi("cè*").endswith("है।")
 
+    def test_pre_base_short_i_with_anusvara_becomes_singh(self):
+        # ÉË is the pre-base glyph for ि and ं.
+        assert decode_legacy_hindi("ÉËºÉc") == "सिंह"
+
+    def test_pre_base_short_i_with_anusvara_in_a_full_label(self):
+        assert decode_legacy_hindi("gÉÉÒ ®ÉVÉxÉÉlÉ ÉËºÉc") == "श्री राजनाथ सिंह"
+        assert decode_legacy_hindi("gÉÉÒ ®ÉàÉVÉÉÒ´ÉxÉ ÉËºÉc") == "श्री रामजीवन सिंह"
+
+    def test_bare_short_i_still_shifts_after_its_consonant(self):
+        # ÉÊ alone must land after its consonant, including across a conjunct.
+        assert decode_legacy_hindi("ÉÊºÉc") == "सिह"
+        assert decode_legacy_hindi("ÉÊBÉEºÉÉxÉ") == "किसान"
+
 
 class TestLegacyParserDecodesText:
     def test_hindi_turn_is_decoded_end_to_end(self):

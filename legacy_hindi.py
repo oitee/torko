@@ -1,27 +1,3 @@
-"""
-Decode the legacy-font "gibberish" Hindi found in older sansad.in transcripts
-back into real Unicode Devanagari.
-
-The 13th Lok Sabha debates (≈1999-2004) store Hindi in a pre-Unicode CDAC-GIST /
-ISFOC font encoding (the bilingual "EN" variant, a cousin of DV-TTSurekh). In it,
-Latin byte-sequences are glyph indices that only render as Hindi when the exact
-font is installed; copied out, they read as `<ºÉBÉEä ¤ÉÉ®ä àÉå` where the intended
-text is `इसके बारे में`. English runs in the same document are already fine.
-
-This module is deliberately self-contained (no third-party converter): every
-public tool we tried was hard-wired to a *different* font's table and silently
-corrupted very common letters — notably `c` (our ह) which they read as ड़, so
-"है" became "ड़ै" everywhere. See ARTICLE_legacy_hindi_decoding.md for the story.
-
-Decoding is a longest-sequence-first substitution over ISFOC_MAP, plus a few
-structural rules that reflect how Devanagari (and this font) work:
-  * a full consonant is drawn as a half-form + a vertical-bar connector, so
-    orphaned halants next to a matra are merged;
-  * the short-i matra "ि" is stored to the LEFT of its consonant (visual order)
-    and must be shifted to its logical position after it;
-  * "reph" (र्) is typed after its consonant and must be moved before it;
-  * Latin words are left untouched so interleaved English survives verbatim.
-"""
 import re
 
 # CDAC-GIST/ISFOC font table. Keys are applied longest-first, so clusters win over single glyphs.
@@ -83,6 +59,8 @@ ISFOC_MAP = {
     # Matras (vowel signs)
     "ÉÉä": "ो", "Éä": "ो", "ÉÉè": "ौ", "Éè": "ौ",
     "ÉÓ": "ीं", "ÉÒ": "ी", "ÉÊ": "ि", "ÉÚ": "ू", "ÉÖ": "ु",
+    # Pre-base short-i with an anusvara. It shifts like "ÉÊ".
+    "ÉË": "िं",
     "ä": "े", "è": "ै", "É": "ा",
 
     # Modifiers
@@ -150,8 +128,8 @@ def decode_legacy_hindi(text: str) -> str:
     # The order of these three fixes matters.
     # Merge a halant that stands before a matra: "ज्ो" -> "जो".
     text = re.sub(r"्([ािीुूेैोौंःँ])", r"\1", text)
-    # Shift the short-i matra "ि" to after its consonant (visual → logical).
-    text = re.sub(r"(ि)([क-हड़ढ़](?:्[क-हड़ढ़])*)", r"\2\1", text)
+    # Move the short-i matra after its consonant, with its anusvara.
+    text = re.sub(r"(ि)(ं?)([क-हड़ढ़](?:्[क-हड़ढ़])*)", r"\3\1\2", text)
     # Move reph before its consonant. The final replace makes it र्.
     text = re.sub(
         r"([क-हड़ढ़](?:्[क-हड़ढ़])?)([ािीुूेैोौंःँ]*)" + _REPH,
