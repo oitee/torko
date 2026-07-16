@@ -15,6 +15,7 @@ from bs4 import BeautifulSoup
 
 import translit
 from legacy_hindi import decode_legacy_hindi
+from urdu_names import urdu_label_to_name
 
 API_URL = "https://sansad.in/api_ls/debate/debate-details"
 
@@ -229,7 +230,15 @@ def resolve_speaker(label: str, index: dict) -> tuple[str | None, dict | None]:
     (matches once the label is transliterated from Devanagari and folded),
     "name-db" (matches the DB roster fallback only after every tier above has
     failed), or None when unmatched.
+
+    An Urdu-script label is rewritten to its romanised name first, when we have
+    a verified reading for it (see urdu_names). That happens here rather than in
+    a tier of its own so the rewritten name goes through every tier below --
+    including the never-guess guard and the term-scoped roster -- exactly as a
+    Devanagari label does. An unknown Urdu name is left alone and simply fails
+    to match, which is the honest outcome.
     """
+    label = urdu_label_to_name(label) or label
     toks = _normalize_name(label)
     if not toks:
         return None, None
