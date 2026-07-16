@@ -66,9 +66,9 @@ class TestNormalizeName:
 class TestBuildSpeakerIndex:
     """§3.2: the four pre-built lookup tables."""
 
-    def test_exposes_all_four_lookup_tables(self):
+    def test_exposes_all_five_lookup_tables(self):
         idx = build_speaker_index(ROSTER)
-        assert set(idx) == {"by_str", "by_join_ordered", "by_join_sorted", "tokenised"}
+        assert set(idx) == {"by_str", "by_join_ordered", "by_join_sorted", "tokenised", "by_folded"}
 
     def test_by_str_keys_on_space_joined_tokens(self):
         idx = build_speaker_index(ROSTER)
@@ -131,6 +131,66 @@ class TestResolveSpeaker:
         ]
         idx = build_speaker_index(roster)
         assert resolve_speaker("SHRI KUMAR", idx) == (None, None)
+
+
+class TestResolveTranslit:
+    """The name-translit tier: Devanagari labels vs the romanised roster."""
+
+    # Golden pairs drawn from real unresolved labels in 008_UNVERIFIED_SPEAKERS_SAMPLE.md.
+    GOLDEN_ROSTER = [
+        {"mpName": "Shri Ram Kripal Yadav", "mpCode": 500, "mpPartCode": 1},
+        {"mpName": "Shri Kodikunnil Suresh", "mpCode": 100, "mpPartCode": 1},
+        {"mpName": "Shri Sharad Yadav", "mpCode": 501, "mpPartCode": 2},
+        {"mpName": "Shrimati Meenakashi Lekhi", "mpCode": 502, "mpPartCode": 1},
+        {"mpName": "Dr. Charan Das Mahant", "mpCode": 503, "mpPartCode": 1},
+    ]
+
+    @pytest.fixture
+    def index(self):
+        return build_speaker_index(self.GOLDEN_ROSTER)
+
+    def test_devanagari_label_with_constituency_resolves(self, index):
+        source, entry = resolve_speaker("श्री राम कृपाल यादव ( पाटलिपुत्र )", index)
+        assert source == "name-translit"
+        assert entry["mpCode"] == 500
+
+    def test_devanagari_ministerial_wrapper_resolves(self, index):
+        label = "कृषि मंत्रालय में राज्य मंत्री (डॉ. चरण दास महंत)"
+        source, entry = resolve_speaker(label, index)
+        assert source == "name-translit"
+        assert entry["mpCode"] == 503
+
+    def test_devanagari_label_without_constituency_resolves(self, index):
+        source, entry = resolve_speaker("श्री शरद यादव", index)
+        assert source == "name-translit"
+        assert entry["mpCode"] == 501
+
+    def test_known_gap_inherent_a_inside_clusters_does_not_yet_match(self, index):
+        # KNOWN LIMITATION, pinned: the roster spelling "Meenakashi" folds to
+        # "minakashi" but Devanagari मीनाक्षी folds to "minakshi" — fold() does
+        # not yet normalise the inherent "a" inside consonant clusters, so this
+        # pair stays unmatched. Flip this test when fold() learns that rule.
+        assert resolve_speaker("श्रीमती मीनाक्षी लेखी ( नई दिल्ली )", index) == (None, None)
+
+    def test_latin_exact_match_still_wins_the_earlier_tier(self, index):
+        # the new tier is last: a plain roster-identical label keeps name-exact
+        source, entry = resolve_speaker("SHRI KODIKUNNIL SURESH", index)
+        assert source == "name-exact"
+
+    def test_presiding_devanagari_label_stays_unmatched(self, index):
+        assert resolve_speaker("माननीय सभापति", index) == (None, None)
+
+    def test_folded_collision_between_two_mps_is_rejected(self):
+        # two people whose names fold to the same key: never guess
+        roster = [
+            {"mpName": "Shri Mohan Singh", "mpCode": 1, "mpPartCode": 1},
+            {"mpName": "Shri Mohun Singh", "mpCode": 2, "mpPartCode": 1},
+        ]
+        idx = build_speaker_index(roster)
+        assert resolve_speaker("श्री मोहन सिंह", idx) == (None, None)
+
+    def test_all_honorific_devanagari_label_never_wildcards(self, index):
+        assert resolve_speaker("श्री", index) == (None, None)
 
 
 class TestAnnotateSpeakers:

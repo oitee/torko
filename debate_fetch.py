@@ -45,6 +45,9 @@ _PAREN_RE = re.compile(r"\(([^)]*)\)")
 _HONORIFICS = {
     "shri", "shrimati", "smt", "sushri", "km", "kumari", "ku", "dr", "prof",
     "adv", "advocate", "mr", "mrs", "ms", "sardar", "sarvashri",
+    # to_latin spellings of Devanagari honorifics (श्री, श्रीमती, सुश्री, कुँवर,
+    # डॉ, प्रो, डा), so they are recognised before folding runs.
+    "shree", "shreemati", "sushree", "kunvar", "kunvara", "do", "pro", "da",
 }
 
 
@@ -90,6 +93,19 @@ def _name_parts(name: str) -> tuple[list[str], set[str]]:
     return full, initials
 
 
+def _folded_key(name: str) -> str:
+    """Build a spelling- and word-order-insensitive key from a name.
+
+    Reuses the script-agnostic folding of `_name_parts`, keeps only the whole-word
+    tokens (initials are too weak to key on), sorts them so a Devanagari label and
+    a romanised roster name that order given/family names differently still produce
+    the same key, and joins them. Returns "" when the name has no usable whole word,
+    so an all-honorific label can never key into (and wildcard-match) the table.
+    """
+    full, _ = _name_parts(name)
+    return "".join(sorted(full))
+
+
 def anchor_agrees_with_label(label: str, roster_name: str) -> bool:
     """Whether an anchor's roster name names the same person as the label.
 
@@ -125,11 +141,24 @@ def build_speaker_index(mp_part_detail_list: list[dict]) -> dict:
         by_join_ordered.setdefault("".join(toks), m)
         by_join_sorted.setdefault("".join(sorted(toks)), m)
         tokenised.append((set(toks), m))
+
+    by_folded: dict[str, dict] = {}
+    folded_codes: dict[str, set] = {}
+    for m in mp_part_detail_list:
+        key = _folded_key(m["mpName"])
+        if not key:
+            continue
+        by_folded.setdefault(key, m)
+        folded_codes.setdefault(key, set()).add(m["mpCode"])
+    # drop any key that names more than one distinct person: never guess
+    by_folded = {k: v for k, v in by_folded.items() if len(folded_codes[k]) == 1}
+
     return {
         "by_str": by_str,
         "by_join_ordered": by_join_ordered,
         "by_join_sorted": by_join_sorted,
         "tokenised": tokenised,
+        "by_folded": by_folded,
     }
 
 
@@ -139,7 +168,9 @@ def resolve_speaker(label: str, index: dict) -> tuple[str | None, dict | None]:
 
     Returns (nameSource, entry). nameSource is one of "name-exact",
     "name-join" (matches once spacing/word-order is ignored), "name-partial"
-    (one entry's tokens are a subset of the other's), or None when unmatched.
+    (one entry's tokens are a subset of the other's), "name-translit"
+    (matches once the label is transliterated from Devanagari and folded),
+    or None when unmatched.
     """
     toks = _normalize_name(label)
     if not toks:
@@ -160,6 +191,8 @@ def resolve_speaker(label: str, index: dict) -> tuple[str | None, dict | None]:
     codes = {m["mpCode"] for m in cands.values()}
     if len(codes) == 1:
         return "name-partial", next(iter(cands.values()))
+    if (key := _folded_key(label)) and (m := index["by_folded"].get(key)):
+        return "name-translit", m
     return None, None
 
 
