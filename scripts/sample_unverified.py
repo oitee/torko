@@ -162,24 +162,78 @@ def parse_segments(payload: dict, db_roster: list[dict] | None = None) -> list[d
     return debate_fetch.split_by_speaker(html, mp_list, db_roster)
 
 
+def swallowed_labels(segments: list[dict]) -> list[str]:
+    """Speaker labels sitting *inside* another speaker's turn text.
+
+    Every coverage number this script reports is computed over labels the
+    splitter found: a turn that never became a boundary never becomes a label,
+    so it can never be counted as unmatched. That makes the denominator itself
+    unverified, and this is the independent check on it. Observed live on
+    LS14/12/9000, which reported 97/106 turns matched -- while three quarters
+    of its turns were absorbed into their predecessors and never counted.
+
+    The probe reads the splitter's *output*, not its input: it re-splits each
+    segment's body on paragraph breaks and flags any paragraph that opens with
+    an ALL-CAPS name and a colon. Anything it finds is by definition a label
+    the splitter declined to open a turn on, since a boundary would have put
+    that paragraph in a segment of its own. Checking the output this way is
+    what keeps the probe from drifting: it never restates the boundary rules
+    it is testing, so it stays honest when those rules change.
+
+    Deliberately a *lower* bound. `_is_caps_label` only recognises Latin
+    script, so an unbolded Devanagari label is as invisible here as it is to
+    the splitter. Zero means "no missed ALL-CAPS labels", never "no missed
+    turns".
+    """
+    found: list[str] = []
+    for seg in segments:
+        for para in (seg.get("text") or "").split("\n\n"):
+            para = para.strip()
+            colon = para.find(":")
+            if not (0 < colon <= debate_fetch.LABEL_MAX_CHARS):
+                continue
+            if debate_fetch._is_caps_label(para[:colon]):
+                found.append(para[:colon].strip())
+    return found
+
+
 def speakers_from_debate(
     ref: dict, era: str
-) -> tuple[list[dict], list[dict], list[dict], int]:
+) -> tuple[list[dict], list[dict], list[dict], list[dict], int]:
     """Fetch+parse one debate.
 
-    Returns (unverified examples, resolved speakers, presiding rows, number of
-    parsed segments). Unverified examples are distinct speaker labels with no
-    `mpCode`; resolved speakers are one row per distinct `mpCode`, with how
-    that code was matched and how many turns it covers. Presiding rows are one
-    per distinct label tagged `nameSource` "presiding" by the parser (a chair
-    label, classified as a role rather than an unverified example), with its
-    turn count. The segment count lets the caller tell a genuinely clean
-    debate (parsed fine, every speaker resolved or presiding) apart from one
-    the parser simply couldn't read.
+    Returns (unverified examples, resolved speakers, presiding rows, swallowed
+    rows, number of parsed segments). Unverified examples are distinct speaker
+    labels with no `mpCode`; resolved speakers are one row per distinct
+    `mpCode`, with how that code was matched and how many turns it covers.
+    Presiding rows are one per distinct label tagged `nameSource` "presiding"
+    by the parser (a chair label, classified as a role rather than an
+    unverified example), with its turn count. Swallowed rows are one per
+    distinct label found *inside* another turn's text (see `swallowed_labels`)
+    -- turns the splitter never opened, and so the one failure the other three
+    counts structurally cannot see. The segment count lets the caller tell a
+    genuinely clean debate (parsed fine, every speaker resolved or presiding)
+    apart from one the parser simply couldn't read.
     """
     ls, session, db_slno = ref["loksabha"], ref["session"], ref["dbSlno"]
     payload = debate_fetch.fetch_debate(ls, session, db_slno)
     segments = parse_segments(payload, db_roster_for(ls))
+
+    swallowed_by_label: dict[str, dict] = {}
+    for label in swallowed_labels(segments):
+        row = swallowed_by_label.setdefault(
+            label,
+            {
+                "loksabha": ls,
+                "session": session,
+                "dbSlno": db_slno,
+                "era": era,
+                "speaker": label,
+                "turns": 0,
+                "url": debate_url(ls, session, db_slno),
+            },
+        )
+        row["turns"] += 1
 
     seen: set[str] = set()
     examples: list[dict] = []
@@ -249,6 +303,7 @@ def speakers_from_debate(
         examples,
         list(resolved_by_code.values()),
         list(presiding_by_label.values()),
+        list(swallowed_by_label.values()),
         len(segments),
     )
 
@@ -267,6 +322,7 @@ def write_outputs(
     replay_of: str | None = None,
     resolved: list[dict] | None = None,
     presiding: list[dict] | None = None,
+    swallowed: list[dict] | None = None,
     draw_note: str | None = None,
 ) -> None:
     """Write this run's self-contained rollup to a fresh markdown + JSONL pair.
@@ -277,17 +333,23 @@ def write_outputs(
     "verified speakers never go down". When `presiding` is given, those rows
     go to a `*_presiding.jsonl` beside the markdown and a section is added
     listing chair labels the parser tagged `nameSource` "presiding" (classified,
-    not unverified). `draw_note`, when given, is a one-line record of how the
-    sample was drawn (debate count, era split, seed, seed file) so a later
-    reader doesn't have to reconstruct it from the CLI invocation. Run files
-    are immutable: writing refuses to touch a path that already exists.
+    not unverified). When `swallowed` is given, those rows go to a
+    `*_swallowed.jsonl` and a section reports labels found inside another
+    turn's text — turns the splitter never opened, which every other count on
+    this page is blind to by construction. `draw_note`, when given, is a
+    one-line record of how the sample was drawn (debate count, era split, seed,
+    seed file) so a later reader doesn't have to reconstruct it from the CLI
+    invocation. Run files are immutable: writing refuses to touch a path that
+    already exists.
     """
     out_resolved = out_md.with_name(out_md.stem + "_resolved.jsonl")
     out_presiding = out_md.with_name(out_md.stem + "_presiding.jsonl")
+    out_swallowed = out_md.with_name(out_md.stem + "_swallowed.jsonl")
     paths = (
         [out_md, out_jsonl]
         + ([out_resolved] if resolved is not None else [])
         + ([out_presiding] if presiding is not None else [])
+        + ([out_swallowed] if swallowed is not None else [])
     )
     for path in paths:
         if path.exists():
@@ -306,6 +368,11 @@ def write_outputs(
     if presiding is not None:
         with out_presiding.open("w", encoding="utf-8") as f:
             for row in presiding:
+                f.write(json.dumps({"run": stamp, **row}, ensure_ascii=False) + "\n")
+
+    if swallowed is not None:
+        with out_swallowed.open("w", encoding="utf-8") as f:
+            for row in swallowed:
                 f.write(json.dumps({"run": stamp, **row}, ensure_ascii=False) + "\n")
 
     by_cat = Counter(ex["category"] for ex in examples)
@@ -380,6 +447,37 @@ def write_outputs(
         ]
         if presiding:
             for i, row in enumerate(presiding, 1):
+                key = f"{row['loksabha']}/{row['session']}/{row['dbSlno']}"
+                lines.append(
+                    f"| {i} | {row['era']} | {key} | [view]({row['url']}) "
+                    f"| {_md_cell(row['speaker'])} | {row['turns']} |"
+                )
+        else:
+            lines.append("| _(none this run)_ | | | | | |")
+        lines.append("")
+
+    if swallowed is not None:
+        n_turns = sum(row["turns"] for row in swallowed)
+        by_debate = Counter(
+            (row["loksabha"], row["session"], row["dbSlno"]) for row in swallowed
+        )
+        lines += [
+            "### Swallowed turns (denominator check)",
+            "",
+            f"> {n_turns} paragraphs across {len(by_debate)} debates open with an "
+            "ALL-CAPS speaker label but sit *inside* another speaker's turn — the "
+            "splitter never opened a boundary there, so they were never counted as "
+            "labels and every other number on this page is blind to them. A "
+            "**lower bound**: the probe only recognises Latin-script labels, so an "
+            "unbolded Devanagari label is invisible to it too. Full rows in "
+            f"`{out_swallowed.name}`.",
+            "",
+            "| # | era | LS/sess/db | source | label | turns |",
+            "| --- | --- | --- | --- | --- | --- |",
+        ]
+        if swallowed:
+            worst = sorted(swallowed, key=lambda r: -r["turns"])
+            for i, row in enumerate(worst, 1):
                 key = f"{row['loksabha']}/{row['session']}/{row['dbSlno']}"
                 lines.append(
                     f"| {i} | {row['era']} | {key} | [view]({row['url']}) "
@@ -512,22 +610,23 @@ def sample_debate_refs(
 
 def collect_refs(
     refs: list[dict],
-) -> tuple[list[dict], list[dict], list[dict], list[dict]]:
+) -> tuple[list[dict], list[dict], list[dict], list[dict], list[dict]]:
     """Fetch+parse an explicit list of debates (no sampling, no target cap).
 
     Returns (unverified examples, clean debates, resolved speakers, presiding
-    rows).
+    rows, swallowed rows).
     """
     examples: list[dict] = []
     clean_debates: list[dict] = []
     resolved: list[dict] = []
     presiding: list[dict] = []
+    swallowed: list[dict] = []
 
     for i, ref in enumerate(refs, 1):
         key = (ref["loksabha"], ref["session"], ref["dbSlno"])
         era = ref["era"]
         try:
-            found, solved, chairs, n_segments = speakers_from_debate(ref, era)
+            found, solved, chairs, eaten, n_segments = speakers_from_debate(ref, era)
         except requests.RequestException as e:
             print(f"  fetch error {key}: {e}; skipping", file=sys.stderr)
             time.sleep(2)
@@ -536,29 +635,36 @@ def collect_refs(
         examples.extend(found)
         resolved.extend(solved)
         presiding.extend(chairs)
+        swallowed.extend(eaten)
         if not found and n_segments:
             clean_debates.append({**ref, "segments": n_segments})
+        n_eaten = sum(r["turns"] for r in eaten)
         print(
             f"  [{i}/{len(refs)}] {key} -> {len(found)} unverified, "
             f"{len(chairs)} presiding, {len(solved)} resolved, {n_segments} segments"
+            + (f", {n_eaten} SWALLOWED" if n_eaten else "")
         )
 
-    return examples, clean_debates, resolved, presiding
+    return examples, clean_debates, resolved, presiding, swallowed
 
 
-def collect(target: int) -> tuple[list[dict], list[dict], list[dict], list[dict]]:
+def collect(
+    target: int,
+) -> tuple[list[dict], list[dict], list[dict], list[dict], list[dict]]:
     """Sample debates until `target` examples are gathered.
 
-    Returns (examples, clean_debates, resolved, presiding) where clean_debates
-    are debates that parsed into segments but yielded zero unverified
-    speakers — the false-positive check — resolved lists every speaker tied to
-    an `mpCode`, and presiding lists every chair label the parser tagged
-    `nameSource` "presiding".
+    Returns (examples, clean_debates, resolved, presiding, swallowed) where
+    clean_debates are debates that parsed into segments but yielded zero
+    unverified speakers — the false-positive check — resolved lists every
+    speaker tied to an `mpCode`, presiding lists every chair label the parser
+    tagged `nameSource` "presiding", and swallowed lists every label found
+    inside another turn's text.
     """
     examples: list[dict] = []
     clean_debates: list[dict] = []
     resolved: list[dict] = []
     presiding: list[dict] = []
+    swallowed: list[dict] = []
     visited: set[tuple] = set()
     era_names = list(STRATA)
     turn = 0
@@ -582,7 +688,7 @@ def collect(target: int) -> tuple[list[dict], list[dict], list[dict], list[dict]
                 continue
             visited.add(key)
             try:
-                found, solved, chairs, n_segments = speakers_from_debate(ref, era)
+                found, solved, chairs, eaten, n_segments = speakers_from_debate(ref, era)
             except requests.RequestException as e:
                 print(f"  fetch error {key}: {e}; skipping", file=sys.stderr)
                 time.sleep(2)
@@ -590,6 +696,7 @@ def collect(target: int) -> tuple[list[dict], list[dict], list[dict], list[dict]
             time.sleep(REQUEST_DELAY_S)
             resolved.extend(solved)
             presiding.extend(chairs)
+            swallowed.extend(eaten)
             if found:
                 got_any = True
                 examples.extend(found)
@@ -610,7 +717,7 @@ def collect(target: int) -> tuple[list[dict], list[dict], list[dict], list[dict]
 
         empty_streak = 0 if got_any else empty_streak + 1
 
-    return examples[:target], clean_debates, resolved, presiding
+    return examples[:target], clean_debates, resolved, presiding, swallowed
 
 
 def main() -> None:
@@ -706,24 +813,25 @@ def main() -> None:
             return
 
         print(f"Parsing {len(refs)} debates ({draw_note})")
-        examples, clean_debates, resolved, presiding = collect_refs(refs)
+        examples, clean_debates, resolved, presiding, swallowed = collect_refs(refs)
         replay_of = None
     elif args.replay_file:
         refs = refs_from_file(args.replay_file)
         print(f"Replaying {len(refs)} debates from {args.replay_file}")
-        examples, clean_debates, resolved, presiding = collect_refs(refs)
+        examples, clean_debates, resolved, presiding, swallowed = collect_refs(refs)
         replay_of = args.replay_file.name
     else:
-        examples, clean_debates, resolved, presiding = collect(args.target)
+        examples, clean_debates, resolved, presiding, swallowed = collect(args.target)
         replay_of = None
 
     write_outputs(
         out_md, out_jsonl, stamp, examples, clean_debates,
         replay_of=replay_of, resolved=resolved, presiding=presiding,
-        draw_note=draw_note,
+        swallowed=swallowed, draw_note=draw_note,
     )
     print(
-        f"\nWrote {len(examples)} examples ({len(presiding)} presiding) "
+        f"\nWrote {len(examples)} examples ({len(presiding)} presiding, "
+        f"{sum(r['turns'] for r in swallowed)} swallowed) "
         f"({len(clean_debates)} clean debates) to {out_md} and {out_jsonl}"
     )
 

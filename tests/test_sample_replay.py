@@ -70,30 +70,30 @@ REFS = [
 
 class TestCollectRefs:
     def test_unverified_count_does_not_exceed_baseline(self, fake_api):
-        examples, _, _, _ = sample_unverified.collect_refs(REFS)
+        examples, _, _, _, _ = sample_unverified.collect_refs(REFS)
         assert len(examples) <= BASELINE_UNVERIFIED
 
     def test_presiding_officer_is_not_an_unverified_example(self, fake_api):
         # "SHRI NEW MEMBER" resolves via anchor-reuse; "MR. SPEAKER" is
         # presiding-tagged by the parser, so no unverified examples remain.
-        examples, _, _, _ = sample_unverified.collect_refs(REFS)
+        examples, _, _, _, _ = sample_unverified.collect_refs(REFS)
         assert examples == []
 
     def test_presiding_officers_are_classified(self, fake_api):
-        _, _, _, presiding = sample_unverified.collect_refs(REFS)
+        _, _, _, presiding, _ = sample_unverified.collect_refs(REFS)
         assert len(presiding) == 2
         for row in presiding:
             assert row["speaker"] == "MR. SPEAKER"
             assert row["turns"] == 1
 
     def test_debates_with_only_presiding_left_count_as_clean(self, fake_api):
-        _, clean_debates, _, _ = sample_unverified.collect_refs(REFS)
+        _, clean_debates, _, _, _ = sample_unverified.collect_refs(REFS)
         assert len(clean_debates) == 2
 
     def test_resolved_speakers_are_recorded_per_debate(self, fake_api):
         # "SHRI NEW MEMBER" is anchored once and reused once -> one resolved
         # row per debate, covering both turns, with both name sources noted.
-        _, _, resolved, _ = sample_unverified.collect_refs(REFS)
+        _, _, resolved, _, _ = sample_unverified.collect_refs(REFS)
         assert len(resolved) == 2  # one row per debate for mpCode 500
         for row in resolved:
             assert row["mp_code"] == "500"
@@ -135,7 +135,7 @@ class TestDbRosterIsWiredIn:
             "load_db_roster",
             lambda term: [{"mpCode": "777", "mpName": "Shri New Member"}],
         )
-        _, _, resolved, _ = sample_unverified.collect_refs(REFS)
+        _, _, resolved, _, _ = sample_unverified.collect_refs(REFS)
         assert [r["mp_code"] for r in resolved] == ["500", "500"]
         for row in resolved:
             assert row["turns"] == 2
@@ -158,7 +158,7 @@ class TestDbRosterIsWiredIn:
         # load_db_roster swallows a dead DB into []; the tier must then no-op
         # and leave the sampler's output exactly as the no_db baseline.
         monkeypatch.setattr(sample_unverified, "load_db_roster", lambda term: [])
-        examples, clean, resolved, presiding = sample_unverified.collect_refs(REFS)
+        examples, clean, resolved, presiding, _ = sample_unverified.collect_refs(REFS)
         assert examples == []
         assert len(clean) == 2
         assert len(resolved) == 2
@@ -272,6 +272,69 @@ class TestWriteOutputs:
             )
 
 
+class TestSwallowedLabels:
+    """The denominator check: labels sitting inside another speaker's turn.
+
+    These are turns the splitter never opened. Every other count the sampler
+    reports is computed over labels the splitter *found*, so nothing else can
+    see them -- which is exactly why this probe reads the splitter's output
+    rather than restating its boundary rules.
+    """
+
+    def test_finds_a_label_buried_in_another_turn(self):
+        segments = [
+            {
+                "speakerLabel": "श्री प्रियरंजन दासमुंशी",
+                "text": "पांच-दस मिनट बढ़ जाएं तो कोई बात नहीं।\n\n"
+                "SHRI E. PONNUSWAMY: Madam, she has not even mentioned a single point.\n\n"
+                "MADAM CHAIRMAN: Mr. Ponnuswamy, you can speak during your turn.",
+            }
+        ]
+        assert sample_unverified.swallowed_labels(segments) == [
+            "SHRI E. PONNUSWAMY",
+            "MADAM CHAIRMAN",
+        ]
+
+    def test_counts_every_occurrence_not_distinct_labels(self):
+        segments = [
+            {"speakerLabel": "X", "text": "MADAM CHAIRMAN: One.\n\nMADAM CHAIRMAN: Two."}
+        ]
+        assert sample_unverified.swallowed_labels(segments) == [
+            "MADAM CHAIRMAN",
+            "MADAM CHAIRMAN",
+        ]
+
+    def test_a_cleanly_split_debate_reports_nothing(self):
+        # each speaker's label is the segment's own label, never in its body
+        segments = [
+            {"speakerLabel": "SHRI E. PONNUSWAMY", "text": "Madam, she has not."},
+            {"speakerLabel": "MADAM CHAIRMAN", "text": "You can speak in your turn."},
+        ]
+        assert sample_unverified.swallowed_labels(segments) == []
+
+    def test_ordinary_prose_with_a_colon_is_not_a_label(self):
+        segments = [
+            {
+                "speakerLabel": "X",
+                "text": "I want to say this: the Bill is good.\n\n… ( Interruptions )",
+            }
+        ]
+        assert sample_unverified.swallowed_labels(segments) == []
+
+    def test_devanagari_labels_are_a_known_blind_spot(self):
+        # _is_caps_label keys on the absence of lowercase *ASCII*, so a
+        # Devanagari label would match everything and mean nothing. The probe
+        # only claims a lower bound; this pins that limit rather than hiding it.
+        segments = [{"speakerLabel": "X", "text": "सभापति महोदया : कृपया समाप्त करें।"}]
+        assert sample_unverified.swallowed_labels(segments) == []
+
+    def test_a_colon_beyond_the_label_window_is_ignored(self):
+        segments = [
+            {"speakerLabel": "X", "text": "A" * 250 + ": trailing colon, far too late"}
+        ]
+        assert sample_unverified.swallowed_labels(segments) == []
+
+
 class TestSplitCounts:
     def test_splits_sum_to_n(self):
         assert sample_unverified.split_counts(10, 0.67) == (7, 3)
@@ -348,11 +411,11 @@ class TestMainCliWiring:
     def _stub_everything(self, monkeypatch, calls):
         monkeypatch.setattr(
             sample_unverified, "collect",
-            lambda target: (calls.setdefault("collect_target", target), [], [], [], [])[1:],
+            lambda target: (calls.setdefault("collect_target", target), [], [], [], [], [])[1:],
         )
         monkeypatch.setattr(
             sample_unverified, "collect_refs",
-            lambda refs: (calls.setdefault("collect_refs_refs", refs), [], [], [], [])[1:],
+            lambda refs: (calls.setdefault("collect_refs_refs", refs), [], [], [], [], [])[1:],
         )
         monkeypatch.setattr(sample_unverified, "write_outputs", lambda *a, **k: None)
 
