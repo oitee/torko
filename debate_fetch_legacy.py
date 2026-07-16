@@ -36,6 +36,7 @@ from debate_fetch import (
     _leading_bold,
     annotate_speakers,
     fetch_debate,
+    is_presiding_label,
     reuse_anchors,
     speaker_distribution,
 )
@@ -200,6 +201,15 @@ def split_by_speaker_legacy(html: str, mp_part_detail_list: list[dict]) -> list[
         seg["mpName"] = decode_legacy_hindi(seg["mpName"] or "") or None
 
     # after decoding, so labels compare in the same (Devanagari) script
+    for seg in segments:
+        if (
+            seg.get("mpCode") is None
+            and seg.get("nameSource") == "unresolved"
+            and is_presiding_label(seg["speakerLabel"])
+        ):
+            seg["nameSource"] = "presiding"
+            seg["mpName"] = seg["speakerLabel"]
+
     reuse_anchors(segments)
     return segments
 
