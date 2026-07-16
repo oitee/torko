@@ -20,6 +20,14 @@ _PAYLOADS = {
 BASELINE_UNVERIFIED = 0
 
 
+@pytest.fixture(autouse=True)
+def no_db(monkeypatch):
+    sample_unverified._DB_ROSTER_CACHE.clear()
+    monkeypatch.setattr(sample_unverified, "load_db_roster", lambda term: [])
+    yield
+    sample_unverified._DB_ROSTER_CACHE.clear()
+
+
 @pytest.fixture
 def fake_api(monkeypatch):
     def fake_fetch(ls, session, db_slno):
@@ -62,6 +70,62 @@ class TestCollectRefs:
             assert row["mp_code"] == "500"
             assert row["turns"] == 2
             assert row["name_sources"] == ["anchor", "anchor-reuse"]
+
+
+class TestDbRosterIsWiredIn:
+    def test_passes_the_terms_db_roster_through_to_the_parser(
+        self, fake_api, monkeypatch
+    ):
+        seen: list = []
+
+        def spy(payload, db_roster=None):
+            seen.append(db_roster)
+            return []
+
+        monkeypatch.setattr(
+            sample_unverified, "load_db_roster", lambda term: [{"mpCode": term, "mpName": "X"}]
+        )
+        monkeypatch.setattr(sample_unverified, "parse_segments", spy)
+        sample_unverified.collect_refs(REFS)
+
+        # one roster per debate, each scoped to that debate's own term
+        assert seen == [[{"mpCode": 15, "mpName": "X"}], [{"mpCode": 16, "mpName": "X"}]]
+
+    def test_a_db_roster_never_costs_an_anchored_resolution(self, fake_api, monkeypatch):
+        # The database roster uses code 777 and the transcript anchor prints 500. The anchor must win.
+        monkeypatch.setattr(
+            sample_unverified,
+            "load_db_roster",
+            lambda term: [{"mpCode": "777", "mpName": "Shri New Member"}],
+        )
+        _, _, resolved, _ = sample_unverified.collect_refs(REFS)
+        assert [r["mp_code"] for r in resolved] == ["500", "500"]
+        for row in resolved:
+            assert row["turns"] == 2
+            assert row["name_sources"] == ["anchor", "anchor-reuse"]
+
+    def test_roster_is_loaded_once_per_term_not_once_per_debate(self, fake_api, monkeypatch):
+        calls: list[int] = []
+
+        def counting_loader(term):
+            calls.append(term)
+            return []
+
+        monkeypatch.setattr(sample_unverified, "load_db_roster", counting_loader)
+        # four debates across two terms -> two loads, not four
+        refs = REFS + [dict(r, dbSlno=r["dbSlno"]) for r in REFS]
+        sample_unverified.collect_refs(refs)
+        assert calls == [15, 16]
+
+    def test_sampler_runs_unchanged_with_no_postgres(self, fake_api, monkeypatch):
+        # load_db_roster swallows a dead DB into []; the tier must then no-op
+        # and leave the sampler's output exactly as the no_db baseline.
+        monkeypatch.setattr(sample_unverified, "load_db_roster", lambda term: [])
+        examples, clean, resolved, presiding = sample_unverified.collect_refs(REFS)
+        assert examples == []
+        assert len(clean) == 2
+        assert len(resolved) == 2
+        assert len(presiding) == 2
 
 
 class TestDefaultOutPath:

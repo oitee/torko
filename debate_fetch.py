@@ -110,8 +110,20 @@ def anchor_agrees_with_label(label: str, roster_name: str) -> bool:
     return strong >= 1 and covered / len(ros_full) >= ANCHOR_COVERAGE_MIN
 
 
-def build_speaker_index(mp_part_detail_list: list[dict]) -> dict:
-    """Index the MP list by several normalised keys for fuzzy name matching."""
+def _folded_lookup(mp_part_detail_list: list[dict]) -> dict[str, dict]:
+    by_folded: dict[str, dict] = {}
+    folded_codes: dict[str, set] = {}
+    for m in mp_part_detail_list:
+        key = _folded_key(m["mpName"])
+        if not key:
+            continue
+        by_folded.setdefault(key, m)
+        folded_codes.setdefault(key, set()).add(m["mpCode"])
+    # Drop any key that names more than one person.
+    return {k: v for k, v in by_folded.items() if len(folded_codes[k]) == 1}
+
+
+def build_speaker_index(mp_part_detail_list: list[dict], db_roster: list[dict] | None = None) -> dict:
     by_str: dict[str, dict] = {}
     by_join_ordered: dict[str, dict] = {}
     by_join_sorted: dict[str, dict] = {}
@@ -123,16 +135,8 @@ def build_speaker_index(mp_part_detail_list: list[dict]) -> dict:
         by_join_sorted.setdefault("".join(sorted(toks)), m)
         tokenised.append((set(toks), m))
 
-    by_folded: dict[str, dict] = {}
-    folded_codes: dict[str, set] = {}
-    for m in mp_part_detail_list:
-        key = _folded_key(m["mpName"])
-        if not key:
-            continue
-        by_folded.setdefault(key, m)
-        folded_codes.setdefault(key, set()).add(m["mpCode"])
-    # Drop any key that names more than one person.
-    by_folded = {k: v for k, v in by_folded.items() if len(folded_codes[k]) == 1}
+    by_folded = _folded_lookup(mp_part_detail_list)
+    by_folded_db = _folded_lookup(db_roster) if db_roster else {}
 
     return {
         "by_str": by_str,
@@ -140,6 +144,7 @@ def build_speaker_index(mp_part_detail_list: list[dict]) -> dict:
         "by_join_sorted": by_join_sorted,
         "tokenised": tokenised,
         "by_folded": by_folded,
+        "by_folded_db": by_folded_db,
     }
 
 
@@ -151,7 +156,8 @@ def resolve_speaker(label: str, index: dict) -> tuple[str | None, dict | None]:
     "name-join" (matches once spacing/word-order is ignored), "name-partial"
     (one entry's tokens are a subset of the other's), "name-translit"
     (matches once the label is transliterated from Devanagari and folded),
-    or None when unmatched.
+    "name-db" (matches the DB roster fallback only after every tier above has
+    failed), or None when unmatched.
     """
     toks = _normalize_name(label)
     if not toks:
@@ -177,8 +183,13 @@ def resolve_speaker(label: str, index: dict) -> tuple[str | None, dict | None]:
     # This allows legacy debates to match Devanagari labels like modern ones.
     # decode_legacy_hindi is idempotent: it's a no-op on already-Unicode text.
     decoded_label = decode_legacy_hindi(label)
-    if (key := _folded_key(decoded_label)) and (m := index["by_folded"].get(key)):
+    key = _folded_key(decoded_label)
+    if key and (m := index["by_folded"].get(key)):
         return "name-translit", m
+
+    # Last resort: the wider database roster.
+    if key and (m := index["by_folded_db"].get(key)):
+        return "name-db", m
 
     return None, None
 
@@ -209,16 +220,10 @@ def is_presiding_label(label: str) -> bool:
     return bool(_PRESIDING_RE.search(label))
 
 
-def annotate_speakers(segments: list[dict], mp_part_detail_list: list[dict]) -> list[dict]:
-    """
-    Fill each segment's canonical mpName + nameSource tag.
-
-    Anchored turns already carry the list's name (nameSource "anchor").
-    Anchor-less turns are matched by name; on success mpName is replaced with
-    the canonical list name and the match method is recorded, otherwise the raw
-    label is kept with nameSource "unresolved".
-    """
-    index = build_speaker_index(mp_part_detail_list)
+def annotate_speakers(
+    segments: list[dict], mp_part_detail_list: list[dict], db_roster: list[dict] | None = None
+) -> list[dict]:
+    index = build_speaker_index(mp_part_detail_list, db_roster)
     for seg in segments:
         if seg.get("mpCode"):
             seg["nameSource"] = "anchor"
@@ -255,13 +260,19 @@ def reuse_anchors(segments: list[dict]) -> list[dict]:
         code, label = seg.get("mpCode"), seg.get("speakerLabel")
         if not code or not label:
             continue
+        # A name-db match is not evidence from this debate. This pass may correct it.
+        if seg.get("nameSource") == "name-db":
+            continue
         prior = resolved.get(label)
         if prior and prior[0] != code:
             ambiguous.add(label)
         resolved.setdefault(label, (code, seg.get("mpName") or label))
 
     for seg in segments:
-        if seg.get("mpCode") or not seg.get("speakerLabel"):
+        if not seg.get("speakerLabel"):
+            continue
+        # A name-db turn is reconsidered here. Every other tier keeps its answer.
+        if seg.get("mpCode") and seg.get("nameSource") != "name-db":
             continue
         if seg.get("nameSource") == "presiding":
             continue
@@ -342,17 +353,9 @@ def _anchor_id(para_soup) -> tuple[str | None, str | None]:
     return None, None
 
 
-def split_by_speaker(html: str, mp_part_detail_list: list[dict]) -> list[dict]:
-    """
-    Split the transcript into per-intervention segments.
-
-    Boundaries are detected from bold speaker labels (bold text at a paragraph
-    start, ending in a colon) rather than <A name> anchors alone, because ~1/3
-    of turns carry no anchor and would otherwise be merged into the preceding
-    speaker. When an anchor is present it is used to attach mpCode/mpPartCode
-    and the canonical name from mpPartDetailList; the label text is the
-    fallback identity so anchor-less speakers are never dropped.
-    """
+def split_by_speaker(
+    html: str, mp_part_detail_list: list[dict], db_roster: list[dict] | None = None
+) -> list[dict]:
     code_to_name = {str(m["mpCode"]): m["mpName"] for m in mp_part_detail_list}
     soup = BeautifulSoup(html, "lxml")
 
@@ -431,7 +434,7 @@ def split_by_speaker(html: str, mp_part_detail_list: list[dict]) -> list[dict]:
         seg["text"] = "\n\n".join(par for par in seg.pop("paras") if par)
 
     segments = [s for s in segments if s["text"] or s["speakerLabel"]]
-    annotate_speakers(segments, mp_part_detail_list)
+    annotate_speakers(segments, mp_part_detail_list, db_roster)
     reuse_anchors(segments)
     return segments
 
@@ -480,7 +483,10 @@ def main():
         sys.exit(1)
 
     mp_part_detail_list = data.get("mpPartDetailList", [])
-    segments = split_by_speaker(html, mp_part_detail_list)
+    from db_roster import load_db_roster
+
+    db_roster = load_db_roster(args.loksabha)
+    segments = split_by_speaker(html, mp_part_detail_list, db_roster)
 
     print(f"Debate date: {data.get('debateDate')}  |  Type: {data.get('debateType')}")
     print(f"Segments found: {len(segments)}")

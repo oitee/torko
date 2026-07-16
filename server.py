@@ -40,7 +40,14 @@ def api_distribution():
 
     mp_part_detail_list = data.get("mpPartDetailList", [])
     legacy = looks_legacy(html)
-    segments = split_by_speaker_legacy(html, mp_part_detail_list) if legacy else split_by_speaker(html, mp_part_detail_list)
+    from db_roster import load_db_roster
+
+    db_roster = load_db_roster(loksabha)
+    segments = (
+        split_by_speaker_legacy(html, mp_part_detail_list, db_roster)
+        if legacy
+        else split_by_speaker(html, mp_part_detail_list, db_roster)
+    )
     dist = speaker_distribution(segments)
 
     return jsonify(

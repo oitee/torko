@@ -51,6 +51,7 @@ import requests
 import debate_fetch
 import debate_fetch_legacy
 import legacy_hindi
+from db_roster import load_db_roster
 
 SEARCH_API = "https://sansad.in/api_ls/debate/debate-search"
 DEBATE_PAGE = "https://sansad.in/ls/debates/view-debate"
@@ -107,14 +108,24 @@ def random_debate_refs(loksabha: int, k: int) -> list[dict]:
     return records[:k]
 
 
-def parse_segments(payload: dict) -> list[dict]:
+# Cache per term here, not in load_db_roster, which must stay uncached for the long-lived server.
+_DB_ROSTER_CACHE: dict[int, list[dict]] = {}
+
+
+def db_roster_for(term: int) -> list[dict]:
+    if term not in _DB_ROSTER_CACHE:
+        _DB_ROSTER_CACHE[term] = load_db_roster(term)
+    return _DB_ROSTER_CACHE[term]
+
+
+def parse_segments(payload: dict, db_roster: list[dict] | None = None) -> list[dict]:
     html = payload.get("debateDesc") or ""
     mp_list = payload.get("mpPartDetailList", []) or []
     if not html:
         return []
     if debate_fetch_legacy.looks_legacy(html):
-        return debate_fetch_legacy.split_by_speaker_legacy(html, mp_list)
-    return debate_fetch.split_by_speaker(html, mp_list)
+        return debate_fetch_legacy.split_by_speaker_legacy(html, mp_list, db_roster)
+    return debate_fetch.split_by_speaker(html, mp_list, db_roster)
 
 
 def speakers_from_debate(
@@ -134,7 +145,7 @@ def speakers_from_debate(
     """
     ls, session, db_slno = ref["loksabha"], ref["session"], ref["dbSlno"]
     payload = debate_fetch.fetch_debate(ls, session, db_slno)
-    segments = parse_segments(payload)
+    segments = parse_segments(payload, db_roster_for(ls))
 
     seen: set[str] = set()
     examples: list[dict] = []
