@@ -233,10 +233,10 @@ class TestAnnotateSpeakers:
         assert segs[0]["nameSource"] == "name-exact"
 
     def test_unmatched_label_kept_as_unresolved(self):
-        segs = [{"mpCode": None, "speakerLabel": "MR. SPEAKER", "mpName": "MR. SPEAKER"}]
+        segs = [{"mpCode": None, "speakerLabel": "SHRI NOBODY SPECIAL", "mpName": "SHRI NOBODY SPECIAL"}]
         annotate_speakers(segs, ROSTER)
         assert segs[0]["nameSource"] == "unresolved"
-        assert segs[0]["mpName"] == "MR. SPEAKER"  # raw label preserved
+        assert segs[0]["mpName"] == "SHRI NOBODY SPECIAL"  # raw label preserved
 
     def test_labelless_segment_gets_none_source(self):
         segs = [{"mpCode": None, "speakerLabel": None, "mpName": None}]

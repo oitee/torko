@@ -7,7 +7,11 @@ member-list entry. Examples fall into three categories:
   * Hindi-script names (label is Devanagari),
   * speakers present in the transcript text but absent from the debate's
     mpPartDetailList (no anchor to match against),
-  * presiding officers (Mr. Speaker / Chairman / etc.).
+  * presiding officers (Mr. Speaker / Chairman / etc.) that the parser missed:
+    genuine presiding labels are now tagged `nameSource` "presiding" by the
+    parser itself and reported in their own classified section, not as
+    unverified examples; the presiding_officer category here only catches
+    chair-like labels the parser failed to tag.
 
 Sampling is stratified by era so the legacy corpus is not drowned out by the
 better-anchored modern debates:
@@ -128,14 +132,19 @@ def parse_segments(payload: dict) -> list[dict]:
     return debate_fetch.split_by_speaker(html, mp_list)
 
 
-def speakers_from_debate(ref: dict, era: str) -> tuple[list[dict], list[dict], int]:
+def speakers_from_debate(
+    ref: dict, era: str
+) -> tuple[list[dict], list[dict], list[dict], int]:
     """Fetch+parse one debate.
 
-    Returns (unverified examples, resolved speakers, number of parsed segments).
-    Unverified examples are distinct speaker labels with no `mpCode`; resolved
-    speakers are one row per distinct `mpCode`, with how that code was matched
-    and how many turns it covers. The segment count lets the caller tell a
-    genuinely clean debate (parsed fine, every speaker resolved) apart from one
+    Returns (unverified examples, resolved speakers, presiding rows, number of
+    parsed segments). Unverified examples are distinct speaker labels with no
+    `mpCode`; resolved speakers are one row per distinct `mpCode`, with how
+    that code was matched and how many turns it covers. Presiding rows are one
+    per distinct label tagged `nameSource` "presiding" by the parser (a chair
+    label, classified as a role rather than an unverified example), with its
+    turn count. The segment count lets the caller tell a genuinely clean
+    debate (parsed fine, every speaker resolved or presiding) apart from one
     the parser simply couldn't read.
     """
     ls, session, db_slno = ref["loksabha"], ref["session"], ref["dbSlno"]
@@ -145,6 +154,7 @@ def speakers_from_debate(ref: dict, era: str) -> tuple[list[dict], list[dict], i
     seen: set[str] = set()
     examples: list[dict] = []
     resolved_by_code: dict[str, dict] = {}
+    presiding_by_label: dict[str, dict] = {}
     for seg in segments:
         label = seg.get("speakerLabel")
         code = seg.get("mpCode")
@@ -168,6 +178,21 @@ def speakers_from_debate(ref: dict, era: str) -> tuple[list[dict], list[dict], i
             if source and source not in row["name_sources"]:
                 row["name_sources"].append(source)
             continue
+        if seg.get("nameSource") == "presiding":
+            row = presiding_by_label.setdefault(
+                label,
+                {
+                    "loksabha": ls,
+                    "session": session,
+                    "dbSlno": db_slno,
+                    "era": era,
+                    "speaker": label,
+                    "turns": 0,
+                    "url": debate_url(ls, session, db_slno),
+                },
+            )
+            row["turns"] += 1
+            continue
         if not label or label in seen:
             continue
         seen.add(label)
@@ -190,7 +215,12 @@ def speakers_from_debate(ref: dict, era: str) -> tuple[list[dict], list[dict], i
                 "url": debate_url(ls, session, db_slno),
             }
         )
-    return examples, list(resolved_by_code.values()), len(segments)
+    return (
+        examples,
+        list(resolved_by_code.values()),
+        list(presiding_by_label.values()),
+        len(segments),
+    )
 
 
 def _md_cell(text: str) -> str:
@@ -206,17 +236,26 @@ def write_outputs(
     clean_debates: list[dict],
     replay_of: str | None = None,
     resolved: list[dict] | None = None,
+    presiding: list[dict] | None = None,
 ) -> None:
     """Write this run's self-contained rollup to a fresh markdown + JSONL pair.
 
     `stamp` is the run's single canonical timestamp (it also names the files).
     When `resolved` is given, those rows go to a `*_resolved.jsonl` beside the
     markdown and a summary section is added to it — the regression baseline for
-    "verified speakers never go down". Run files are immutable: writing refuses
-    to touch a path that already exists.
+    "verified speakers never go down". When `presiding` is given, those rows
+    go to a `*_presiding.jsonl` beside the markdown and a section is added
+    listing chair labels the parser tagged `nameSource` "presiding" (classified,
+    not unverified). Run files are immutable: writing refuses to touch a path
+    that already exists.
     """
     out_resolved = out_md.with_name(out_md.stem + "_resolved.jsonl")
-    paths = [out_md, out_jsonl] + ([out_resolved] if resolved is not None else [])
+    out_presiding = out_md.with_name(out_md.stem + "_presiding.jsonl")
+    paths = (
+        [out_md, out_jsonl]
+        + ([out_resolved] if resolved is not None else [])
+        + ([out_presiding] if presiding is not None else [])
+    )
     for path in paths:
         if path.exists():
             raise SystemExit(f"{path} already exists; run files are immutable")
@@ -229,6 +268,11 @@ def write_outputs(
     if resolved is not None:
         with out_resolved.open("w", encoding="utf-8") as f:
             for row in resolved:
+                f.write(json.dumps({"run": stamp, **row}, ensure_ascii=False) + "\n")
+
+    if presiding is not None:
+        with out_presiding.open("w", encoding="utf-8") as f:
+            for row in presiding:
                 f.write(json.dumps({"run": stamp, **row}, ensure_ascii=False) + "\n")
 
     by_cat = Counter(ex["category"] for ex in examples)
@@ -260,7 +304,7 @@ def write_outputs(
         "| category | count | meaning |",
         "| --- | --- | --- |",
         f"| hindi_name | {by_cat['hindi_name']} | label is Devanagari script (legacy-font names decoded first) |",
-        f"| presiding_officer | {by_cat['presiding_officer']} | Chair / Speaker / etc. — role, not an MP row |",
+        f"| presiding_officer | {by_cat['presiding_officer']} | chair-like label the parser did NOT tag (leakage: candidates for is_presiding_label) |",
         f"| in_text_no_anchor | {by_cat['in_text_no_anchor']} | named speaker with no anchor / not in mpPartDetailList |",
         "",
         f"By era: legacy={by_era['legacy']}, modern={by_era['modern']}",
@@ -284,6 +328,29 @@ def write_outputs(
             "| --- | --- |",
         ]
         lines += [f"| {src} | {n} |" for src, n in by_source.most_common()]
+        lines.append("")
+
+    if presiding is not None:
+        lines += [
+            "### Presiding officers (classified)",
+            "",
+            f"> {len(presiding)} chair rows (one per debate + label), "
+            f"{len({row['speaker'] for row in presiding})} distinct labels, "
+            'tagged nameSource "presiding" by the parser — catalogued as the '
+            f"role, never mapped to a member. Full rows in `{out_presiding.name}`.",
+            "",
+            "| # | era | LS/sess/db | source | label | turns |",
+            "| --- | --- | --- | --- | --- | --- |",
+        ]
+        if presiding:
+            for i, row in enumerate(presiding, 1):
+                key = f"{row['loksabha']}/{row['session']}/{row['dbSlno']}"
+                lines.append(
+                    f"| {i} | {row['era']} | {key} | [view]({row['url']}) "
+                    f"| {_md_cell(row['speaker'])} | {row['turns']} |"
+                )
+        else:
+            lines.append("| _(none this run)_ | | | | | |")
         lines.append("")
 
     lines += [
@@ -348,20 +415,24 @@ def refs_from_file(run_file: Path) -> list[dict]:
     return list(refs.values())
 
 
-def collect_refs(refs: list[dict]) -> tuple[list[dict], list[dict], list[dict]]:
+def collect_refs(
+    refs: list[dict],
+) -> tuple[list[dict], list[dict], list[dict], list[dict]]:
     """Fetch+parse an explicit list of debates (no sampling, no target cap).
 
-    Returns (unverified examples, clean debates, resolved speakers).
+    Returns (unverified examples, clean debates, resolved speakers, presiding
+    rows).
     """
     examples: list[dict] = []
     clean_debates: list[dict] = []
     resolved: list[dict] = []
+    presiding: list[dict] = []
 
     for i, ref in enumerate(refs, 1):
         key = (ref["loksabha"], ref["session"], ref["dbSlno"])
         era = ref["era"]
         try:
-            found, solved, n_segments = speakers_from_debate(ref, era)
+            found, solved, chairs, n_segments = speakers_from_debate(ref, era)
         except requests.RequestException as e:
             print(f"  fetch error {key}: {e}; skipping", file=sys.stderr)
             time.sleep(2)
@@ -369,26 +440,30 @@ def collect_refs(refs: list[dict]) -> tuple[list[dict], list[dict], list[dict]]:
         time.sleep(REQUEST_DELAY_S)
         examples.extend(found)
         resolved.extend(solved)
+        presiding.extend(chairs)
         if not found and n_segments:
             clean_debates.append({**ref, "segments": n_segments})
         print(
             f"  [{i}/{len(refs)}] {key} -> {len(found)} unverified, "
-            f"{len(solved)} resolved, {n_segments} segments"
+            f"{len(chairs)} presiding, {len(solved)} resolved, {n_segments} segments"
         )
 
-    return examples, clean_debates, resolved
+    return examples, clean_debates, resolved, presiding
 
 
-def collect(target: int) -> tuple[list[dict], list[dict], list[dict]]:
+def collect(target: int) -> tuple[list[dict], list[dict], list[dict], list[dict]]:
     """Sample debates until `target` examples are gathered.
 
-    Returns (examples, clean_debates, resolved) where clean_debates are debates
-    that parsed into segments but yielded zero unverified speakers — the
-    false-positive check — and resolved lists every speaker tied to an `mpCode`.
+    Returns (examples, clean_debates, resolved, presiding) where clean_debates
+    are debates that parsed into segments but yielded zero unverified
+    speakers — the false-positive check — resolved lists every speaker tied to
+    an `mpCode`, and presiding lists every chair label the parser tagged
+    `nameSource` "presiding".
     """
     examples: list[dict] = []
     clean_debates: list[dict] = []
     resolved: list[dict] = []
+    presiding: list[dict] = []
     visited: set[tuple] = set()
     era_names = list(STRATA)
     turn = 0
@@ -412,13 +487,14 @@ def collect(target: int) -> tuple[list[dict], list[dict], list[dict]]:
                 continue
             visited.add(key)
             try:
-                found, solved, n_segments = speakers_from_debate(ref, era)
+                found, solved, chairs, n_segments = speakers_from_debate(ref, era)
             except requests.RequestException as e:
                 print(f"  fetch error {key}: {e}; skipping", file=sys.stderr)
                 time.sleep(2)
                 continue
             time.sleep(REQUEST_DELAY_S)
             resolved.extend(solved)
+            presiding.extend(chairs)
             if found:
                 got_any = True
                 examples.extend(found)
@@ -439,7 +515,7 @@ def collect(target: int) -> tuple[list[dict], list[dict], list[dict]]:
 
         empty_streak = 0 if got_any else empty_streak + 1
 
-    return examples[:target], clean_debates, resolved
+    return examples[:target], clean_debates, resolved, presiding
 
 
 def main() -> None:
@@ -473,18 +549,18 @@ def main() -> None:
     if args.replay_file:
         refs = refs_from_file(args.replay_file)
         print(f"Replaying {len(refs)} debates from {args.replay_file}")
-        examples, clean_debates, resolved = collect_refs(refs)
+        examples, clean_debates, resolved, presiding = collect_refs(refs)
         replay_of = args.replay_file.name
     else:
-        examples, clean_debates, resolved = collect(args.target)
+        examples, clean_debates, resolved, presiding = collect(args.target)
         replay_of = None
 
     write_outputs(
         out_md, out_jsonl, stamp, examples, clean_debates,
-        replay_of=replay_of, resolved=resolved,
+        replay_of=replay_of, resolved=resolved, presiding=presiding,
     )
     print(
-        f"\nWrote {len(examples)} examples "
+        f"\nWrote {len(examples)} examples ({len(presiding)} presiding) "
         f"({len(clean_debates)} clean debates) to {out_md} and {out_jsonl}"
     )
 
