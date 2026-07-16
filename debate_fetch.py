@@ -395,20 +395,49 @@ def _leading_bold(para_soup, plain: str) -> str:
     return ""
 
 
+def _is_caps_label(text: str) -> bool:
+    """
+    True if `text` reads as a speaker label rather than a normal sentence:
+    transcripts print speaker names and designations entirely in capitals
+    ("MR. SPEAKER", "SHRI RUPCHAND PAL (HOOGHLY)"), so the absence of any
+    lowercase ASCII letter is a strong, cheap signal. Requires at least one
+    letter so bare punctuation doesn't count.
+
+    Latin-script only, by construction: Devanagari has no letter case, so a
+    Hindi label would satisfy "no lowercase" vacuously and this test would wave
+    through every line of a Hindi paragraph. Callers get bold as the
+    script-agnostic signal and this one as the Latin-script fallback.
+    """
+    return bool(re.search(r"[A-Za-z]", text)) and not re.search(r"[a-z]", text)
+
+
 def _label_colon_pos(para_soup, plain: str) -> int | None:
     """
-    If this paragraph opens a new speaker turn via a bold label, return the
-    index of the colon that terminates the label; otherwise None.
+    If this paragraph opens a new speaker turn, return the index of the colon
+    that terminates the label; otherwise None.
 
-    A turn opens when the paragraph *starts* with bold text and a colon appears
-    within LABEL_MAX_CHARS. The <A name> anchors only cover ~2/3 of turns, so
-    this bold-label test — script-agnostic, keyed on the colon — is the primary
-    boundary signal; anchors are used only to attach an authoritative ID.
+    Two independent signals open a turn (either is sufficient), because neither
+    covers the corpus alone:
+      - bold text at the very start of the paragraph — script-agnostic, and the
+        only signal that works on Devanagari labels, or
+      - the text up to the colon has no lowercase letters.
+
+    The <A name> anchors only cover ~2/3 of turns, so these label tests are the
+    primary boundary signal; anchors only attach an authoritative ID.
+
+    The ALL-CAPS half is not legacy-only. LS14/12/9000 bolds its *Hindi* labels
+    and prints its English ones as plain text ("SHRIMATI MANEKA GANDHI
+    (PILIBHIT): Thank you..."), so a bold-only test silently glued three
+    quarters of that debate onto the wrong speakers while still reporting 91.5%
+    resolution — the swallowed turns never became labels, so nothing counted
+    them as missing. See internal_docs/018_WHERE_THINGS_STAND.md §5.
     """
-    if not _leading_bold(para_soup, plain):
-        return None
     colon = plain.find(":")
-    if 0 < colon <= LABEL_MAX_CHARS:
+    if not (0 < colon <= LABEL_MAX_CHARS):
+        return None
+    if _leading_bold(para_soup, plain):
+        return colon
+    if _is_caps_label(plain[:colon]):
         return colon
     return None
 

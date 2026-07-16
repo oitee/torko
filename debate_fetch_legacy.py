@@ -7,7 +7,10 @@ every assumption debate_fetch.py's split_by_speaker() makes:
     <A name="209*1">, so debate_fetch.ANCHOR_NAME_RE never matches and every
     anchor is silently invisible.
   - Most speaker labels carry no <b> bold markup at all, so the bold-colon
-    signal that carries ~1/3 of modern turns never fires here either.
+    signal that carries ~1/3 of modern turns never fires here either. This
+    module used to own the ALL-CAPS label test that covers for that; it now
+    lives in debate_fetch, because recent debates need it too — see
+    _label_colon_pos there.
   - <p> (and, in Hindi passages, <h6>) tags are never explicitly closed, and
     neither is <A name="...">. Usually the parser recovers fine, but when
     nothing forces the dangling <a> closed before the next unclosed <p>,
@@ -18,9 +21,9 @@ every assumption debate_fetch.py's split_by_speaker() makes:
     the second speaker collapses into one unattributed segment with parts of
     the speech duplicated 2-3x.
 
-With none of the modern signals reliable, this module adds one new one
-(ALL-CAPS label detection) and neutralises the unclosed-anchor landmine
-before parsing, rather than hoping lxml's tag-soup recovery guesses right.
+With none of the modern signals reliable, this module reads the part-less
+anchor format and neutralises the unclosed-anchor landmine before parsing,
+rather than hoping lxml's tag-soup recovery guesses right.
 
 Usage:
     python3 debate_fetch_legacy.py --loksabha 13 --session 1 --dbslno 6656
@@ -33,6 +36,8 @@ from bs4 import BeautifulSoup
 from debate_fetch import (
     STAR_PREFIX_RE,
     _clean_inline,
+    _is_caps_label,
+    _label_colon_pos,
     _leading_bold,
     annotate_speakers,
     fetch_debate,
@@ -75,38 +80,6 @@ def _sanitize_legacy_html(html: str) -> str:
     recovery to guess correctly.
     """
     return re.sub(r'(?i)(<a\s+name="[^"]*")\s*>', r"\1/>", html)
-
-
-def _is_caps_label(text: str) -> bool:
-    """
-    True if `text` reads as an old-style speaker label rather than a normal
-    sentence: legacy transcripts print speaker names and designations
-    entirely in capitals ("MR. SPEAKER", "SHRI RUPCHAND PAL (HOOGHLY)"), so
-    the absence of any lowercase ASCII letter is a strong, cheap signal.
-    Requires at least one letter so bare punctuation doesn't count.
-    """
-    return bool(re.search(r"[A-Za-z]", text)) and not re.search(r"[a-z]", text)
-
-
-def _label_colon_pos(para_soup, plain: str) -> int | None:
-    """
-    Return the index of the colon ending a speaker label, or None.
-
-    Two independent signals open a turn (either is sufficient), mirroring
-    debate_fetch's bold-colon test but adding the ALL-CAPS test because most
-    legacy labels carry no bold markup at all:
-      - bold text at the very start of the paragraph (works when present —
-        observed on some but not all legacy debates), or
-      - the text up to the colon has no lowercase letters.
-    """
-    colon = plain.find(":")
-    if not (0 < colon <= LABEL_MAX_CHARS):
-        return None
-    if _leading_bold(para_soup, plain):
-        return colon
-    if _is_caps_label(plain[:colon]):
-        return colon
-    return None
 
 
 def _anchor_id(para_soup) -> str | None:
