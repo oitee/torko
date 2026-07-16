@@ -14,6 +14,7 @@ from bs4 import BeautifulSoup
 
 import translit
 from legacy_hindi import decode_legacy_hindi
+from urdu_names import urdu_label_to_name
 
 API_URL = "https://sansad.in/api_ls/debate/debate-details"
 
@@ -168,16 +169,7 @@ def build_speaker_index(mp_part_detail_list: list[dict], db_roster: list[dict] |
 
 
 def resolve_speaker(label: str, index: dict) -> tuple[str | None, dict | None]:
-    """
-    Try to match a raw speaker label to an MP list entry.
-
-    Returns (nameSource, entry). nameSource is one of "name-exact",
-    "name-join" (matches once spacing/word-order is ignored), "name-partial"
-    (one entry's tokens are a subset of the other's), "name-translit"
-    (matches once the label is transliterated from Devanagari and folded),
-    "name-db" (matches the DB roster fallback only after every tier above has
-    failed), or None when unmatched.
-    """
+    label = urdu_label_to_name(label) or label
     toks = _normalize_name(label)
     if not toks:
         return None, None
