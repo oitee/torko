@@ -53,6 +53,53 @@ class TestDecodeLegacyHindi:
         assert decode_legacy_hindi("ÉÊBÉEºÉÉxÉ") == "किसान"
 
 
+class TestSecondPassIsANoOp:
+    def test_looks_encoded_is_false_on_decoded_output_even_with_residue(self):
+        # Ê and Ò have no ISFOC_MAP entry, so they stay as Latin-1 residue next to Devanagari.
+        decoded = decode_legacy_hindi("ÉÊnFÉhÉ ÊnããÉÒ")
+        assert "Ê" in decoded and "Ò" in decoded  # sanity: residue is present
+        assert looks_encoded(decoded) is False
+
+    def test_repeated_decoding_does_not_drift(self):
+        raw = "ÉÊnFÉhÉ ÊnããÉÒ"
+        once = decode_legacy_hindi(raw)
+        twice = decode_legacy_hindi(once)
+        thrice = decode_legacy_hindi(twice)
+        assert once == twice == thrice
+
+    def test_singh_is_not_re_broken_by_a_second_pass(self):
+        # A label decoded twice must not change. सिंह must not become सहिं.
+        once = decode_legacy_hindi("gÉÉÒ. ºÉÉÉÊcÉ¤É ÉËºÉc ´ÉàÉÉÇ")
+        twice = decode_legacy_hindi(once)
+        assert "सिंह" in once
+        assert once == twice
+
+    def test_decoded_matra_order_is_not_swapped_by_a_second_pass(self):
+        # A matra followed by the next consonant must not be shifted again (दक्षिण).
+        first_pass = decode_legacy_hindi("nÉÊFÉhÉ")
+        second_pass = decode_legacy_hindi(first_pass)
+        assert first_pass == second_pass
+
+
+class TestOnlyRealEncodedSequencesArmTheDecoder:
+    def test_english_with_an_invisible_soft_hyphen_is_left_alone(self):
+        # Real case: LS14/5/2711. Soft hyphens as line-break hints inside English.
+        text = "Rajya Sabha Mem\xadbers are present"
+        assert decode_legacy_hindi(text) == text
+
+    def test_a_run_of_soft_hyphens_is_not_invented_into_letters(self):
+        assert decode_legacy_hindi("\xad" * 3 + "_") == "\xad\xad\xad_"
+
+    def test_but_soft_hyphen_still_means_sha_inside_real_encoded_text(self):
+        # In encoded text the soft hyphen is ष, so it must not be stripped.
+        assert decode_legacy_hindi("ºÉÖ\xadÉàÉÉ") == "सुषमा"
+
+    def test_already_unicode_hindi_is_not_re_shifted(self):
+        # Real case: LS16/4/5083. A 2015 debate, never legacy-encoded, with a stray Latin-1 char.
+        text = "श्री मल्लिकार्जुन खड़गे: मैडम, डिवीजन के लिए हमने पूछा।"
+        assert decode_legacy_hindi(text) == text
+
+
 class TestLegacyParserDecodesText:
     def test_hindi_turn_is_decoded_end_to_end(self):
         html = "<p>ºÉ®BÉEÉ® BÉE¤É ¤ÉªÉÉxÉ näMÉÉÒ*</p>"

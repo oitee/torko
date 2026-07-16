@@ -198,9 +198,7 @@ def resolve_speaker(label: str, index: dict) -> tuple[str | None, dict | None]:
     if len(codes) == 1:
         return "name-partial", next(iter(cands.values()))
 
-    # Try name-translit. For legacy-encoded labels, decode first.
-    # This allows legacy debates to match Devanagari labels like modern ones.
-    # decode_legacy_hindi is idempotent: it's a no-op on already-Unicode text.
+    # Decode legacy-font labels first. Decoding already decoded text changes nothing.
     decoded_label = decode_legacy_hindi(label)
     key = _folded_key(decoded_label)
     if key and (m := index["by_folded"].get(key)):
