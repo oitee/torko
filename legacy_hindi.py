@@ -18,7 +18,8 @@ structural rules that reflect how Devanagari (and this font) work:
   * a full consonant is drawn as a half-form + a vertical-bar connector, so
     orphaned halants next to a matra are merged;
   * the short-i matra "ि" is stored to the LEFT of its consonant (visual order)
-    and must be shifted to its logical position after it;
+    and must be shifted to its logical position after it, together with any
+    anusvara typed as part of the same pre-base glyph ("ÉË" -> "िं" -> "सिं");
   * "reph" (र्) is typed after its consonant and must be moved before it;
   * Latin words are left untouched so interleaved English survives verbatim.
 """
@@ -88,6 +89,9 @@ ISFOC_MAP = {
     # Matras (vowel signs)
     "ÉÉä": "ो", "Éä": "ो", "ÉÉè": "ौ", "Éè": "ौ",
     "ÉÓ": "ीं", "ÉÒ": "ी", "ÉÊ": "ि", "ÉÚ": "ू", "ÉÖ": "ु",
+    # pre-base short-i carrying an anusvara ("ÉËºÉc" -> "सिंह"); like "ÉÊ" it is
+    # stored left of its consonant, so the shift regex below moves both along.
+    "ÉË": "िं",
     "ä": "े", "è": "ै", "É": "ा",
 
     # Modifiers
@@ -163,8 +167,9 @@ def decode_legacy_hindi(text: str) -> str:
     # Merge an orphaned halant sitting in front of a matra (a half-form + bar
     # that should have combined): "ज्ो" → "जो".
     text = re.sub(r"्([ािीुूेैोौंःँ])", r"\1", text)
-    # Shift the short-i matra "ि" to after its consonant (visual → logical).
-    text = re.sub(r"(ि)([क-हड़ढ़](?:्[क-हड़ढ़])*)", r"\2\1", text)
+    # Shift the short-i matra "ि" to after its consonant (visual → logical),
+    # carrying an anusvara typed with it ("िंस" -> "सिं") along for the ride.
+    text = re.sub(r"(ि)(ं?)([क-हड़ढ़](?:्[क-हड़ढ़])*)", r"\3\1\2", text)
     # Shift reph left onto the consonant it belongs to, then realise it as र्.
     text = re.sub(
         r"([क-हड़ढ़](?:्[क-हड़ढ़])?)([ािीुूेैोौंःँ]*)" + _REPH,

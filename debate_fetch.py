@@ -14,6 +14,7 @@ import requests
 from bs4 import BeautifulSoup
 
 import translit
+from legacy_hindi import decode_legacy_hindi
 
 API_URL = "https://sansad.in/api_ls/debate/debate-details"
 
@@ -193,8 +194,14 @@ def resolve_speaker(label: str, index: dict) -> tuple[str | None, dict | None]:
     codes = {m["mpCode"] for m in cands.values()}
     if len(codes) == 1:
         return "name-partial", next(iter(cands.values()))
-    if (key := _folded_key(label)) and (m := index["by_folded"].get(key)):
+
+    # Try name-translit. For legacy-encoded labels, decode first.
+    # This allows legacy debates to match Devanagari labels like modern ones.
+    # decode_legacy_hindi is idempotent: it's a no-op on already-Unicode text.
+    decoded_label = decode_legacy_hindi(label)
+    if (key := _folded_key(decoded_label)) and (m := index["by_folded"].get(key)):
         return "name-translit", m
+
     return None, None
 
 
