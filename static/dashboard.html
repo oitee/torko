@@ -618,7 +618,7 @@ function render(data) {
     card.className = 'debate-card';
     card.href = `debate.html?id=${encodeURIComponent(d.id)}`;
     card.innerHTML = `
-      <p class="debate-title">${escapeHtml(d.title)}</p>
+      <p class="debate-title">${escapeHtml(cleanTitle(d.title))}</p>
       <p class="debate-sub">LS${d.loksabha} · Session ${d.session} · ${d.debateDate || 'undated'} · ${escapeHtml(d.debateType || '')} · ${d.turnCount} turns${d.sourceUrl ? ` · <span class="source-link" data-src="${escapeHtml(d.sourceUrl)}">sansad.in ↗</span>` : ''}</p>
       ${mpDiffMini(d.mpDiff)}
       <div class="speaker-chips">
@@ -665,6 +665,20 @@ function mpDiffMini(m) {
 
 function escapeHtml(s) {
   return (s || '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+}
+
+// Titles come straight from the source HTML: they carry markup (`210<sup>th</sup>`),
+// entities (`&amp;`) and stray `\r\n`. Strip tags, decode entities via a detached
+// textarea (text-only, executes nothing), and collapse whitespace. Escape the
+// result at the call site as usual.
+function cleanTitle(s) {
+  // Block tags become a space so words don't fuse; inline tags (<sup>, <span>,
+  // <b>…) are dropped so ordinals read "194th", not "194 th".
+  const spaced = (s || '').replace(/<\s*\/?(br|p)\b[^>]*>/gi, ' ');
+  const noTags = spaced.replace(/<[^>]*>/g, '');
+  const ta = document.createElement('textarea');
+  ta.innerHTML = noTags;
+  return ta.value.replace(/\s+/g, ' ').trim();
 }
 
 // The cards are themselves anchors, so the source link cannot be one too.
