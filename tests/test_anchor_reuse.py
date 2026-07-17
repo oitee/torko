@@ -122,6 +122,51 @@ class TestSriIsAnHonorificOnlyWhenItLeads:
         assert "sri" in full
 
 
+class TestReuseRefusesToPickBetweenTwoAnchors:
+    """One label matching two anchored people is evidence for two humans."""
+
+    def test_a_label_matching_two_different_people_resolves_to_neither(self):
+        # The old loop took the FIRST match and stopped, so dict order decided
+        # which human being got the words. Nothing in `ambiguous` catches this:
+        # it guards one label printed for two mpCodes, not one label fuzzy-
+        # matching two separate anchors.
+        segs = [
+            {"mpCode": "11", "speakerLabel": "SHRI RAM KUMAR SINGH",
+             "mpName": "Shri Ram Kumar Singh", "nameSource": "anchor"},
+            {"mpCode": "22", "speakerLabel": "SHRI RAM KUMAR SINHA",
+             "mpName": "Shri Ram Kumar Sinha", "nameSource": "anchor"},
+            {"mpCode": None, "speakerLabel": "SHRI RAM KUMAR", "mpName": None},
+        ]
+        out = reuse_anchors(segs)
+        assert out[2]["mpCode"] is None
+        assert out[2].get("nameSource") != "anchor-reuse"
+
+    def test_one_person_anchored_under_two_spellings_still_resolves(self):
+        # The counterpart that keeps the guard honest. LS18/4/2819 prints
+        # Harsimrat Kaur Badal both with and without her constituency; two
+        # labels, two mpCodes in the roster, one human. Keying the candidates
+        # by mpCode is what would make this ambiguous -- so this test pins the
+        # single-person case, where both labels carry the SAME code.
+        segs = [
+            {"mpCode": "5107", "speakerLabel": "SHRIMATI HARSIMRAT KAUR BADAL (BATHINDA)",
+             "mpName": "Shrimati Harsimrat Kaur Badal", "nameSource": "anchor"},
+            {"mpCode": "5107", "speakerLabel": "SHRIMATI HARSIMRAT KAUR BADAL",
+             "mpName": "Shrimati Harsimrat Kaur Badal", "nameSource": "anchor"},
+            {"mpCode": None, "speakerLabel": "श्रीमती हरसिमरत कौर बादल", "mpName": None},
+        ]
+        out = reuse_anchors(segs)
+        assert out[2]["mpCode"] == "5107"
+        assert out[2]["nameSource"] == "anchor-reuse"
+
+    def test_a_single_unambiguous_anchor_still_carries(self):
+        segs = [
+            {"mpCode": "100", "speakerLabel": "SHRI KODIKUNNIL SURESH",
+             "mpName": "Shri Kodikunnil Suresh", "nameSource": "anchor"},
+            {"mpCode": None, "speakerLabel": "SHRI KODIKUNNIL SURESH", "mpName": None},
+        ]
+        assert reuse_anchors(segs)[1]["mpCode"] == "100"
+
+
 class TestAMinisterialTitleIsNotAName:
     """A title describes a job. It is never evidence of who holds it."""
 
