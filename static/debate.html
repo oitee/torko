@@ -64,6 +64,33 @@
   .error { color: #d03b3b; font-size: 14px; margin-bottom: 18px; }
   .section-title { font-size: 14px; font-weight: 600; margin: 0 0 12px; }
 
+  .transcript-controls {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+    flex-wrap: wrap;
+    margin: 0 0 12px;
+    font-size: 13px;
+  }
+  .transcript-controls label { color: var(--text-secondary); }
+  .transcript-controls select {
+    padding: 6px 8px;
+    border-radius: 6px;
+    border: 1px solid var(--border);
+    background: var(--surface-1);
+    color: var(--text-primary);
+    font-size: 13px;
+    max-width: 320px;
+  }
+  .transcript-controls .clear {
+    all: unset;
+    cursor: pointer;
+    color: var(--series-1);
+    font-size: 12px;
+  }
+  .transcript-controls .clear:hover { text-decoration: underline; }
+  .transcript-item.dim { display: none; }
+
   .badge {
     display: inline-flex;
     align-items: center;
@@ -295,27 +322,92 @@ function render(data) {
 
   const sectionTitle = document.createElement('p');
   sectionTitle.className = 'section-title';
-  sectionTitle.textContent = `Transcript (${data.turns.length} turns, in order)`;
+  sectionTitle.id = 'transcript-title';
   contentEl.appendChild(sectionTitle);
+
+  contentEl.appendChild(buildTranscriptControls(data.turns));
 
   const list = document.createElement('div');
   list.className = 'transcript-list';
-  data.turns.forEach((t, i) => {
+  list.id = 'transcript-list';
+  contentEl.appendChild(list);
+
+  allTurns = data.turns;
+  // A speaker deep-link (?speaker=<sansadId>, e.g. from the speaker page) opens
+  // the debate pre-filtered to just that person's turns.
+  const wantSpeaker = params.get('speaker');
+  applyTurnFilter(wantSpeaker ? `id:${wantSpeaker}` : '');
+}
+
+let allTurns = [];
+
+// A turn's filter key: its sansadId if resolved, else its printed label. Lets
+// one control cover both verified people and unresolved/role labels without
+// pretending an unresolved label is an identity.
+function turnKey(t) {
+  return (t.verified && t.sansadId) ? `id:${t.sansadId}` : `name:${t.name || '(unattributed)'}`;
+}
+
+function buildTranscriptControls(turns) {
+  const bar = document.createElement('div');
+  bar.className = 'transcript-controls';
+
+  const counts = new Map();   // key -> {label, count}
+  turns.forEach(t => {
+    const key = turnKey(t);
+    const entry = counts.get(key) || { label: t.name || '(unattributed)', count: 0 };
+    entry.count += 1;
+    counts.set(key, entry);
+  });
+  const options = [...counts.entries()].sort((a, b) => b[1].count - a[1].count);
+
+  bar.innerHTML = `
+    <label for="turn-filter">Show turns by</label>
+    <select id="turn-filter">
+      <option value="">Everyone (${turns.length} turns)</option>
+      ${options.map(([key, e]) => `<option value="${escapeHtml(key)}">${escapeHtml(e.label)} (${e.count})</option>`).join('')}
+    </select>
+    <button type="button" class="clear" id="turn-clear" style="display:none">Show all turns</button>
+  `;
+  bar.querySelector('#turn-filter').addEventListener('change', e => applyTurnFilter(e.target.value));
+  bar.querySelector('#turn-clear').addEventListener('click', () => applyTurnFilter(''));
+  return bar;
+}
+
+function applyTurnFilter(key) {
+  const sel = document.getElementById('turn-filter');
+  const clearBtn = document.getElementById('turn-clear');
+  const list = document.getElementById('transcript-list');
+  const title = document.getElementById('transcript-title');
+  if (sel && sel.value !== key) sel.value = key;
+
+  // Render every turn once, keeping its ORIGINAL #index; the filter hides the
+  // rest so numbering still refers to position in the full debate.
+  const shown = [];
+  list.innerHTML = allTurns.map((t, i) => {
+    const match = !key || turnKey(t) === key;
+    if (match) shown.push(i);
     const name = t.name || '(unattributed)';
     const nameHtml = (t.verified && t.sansadId)
       ? `<a class="speaker-link" href="speaker.html?id=${encodeURIComponent(t.sansadId)}">${escapeHtml(name)}</a>`
       : escapeHtml(name);
-    const item = document.createElement('div');
-    item.className = 'transcript-item';
-    item.innerHTML = `
-      <div class="transcript-speaker">
-        ${nameHtml}${t.party ? `<span class="transcript-party"> · ${escapeHtml(t.party)}</span>` : ''}${badge(t.verified, t.nameSource)}<span class="transcript-index">#${i + 1}</span>
-      </div>
-      <div class="transcript-text">${escapeHtml(t.text)}</div>
-    `;
-    list.appendChild(item);
-  });
-  contentEl.appendChild(list);
+    return `
+      <div class="transcript-item${match ? '' : ' dim'}">
+        <div class="transcript-speaker">
+          ${nameHtml}${t.party ? `<span class="transcript-party"> · ${escapeHtml(t.party)}</span>` : ''}${badge(t.verified, t.nameSource)}<span class="transcript-index">#${i + 1}</span>
+        </div>
+        <div class="transcript-text">${escapeHtml(t.text)}</div>
+      </div>`;
+  }).join('');
+
+  if (key) {
+    const label = (sel && sel.selectedOptions[0]) ? sel.selectedOptions[0].textContent : '';
+    title.textContent = `Transcript — ${shown.length} of ${allTurns.length} turns (${label})`;
+    if (clearBtn) clearBtn.style.display = '';
+  } else {
+    title.textContent = `Transcript (${allTurns.length} turns, in order)`;
+    if (clearBtn) clearBtn.style.display = 'none';
+  }
 }
 
 function badge(verified, source) {
