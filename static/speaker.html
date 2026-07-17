@@ -119,8 +119,8 @@
 
   <div class="caveat">
     Party shown is each MP's <strong>last recorded term's party</strong>, not necessarily their
-    party when they gave a particular speech. Demo data covers only 25 debates, not the full corpus —
-    debate counts here are not a real activity measure.
+    party when they gave a particular speech. Debate counts reflect only debates where we
+    attributed a turn to this MP — a coverage figure, not a verified activity total.
   </div>
 
   <div class="search-box">
@@ -161,7 +161,7 @@ function showSuggestions(query) {
   suggestionsEl.innerHTML = matches.map(s => `
     <div class="suggestion-item" data-id="${s.sansadId}">
       <span class="suggestion-name">${escapeHtml(s.name)}</span>
-      <span class="suggestion-meta">${escapeHtml(s.party || 'party unknown')} · ${s.debateCount} debate${s.debateCount === 1 ? '' : 's'} in demo data</span>
+      <span class="suggestion-meta">${escapeHtml(s.party || 'party unknown')} · ${s.debateCount} debate${s.debateCount === 1 ? '' : 's'}</span>
     </div>
   `).join('');
   suggestionsEl.style.display = 'block';
@@ -185,13 +185,17 @@ document.addEventListener('click', (e) => {
   if (!e.target.closest('.search-box')) suggestionsEl.style.display = 'none';
 });
 
-async function loadSpeaker(sansadId) {
+async function loadSpeaker(sansadId, opts = {}) {
   errorEl.style.display = 'none';
   contentEl.innerHTML = '';
+  if (opts.pushUrl !== false) {
+    history.replaceState(null, '', `?id=${encodeURIComponent(sansadId)}`);
+  }
   try {
     const resp = await fetch(`/api/dashboard/speakers/${encodeURIComponent(sansadId)}`);
     const data = await resp.json();
     if (!resp.ok) throw new Error(data.error || 'Request failed');
+    if (data.speaker && data.speaker.name) searchInput.value = data.speaker.name;
     renderSpeaker(data);
   } catch (err) {
     errorEl.textContent = err.message;
@@ -211,14 +215,14 @@ function renderSpeaker(data) {
   if (data.debates.length === 0) {
     const empty = document.createElement('p');
     empty.className = 'empty';
-    empty.textContent = 'No debates found for this speaker in the demo data.';
+    empty.textContent = 'No debates found where we attributed a turn to this speaker.';
     contentEl.appendChild(empty);
     return;
   }
 
   const heading = document.createElement('p');
   heading.style.cssText = 'font-size:13px;font-weight:600;margin:0 0 10px;';
-  heading.textContent = `${data.totalDebates} debate${data.totalDebates === 1 ? '' : 's'} in demo data`;
+  heading.textContent = `${data.totalDebates} debate${data.totalDebates === 1 ? '' : 's'} with an attributed turn`;
   contentEl.appendChild(heading);
 
   const list = document.createElement('div');
@@ -250,4 +254,8 @@ document.addEventListener('click', e => {
 });
 
 loadAllSpeakers();
+
+// Deep-link support: speaker.html?id=<sansadId> auto-loads that speaker.
+const initialId = new URLSearchParams(location.search).get('id');
+if (initialId) loadSpeaker(initialId, { pushUrl: false });
 </script>
