@@ -317,6 +317,10 @@
       <label for="q">Title contains</label>
       <input type="text" id="q" placeholder="e.g. airport">
     </div>
+    <div class="field">
+      <label for="text">Transcript contains</label>
+      <input type="text" id="text" placeholder="keyword in what was said">
+    </div>
     <button type="submit">Filter</button>
     <button type="button" class="secondary" id="reset-btn">Reset</button>
   </form>
@@ -571,12 +575,14 @@ function buildQuery(page) {
   const dateTo = document.getElementById('date_to').value;
   const [loksabha, session] = document.getElementById('term-session').value.split('|');
   const q = document.getElementById('q').value.trim();
+  const textq = document.getElementById('text').value.trim();
 
   if (dateFrom) params.set('date_from', dateFrom);
   if (dateTo) params.set('date_to', dateTo);
   if (loksabha) params.set('loksabha', loksabha);
   if (session) params.set('session', session);
   if (q) params.set('q', q);
+  if (textq) params.set('text', textq);
   typeToken.getValues().forEach(t => params.append('debate_type', t));
   partyToken.getValues().forEach(p => params.append('party', p));
   speakerToken.getValues().forEach(s => params.append('speaker', s));

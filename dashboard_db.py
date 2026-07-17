@@ -99,6 +99,7 @@ def list_debates(
     page: int,
     page_size: int,
     debate_types: list[str] | None = None,
+    text_query: str | None = None,
 ) -> dict:
     clauses = []
     params: dict = {}
@@ -121,6 +122,15 @@ def list_debates(
     if q:
         clauses.append("d.title ILIKE :q")
         params["q"] = f"%{q}%"
+    if text_query:
+        # Whole-word keyword match over every turn's body, served by the GIN
+        # index in 08-turns-fts.sql. Same 'simple' config as the index, or it
+        # would not be used. plainto_tsquery ANDs the words together.
+        clauses.append(
+            "EXISTS (SELECT 1 FROM turns t WHERE t.debate_id = d.id "
+            "AND to_tsvector('simple', t.text) @@ plainto_tsquery('simple', :text_query))"
+        )
+        params["text_query"] = text_query
     if parties:
         clauses.append(
             "EXISTS (SELECT 1 FROM turns t JOIN speakers sp ON sp.person_id = t.person_id "
