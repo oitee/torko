@@ -297,8 +297,8 @@ def is_presiding_label(label: str) -> bool:
     Covers English chair titles (Speaker, Deputy-Speaker, Chairman,
     Chairperson) and their Devanagari equivalents (अध्यक्ष, उपाध्यक्ष,
     सभापति). Crowd labels such as "SEVERAL HON. MEMBERS" or "अनेक माननीय
-    सदस्य" are deliberately not matched: they are anonymous interjections,
-    not the Chair.
+    सदस्य" are deliberately not matched here: they are anonymous
+    interjections, not the Chair, and `is_crowd_label` classifies them.
 
     Args:
         label: the raw speaker label as printed in the transcript.
@@ -306,6 +306,85 @@ def is_presiding_label(label: str) -> bool:
     if not label:
         return False
     return bool(_PRESIDING_RE.search(label))
+
+
+_CROWD_RE = re.compile(
+    # "SEVERAL/SOME/MANY HON. MEMBERS", with the apostrophe forms ("HON'BLE")
+    # and the stray-space forms ("SEVERAL HON . MEMBERS") folded in by the
+    # tolerant separator rather than by listing each spelling.
+    r"\b(?:several|some|many)\b[\s.'’A-Za-z]*\bmembers\b"
+    # Devanagari: अनेक / कई / कुछ माननीय सदस्य.
+    r"|(?:अनेक|कई|कुछ)\s*माननीय\s*सदस्य",
+    re.IGNORECASE,
+)
+
+
+def is_crowd_label(label: str) -> bool:
+    """Return True when a speaker label names a crowd rather than a person.
+
+    "SEVERAL HON. MEMBERS:", "अनेक माननीय सदस्य:" -- an anonymous chorus of
+    interjections. 1,199 turns across the corpus.
+
+    These are a category of their own, NOT a matching failure. Before this
+    existed they fell through to "unresolved", which quietly conflated two
+    unlike things: a name we failed to match (a bug we could fix) and a label
+    that names nobody at all (nothing to fix, ever). That conflation is the
+    §6.5 trap -- it makes the unresolved bucket unreadable as a work list.
+
+    Unlike a presiding officer, a crowd label is terminal: no future evidence
+    can resolve it, because there is no one person it refers to.
+
+    Args:
+        label: the raw speaker label as printed in the transcript.
+    """
+    if not label:
+        return False
+    return bool(_CROWD_RE.search(label))
+
+
+# Canonical offices, matched MOST-SPECIFIC-FIRST. The order is load-bearing and
+# every entry below is a different human being from the one under it:
+#   "DEPUTY-CHAIRMAN" contains "CHAIRMAN"
+#   "DEPUTY-SPEAKER"  contains "SPEAKER"
+#   उपाध्यक्ष          contains अध्यक्ष
+# Test the plain forms first and every deputy in the corpus is silently filed as
+# their principal -- a misattribution we would have manufactured ourselves.
+# `deputy_chairman` is not hypothetical: the corpus prints
+# "DEPUTY-CHAIRMAN (RAJYA SABHA):" 58 times (LS13, LS15), the OTHER House's
+# officer appearing in a Lok Sabha transcript.
+_ROLE_CODES: tuple[tuple[str, re.Pattern[str]], ...] = (
+    ("deputy_chairman", re.compile(r"deputy[-\s]*chair(?:man|person)", re.IGNORECASE)),
+    ("deputy_speaker", re.compile(r"deputy[-\s]*speaker|उपाध्यक्ष", re.IGNORECASE)),
+    ("chairman", re.compile(r"chair(?:man|person)|सभापति", re.IGNORECASE)),
+    ("speaker", re.compile(r"\bspeaker\b|अध्यक्ष", re.IGNORECASE)),
+)
+
+
+def role_code_for_label(label: str) -> str | None:
+    """Map a speaker label to a canonical `speaker_roles.code`, or None.
+
+    Returns one of the office slugs seeded in db/init/06-speaker-roles.sql --
+    'speaker', 'deputy_speaker', 'chairman', 'members_crowd' -- so a turn that
+    names no person still records WHICH non-person it named.
+
+    The corpus prints 143 distinct role spellings, but they are 3 offices plus
+    spacing/punctuation/typo noise. We search for the office word instead of
+    matching whole strings, which absorbs "MR.SPEAKER", "HON . SPEAKER",
+    "M R . CHAIRMAN", the "*m75 " index-marker prefix and the "DEPUPTY" typo
+    without a rule per variant. The Devanagari forms are the same three
+    offices, not extra ones.
+
+    Args:
+        label: the raw speaker label as printed in the transcript.
+    """
+    if not label:
+        return None
+    if is_crowd_label(label):
+        return "members_crowd"
+    for code, pattern in _ROLE_CODES:
+        if pattern.search(label):
+            return code
+    return None
 
 
 def annotate_speakers(
@@ -328,9 +407,18 @@ def annotate_speakers(
         if not seg.get("speakerLabel"):
             seg["nameSource"] = None
             continue
+        # Crowd first: "SEVERAL HON. MEMBERS" names nobody, and testing it
+        # before the Chair keeps the two categories disjoint by construction
+        # rather than by hoping the regexes never overlap.
+        if is_crowd_label(seg["speakerLabel"]):
+            seg["nameSource"] = "crowd"
+            seg["mpName"] = seg["speakerLabel"]
+            seg["roleCode"] = "members_crowd"
+            continue
         if is_presiding_label(seg["speakerLabel"]):
             seg["nameSource"] = "presiding"
             seg["mpName"] = seg["speakerLabel"]
+            seg["roleCode"] = role_code_for_label(seg["speakerLabel"])
             continue
         source, entry = resolve_speaker(seg["speakerLabel"], index)
         if entry:
