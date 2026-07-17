@@ -15,12 +15,42 @@
 -- `is_legacy BOOL`. One boolean cannot hold it: "is the Hindi disguised?" and
 -- "are the speaker names bold or plain capitals?" are two independent questions,
 -- and conflating them is a known bug (018 §6.9). Both are computable from
--- raw_html on demand:
---   recent-style ID tag: raw_html ~* '<A\s+name="[0-9]+\*[0-9]+"'
---   disguised Hindi (ISFOC): raw_html ~ 'BÉE|àÉ|ãÉ|ºÉ'
---   the second font:         raw_html ~ 'Eò|®ú|½þ'
+-- raw_html on demand -- but NOT by a plain SQL regex. See the next note.
 -- Storing a derived answer would freeze today's guess at a question we are
 -- still trying to measure.
+--
+-- ############################################################################
+-- DO NOT GREP raw_html FOR FONT GLYPHS. It does not work, and it fails in the
+-- most dangerous way available: quietly, with a confident small number.
+--
+-- These three lines used to live here as the recommended way to measure era
+-- and font, and .claude/STATE.md called the query built from them "the
+-- highest-value query in the project":
+--     disguised Hindi (ISFOC): raw_html ~ 'BÉE|àÉ|ãÉ|ºÉ'
+--     the second font:         raw_html ~ 'Eò|®ú|½þ'
+-- They are WRONG. `raw_html` MIXES representations: this source stores most
+-- old-font pages as HTML NAMED ENTITIES (&Eacute;, &Ograve;, &THORN;) and
+-- Unicode Devanagari as NUMERIC entities (&#2358;), while a minority of pages
+-- store the very same glyphs literally. A literal-glyph regex therefore sees
+-- only the minority. Measured over all 64,921 rows:
+--     LS13 old-font debates:  regex said 43     truth 4,443  (4,400 entity-only)
+--     second font:            regex said  7     truth   370  (all in LS13)
+-- The regex found 1% of the corpus and reported it as the whole. Note that
+-- `SELECT count(*) ... WHERE raw_html LIKE '%श्री%'` returns ZERO across every
+-- row in this table, which is the fastest way to see the problem for yourself.
+--
+-- The PARSER is not affected and never was: both readers go through
+-- BeautifulSoup, which decodes entities before any matching happens. Only
+-- hand-written SQL over raw_html is affected -- i.e. exactly the ad-hoc
+-- measurement queries we reach for when deciding what to work on next.
+--
+-- TO MEASURE, decode first, in Python, the way the parser does:
+--     html.unescape(raw_html)   then apply the signature
+-- Routing itself is the one thing a plain regex CAN answer, because anchors
+-- are pure ASCII -- and it is the real decision the code makes:
+--     debate_fetch_legacy.looks_legacy(html) == not MODERN_ANCHOR_RE.search(html)
+--     recent-style ID tag: raw_html ~* '<A\s+name="[0-9]+\*[0-9]+"'
+-- ############################################################################
 --
 -- Two API responses feed this table and NEITHER is complete on its own: the
 -- search record carries the title/type/keywords but its `debateDesc` is always
