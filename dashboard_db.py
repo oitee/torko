@@ -64,6 +64,30 @@ def _speakers_present(conn, debate_id: int) -> list[dict]:
     ]
 
 
+def summarize_mp_diff(mp_list_raw, attributed) -> dict:
+    """Bird's-eye tagged-vs-attributed counts for one debate, for the list view.
+
+    Pure set math over Sansad's tag list (`mp_list_raw`, each entry has
+    `mpCode`/`mpName`) versus the sansadIds we attributed a turn to
+    (`attributed`, a {sansadId: name} map). NO `raw_html`, NO parsing -- this
+    runs per card across a whole page, so it must stay cheap. It therefore has
+    NO reason breakdown: `missCount` is the WORST CASE (every tagged MP we did
+    not attribute counted as a miss), deliberately. The reasoned split lives in
+    `get_mp_diff`, one debate at a time. Counted OVER one debate.
+    """
+    tagged = {str(m["mpCode"]): (m.get("mpName") or str(m["mpCode"])) for m in (mp_list_raw or [])}
+    attr_codes = set(attributed)
+    agree = [n for c, n in sorted(tagged.items()) if c in attr_codes]
+    miss = [n for c, n in sorted(tagged.items()) if c not in attr_codes]
+    return {
+        "taggedCount": len(tagged),
+        "agreeCount": len(agree),
+        "missCount": len(miss),
+        "agreeSample": agree[:2],
+        "missSample": miss[:2],
+    }
+
+
 def list_debates(
     date_from: str | None,
     date_to: str | None,
@@ -120,7 +144,7 @@ def list_debates(
             text(
                 f"""
                 SELECT d.id, d.loksabha, d.session, d.dbslno, d.title,
-                       d.debate_type, d.debate_date, d.source_url,
+                       d.debate_type, d.debate_date, d.source_url, d.mp_list_raw,
                        (SELECT count(*) FROM turns t WHERE t.debate_id = d.id) AS turn_count
                 FROM debates d
                 {where}
@@ -134,6 +158,7 @@ def list_debates(
         results = []
         for r in rows:
             present = _speakers_present(conn, r.id)
+            attributed = {s["sansadId"]: s["name"] for s in present}
             results.append(
                 {
                     "id": composite_id(r.loksabha, r.session, r.dbslno),
@@ -147,6 +172,7 @@ def list_debates(
                     "speakerCount": len(present),
                     "turnCount": r.turn_count,
                     "speakersPresent": present,
+                    "mpDiff": summarize_mp_diff(r.mp_list_raw, attributed),
                 }
             )
 

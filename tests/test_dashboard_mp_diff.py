@@ -113,3 +113,69 @@ class TestGetMpDiffHandlesTheEmptyCase:
 
         monkeypatch.setattr("dashboard_db.get_engine", lambda: FakeEngine())
         assert get_mp_diff(18, 1, 999999) is None
+
+
+class TestSummarizeMpDiff:
+    """The bird's-eye list summary (`summarize_mp_diff`) -- pure set math, no DB.
+
+    Deliberately reasonless: `missCount` is the worst case (every tagged MP we
+    did not attribute), because the list view cannot afford the per-debate
+    `raw_html` parse that produces reasons. Counted over one debate.
+    """
+
+    def test_agreement_and_miss_split(self):
+        from dashboard_db import summarize_mp_diff
+
+        mp_list = [
+            {"mpCode": 131, "mpName": "Gangwar"},
+            {"mpCode": 385, "mpName": "Rudy"},
+            {"mpCode": 593, "mpName": "Judev"},
+        ]
+        attributed = {"131": "Gangwar", "385": "Rudy"}
+        s = summarize_mp_diff(mp_list, attributed)
+        assert s["taggedCount"] == 3
+        assert s["agreeCount"] == 2
+        assert s["missCount"] == 1
+        assert s["missSample"] == ["Judev"]
+        assert set(s["agreeSample"]) == {"Gangwar", "Rudy"}
+
+    def test_worst_case_counts_every_unattributed_tag(self):
+        from dashboard_db import summarize_mp_diff
+
+        mp_list = [{"mpCode": i, "mpName": f"MP{i}"} for i in range(5)]
+        s = summarize_mp_diff(mp_list, {})  # attributed nobody
+        assert s["missCount"] == 5
+        assert s["agreeCount"] == 0
+
+    def test_sample_capped_at_two(self):
+        from dashboard_db import summarize_mp_diff
+
+        mp_list = [{"mpCode": i, "mpName": f"MP{i}"} for i in range(6)]
+        s = summarize_mp_diff(mp_list, {})
+        assert len(s["missSample"]) == 2
+        assert s["missCount"] == 6  # count is full, sample is capped
+
+    def test_attributed_not_in_tag_list_does_not_inflate(self):
+        # MPs we attributed but Sansad never tagged are not part of this summary;
+        # it is scoped to the tag list only.
+        from dashboard_db import summarize_mp_diff
+
+        mp_list = [{"mpCode": 131, "mpName": "Gangwar"}]
+        attributed = {"131": "Gangwar", "999": "Someone Sansad omitted"}
+        s = summarize_mp_diff(mp_list, attributed)
+        assert s["taggedCount"] == 1
+        assert s["agreeCount"] == 1
+        assert s["missCount"] == 0
+
+    def test_empty_tag_list(self):
+        from dashboard_db import summarize_mp_diff
+
+        s = summarize_mp_diff([], {"131": "x"})
+        assert s["taggedCount"] == 0
+        assert s["missSample"] == []
+
+    def test_missing_mpname_falls_back_to_code(self):
+        from dashboard_db import summarize_mp_diff
+
+        s = summarize_mp_diff([{"mpCode": 131}], {})
+        assert s["missSample"] == ["131"]

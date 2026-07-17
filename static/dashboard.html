@@ -106,6 +106,14 @@
   .source-link:hover { text-decoration: underline; }
   .debate-title { font-size: 14px; font-weight: 600; margin: 0 0 6px; }
   .debate-sub { font-size: 12px; color: var(--text-muted); margin: 0 0 8px; }
+  .mp-diff-mini { font-size: 12px; margin: 0 0 8px; display: flex; flex-wrap: wrap; gap: 10px; align-items: baseline; }
+  .mp-diff-mini .mini-ok { color: #1a7f4b; font-weight: 600; }
+  .mp-diff-mini .mini-miss { color: #b23030; font-weight: 600; }
+  .mp-diff-mini .mini-names { color: var(--text-muted); }
+  @media (prefers-color-scheme: dark) {
+    .mp-diff-mini .mini-ok { color: #57d493; }
+    .mp-diff-mini .mini-miss { color: #e06a6a; }
+  }
   .speaker-chips { display: flex; flex-wrap: wrap; gap: 6px; }
   .chip {
     font-size: 11.5px;
@@ -296,6 +304,7 @@ function render(data) {
     card.innerHTML = `
       <p class="debate-title">${escapeHtml(d.title)}</p>
       <p class="debate-sub">LS${d.loksabha} · Session ${d.session} · ${d.debateDate || 'undated'} · ${escapeHtml(d.debateType || '')} · ${d.turnCount} turns${d.sourceUrl ? ` · <span class="source-link" data-src="${escapeHtml(d.sourceUrl)}">sansad.in ↗</span>` : ''}</p>
+      ${mpDiffMini(d.mpDiff)}
       <div class="speaker-chips">
         ${d.speakersPresent.map(s => `<span class="chip">${escapeHtml(s.name)}${s.party ? ' · ' + escapeHtml(s.party) : ''}</span>`).join('')}
       </div>
@@ -318,6 +327,22 @@ document.getElementById('reset-btn').addEventListener('click', () => {
 });
 prevBtn.addEventListener('click', () => search(state.page - 1));
 nextBtn.addEventListener('click', () => search(state.page + 1));
+
+// Bird's-eye tagged-vs-attributed line. Worst case: every tagged MP we did not
+// attribute is counted red. The card links to the debate page for the reasoned
+// breakdown, so "more" is that navigation, not an inline fetch.
+function mpDiffMini(m) {
+  if (!m || !m.taggedCount) return '';
+  const names = m.missSample.map(escapeHtml).join(', ');
+  const extra = m.missCount - m.missSample.length;
+  const more = m.missCount
+    ? `<span class="mini-names">${names}${extra > 0 ? ` +${extra} more` : ''} →</span>`
+    : '';
+  return `<p class="mp-diff-mini" title="Of ${m.taggedCount} MPs Sansad tagged, ${m.agreeCount} got an attributed turn and ${m.missCount} did not (worst case). Full breakdown on the debate page.">`
+    + `<span class="mini-ok">✓ ${m.agreeCount} matched</span>`
+    + `<span class="mini-miss">✗ ${m.missCount} unattributed</span>`
+    + `${more}</p>`;
+}
 
 function escapeHtml(s) {
   return (s || '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
