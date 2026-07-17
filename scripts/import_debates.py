@@ -57,6 +57,25 @@ from sample_unverified import search_page  # noqa: E402
 TERMS = (13, 14, 15, 16, 17, 18)
 DEBATE_PAGE = "https://sansad.in/ls/debates/view-debate"
 
+# A search page that takes longer than this is worth saying out loud. The search
+# endpoint's latency is wildly uneven -- measured at 0.2s median with a tail past
+# 27s on the same term, minutes apart -- so a slow page is normal, not an error.
+# We log it anyway: a run with no output for ten minutes is indistinguishable
+# from a hung one, and that ambiguity has cost this project several runs.
+SLOW_PAGE_SECONDS = 5.0
+
+
+def log(msg: str) -> None:
+    """Timestamped, flushed. Both halves matter.
+
+    Flushed because stdout redirected to a file is block-buffered, so an
+    unflushed run writes *nothing* for its first several KB -- an empty log file
+    reads exactly like a hang, and that is precisely how this importer has been
+    misdiagnosed. Timestamped because "is it stuck?" is a question about elapsed
+    time, and without a clock on each line there is no way to answer it.
+    """
+    print(f"[{datetime.now():%H:%M:%S}] {msg}", flush=True)
+
 # Keys we model explicitly. Anything else the API returns lands in `extra` rather
 # than being dropped, so the shred stays lossless even if sansad adds a field.
 PAYLOAD_KNOWN = {"contents", "debateDesc", "debateDate", "debateType", "mpPartDetailList"}
@@ -211,14 +230,58 @@ def enumerate_refs(loksabha: int) -> list[dict]:
     The mitigation is free: re-running the importer re-walks the search from
     scratch, so a second run picks up anything a first run never saw. See the
     reconciliation summary at the end of a run.
+
+    The walk is the slowest, quietest part of a run -- ~113 pages for LS15 at a
+    second-to-half-a-minute each, before a single debate is fetched. It reports
+    per page for that reason.
     """
-    meta = search_page(loksabha, 1).get("_metadata", {})
+    meta = search_page_retrying(loksabha, 1).get("_metadata", {})
     total_pages = max(int(meta.get("totalPages", 1)), 1)
+    log(f"LS{loksabha}: walking {total_pages} search pages")
     seen: dict[tuple[int, int], dict] = {}
+    walk_started = time.time()
     for page in range(1, total_pages + 1):
-        for rec in search_page(loksabha, page).get("records", []):
+        for rec in search_page_retrying(loksabha, page).get("records", []):
             seen.setdefault((int(rec["session"]), int(rec["dbSlno"])), rec)
+        if page % 10 == 0 or page == total_pages:
+            log(f"  LS{loksabha}: search page {page}/{total_pages}  "
+                f"distinct={len(seen)}  {time.time() - walk_started:.0f}s elapsed")
+    log(f"LS{loksabha}: search walk done, {len(seen)} distinct debates "
+        f"in {(time.time() - walk_started) / 60:.1f} min")
     return list(seen.values())
+
+
+def search_page_retrying(loksabha: int, page: int, retries: int = 5) -> dict:
+    """One search page, retried with linear backoff.
+
+    Without this, one timeout ends the run. That is not hypothetical: a full
+    multi-hour walk died on a single ConnectTimeout at LS14 page 3 after
+    importing 7,616 debates of LS13. The endpoint is not blocking us -- it is
+    just erratic -- so a page that times out is very likely to succeed on the
+    next ask, and giving up on the whole term is the wrong response to it.
+
+    Raises only if every attempt fails: enumeration cannot proceed on a partial
+    walk, and silently importing a term minus one page would be a data gap
+    nobody would ever notice.
+    """
+    for attempt in range(1, retries + 1):
+        started = time.time()
+        try:
+            payload = search_page(loksabha, page)
+            elapsed = time.time() - started
+            if elapsed > SLOW_PAGE_SECONDS:
+                log(f"  LS{loksabha}: search page {page} was slow ({elapsed:.0f}s) "
+                    f"-- the endpoint is erratic, not stuck")
+            return payload
+        except requests.RequestException as exc:
+            log(f"  LS{loksabha}: search page {page} failed after {time.time() - started:.0f}s "
+                f"(attempt {attempt}/{retries}): {type(exc).__name__}: {exc}")
+            if attempt == retries:
+                raise
+            backoff = 5 * attempt
+            log(f"  LS{loksabha}: retrying search page {page} in {backoff}s")
+            time.sleep(backoff)
+    raise RuntimeError("unreachable")
 
 
 def fetch_one(loksabha: int, rec: dict, retries: int = 3) -> tuple[dict | None, str | None]:
@@ -268,7 +331,7 @@ def import_term(engine, loksabha: int, workers: int, batch_size: int,
     stored = len(refs) - len(todo)
     if limit is not None:
         todo = todo[:limit]
-    print(f"LS{loksabha}: {len(refs)} debates, {stored} already stored, {len(todo)} to fetch")
+    log(f"LS{loksabha}: {len(refs)} debates, {stored} already stored, {len(todo)} to fetch")
     if not todo:
         return 0, [], len(refs)
 
@@ -286,7 +349,12 @@ def import_term(engine, loksabha: int, workers: int, batch_size: int,
                 conn.execute(UPSERT, rows)
         written += len(rows)
         done = min(start + batch_size, len(todo))
-        print(f"  LS{loksabha}: {done}/{len(todo)}  written={written}  errors={len(errors)}", flush=True)
+        log(f"  LS{loksabha}: {done}/{len(todo)}  written={written}  errors={len(errors)}")
+        # Errors are summarised at the end of a run, which is no help while one is
+        # still going: a batch quietly failing every fetch looks the same as a batch
+        # succeeding until the summary lands hours later. Say it as it happens.
+        for err in (e for _, e in results if e):
+            log(f"    error: {err}")
     return written, errors, len(refs)
 
 
@@ -312,8 +380,8 @@ def main() -> None:
     engine = get_engine()
     terms = tuple(sorted(set(args.loksabha))) if args.loksabha else TERMS
     skip = set() if args.refetch else existing_keys(engine)
-    print(f"terms={list(terms)} workers={args.workers} already stored={len(skip)}"
-          f"{' DRY RUN' if args.dry_run else ''}\n")
+    log(f"terms={list(terms)} workers={args.workers} already stored={len(skip)}"
+        f"{' DRY RUN' if args.dry_run else ''}")
 
     started = time.time()
     total, all_errors, enumerated = 0, [], {}
