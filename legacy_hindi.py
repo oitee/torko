@@ -25,6 +25,10 @@ structural rules that reflect how Devanagari (and this font) work:
 """
 import re
 
+# Reph's private-use marker, defined here because several ISFOC_MAP rows below
+# decode to it; see the "Ç" entry for what it is for.
+_REPH = ""
+
 # ---------------------------------------------------------------------------
 # The mapping table for this exact font variant. Multi-character keys are
 # applied longest-first (see decode_legacy_hindi) so clusters like "BÉE"→क are
@@ -46,26 +50,50 @@ ISFOC_MAP = {
 
     # Full consonants & half bases
     "BÉE": "क", "BÉD": "क्", "B": "क्",
+    # क and फ are drawn as two halves ("B".."E", "{".."E") and a BELOW-base matra
+    # is typed *between* them rather than after the pair. Unmapped, the closing
+    # half was stranded as a literal "E": "BÉÖEÆ´É®" (कुंवर) decoded as "कुEंवर".
+    "BÉÖE": "कु", "BÉßE": "कृ", "{ÉÖE": "फु",
     "JÉ": "ख", "J": "ख्",
     "MÉ": "ग", "M": "ग्",
     "PÉ": "घ", "P": "घ्",
     "b": "ड", "½": "ड़",
     "SÉ": "च", "S": "च्",
-    "EU": "छ",
+    # "EU" is really the closing half of क/फ plus छ -- it is what lets "BÉÖEU"
+    # (कुछ) work today. छ on its own still needs its own row: "+ÉSUÉÒ" -> अच्छी.
+    "EU": "छ", "U": "छ",
     "VÉ": "ज", "V": "ज्",
     "ZÉ": "झ", "Z": "झ्",
     "g½": "ढ़", "gÉ": "ढ", "g": "ढ",
+    # A second ढ़ glyph, distinct from "g½": "SÉÆbÉÒMÉfÃ" -> चंडीगढ़, "{ÉfÃxÉä" -> पढ़ने.
+    "fÃ": "ढ़",
     "]": "ट",
     "~": "ठ",
     "hÉ": "ण", "h": "ण्",
     "iÉ": "त", "i": "त्",
+    "kÉ": "त्त",   # "MÉÖhÉ´ÉkÉÉ" -> गुणवत्ता
     "lÉ": "थ", "l": "थ्",
     "n": "द",
+    # द-conjuncts, each its own glyph. Note "u" carries its connector but "tÉ"
+    # takes the separate "É": "uÉ®É" -> द्वारा, "ÉÊuiÉÉÒªÉ" -> द्वितीय, but
+    # "´ÉètÉ" -> वैद्य and "ÉÊ´É¶´ÉÉÊ´ÉtÉÉãÉªÉ" -> विश्वविद्यालय.
+    "u": "द्व", "tÉ": "द्य", "q": "द्द",
+    # ह's half-form has its own glyph; "c" is only the full letter. Seen in
+    # "ÿªÉÚàÉxÉ" -> ह्यूमन and "ºÉÖ¥ÉÿàÉhªÉàÉ" -> सुब्रह्मण्यम.
+    "ÿ": "ह्",
     "vÉ": "ध", "v": "ध्",
     "xÉ": "न", "x": "न्",
     "{É": "प", "{": "प्",
     "{ÉE": "फ", "{ÉD": "फ्",
     "¤É": "ब", "¤": "ब्",
+    # ब्र/भ्र/स्र are each a single glyph, not two letters: "¥ÉÉÆb" -> ब्रांड,
+    # "ÉÊn¶ÉÉ§ÉÉÊàÉiÉ" -> दिशाभ्रमित, "»ÉÉäiÉ" -> स्रोत. Each needs its bare half-form
+    # too -- exactly as "¤É" (ब) needs "¤" (ब्) -- because a following "ÉÉä" (ो)
+    # is a longer key and consumes the "É" first, leaving the half-form alone;
+    # the halant-merge below then rejoins them ("स्र्" + "ो" -> "स्रो").
+    "¥É": "ब्र", "¥": "ब्र्",
+    "§É": "भ्र", "§": "भ्र्",
+    "»É": "स्र", "»": "स्र्",
     "£É": "भ", "£": "भ्",
     "àÉ": "म", "à": "म्",
     "ªÉ": "य", "ª": "य्",
@@ -82,9 +110,27 @@ ISFOC_MAP = {
     "jÉ": "त्र", "j": "त्र्",
     "YÉ": "ज्ञ", "Y": "ज्ञ्",
     "©É": "म्र", "OÉ": "ग्र",
-    "<Ç": "ई", "<": "इ", ">": "ई", "=": "उ",
+    # More r-conjuncts, each a single glyph in this font. "µÉE" is already
+    # implied by the "ÉÊµÉEÉÎ¶SÉªÉxÉ" -> क्रिश्चियन entry above; spelling it out
+    # generalises it: "+ÉÉµÉEàÉhÉ" -> आक्रमण, "µÉEÉÆÉÊiÉ" -> क्रांति.
+    "µÉE": "क्र",
+    "|ÉE": "फ्र",   # "|ÉEÉÆºÉ" -> फ्रांस, "BÉEÉìxÉ|ÉEäxºÉ" -> कॉन्फ्रेंस
+    # A subscript र typed after the consonant it joins: "{Éè]ÅÉäãÉ" -> पैट्रोल.
+    "Å": "्र",
+    "á": "्य",     # the same idea for य: "<Æ]ÅÉäbáÉÚºÉ" -> इंट्रोड्यूस
+    "<Ç": "ई", "<": "इ", ">ó": "ऊ", ">": "ई", "=": "उ",
     "Aä": "ऐ", "A": "ए",
     "+ÉÉä": "ओ", "+ÉÉè": "औ", "+ÉÉ": "आ", "+É": "अ",
+    # "अ" followed by the pre-base "ि" collides with "आ": both are "+É" plus a
+    # glyph opening with "É". Longest-first would otherwise let "+ÉÉ" (आ) eat
+    # the "É" that "ÉÊ" (ि) needs, stranding a bare "Ê" -- which is exactly how
+    # "+ÉÉÊxÉãÉ" (अनिल) used to decode as "आÊनल". Spelling the pair out keeps
+    # them apart; a real "आ" + "ि" carries one more "É" ("+ÉÉÉÊn" -> आदि) and
+    # still takes the "+ÉÉ" branch.
+    "+ÉÉÊ": "अि",
+    # Same collision, same fix, for the other glyphs that open with "É":
+    # "+ÉÉìxÉ®äÉÊ®ªÉàÉ" -> ऑनरेरियम, "+ÉÉÎºiÉi´É" -> अस्तित्व, "+ÉÉËcºÉÉ" -> अहिंसा.
+    "+ÉÉì": "ऑ", "+ÉÉÎ": "अि", "+ÉÉË": "अिं",
 
     # Matras (vowel signs)
     "ÉÉä": "ो", "Éä": "ो", "ÉÉè": "ौ", "Éè": "ौ",
@@ -92,22 +138,42 @@ ISFOC_MAP = {
     # pre-base short-i carrying an anusvara ("ÉËºÉc" -> "सिंह"); like "ÉÊ" it is
     # stored left of its consonant, so the shift regex below moves both along.
     "ÉË": "िं",
+    # The pre-base short-i is drawn at several widths, to reach over whatever
+    # follows it, and each width is its own glyph. "ÉÎ"/"ÉÏ" are the wide
+    # variants of "ÉÊ"/"ÉË", used before a conjunct: "¤ÉÉÎãBÉE" -> बल्कि,
+    # "ÉÊ¤ÉÉÏãbMÉ" -> बिल्डिंग. They shift exactly like the narrow ones.
+    "ÉÎ": "ि", "ÉÏ": "िं",
+    "Éì": "ॉ",     # "bÉì." -> डॉ., "BÉEÉìàÉxÉ´ÉèãlÉ" -> कॉमनवैल्थ
     "ä": "े", "è": "ै", "É": "ा",
 
     # Modifiers
     "Æ": "ं", "Ó": "ं", "&": "ः", "Þ": "ृ", "ß": "ृ",
+    "Ä": "ँ",      # "cÚÄ" -> हूँ, "+ÉÉÄJÉÉå" -> आँखों
     "å": "ें", "é": "ैं", "ÉÆ": "ां", "Éå": "ों", "Éé": "ौं",
-    "°ô": "रु", "°": "रू", "ç": "्", "Ì": "र्ि",
+    "°ô": "रु", "°": "रू", "âó": "रु", "ç": "्", "Ì": "र्ि",
 
     # Reph is parked on a private-use marker so the later regex can shift it
     # left safely without colliding with a real "र्"; then it becomes "र्".
-    "Ç": "",
+    "Ç": _REPH,
+    # A matra can carry the reph in the same glyph. These decode to both at once
+    # and let the same regex do the placing: "{ÉÉ]ÉÔ" -> पार्टी, "àÉÉBÉEæ]" -> मार्केट.
+    # "Éæ" is to "æ" what "Éä" (ो) is to "ä" (े) -- this font builds ो as ा + े.
+    "ÉÔ": _REPH + "ी",
+    "Éæ": _REPH + "ो",
+    "æ": _REPH + "े",
+    "ÉÈ": _REPH + "ां",    # "ºÉ´ÉÉÈMÉÉÒhÉ" -> सर्वांगीण, "vÉàÉÉÈiÉ®hÉ" -> धर्मांतरण
+    # Deliberately NOT mapped: "ÉÍ" ("¶ÉÉÍàÉnÉ" -> शर्मिंदा). It carries a reph
+    # AND a pre-base "िं", and unlike the entries above its reph belongs to the
+    # consonant that FOLLOWS it, so it is already in place and must not shift.
+    # The two structural regexes below would fight over it (the reph rule drags
+    # it left past the wrong letter, giving "र्शमिंदा"). Getting it right needs
+    # a second, non-shifting reph marker, which is more machinery than 5 sightings
+    # justify -- so it stays visible residue, which is what it is today.
     "Â": "",       # invisible filler glyph
     "*": "।",
 }
 
 _SORTED_KEYS = sorted(ISFOC_MAP, key=len, reverse=True)
-_REPH = ""
 
 # Signature of the legacy encoding. This used to be "any Latin-1 supplement
 # character", on the theory that Unicode Devanagari and plain ASCII never

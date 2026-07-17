@@ -69,6 +69,118 @@ class TestDecodeLegacyHindi:
         assert decode_legacy_hindi("ÉÊBÉEºÉÉxÉ") == "किसान"
 
 
+class TestTableGapsThatStrandedResidue:
+    """Glyphs that had no ISFOC_MAP row and fell through as literal Latin-1.
+
+    Every sequence below was taken from a real 13th/14th-LS transcript; the
+    comment on each gives the word as the source prints it. A missing row here
+    is not cosmetic: it strands residue in the middle of a name, so the label
+    never matches a member -- and (before the signature fix) that same residue
+    re-armed the decoder and corrupted the text on a second pass.
+    """
+
+    def test_a_plus_pre_base_short_i_is_not_swallowed_by_aa(self):
+        # The headline gap. "अ" + pre-base "ि" and "आ" are both "+É" followed by
+        # a glyph opening with "É", so longest-first let "+ÉÉ" (आ) eat the "É"
+        # that "ÉÊ" (ि) needed: "अनिल" decoded as "आÊनल".
+        assert decode_legacy_hindi("+ÉÉÊxÉãÉ ¤ÉºÉÖ") == "अनिल बसु"
+        assert decode_legacy_hindi("+ÉÉÊJÉãÉä¶É") == "अखिलेश"
+        assert decode_legacy_hindi("+ÉÉÊvÉBÉEÉ®") == "अधिकार"
+
+    def test_a_plus_other_pre_base_glyphs_are_not_swallowed_either(self):
+        assert decode_legacy_hindi("+ÉÉÎºiÉi´É") == "अस्तित्व"
+        assert decode_legacy_hindi("+ÉÉËcºÉÉ") == "अहिंसा"
+        assert decode_legacy_hindi("+ÉÉì{É®SªÉÖÉÊxÉ]ÉÒ") == "ऑपरच्युनिटी"
+
+    def test_a_real_aa_followed_by_short_i_still_takes_the_aa_branch(self):
+        # The control for the two tests above, and the case they could break: a
+        # genuine "आ" + "ि" carries one more "É" and must NOT read as "अ" + "ि".
+        assert decode_legacy_hindi("+ÉÉÉÊn") == "आदि"
+
+    def test_candra_o_matra(self):
+        assert decode_legacy_hindi("bÉì.") == "डॉ."
+        assert decode_legacy_hindi("BÉEÉìàÉxÉ´ÉèãlÉ") == "कॉमनवैल्थ"
+
+    def test_wide_pre_base_short_i_variants_shift_like_the_narrow_ones(self):
+        # "ÉÎ"/"ÉÏ" are the same matras as "ÉÊ"/"ÉË" drawn wider to reach over a
+        # conjunct. They are separate glyphs, and shift identically.
+        assert decode_legacy_hindi("¤ÉÉÎãBÉE") == "बल्कि"
+        assert decode_legacy_hindi("ÉÎºlÉiÉ") == "स्थित"
+        assert decode_legacy_hindi("ÉÊ¤ÉÉÏãbMÉ") == "बिल्डिंग"
+
+    def test_r_conjuncts_are_single_glyphs(self):
+        assert decode_legacy_hindi("+ÉÉµÉEàÉhÉ") == "आक्रमण"
+        assert decode_legacy_hindi("|ÉEÉÆºÉ") == "फ्रांस"
+        assert decode_legacy_hindi("{Éè]ÅÉäãÉ") == "पैट्रोल"
+        assert decode_legacy_hindi("BÉEÉÆº]ÉÒ]áÉÚ¶ÉxÉ") == "कांस्टीट्यूशन"
+
+    def test_conjunct_half_forms_rejoin_a_following_o_matra(self):
+        # "ÉÉä" (ो) is a longer key than "¥É" (ब्र), so it consumes the "É" and
+        # leaves the bare half-form -- which must therefore be mapped too, just
+        # as "¤É" (ब) needs "¤" (ब्). The halant-merge then rejoins them.
+        assert decode_legacy_hindi("¥ÉÉÆb") == "ब्रांड"
+        assert decode_legacy_hindi("¥ÉÉäBÉEºÉÇ") == "ब्रोकर्स"
+        assert decode_legacy_hindi("»ÉÉäiÉ") == "स्रोत"
+        assert decode_legacy_hindi("§ÉÉÊàÉiÉ") == "भ्रमित"
+
+    def test_ha_half_form_has_its_own_glyph(self):
+        assert decode_legacy_hindi("ÿªÉÚàÉxÉ") == "ह्यूमन"
+        assert decode_legacy_hindi("ºÉÖ¥ÉÿàÉhªÉàÉ") == "सुब्रह्मण्यम"
+
+    def test_second_dha_with_nukta_glyph(self):
+        assert decode_legacy_hindi("SÉÆbÉÒMÉfÃ") == "चंडीगढ़"
+        assert decode_legacy_hindi("{ÉfÃxÉä") == "पढ़ने"
+
+    def test_candrabindu(self):
+        assert decode_legacy_hindi("cÚÄ") == "हूँ"
+        assert decode_legacy_hindi("+ÉÉÄJÉÉå") == "आँखों"
+
+    def test_independent_uu_and_ru(self):
+        assert decode_legacy_hindi(">ó{É®") == "ऊपर"
+        assert decode_legacy_hindi("âó{ÉªÉä") == "रुपये"
+
+    def test_matras_that_carry_the_reph_place_it_on_the_right_letter(self):
+        # These glyphs are a matra and a reph at once. The reph must still land
+        # on the consonant it belongs to, which is not the one it is typed after.
+        assert decode_legacy_hindi("{ÉÉ]ÉÔ") == "पार्टी"
+        assert decode_legacy_hindi("SÉ]VÉÉÔ") == "चटर्जी"
+        assert decode_legacy_hindi("àÉÉBÉEæ]") == "मार्केट"
+        assert decode_legacy_hindi("ÉÊxÉnæ¶É") == "निर्देश"
+        assert decode_legacy_hindi("ºÉ´ÉÉæSSÉ") == "सर्वोच्च"
+        assert decode_legacy_hindi("vÉàÉÉÈiÉ®hÉ") == "धर्मांतरण"
+
+    def test_below_base_matra_typed_inside_a_two_half_glyph(self):
+        # क is drawn "B".."E" and फ is "{".."E"; a below-base matra goes BETWEEN
+        # the halves, so the closing half was left stranded as a literal "E".
+        assert decode_legacy_hindi("BÉÖEÆ´É®") == "कुंवर"
+        assert decode_legacy_hindi("BÉÖEàÉÉ®ÉÒ") == "कुमारी"
+        assert decode_legacy_hindi("BÉßE{ÉÉ") == "कृपा"
+        assert decode_legacy_hindi("{ÉÖEãÉ") == "फुल"
+
+    def test_chha_still_works_through_the_closing_half(self):
+        # "EU" (closing half + छ) is what makes "BÉÖEU" decode today. Adding the
+        # "BÉÖE" row above consumes that "E" first, so छ must stand on its own
+        # too -- and कुछ must still come out the other side either way.
+        assert decode_legacy_hindi("BÉÖEU") == "कुछ"
+        assert decode_legacy_hindi("+ÉSUÉÒ") == "अच्छी"
+
+    def test_da_conjuncts(self):
+        assert decode_legacy_hindi("uÉ®É") == "द्वारा"
+        assert decode_legacy_hindi("ÉÊuiÉÉÒªÉ") == "द्वितीय"
+        assert decode_legacy_hindi("´ÉètÉ") == "वैद्य"
+        assert decode_legacy_hindi("ÉÊ´É¶´ÉÉÊ´ÉtÉÉãÉªÉ") == "विश्वविद्यालय"
+        assert decode_legacy_hindi("=qä¶ªÉÉå") == "उद्देश्यों"
+
+    def test_double_ta_conjunct(self):
+        assert decode_legacy_hindi("MÉÖhÉ´ÉkÉÉ") == "गुणवत्ता"
+
+    def test_o_carrying_reph_is_built_like_the_plain_o(self):
+        # "Éæ" is to "æ" what "Éä" (ो) is to "ä" (े) -- this font builds ो as
+        # ा + े, and the reph-bearing pair follows the same construction.
+        assert decode_legacy_hindi("ºÉ´ÉÉæSSÉ") == "सर्वोच्च"   # Éæ -> reph + ो
+        assert decode_legacy_hindi("àÉÉBÉEæ]") == "मार्केट"      # æ  -> reph + े
+
+
 class TestSecondPassIsANoOp:
     """decode_legacy_hindi must be safe to call on its own output.
 
