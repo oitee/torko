@@ -107,6 +107,10 @@
     margin-bottom: 4px;
   }
   .transcript-party { color: var(--text-muted); font-weight: 400; font-size: 12px; }
+  .speaker-link { color: var(--series-1); text-decoration: none; }
+  .speaker-link:hover { text-decoration: underline; }
+  a.chip.chip-link { text-decoration: none; cursor: pointer; }
+  a.chip.chip-link:hover { text-decoration: underline; }
   .transcript-index { color: var(--text-muted); font-weight: 400; font-size: 12px; margin-left: 6px; }
   .transcript-text {
     font-size: 13.5px;
@@ -231,16 +235,12 @@ function renderMpDiff(diff) {
     </div>
   `);
 
-  const unexplained = diff.taggedNotAttributed.filter(m => m.reason === 'unexplained');
-  const explained = diff.taggedNotAttributed.filter(m => m.reason !== 'unexplained');
-
   groups.push(`
     <div class="mp-diff-group">
       <p class="mp-diff-label">Tagged by Sansad, no turn attributed (${diff.taggedNotAttributed.length})</p>
-      <p class="mp-diff-note">Mostly not our fault — see reason on each chip. Only "unexplained" is a real miss.</p>
+      <p class="mp-diff-note">Every one counted as a miss — worst case, deliberately. The reason on each chip says why it went unattributed; it is information, not an excuse.</p>
       <div class="speaker-chips">
-        ${unexplained.map(m => `<span class="chip chip-miss" title="${escapeHtml(REASON_LABEL[m.reason] || m.reason)}">${escapeHtml(m.name || m.sansadId)} <span class="chip-reason">(${escapeHtml(m.reason)})</span></span>`).join('')}
-        ${explained.map(m => `<span class="chip chip-ceiling" title="${escapeHtml(REASON_LABEL[m.reason] || m.reason)}">${escapeHtml(m.name || m.sansadId)} <span class="chip-reason">(${escapeHtml(m.reason)})</span></span>`).join('')}
+        ${diff.taggedNotAttributed.map(m => `<span class="chip chip-miss" title="${escapeHtml(REASON_LABEL[m.reason] || m.reason)}">${escapeHtml(m.name || m.sansadId)} <span class="chip-reason">(${escapeHtml(m.reason)})</span></span>`).join('')}
         ${!diff.taggedNotAttributed.length ? '<span class="mp-diff-note">none</span>' : ''}
       </div>
     </div>
@@ -258,7 +258,9 @@ function render(data) {
     <p class="debate-meta">LS${data.loksabha} · Session ${data.session} · dbSlno ${data.dbslno} · ${data.debateDate || 'undated'} · ${escapeHtml(data.debateType || '')} · ${data.turnCount} turns</p>
     ${data.sourceUrl ? `<p class="debate-meta"><a class="source-link" href="${escapeHtml(data.sourceUrl)}" target="_blank" rel="noopener noreferrer">View original on sansad.in ↗</a></p>` : ''}
     <div class="speaker-chips">
-      ${data.speakersPresent.map(s => `<span class="chip">${escapeHtml(s.name)}${s.party ? ' · ' + escapeHtml(s.party) : ''}</span>`).join('')}
+      ${data.speakersPresent.map(s => s.sansadId
+        ? `<a class="chip chip-link" href="speaker.html?id=${encodeURIComponent(s.sansadId)}">${escapeHtml(s.name)}${s.party ? ' · ' + escapeHtml(s.party) : ''}</a>`
+        : `<span class="chip">${escapeHtml(s.name)}${s.party ? ' · ' + escapeHtml(s.party) : ''}</span>`).join('')}
     </div>
   `;
   contentEl.appendChild(header);
@@ -272,11 +274,14 @@ function render(data) {
   list.className = 'transcript-list';
   data.turns.forEach((t, i) => {
     const name = t.name || '(unattributed)';
+    const nameHtml = (t.verified && t.sansadId)
+      ? `<a class="speaker-link" href="speaker.html?id=${encodeURIComponent(t.sansadId)}">${escapeHtml(name)}</a>`
+      : escapeHtml(name);
     const item = document.createElement('div');
     item.className = 'transcript-item';
     item.innerHTML = `
       <div class="transcript-speaker">
-        ${escapeHtml(name)}${t.party ? `<span class="transcript-party"> · ${escapeHtml(t.party)}</span>` : ''}${badge(t.verified, t.nameSource)}<span class="transcript-index">#${i + 1}</span>
+        ${nameHtml}${t.party ? `<span class="transcript-party"> · ${escapeHtml(t.party)}</span>` : ''}${badge(t.verified, t.nameSource)}<span class="transcript-index">#${i + 1}</span>
       </div>
       <div class="transcript-text">${escapeHtml(t.text)}</div>
     `;
