@@ -46,6 +46,8 @@
   }
   .debate-title { font-size: 18px; font-weight: 700; margin: 0 0 6px; }
   .debate-meta { color: var(--text-secondary); font-size: 13px; margin-bottom: 12px; }
+  .source-link { color: var(--series-1); text-decoration: none; }
+  .source-link:hover { text-decoration: underline; }
   .speaker-chips { display: flex; flex-wrap: wrap; gap: 6px; }
   .chip {
     font-size: 11.5px;
@@ -150,6 +152,7 @@ function render(data) {
   header.innerHTML = `
     <p class="debate-title">${escapeHtml(data.title)}</p>
     <p class="debate-meta">LS${data.loksabha} · Session ${data.session} · dbSlno ${data.dbslno} · ${data.debateDate || 'undated'} · ${escapeHtml(data.debateType || '')} · ${data.turnCount} turns</p>
+    ${data.sourceUrl ? `<p class="debate-meta"><a class="source-link" href="${escapeHtml(data.sourceUrl)}" target="_blank" rel="noopener noreferrer">View original on sansad.in ↗</a></p>` : ''}
     <div class="speaker-chips">
       ${data.speakersPresent.map(s => `<span class="chip">${escapeHtml(s.name)}${s.party ? ' · ' + escapeHtml(s.party) : ''}</span>`).join('')}
     </div>
