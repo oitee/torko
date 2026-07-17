@@ -5,14 +5,78 @@ Serves a single HTML page (static/index.html) that lets the user enter a
 Lok Sabha number, session number, and debate serial number, then calls
 sansad.in via /api/distribution and renders the speaker-wise distribution.
 
+Also serves /api/dashboard/* — the debate-dashboard demo. Contract and
+rationale: internal_docs/026_DASHBOARD_DEMO.md, internal_docs/028_TURNS_TABLE.md.
+Backed by the `turns` table (dashboard_db.py) — real corpus, not the frozen
+fixture the routes used before `turns` existed. FE (static/dashboard.html,
+debate.html, speaker.html) is unchanged: same JSON contract either way.
+
 Run: source .venv/bin/activate && python3 server.py
 """
 from flask import Flask, jsonify, request, send_from_directory
 
+import dashboard_db
 from debate_fetch import fetch_debate, split_by_speaker, speaker_distribution
 from debate_fetch_legacy import looks_legacy, split_by_speaker_legacy
 
 app = Flask(__name__, static_folder="static", static_url_path="")
+
+
+@app.route("/api/dashboard/debates")
+def api_dashboard_debates():
+    page = max(request.args.get("page", 1, type=int), 1)
+    page_size = max(request.args.get("pageSize", 20, type=int), 1)
+
+    result = dashboard_db.list_debates(
+        date_from=request.args.get("date_from"),
+        date_to=request.args.get("date_to"),
+        loksabha=request.args.get("loksabha", type=int),
+        session=request.args.get("session", type=int),
+        parties=request.args.getlist("party"),
+        speaker_codes=request.args.getlist("speaker"),
+        q=(request.args.get("q") or "").strip(),
+        page=page,
+        page_size=page_size,
+    )
+
+    return jsonify(
+        {
+            "total": result["total"],
+            "page": page,
+            "pageSize": page_size,
+            "results": result["results"],
+        }
+    )
+
+
+@app.route("/api/dashboard/debates/<debate_id>")
+def api_dashboard_debate_detail(debate_id):
+    parsed = dashboard_db.parse_composite_id(debate_id)
+    if parsed is None:
+        return jsonify({"error": f"Malformed debate id {debate_id!r}, expected loksabha-session-dbslno"}), 400
+    detail = dashboard_db.get_debate_detail(*parsed)
+    if detail is None:
+        return jsonify({"error": f"No debate with id {debate_id!r}"}), 404
+    return jsonify(detail)
+
+
+@app.route("/api/dashboard/speakers")
+def api_dashboard_speakers():
+    q = (request.args.get("q") or "").strip()
+    return jsonify({"results": dashboard_db.list_speakers(q)})
+
+
+@app.route("/api/dashboard/speakers/<sansad_id>")
+def api_dashboard_speaker_detail(sansad_id):
+    detail = dashboard_db.get_speaker_detail(sansad_id)
+    if detail is None:
+        return jsonify({"error": f"No speaker with sansadId {sansad_id!r}"}), 404
+    return jsonify(detail)
+
+
+@app.route("/api/dashboard/facets")
+def api_dashboard_facets():
+    return jsonify(dashboard_db.get_facets())
 
 
 @app.route("/")
