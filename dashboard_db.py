@@ -515,9 +515,13 @@ def get_facets() -> dict:
             text("SELECT DISTINCT loksabha, session FROM debates ORDER BY loksabha, session")
         ).fetchall()
         debate_types = [
-            r[0]
+            {"type": r.debate_type, "count": r.count}
             for r in conn.execute(
-                text("SELECT DISTINCT debate_type FROM debates WHERE debate_type IS NOT NULL ORDER BY debate_type")
+                text(
+                    "SELECT debate_type, count(*) AS count FROM debates "
+                    "WHERE debate_type IS NOT NULL "
+                    "GROUP BY debate_type ORDER BY count DESC, debate_type"
+                )
             ).fetchall()
         ]
 

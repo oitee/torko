@@ -533,13 +533,14 @@ async function loadFacets() {
     termSel.appendChild(group);
   });
 
-  // Debate type: small fixed list, filtered client-side, multi-select.
+  // Debate type: fixed list ordered by frequency, count shown, filtered
+  // client-side, multi-select.
   typeToken = createTokenSelect('type', q => {
     const ql = q.toLowerCase();
     return (facets.debateTypes || [])
-      .filter(t => !ql || t.toLowerCase().includes(ql))
+      .filter(t => !ql || t.type.toLowerCase().includes(ql))
       .slice(0, 50)
-      .map(t => ({ value: t, label: t }));
+      .map(t => ({ value: t.type, label: t.type, sub: `(${t.count.toLocaleString()})` }));
   });
 
   // Party: small fixed list, filtered client-side.
