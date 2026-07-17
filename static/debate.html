@@ -1,0 +1,194 @@
+<title>Debate — Lok Sabha</title>
+<style>
+  :root {
+    --page-plane:     #f9f9f7;
+    --surface-1:      #fcfcfb;
+    --text-primary:   #0b0b0b;
+    --text-secondary: #52514e;
+    --text-muted:     #898781;
+    --gridline:       #e1e0d9;
+    --baseline:       #c3c2b7;
+    --series-1:       #2a78d6;
+    --border:         rgba(11,11,11,0.10);
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --page-plane:     #0d0d0d;
+      --surface-1:      #1a1a19;
+      --text-primary:   #ffffff;
+      --text-secondary: #c3c2b7;
+      --text-muted:     #898781;
+      --gridline:       #2c2c2a;
+      --baseline:       #383835;
+      --series-1:       #3987e5;
+      --border:         rgba(255,255,255,0.10);
+    }
+  }
+
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    background: var(--page-plane);
+    color: var(--text-primary);
+    font-family: system-ui, -apple-system, "Segoe UI", sans-serif;
+  }
+  .wrap { max-width: 780px; margin: 0 auto; padding: 32px 20px 80px; }
+  .nav { font-size: 13px; margin-bottom: 20px; }
+  .nav a { color: var(--series-1); text-decoration: none; }
+  .nav a:hover { text-decoration: underline; }
+
+  .debate-header {
+    background: var(--surface-1);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 18px;
+    margin-bottom: 20px;
+  }
+  .debate-title { font-size: 18px; font-weight: 700; margin: 0 0 6px; }
+  .debate-meta { color: var(--text-secondary); font-size: 13px; margin-bottom: 12px; }
+  .speaker-chips { display: flex; flex-wrap: wrap; gap: 6px; }
+  .chip {
+    font-size: 11.5px;
+    padding: 2px 8px;
+    border-radius: 999px;
+    background: rgba(42,120,214,0.10);
+    color: var(--series-1);
+    border: 1px solid rgba(42,120,214,0.25);
+  }
+  @media (prefers-color-scheme: dark) {
+    .chip { background: rgba(57,135,229,0.14); color: #79b5f0; border-color: rgba(57,135,229,0.30); }
+  }
+
+  .error { color: #d03b3b; font-size: 14px; margin-bottom: 18px; }
+  .section-title { font-size: 14px; font-weight: 600; margin: 0 0 12px; }
+
+  .badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 3px;
+    font-size: 10.5px;
+    font-weight: 600;
+    line-height: 1;
+    padding: 2px 6px 2px 4px;
+    border-radius: 999px;
+    vertical-align: middle;
+    margin-left: 6px;
+    cursor: help;
+    white-space: nowrap;
+  }
+  .badge svg { width: 11px; height: 11px; display: block; }
+  .badge.verified {
+    color: #1a7f4b;
+    background: rgba(26,127,75,0.12);
+    border: 1px solid rgba(26,127,75,0.25);
+  }
+  .badge.unverified {
+    color: var(--text-muted);
+    background: rgba(137,135,129,0.10);
+    border: 1px solid rgba(137,135,129,0.28);
+  }
+  @media (prefers-color-scheme: dark) {
+    .badge.verified { color: #57d493; background: rgba(87,212,147,0.14); border-color: rgba(87,212,147,0.30); }
+  }
+
+  .transcript-list { display: flex; flex-direction: column; gap: 10px; }
+  .transcript-item {
+    background: var(--surface-1);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 12px 14px;
+  }
+  .transcript-speaker {
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--text-primary);
+    margin-bottom: 4px;
+  }
+  .transcript-party { color: var(--text-muted); font-weight: 400; font-size: 12px; }
+  .transcript-index { color: var(--text-muted); font-weight: 400; font-size: 12px; margin-left: 6px; }
+  .transcript-text {
+    font-size: 13.5px;
+    line-height: 1.5;
+    color: var(--text-secondary);
+    white-space: pre-wrap;
+  }
+</style>
+
+<div class="wrap">
+  <div class="nav"><a href="dashboard.html">&larr; Debate list</a> &nbsp;·&nbsp; <a href="speaker.html">Speaker view</a></div>
+  <div id="error" class="error" style="display:none"></div>
+  <div id="content"></div>
+</div>
+
+<script>
+const errorEl = document.getElementById('error');
+const contentEl = document.getElementById('content');
+
+const params = new URLSearchParams(window.location.search);
+const debateId = params.get('id');
+
+async function load() {
+  if (!debateId) {
+    errorEl.textContent = 'No debate id given (expected ?id=18-5-4012 in the URL).';
+    errorEl.style.display = 'block';
+    return;
+  }
+  try {
+    const resp = await fetch(`/api/dashboard/debates/${encodeURIComponent(debateId)}`);
+    const data = await resp.json();
+    if (!resp.ok) throw new Error(data.error || 'Request failed');
+    render(data);
+  } catch (err) {
+    errorEl.textContent = err.message;
+    errorEl.style.display = 'block';
+  }
+}
+
+function render(data) {
+  const header = document.createElement('div');
+  header.className = 'debate-header';
+  header.innerHTML = `
+    <p class="debate-title">${escapeHtml(data.title)}</p>
+    <p class="debate-meta">LS${data.loksabha} · Session ${data.session} · dbSlno ${data.dbslno} · ${data.debateDate || 'undated'} · ${escapeHtml(data.debateType || '')} · ${data.turnCount} turns</p>
+    <div class="speaker-chips">
+      ${data.speakersPresent.map(s => `<span class="chip">${escapeHtml(s.name)}${s.party ? ' · ' + escapeHtml(s.party) : ''}</span>`).join('')}
+    </div>
+  `;
+  contentEl.appendChild(header);
+
+  const sectionTitle = document.createElement('p');
+  sectionTitle.className = 'section-title';
+  sectionTitle.textContent = `Transcript (${data.turns.length} turns, in order)`;
+  contentEl.appendChild(sectionTitle);
+
+  const list = document.createElement('div');
+  list.className = 'transcript-list';
+  data.turns.forEach((t, i) => {
+    const name = t.name || '(unattributed)';
+    const item = document.createElement('div');
+    item.className = 'transcript-item';
+    item.innerHTML = `
+      <div class="transcript-speaker">
+        ${escapeHtml(name)}${t.party ? `<span class="transcript-party"> · ${escapeHtml(t.party)}</span>` : ''}${badge(t.verified, t.nameSource)}<span class="transcript-index">#${i + 1}</span>
+      </div>
+      <div class="transcript-text">${escapeHtml(t.text)}</div>
+    `;
+    list.appendChild(item);
+  });
+  contentEl.appendChild(list);
+}
+
+function badge(verified, source) {
+  if (verified) {
+    return `<span class="badge verified" title="Normalised to official MP list (${escapeHtml(source || 'anchor')})">`
+      + `<svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 8.5l3.5 3.5L13 4.5"/></svg>Verified</span>`;
+  }
+  return `<span class="badge unverified" title="Raw transcript label — not matched to the MP list">Unverified</span>`;
+}
+
+function escapeHtml(s) {
+  return (s || '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+}
+
+load();
+</script>

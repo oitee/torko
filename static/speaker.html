@@ -1,0 +1,242 @@
+<title>Speaker View — Lok Sabha Debates</title>
+<style>
+  :root {
+    --page-plane:     #f9f9f7;
+    --surface-1:      #fcfcfb;
+    --text-primary:   #0b0b0b;
+    --text-secondary: #52514e;
+    --text-muted:     #898781;
+    --gridline:       #e1e0d9;
+    --baseline:       #c3c2b7;
+    --series-1:       #2a78d6;
+    --border:         rgba(11,11,11,0.10);
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --page-plane:     #0d0d0d;
+      --surface-1:      #1a1a19;
+      --text-primary:   #ffffff;
+      --text-secondary: #c3c2b7;
+      --text-muted:     #898781;
+      --gridline:       #2c2c2a;
+      --baseline:       #383835;
+      --series-1:       #3987e5;
+      --border:         rgba(255,255,255,0.10);
+    }
+  }
+
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    background: var(--page-plane);
+    color: var(--text-primary);
+    font-family: system-ui, -apple-system, "Segoe UI", sans-serif;
+  }
+  .wrap { max-width: 780px; margin: 0 auto; padding: 32px 20px 80px; }
+  h1 { font-size: 20px; margin: 0 0 4px; }
+  .subtitle { color: var(--text-secondary); font-size: 14px; margin-bottom: 6px; }
+  .nav { font-size: 13px; margin-bottom: 20px; }
+  .nav a { color: var(--series-1); text-decoration: none; }
+  .nav a:hover { text-decoration: underline; }
+
+  .caveat {
+    font-size: 12px;
+    color: var(--text-muted);
+    background: var(--surface-1);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 8px 12px;
+    margin-bottom: 20px;
+  }
+
+  .search-box { position: relative; margin-bottom: 20px; }
+  .search-box input {
+    width: 100%;
+    padding: 10px 12px;
+    border-radius: 8px;
+    border: 1px solid var(--border);
+    background: var(--surface-1);
+    color: var(--text-primary);
+    font-size: 14px;
+  }
+  .suggestions {
+    position: absolute;
+    top: calc(100% + 4px);
+    left: 0; right: 0;
+    background: var(--surface-1);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    max-height: 260px;
+    overflow-y: auto;
+    z-index: 5;
+    display: none;
+  }
+  .suggestion-item {
+    padding: 8px 12px;
+    cursor: pointer;
+    font-size: 13px;
+    border-bottom: 1px solid var(--gridline);
+  }
+  .suggestion-item:last-child { border-bottom: none; }
+  .suggestion-item:hover { background: var(--page-plane); }
+  .suggestion-name { font-weight: 600; }
+  .suggestion-meta { color: var(--text-muted); font-size: 12px; margin-left: 6px; }
+
+  .speaker-header {
+    background: var(--surface-1);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 18px;
+    margin-bottom: 20px;
+  }
+  .speaker-name { font-size: 18px; font-weight: 700; margin: 0 0 4px; }
+  .speaker-meta { color: var(--text-secondary); font-size: 13px; }
+
+  .debate-list { display: flex; flex-direction: column; gap: 10px; }
+  .debate-card {
+    display: block;
+    background: var(--surface-1);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 14px 16px;
+    text-decoration: none;
+    color: inherit;
+  }
+  .debate-card:hover { border-color: var(--series-1); }
+  .debate-title { font-size: 14px; font-weight: 600; margin: 0 0 6px; }
+  .debate-sub { font-size: 12px; color: var(--text-muted); }
+
+  .empty { color: var(--text-muted); font-size: 13px; }
+  .error { color: #d03b3b; font-size: 14px; margin-bottom: 18px; }
+</style>
+
+<div class="wrap">
+  <h1>Speaker View</h1>
+  <div class="subtitle">Pick an MP to see every debate they spoke in.</div>
+  <div class="nav"><a href="index.html">Single-debate lookup</a> &nbsp;·&nbsp; <a href="dashboard.html">Debate list</a></div>
+
+  <div class="caveat">
+    Party shown is each MP's <strong>last recorded term's party</strong>, not necessarily their
+    party when they gave a particular speech. Demo data covers only 25 debates, not the full corpus —
+    debate counts here are not a real activity measure.
+  </div>
+
+  <div class="search-box">
+    <input type="text" id="speaker-search" placeholder="Search for an MP by name&hellip;" autocomplete="off">
+    <div class="suggestions" id="suggestions"></div>
+  </div>
+
+  <div id="error" class="error" style="display:none"></div>
+  <div id="speaker-content"></div>
+</div>
+
+<script>
+const searchInput = document.getElementById('speaker-search');
+const suggestionsEl = document.getElementById('suggestions');
+const errorEl = document.getElementById('error');
+const contentEl = document.getElementById('speaker-content');
+
+let allSpeakers = [];
+let debounceTimer = null;
+
+async function loadAllSpeakers() {
+  const resp = await fetch('/api/dashboard/speakers');
+  const data = await resp.json();
+  allSpeakers = data.results;
+}
+
+function showSuggestions(query) {
+  const q = query.trim().toLowerCase();
+  const matches = q
+    ? allSpeakers.filter(s => (s.name || '').toLowerCase().includes(q))
+    : allSpeakers;
+
+  if (matches.length === 0) {
+    suggestionsEl.style.display = 'none';
+    return;
+  }
+
+  suggestionsEl.innerHTML = matches.map(s => `
+    <div class="suggestion-item" data-id="${s.sansadId}">
+      <span class="suggestion-name">${escapeHtml(s.name)}</span>
+      <span class="suggestion-meta">${escapeHtml(s.party || 'party unknown')} · ${s.debateCount} debate${s.debateCount === 1 ? '' : 's'} in demo data</span>
+    </div>
+  `).join('');
+  suggestionsEl.style.display = 'block';
+
+  suggestionsEl.querySelectorAll('.suggestion-item').forEach(el => {
+    el.addEventListener('click', () => {
+      const speaker = allSpeakers.find(s => s.sansadId === el.dataset.id);
+      searchInput.value = speaker.name;
+      suggestionsEl.style.display = 'none';
+      loadSpeaker(el.dataset.id);
+    });
+  });
+}
+
+searchInput.addEventListener('input', () => {
+  clearTimeout(debounceTimer);
+  debounceTimer = setTimeout(() => showSuggestions(searchInput.value), 120);
+});
+searchInput.addEventListener('focus', () => showSuggestions(searchInput.value));
+document.addEventListener('click', (e) => {
+  if (!e.target.closest('.search-box')) suggestionsEl.style.display = 'none';
+});
+
+async function loadSpeaker(sansadId) {
+  errorEl.style.display = 'none';
+  contentEl.innerHTML = '';
+  try {
+    const resp = await fetch(`/api/dashboard/speakers/${encodeURIComponent(sansadId)}`);
+    const data = await resp.json();
+    if (!resp.ok) throw new Error(data.error || 'Request failed');
+    renderSpeaker(data);
+  } catch (err) {
+    errorEl.textContent = err.message;
+    errorEl.style.display = 'block';
+  }
+}
+
+function renderSpeaker(data) {
+  const header = document.createElement('div');
+  header.className = 'speaker-header';
+  header.innerHTML = `
+    <p class="speaker-name">${escapeHtml(data.speaker.name)}</p>
+    <p class="speaker-meta">${escapeHtml(data.speaker.party || 'Party unknown')} · ${escapeHtml(data.speaker.constituency || 'Constituency unknown')} · sansadId ${escapeHtml(data.speaker.sansadId)}</p>
+  `;
+  contentEl.appendChild(header);
+
+  if (data.debates.length === 0) {
+    const empty = document.createElement('p');
+    empty.className = 'empty';
+    empty.textContent = 'No debates found for this speaker in the demo data.';
+    contentEl.appendChild(empty);
+    return;
+  }
+
+  const heading = document.createElement('p');
+  heading.style.cssText = 'font-size:13px;font-weight:600;margin:0 0 10px;';
+  heading.textContent = `${data.totalDebates} debate${data.totalDebates === 1 ? '' : 's'} in demo data`;
+  contentEl.appendChild(heading);
+
+  const list = document.createElement('div');
+  list.className = 'debate-list';
+  data.debates.forEach(d => {
+    const card = document.createElement('a');
+    card.className = 'debate-card';
+    card.href = `debate.html?id=${encodeURIComponent(d.id)}`;
+    card.innerHTML = `
+      <p class="debate-title">${escapeHtml(d.title)}</p>
+      <p class="debate-sub">LS${d.loksabha} · Session ${d.session} · ${d.debateDate || 'undated'} · ${escapeHtml(d.debateType || '')} · this speaker: ${d.interventions} intervention${d.interventions === 1 ? '' : 's'}, ${d.words.toLocaleString()} words</p>
+    `;
+    list.appendChild(card);
+  });
+  contentEl.appendChild(list);
+}
+
+function escapeHtml(s) {
+  return (s || '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+}
+
+loadAllSpeakers();
+</script>
