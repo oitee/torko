@@ -71,6 +71,12 @@
     flex-wrap: wrap;
     margin: 0 0 12px;
     font-size: 13px;
+    position: sticky;
+    top: 0;
+    z-index: 5;
+    padding: 10px 0;
+    background: var(--page-plane);
+    border-bottom: 1px solid var(--border);
   }
   .transcript-controls label { color: var(--text-secondary); }
   .transcript-controls select {
@@ -90,6 +96,25 @@
   }
   .transcript-controls .clear:hover { text-decoration: underline; }
   .transcript-item.dim { display: none; }
+
+  .to-top {
+    position: fixed;
+    right: 24px;
+    bottom: 24px;
+    width: 40px;
+    height: 40px;
+    border-radius: 999px;
+    border: 1px solid var(--border);
+    background: var(--series-1);
+    color: #fff;
+    font-size: 18px;
+    line-height: 1;
+    cursor: pointer;
+    box-shadow: 0 4px 14px rgba(0,0,0,0.22);
+    display: none;
+    z-index: 20;
+  }
+  .to-top.show { display: block; }
 
   .badge {
     display: inline-flex;
@@ -205,6 +230,7 @@
   <div id="error" class="error" style="display:none"></div>
   <div id="content"></div>
 </div>
+<button type="button" class="to-top" id="to-top" title="Back to top" aria-label="Back to top">&uarr;</button>
 
 <script>
 const errorEl = document.getElementById('error');
@@ -434,6 +460,14 @@ function cleanTitle(s) {
   ta.innerHTML = noTags;
   return ta.value.replace(/\s+/g, ' ').trim();
 }
+
+// Back-to-top button: appears once the reader is well down a long transcript,
+// so navigating a giant debate doesn't mean a long manual scroll back.
+const toTop = document.getElementById('to-top');
+toTop.addEventListener('click', () => window.scrollTo({ top: 0, behavior: 'smooth' }));
+window.addEventListener('scroll', () => {
+  toTop.classList.toggle('show', window.scrollY > 600);
+}, { passive: true });
 
 load();
 </script>
