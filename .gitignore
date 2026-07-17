@@ -3,7 +3,13 @@
 __pycache__/
 *.pyc
 server.log
-.claude/launch.json
 
 # internal docs
 internal_docs/
+
+# agent-facing orientation layer: CLAUDE.md, STATE/NOW, skills, local settings.
+# Loaded from disk, not from git — ignoring them does not disable them.
+# Not versioned: back these up outside git.
+.claude/
+CLAUDE.md
+CLAUDE.local.md
