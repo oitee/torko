@@ -52,6 +52,16 @@ _HONORIFICS = {
     "shree", "shreemati", "sushree", "kunvar", "kunvara", "do", "pro", "da",
 }
 
+# Honorifics ONLY when they lead the name. "Sri" is how the DB roster spells the
+# honorific ("Sri Arakkaparambil Antony"), but it is *also* a real name particle
+# sitting inside one ("Shri Lavu Sri Krishna Devarayalu" — mpCode 200, a real
+# MP). Dropping it wherever it appears breaks that name; keeping it everywhere
+# leaves a bare honorific in the roster's word list, where it is a word the
+# label can never match and so drags coverage down and loses real people.
+# Position is what separates the two: an honorific leads a name, a particle sits
+# inside one.
+_LEADING_HONORIFICS = {"sri"}
+
 
 def _normalize_name(label: str) -> list[str]:
     """
@@ -74,7 +84,13 @@ def _normalize_name(label: str) -> list[str]:
             break
     label = _PAREN_RE.sub(" ", label)  # drop remaining (constituency)
     label = re.sub(r"[^\w\s]", " ", label.lower())
-    return [tok for tok in label.split() if tok and tok not in _HONORIFICS]
+    toks = [tok for tok in label.split() if tok and tok not in _HONORIFICS]
+    # only now, once the unconditional honorifics are gone, is the *first* token
+    # the front of the actual name — "Shri Lavu Sri Krishna" must lose "shri"
+    # before "sri" can be judged on its position.
+    if toks and toks[0] in _LEADING_HONORIFICS:
+        toks = toks[1:]
+    return toks
 
 
 # Honorifics as they look *after* transliteration+folding: श्री -> "shree" -> "shri",
@@ -125,19 +141,44 @@ def _name_agreement(label: str, roster_name: str) -> bool | None:
     Kharventhan" / "S.K. KHARVENTHAN"), which counts towards coverage — but
     initials are weak evidence, so at least one whole word must also match
     outright before the two names are treated as the same person.
+
+    **An initial only counts when nothing else is left unexplained.** A single
+    letter agreeing is the weakest evidence in this file, and it cannot be
+    allowed to carry a name that the label has already positively failed to
+    account for. Measured, not theorised — the case that forced this rule:
+
+        label  "... (श्री पवन कुमार बंसल)"   ->  pavan, kumar, bnsal
+        roster "* SHRI P. KUMAR"             ->  kumar, initial p
+
+    "kumar" matched outright, the initial "p" happened to agree with "pavan",
+    and "bnsal" matched *nothing at all* — 2 of 3 words "covered", over the 0.6
+    bar, and Pawan Kumar Bansal's words were filed under P. Kumar (mpCode
+    4546): two different human beings. The coincidence of one common surname
+    and one initial outvoted an entire unmatched surname.
+
+    Requiring full coverage instead would also have closed this, and was
+    measured: it costs 4.4% of all carried anchors, including obviously correct
+    ones ("श्री रवि किशन" / "Ravi Kishan Shukla"). This rule costs
+    approximately nothing, because it only distrusts an initial in exactly the
+    situation where the initial is the only thing holding the match up.
     """
     lab_full, lab_initials = _name_parts(label)
     ros_full, _ = _name_parts(roster_name)
     if not ros_full or not (lab_full or lab_initials):
         return None  # nothing usable on one side: no evidence either way
 
-    strong = covered = 0
+    strong = weak = unexplained = 0
     for r in ros_full:
         if any(SequenceMatcher(None, r, l).ratio() >= ANCHOR_TOKEN_MIN for l in lab_full):
             strong += 1
-            covered += 1
         elif r[0] in lab_initials:
-            covered += 1
+            weak += 1  # an initial agrees; provisional, see below
+        else:
+            unexplained += 1
+
+    # The roster name has a word the label accounts for in no way whatsoever.
+    # That is positive disagreement, so the initials stop being evidence.
+    covered = strong if unexplained else strong + weak
     return strong >= 1 and covered / len(ros_full) >= ANCHOR_COVERAGE_MIN
 
 

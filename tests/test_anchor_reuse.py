@@ -18,6 +18,7 @@ returning True when nothing had been compared — see TestNoEvidenceIsNotAgreeme
 for what that cost.
 """
 from debate_fetch import (
+    _name_parts,
     _name_agreement,
     anchor_contradicts_label,
     labels_name_same_person,
@@ -51,6 +52,74 @@ class TestNameAgreement:
         # the distinction the whole bug turned on: nothing was compared, so
         # there is no verdict to give. None is not False and not True.
         assert _name_agreement("MR. SPEAKER", "") is None
+
+
+class TestAnInitialCannotCarryAnUnexplainedWord:
+    """The misattribution found by measuring the 80% path (internal_docs/026).
+
+    Every case here is real and was pulled out of the corpus, not invented. The
+    rule they force: an initial is the weakest evidence in the file, so it stops
+    counting the moment the roster name has a word the label explains in no way
+    at all.
+    """
+
+    def test_a_shared_surname_plus_a_lucky_initial_is_not_a_person(self):
+        # LS15/10/6421. "kumar" matched outright, the initial "p" happened to
+        # agree with "pavan", and "bnsal" matched nothing whatsoever -- 2 of 3
+        # words "covered", over the 0.6 bar. That filed Pawan Kumar Bansal's
+        # words under P. Kumar (mpCode 4546): two different human beings, and
+        # the exact sin never-guess exists to prevent.
+        assert labels_name_same_person(
+            "संसदीय कार्य मंत्री तथा जल संसाधन मंत्री (श्री पवन कुमार बंसल)",
+            "* SHRI P. KUMAR (TIRUCHIRAPPALLI)",
+        ) is False
+
+    def test_the_unexplained_word_is_what_kills_it_not_the_initial(self):
+        # Same shape as the Bansal case but with nothing left over: every roster
+        # word is either matched or explained by an initial. This must survive,
+        # and it is why the fix is not simply "distrust initials".
+        assert labels_name_same_person(
+            "S.K. KHARVENTHAN", "Salarapatty Kuppusamy Kharventhan"
+        ) is True
+
+    def test_an_initial_still_covers_when_the_rest_matches_outright(self):
+        # LS14/9/6375: A.K. Antony IS Arakkaparambil Kurien Antony. The initial
+        # "a" carries "arakkaparambil" -- legitimately, because nothing is
+        # unexplained once "Sri" is read as the honorific it is.
+        assert labels_name_same_person(
+            "THE MINISTER OF DEFENCE (SHRI A.K. ANTONY)", "Sri Arakkaparambil Antony"
+        ) is True
+
+    def test_an_unmatched_word_alone_does_not_reject_when_no_initial_props_it_up(self):
+        # LS17/1/127. "chowdhury"/"choudhari" transliterate too far apart to
+        # score 0.8, so it is unexplained -- but two whole words matched and no
+        # initial is doing the work, so this stays a match. Requiring full
+        # coverage instead would have thrown this away (and 4.4% of all carried
+        # anchors with it).
+        assert labels_name_same_person(
+            "श्री अधीर रंजन चौधरी", "SHRI ADHIR RANJAN CHOWDHURY (BAHARAMPUR)"
+        ) is True
+
+    def test_a_longer_roster_name_still_matches_a_shorter_label(self):
+        # LS17/1/1289: Ravi Kishan is Ravi Kishan Shukla.
+        assert labels_name_same_person(
+            "श्री रवि किशन", "श्री रवि किशन शुक्ला ( गोरखपुर )"
+        ) is True
+
+
+class TestSriIsAnHonorificOnlyWhenItLeads:
+    """`Sri` is both an honorific and a name particle. Position separates them."""
+
+    def test_leading_sri_is_dropped_as_an_honorific(self):
+        # How the DB roster spells it. Left in, it is a word the label can never
+        # match, so it drags coverage down and loses real people.
+        assert _name_parts("Sri Arakkaparambil Antony") == (["arkprmbil", "antony"], set())
+
+    def test_sri_inside_a_name_is_kept_as_part_of_the_name(self):
+        # Shri Lavu Sri Krishna Devarayalu, mpCode 200 -- a real MP whose name
+        # contains "Sri". Dropping it wherever it appears breaks this person.
+        full, _initials = _name_parts("Shri Lavu Sri Krishna Devarayalu")
+        assert "sri" in full
 
 
 class TestNoEvidenceIsNotAgreement:
