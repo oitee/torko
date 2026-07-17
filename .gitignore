@@ -13,3 +13,9 @@ internal_docs/
 .claude/
 CLAUDE.md
 CLAUDE.local.md
+
+# obsidian vault config for internal_docs/
+.obsidian/
+
+# generated dashboard fixture (server reads Postgres now)
+fixtures/
