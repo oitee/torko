@@ -134,6 +134,17 @@
     color: var(--text-secondary);
     margin: 0 0 6px;
   }
+  .mp-diff-summary {
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--text-secondary);
+    cursor: pointer;
+    margin-bottom: 6px;
+    list-style-position: inside;
+  }
+  .mp-diff-summary:hover { color: var(--text-primary); }
+  .present-details { margin-top: 10px; }
+  .present-details .speaker-chips { margin-top: 8px; }
   .mp-diff-note {
     font-size: 11.5px;
     color: var(--text-muted);
@@ -208,6 +219,18 @@ const REASON_LABEL = {
   unexplained: 'printed as a speaker, not attributed — a real miss',
 };
 
+// A chip links to the MP's page only when `link` is true -- i.e. we attributed
+// them a turn somewhere, so the page has content. Tagged-but-unattributed MPs
+// get no link: we have no turn for them, and a link would imply a profile we
+// may not have (same rule as the transcript names).
+function mpChip(m, cls, inner, link) {
+  const label = inner || escapeHtml(m.name || m.sansadId);
+  if (link && m.sansadId) {
+    return `<a class="chip ${cls} chip-link" href="speaker.html?id=${encodeURIComponent(m.sansadId)}">${label}</a>`;
+  }
+  return `<span class="chip ${cls}">${label}</span>`;
+}
+
 function renderMpDiff(diff) {
   if (!diff.taggedCount && !diff.attributedCount) return;
 
@@ -216,21 +239,13 @@ function renderMpDiff(diff) {
 
   const groups = [];
 
-  groups.push(`
-    <div class="mp-diff-group">
-      <p class="mp-diff-label">Tagged by Sansad and attributed by us (${diff.agreement.length})</p>
-      <div class="speaker-chips">
-        ${diff.agreement.map(m => `<span class="chip">${escapeHtml(m.name || m.sansadId)}</span>`).join('') || '<span class="mp-diff-note">none</span>'}
-      </div>
-    </div>
-  `);
-
+  // Diffs first, expanded -- this is what the panel is for.
   groups.push(`
     <div class="mp-diff-group">
       <p class="mp-diff-label">Attributed by us, not in Sansad's tag list (${diff.attributedNotTagged.length})</p>
       <p class="mp-diff-note">The transcript prints these MPs as speakers; Sansad's own participant list omits them. Matched from the printed name — this panel counts names matched, not matches independently confirmed correct.</p>
       <div class="speaker-chips">
-        ${diff.attributedNotTagged.map(m => `<span class="chip chip-added">${escapeHtml(m.name || m.sansadId)}</span>`).join('') || '<span class="mp-diff-note">none</span>'}
+        ${diff.attributedNotTagged.map(m => mpChip(m, 'chip-added', null, true)).join('') || '<span class="mp-diff-note">none</span>'}
       </div>
     </div>
   `);
@@ -240,10 +255,20 @@ function renderMpDiff(diff) {
       <p class="mp-diff-label">Tagged by Sansad, no turn attributed (${diff.taggedNotAttributed.length})</p>
       <p class="mp-diff-note">Every one counted as a miss — worst case, deliberately. The reason on each chip says why it went unattributed; it is information, not an excuse.</p>
       <div class="speaker-chips">
-        ${diff.taggedNotAttributed.map(m => `<span class="chip chip-miss" title="${escapeHtml(REASON_LABEL[m.reason] || m.reason)}">${escapeHtml(m.name || m.sansadId)} <span class="chip-reason">(${escapeHtml(m.reason)})</span></span>`).join('')}
+        ${diff.taggedNotAttributed.map(m => mpChip(m, 'chip-miss', `${escapeHtml(m.name || m.sansadId)} <span class="chip-reason">(${escapeHtml(m.reason)})</span>`, false)).join('')}
         ${!diff.taggedNotAttributed.length ? '<span class="mp-diff-note">none</span>' : ''}
       </div>
     </div>
+  `);
+
+  // Agreement is the bulk and the least interesting -- collapse it.
+  groups.push(`
+    <details class="mp-diff-group">
+      <summary class="mp-diff-summary">Tagged by Sansad and attributed by us (${diff.agreement.length})</summary>
+      <div class="speaker-chips">
+        ${diff.agreement.map(m => mpChip(m, '', null, true)).join('') || '<span class="mp-diff-note">none</span>'}
+      </div>
+    </details>
   `);
 
   box.innerHTML = `<p class="section-title">Sansad's tag list vs. our attribution (${diff.taggedCount} tagged, this debate only)</p>${groups.join('')}`;
@@ -257,11 +282,14 @@ function render(data) {
     <p class="debate-title">${escapeHtml(data.title)}</p>
     <p class="debate-meta">LS${data.loksabha} · Session ${data.session} · dbSlno ${data.dbslno} · ${data.debateDate || 'undated'} · ${escapeHtml(data.debateType || '')} · ${data.turnCount} turns</p>
     ${data.sourceUrl ? `<p class="debate-meta"><a class="source-link" href="${escapeHtml(data.sourceUrl)}" target="_blank" rel="noopener noreferrer">View original on sansad.in ↗</a></p>` : ''}
-    <div class="speaker-chips">
-      ${data.speakersPresent.map(s => s.sansadId
-        ? `<a class="chip chip-link" href="speaker.html?id=${encodeURIComponent(s.sansadId)}">${escapeHtml(s.name)}${s.party ? ' · ' + escapeHtml(s.party) : ''}</a>`
-        : `<span class="chip">${escapeHtml(s.name)}${s.party ? ' · ' + escapeHtml(s.party) : ''}</span>`).join('')}
-    </div>
+    <details class="present-details">
+      <summary class="mp-diff-summary">Speakers we attributed (${data.speakersPresent.length})</summary>
+      <div class="speaker-chips">
+        ${data.speakersPresent.map(s => s.sansadId
+          ? `<a class="chip chip-link" href="speaker.html?id=${encodeURIComponent(s.sansadId)}">${escapeHtml(s.name)}${s.party ? ' · ' + escapeHtml(s.party) : ''}</a>`
+          : `<span class="chip">${escapeHtml(s.name)}${s.party ? ' · ' + escapeHtml(s.party) : ''}</span>`).join('')}
+      </div>
+    </details>
   `;
   contentEl.appendChild(header);
 
