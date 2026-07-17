@@ -213,20 +213,59 @@ _PRESIDING_RE = re.compile(
 
 
 def is_presiding_label(label: str) -> bool:
-    """Return True when a speaker label names a presiding officer (the Chair).
+    if not label:
+        return False
+    return bool(_PRESIDING_RE.search(label))
 
-    Covers English chair titles (Speaker, Deputy-Speaker, Chairman,
-    Chairperson) and their Devanagari equivalents (अध्यक्ष, उपाध्यक्ष,
-    सभापति). Crowd labels such as "SEVERAL HON. MEMBERS" or "अनेक माननीय
-    सदस्य" are deliberately not matched: they are anonymous interjections,
-    not the Chair.
+
+_CROWD_RE = re.compile(
+    # "SEVERAL HON. MEMBERS". The loose separator also accepts "HON'BLE" and "HON . MEMBERS".
+    r"\b(?:several|some|many)\b[\s.'’A-Za-z]*\bmembers\b"
+    r"|(?:अनेक|कई|कुछ)\s*माननीय\s*सदस्य",
+    re.IGNORECASE,
+)
+
+
+def is_crowd_label(label: str) -> bool:
+    if not label:
+        return False
+    return bool(_CROWD_RE.search(label))
+
+
+# Order matters: each deputy title contains its principal title, so test the deputy first.
+_ROLE_CODES: tuple[tuple[str, re.Pattern[str]], ...] = (
+    ("deputy_chairman", re.compile(r"deputy[-\s]*chair(?:man|person)", re.IGNORECASE)),
+    ("deputy_speaker", re.compile(r"deputy[-\s]*speaker|उपाध्यक्ष", re.IGNORECASE)),
+    ("chairman", re.compile(r"chair(?:man|person)|सभापति", re.IGNORECASE)),
+    ("speaker", re.compile(r"\bspeaker\b|अध्यक्ष", re.IGNORECASE)),
+)
+
+
+def role_code_for_label(label: str) -> str | None:
+    """Map a speaker label to a canonical `speaker_roles.code`, or None.
+
+    Returns one of the office slugs seeded in db/init/06-speaker-roles.sql --
+    'speaker', 'deputy_speaker', 'chairman', 'members_crowd' -- so a turn that
+    names no person still records WHICH non-person it named.
+
+    The corpus prints 143 distinct role spellings, but they are 3 offices plus
+    spacing/punctuation/typo noise. We search for the office word instead of
+    matching whole strings, which absorbs "MR.SPEAKER", "HON . SPEAKER",
+    "M R . CHAIRMAN", the "*m75 " index-marker prefix and the "DEPUPTY" typo
+    without a rule per variant. The Devanagari forms are the same three
+    offices, not extra ones.
 
     Args:
         label: the raw speaker label as printed in the transcript.
     """
     if not label:
-        return False
-    return bool(_PRESIDING_RE.search(label))
+        return None
+    if is_crowd_label(label):
+        return "members_crowd"
+    for code, pattern in _ROLE_CODES:
+        if pattern.search(label):
+            return code
+    return None
 
 
 def annotate_speakers(
@@ -240,9 +279,16 @@ def annotate_speakers(
         if not seg.get("speakerLabel"):
             seg["nameSource"] = None
             continue
+        # Test crowd before presiding, so the two categories stay disjoint.
+        if is_crowd_label(seg["speakerLabel"]):
+            seg["nameSource"] = "crowd"
+            seg["mpName"] = seg["speakerLabel"]
+            seg["roleCode"] = "members_crowd"
+            continue
         if is_presiding_label(seg["speakerLabel"]):
             seg["nameSource"] = "presiding"
             seg["mpName"] = seg["speakerLabel"]
+            seg["roleCode"] = role_code_for_label(seg["speakerLabel"])
             continue
         source, entry = resolve_speaker(seg["speakerLabel"], index)
         if entry:

@@ -17,7 +17,9 @@ from debate_fetch import (
     _leading_bold,
     annotate_speakers,
     fetch_debate,
+    is_crowd_label,
     is_presiding_label,
+    role_code_for_label,
     reuse_anchors,
     speaker_distribution,
 )
@@ -120,13 +122,17 @@ def split_by_speaker_legacy(
 
     # after decoding, so labels compare in the same (Devanagari) script
     for seg in segments:
-        if (
-            seg.get("mpCode") is None
-            and seg.get("nameSource") == "unresolved"
-            and is_presiding_label(seg["speakerLabel"])
-        ):
+        if seg.get("mpCode") is not None or seg.get("nameSource") != "unresolved":
+            continue
+        # Test crowd before presiding, as the recent reader does.
+        if is_crowd_label(seg["speakerLabel"]):
+            seg["nameSource"] = "crowd"
+            seg["mpName"] = seg["speakerLabel"]
+            seg["roleCode"] = "members_crowd"
+        elif is_presiding_label(seg["speakerLabel"]):
             seg["nameSource"] = "presiding"
             seg["mpName"] = seg["speakerLabel"]
+            seg["roleCode"] = role_code_for_label(seg["speakerLabel"])
 
     reuse_anchors(segments)
     return segments
