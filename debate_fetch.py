@@ -324,14 +324,19 @@ def reuse_anchors(segments: list[dict]) -> list[dict]:
         if seg.get("nameSource") == "presiding":
             continue
         label = seg["speakerLabel"]
-        for anchored_label, (code, name) in resolved.items():
-            if anchored_label in ambiguous:
-                continue
-            if labels_name_same_person(label, anchored_label):
-                seg["mpCode"] = code
-                seg["mpName"] = name
-                seg["nameSource"] = "anchor-reuse"
-                break
+        # Collect every match. One label can match two different anchored people.
+        hits = {
+            code: name
+            for anchored_label, (code, name) in resolved.items()
+            if anchored_label not in ambiguous
+            and labels_name_same_person(label, anchored_label)
+        }
+        # Keyed by mpCode, so two spellings of one person still resolve. Two people give no name.
+        if len(hits) == 1:
+            code, name = next(iter(hits.items()))
+            seg["mpCode"] = code
+            seg["mpName"] = name
+            seg["nameSource"] = "anchor-reuse"
     return segments
 
 

@@ -76,6 +76,42 @@ class TestSriIsAnHonorificOnlyWhenItLeads:
         assert "sri" in full
 
 
+class TestReuseRefusesToPickBetweenTwoAnchors:
+    def test_a_label_matching_two_different_people_resolves_to_neither(self):
+        # The dict order must not decide which person gets the words.
+        segs = [
+            {"mpCode": "11", "speakerLabel": "SHRI RAM KUMAR SINGH",
+             "mpName": "Shri Ram Kumar Singh", "nameSource": "anchor"},
+            {"mpCode": "22", "speakerLabel": "SHRI RAM KUMAR SINHA",
+             "mpName": "Shri Ram Kumar Sinha", "nameSource": "anchor"},
+            {"mpCode": None, "speakerLabel": "SHRI RAM KUMAR", "mpName": None},
+        ]
+        out = reuse_anchors(segs)
+        assert out[2]["mpCode"] is None
+        assert out[2].get("nameSource") != "anchor-reuse"
+
+    def test_one_person_anchored_under_two_spellings_still_resolves(self):
+        # Real case: LS18/4/2819. Harsimrat Kaur Badal prints with and without her constituency. Both labels carry the same code.
+        segs = [
+            {"mpCode": "5107", "speakerLabel": "SHRIMATI HARSIMRAT KAUR BADAL (BATHINDA)",
+             "mpName": "Shrimati Harsimrat Kaur Badal", "nameSource": "anchor"},
+            {"mpCode": "5107", "speakerLabel": "SHRIMATI HARSIMRAT KAUR BADAL",
+             "mpName": "Shrimati Harsimrat Kaur Badal", "nameSource": "anchor"},
+            {"mpCode": None, "speakerLabel": "श्रीमती हरसिमरत कौर बादल", "mpName": None},
+        ]
+        out = reuse_anchors(segs)
+        assert out[2]["mpCode"] == "5107"
+        assert out[2]["nameSource"] == "anchor-reuse"
+
+    def test_a_single_unambiguous_anchor_still_carries(self):
+        segs = [
+            {"mpCode": "100", "speakerLabel": "SHRI KODIKUNNIL SURESH",
+             "mpName": "Shri Kodikunnil Suresh", "nameSource": "anchor"},
+            {"mpCode": None, "speakerLabel": "SHRI KODIKUNNIL SURESH", "mpName": None},
+        ]
+        assert reuse_anchors(segs)[1]["mpCode"] == "100"
+
+
 class TestAMinisterialTitleIsNotAName:
     def test_two_different_ministers_do_not_match_on_office_boilerplate(self):
         # Real case: LS16/8/6812. A title in square brackets must not count as name words.
