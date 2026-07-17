@@ -76,6 +76,32 @@ class TestSriIsAnHonorificOnlyWhenItLeads:
         assert "sri" in full
 
 
+class TestAMinisterialTitleIsNotAName:
+    def test_two_different_ministers_do_not_match_on_office_boilerplate(self):
+        # Real case: LS16/8/6812. A title in square brackets must not count as name words.
+        assert labels_name_same_person(
+            "THE MINISTER OF STATE OF THE MINISTRY OF PLANNING AND MINISTER OF STATE "
+            "IN THE MINISTRY OF DEFENCE (RAO INDERJIT SINGH)",
+            "THE MINISTER OF STATE IN THE MINISTRY OF INFORMATION AND BROADCASTING "
+            "[COL. RAJYAVARDHAN RATHORE (Retd.)]",
+        ) is False
+
+    def test_a_title_with_the_name_in_square_brackets_collapses_to_the_name(self):
+        assert _name_parts(
+            "THE MINISTER OF STATE IN THE MINISTRY OF INFORMATION AND BROADCASTING "
+            "[COL. RAJYAVARDHAN RATHORE (Retd.)]"
+        ) == (["rjyvrdhan", "rthore"], set())
+
+    def test_the_round_bracket_form_still_collapses(self):
+        full, initials = _name_parts("THE MINISTER OF HOUSING [SHRI M. VENKAIAH NAIDU]")
+        assert full == ["venkaiah", "naidu"] and initials == {"m"}
+
+    def test_office_words_are_dropped_before_folding_not_after(self):
+        # fold() strips the inherent a, so Anand folds to the office word and. Filtering after the fold deletes the name.
+        full, _initials = _name_parts("Shri Anand Kumar")
+        assert full == ["and", "kumar"]
+
+
 class TestNoEvidenceIsNotAgreement:
     def test_an_undecodable_label_names_nobody(self):
         # raw legacy-font bytes: fold to no usable word at all

@@ -39,6 +39,8 @@ _PAREN_RE = re.compile(r"\(([^)]*)\)")
 _HONORIFICS = {
     "shri", "shrimati", "smt", "sushri", "km", "kumari", "ku", "dr", "prof",
     "adv", "advocate", "mr", "mrs", "ms", "sardar", "sarvashri",
+    # Military ranks, as in "COL. RAJYAVARDHAN RATHORE (Retd.)".
+    "col", "capt", "maj", "gen", "lt", "brig", "adm", "retd",
     # to_latin spellings of Devanagari honorifics.
     "shree", "shreemati", "sushree", "kunvar", "kunvara", "do", "pro", "da",
 }
@@ -48,15 +50,8 @@ _LEADING_HONORIFICS = {"sri"}
 
 
 def _normalize_name(label: str) -> list[str]:
-    """
-    Reduce a speaker label to its bare name tokens for matching against
-    mpPartDetailList: drop honorifics, drop the constituency in parentheses,
-    and strip punctuation. A ministerial designation
-    ("THE MINISTER OF ... (SHRI PRALHAD JOSHI)") is collapsed to the person's
-    name inside the parentheses. Indic-script labels pass through as their own
-    tokens (which won't match the romanised list — that gap needs
-    transliteration, tracked separately).
-    """
+    # The source prints a minister's name in round or square brackets.
+    label = label.replace("[", "(").replace("]", ")")
     # A ministerial title keeps the name in brackets, led by an honorific.
     for inside in _PAREN_RE.findall(label):
         head = re.sub(r"[^\w\s]", " ", inside).lower().split()
@@ -81,9 +76,17 @@ _FOLDED_HONORIFICS = {
 }
 
 
+# Words that every ministerial title shares. Two titles that do not collapse to a name would otherwise match on these.
+_OFFICE_WORDS = {
+    "the", "of", "in", "and", "for", "minister", "ministry", "minister's",
+    "state", "department", "deputy", "prime", "union", "cabinet", "office",
+}
+
+
 def _name_parts(name: str) -> tuple[list[str], set[str]]:
-    """Folded name tokens, script-agnostic, split into full words and initials."""
-    toks = [translit.fold(t) for t in _normalize_name(translit.to_latin(name or ""))]
+    # Remove office words before folding. Folding maps the name "Anand" to the office word "and".
+    plain = [t for t in _normalize_name(translit.to_latin(name or "")) if t not in _OFFICE_WORDS]
+    toks = [translit.fold(t) for t in plain]
     toks = [t for t in toks if t and t not in _FOLDED_HONORIFICS]
     full = [t for t in toks if len(t) >= 3]
     initials = {t[0] for t in toks if 0 < len(t) < 3}
