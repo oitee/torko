@@ -132,7 +132,7 @@
   <div class="caveat">
     Party filters use each MP's <strong>last recorded term's party</strong>, not necessarily their
     party at the time of the speech — MPs who changed parties will show under their most recent one.
-    Demo data: 25 real debates from LS17 &amp; LS18, not the full corpus.
+    Covers the full corpus: 64,921 debates, LS13&ndash;LS18.
   </div>
 
   <form class="filters" id="filter-form">
@@ -282,7 +282,7 @@ function render(data) {
   metaEl.textContent = `${data.total} debate${data.total === 1 ? '' : 's'} match`;
 
   if (data.results.length === 0) {
-    resultsEl.innerHTML = `<p style="color:var(--text-muted);font-size:13px;">No debates match these filters. Demo data is 25 debates from LS17/LS18 only — try widening the filters.</p>`;
+    resultsEl.innerHTML = `<p style="color:var(--text-muted);font-size:13px;">No debates match these filters — try widening them.</p>`;
     paginationEl.style.display = 'none';
     return;
   }
