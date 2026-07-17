@@ -70,7 +70,73 @@
     color: var(--text-primary);
     font-size: 13px;
   }
-  .field input[type="date"] { width: 150px; }
+  .date-wrap { position: relative; }
+  .date-input {
+    width: 150px;
+    padding: 8px 10px;
+    border-radius: 6px;
+    border: 1px solid var(--border);
+    background: var(--page-plane);
+    color: var(--text-primary);
+    font-size: 13px;
+    cursor: pointer;
+  }
+  .date-pop {
+    display: none;
+    position: absolute;
+    z-index: 20;
+    top: 100%;
+    left: 0;
+    margin-top: 4px;
+    width: 236px;
+    padding: 10px;
+    background: var(--surface-1);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    box-shadow: 0 6px 20px rgba(0,0,0,0.18);
+  }
+  .date-pop.open { display: block; }
+  .date-pop-head { display: flex; gap: 6px; align-items: center; margin-bottom: 8px; }
+  .date-pop-head select {
+    flex: 1;
+    padding: 4px 6px;
+    border-radius: 5px;
+    border: 1px solid var(--border);
+    background: var(--page-plane);
+    color: var(--text-primary);
+    font-size: 12px;
+  }
+  .date-nav {
+    all: unset;
+    cursor: pointer;
+    padding: 2px 7px;
+    border-radius: 5px;
+    color: var(--text-secondary);
+    font-size: 15px;
+  }
+  .date-nav:hover { background: rgba(42,120,214,0.12); color: var(--series-1); }
+  .date-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 2px; }
+  .date-dow { font-size: 10px; color: var(--text-muted); text-align: center; padding: 2px 0; }
+  .date-cell {
+    all: unset;
+    cursor: pointer;
+    text-align: center;
+    font-size: 12px;
+    padding: 5px 0;
+    border-radius: 5px;
+    color: var(--text-primary);
+  }
+  .date-cell:hover { background: rgba(42,120,214,0.12); }
+  .date-cell.sel { background: var(--series-1); color: #fff; }
+  .date-cell.empty { cursor: default; }
+  .date-pop-foot { margin-top: 8px; text-align: right; }
+  .date-clear {
+    all: unset;
+    cursor: pointer;
+    font-size: 12px;
+    color: var(--series-1);
+  }
+  .date-clear:hover { text-decoration: underline; }
 
   .token-select { position: relative; width: 220px; }
   .token-select input {
@@ -207,19 +273,29 @@
   <form class="filters" id="filter-form">
     <div class="field">
       <label for="date_from">From</label>
-      <input type="date" id="date_from">
+      <div class="date-wrap">
+        <input type="text" id="date_from" class="date-input" readonly placeholder="Any">
+        <div class="date-pop" id="date_from-pop"></div>
+      </div>
     </div>
     <div class="field">
       <label for="date_to">To</label>
-      <input type="date" id="date_to">
+      <div class="date-wrap">
+        <input type="text" id="date_to" class="date-input" readonly placeholder="Any">
+        <div class="date-pop" id="date_to-pop"></div>
+      </div>
     </div>
     <div class="field">
-      <label for="loksabha">Lok Sabha</label>
-      <select id="loksabha"><option value="">Any</option></select>
+      <label for="term-session">Term &amp; session</label>
+      <select id="term-session"><option value="">Any</option></select>
     </div>
     <div class="field">
-      <label for="session">Session</label>
-      <select id="session"><option value="">Any</option></select>
+      <label for="type-input">Debate type</label>
+      <div class="token-select" id="type-select">
+        <div class="token-chips" id="type-chips"></div>
+        <input type="text" id="type-input" placeholder="e.g. motion, obituary" autocomplete="off">
+        <div class="token-suggestions" id="type-suggestions"></div>
+      </div>
     </div>
     <div class="field">
       <label for="party-input">Party</label>
@@ -268,6 +344,7 @@ const nextBtn = document.getElementById('next-btn');
 let state = { page: 1, pageSize: 10, total: 0 };
 let partyToken = null;
 let speakerToken = null;
+let typeToken = null;
 
 // A search-box-with-chips replacing a <select multiple>. `fetchSuggestions(q)`
 // returns [{value, label, sub?}]; selected items become removable chips.
@@ -366,17 +443,104 @@ function createTokenSelect(prefix, fetchSuggestions) {
   };
 }
 
+// A compact date picker with month + year dropdowns, so jumping across years
+// is one click, not the native input's year-by-year stepping. Value is written
+// to the input as ISO yyyy-mm-dd, which the backend's date filter expects.
+const MONTHS = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+function createDatePicker(id, minYear, maxYear) {
+  const input = document.getElementById(id);
+  const pop = document.getElementById(`${id}-pop`);
+  const today = new Date();
+  let viewY = today.getFullYear();
+  let viewM = today.getMonth();
+
+  function iso(y, m, d) {
+    return `${y}-${String(m + 1).padStart(2, '0')}-${String(d).padStart(2, '0')}`;
+  }
+
+  function render() {
+    const yearOpts = [];
+    for (let y = maxYear; y >= minYear; y--) yearOpts.push(`<option value="${y}"${y === viewY ? ' selected' : ''}>${y}</option>`);
+    const monthOpts = MONTHS.map((m, i) => `<option value="${i}"${i === viewM ? ' selected' : ''}>${m}</option>`).join('');
+    const first = new Date(viewY, viewM, 1).getDay();
+    const days = new Date(viewY, viewM + 1, 0).getDate();
+    const cells = [];
+    ['S','M','T','W','T','F','S'].forEach(d => cells.push(`<div class="date-dow">${d}</div>`));
+    for (let i = 0; i < first; i++) cells.push('<span class="date-cell empty"></span>');
+    for (let d = 1; d <= days; d++) {
+      const val = iso(viewY, viewM, d);
+      cells.push(`<button type="button" class="date-cell${input.value === val ? ' sel' : ''}" data-d="${d}">${d}</button>`);
+    }
+    pop.innerHTML = `
+      <div class="date-pop-head">
+        <button type="button" class="date-nav" data-nav="-1">‹</button>
+        <select class="date-month">${monthOpts}</select>
+        <select class="date-year">${yearOpts.join('')}</select>
+        <button type="button" class="date-nav" data-nav="1">›</button>
+      </div>
+      <div class="date-grid">${cells.join('')}</div>
+      <div class="date-pop-foot"><button type="button" class="date-clear">Clear</button></div>
+    `;
+    pop.querySelector('.date-month').addEventListener('change', e => { viewM = +e.target.value; render(); });
+    pop.querySelector('.date-year').addEventListener('change', e => { viewY = +e.target.value; render(); });
+    pop.querySelectorAll('.date-nav').forEach(b => b.addEventListener('click', () => {
+      viewM += +b.dataset.nav;
+      if (viewM < 0) { viewM = 11; viewY--; } else if (viewM > 11) { viewM = 0; viewY++; }
+      render();
+    }));
+    pop.querySelectorAll('.date-cell[data-d]').forEach(b => b.addEventListener('click', () => {
+      input.value = iso(viewY, viewM, +b.dataset.d);
+      pop.classList.remove('open');
+    }));
+    pop.querySelector('.date-clear').addEventListener('click', () => {
+      input.value = '';
+      pop.classList.remove('open');
+    });
+  }
+
+  input.addEventListener('click', () => {
+    const opening = !pop.classList.contains('open');
+    document.querySelectorAll('.date-pop.open').forEach(p => p.classList.remove('open'));
+    if (opening) {
+      if (input.value) { const [y, m] = input.value.split('-').map(Number); viewY = y; viewM = m - 1; }
+      render();
+      pop.classList.add('open');
+    }
+  });
+  document.addEventListener('click', e => {
+    if (!e.target.closest('.date-wrap')) pop.classList.remove('open');
+  });
+}
+
 async function loadFacets() {
   const resp = await fetch('/api/dashboard/facets');
   const facets = await resp.json();
 
-  const loksabhaSel = document.getElementById('loksabha');
+  // Term & session clubbed into one control: "LS14 · all sessions" then each
+  // "LS14 · Session 2", grouped by term. Value is "" | "14" | "14|2".
+  const termSel = document.getElementById('term-session');
   facets.loksabhas.forEach(ls => {
-    const opt = document.createElement('option');
-    opt.value = ls; opt.textContent = `LS ${ls}`;
-    loksabhaSel.appendChild(opt);
+    const group = document.createElement('optgroup');
+    group.label = `LS ${ls}`;
+    const all = document.createElement('option');
+    all.value = String(ls); all.textContent = `LS${ls} · all sessions`;
+    group.appendChild(all);
+    (facets.sessionsByLoksabha[String(ls)] || []).forEach(s => {
+      const opt = document.createElement('option');
+      opt.value = `${ls}|${s}`; opt.textContent = `LS${ls} · Session ${s}`;
+      group.appendChild(opt);
+    });
+    termSel.appendChild(group);
   });
-  loksabhaSel.addEventListener('change', () => populateSessions(facets));
+
+  // Debate type: small fixed list, filtered client-side, multi-select.
+  typeToken = createTokenSelect('type', q => {
+    const ql = q.toLowerCase();
+    return (facets.debateTypes || [])
+      .filter(t => !ql || t.toLowerCase().includes(ql))
+      .slice(0, 50)
+      .map(t => ({ value: t, label: t }));
+  });
 
   // Party: small fixed list, filtered client-side.
   partyToken = createTokenSelect('party', q => {
@@ -398,27 +562,13 @@ async function loadFacets() {
     }));
   });
 
-  populateSessions(facets);
-}
-
-function populateSessions(facets) {
-  const loksabha = document.getElementById('loksabha').value;
-  const sessionSel = document.getElementById('session');
-  sessionSel.innerHTML = '<option value="">Any</option>';
-  const sessions = loksabha ? (facets.sessionsByLoksabha[loksabha] || []) : [...new Set(Object.values(facets.sessionsByLoksabha).flat())].sort((a,b)=>a-b);
-  sessions.forEach(s => {
-    const opt = document.createElement('option');
-    opt.value = s; opt.textContent = `Session ${s}`;
-    sessionSel.appendChild(opt);
-  });
 }
 
 function buildQuery(page) {
   const params = new URLSearchParams();
   const dateFrom = document.getElementById('date_from').value;
   const dateTo = document.getElementById('date_to').value;
-  const loksabha = document.getElementById('loksabha').value;
-  const session = document.getElementById('session').value;
+  const [loksabha, session] = document.getElementById('term-session').value.split('|');
   const q = document.getElementById('q').value.trim();
 
   if (dateFrom) params.set('date_from', dateFrom);
@@ -426,6 +576,7 @@ function buildQuery(page) {
   if (loksabha) params.set('loksabha', loksabha);
   if (session) params.set('session', session);
   if (q) params.set('q', q);
+  typeToken.getValues().forEach(t => params.append('debate_type', t));
   partyToken.getValues().forEach(p => params.append('party', p));
   speakerToken.getValues().forEach(s => params.append('speaker', s));
   params.set('page', page);
@@ -489,6 +640,7 @@ document.getElementById('reset-btn').addEventListener('click', () => {
   form.reset();
   partyToken.clear();
   speakerToken.clear();
+  typeToken.clear();
   search(1);
 });
 prevBtn.addEventListener('click', () => search(state.page - 1));
@@ -522,6 +674,9 @@ document.addEventListener('click', e => {
   e.stopPropagation();
   window.open(link.dataset.src, '_blank', 'noopener');
 });
+
+createDatePicker('date_from', 1998, new Date().getFullYear());
+createDatePicker('date_to', 1998, new Date().getFullYear());
 
 loadFacets().then(() => search(1));
 </script>

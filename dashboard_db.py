@@ -98,6 +98,7 @@ def list_debates(
     q: str,
     page: int,
     page_size: int,
+    debate_types: list[str] | None = None,
 ) -> dict:
     clauses = []
     params: dict = {}
@@ -114,6 +115,9 @@ def list_debates(
     if session is not None:
         clauses.append("d.session = :session")
         params["session"] = session
+    if debate_types:
+        clauses.append("d.debate_type = ANY(:debate_types)")
+        params["debate_types"] = debate_types
     if q:
         clauses.append("d.title ILIKE :q")
         params["q"] = f"%{q}%"

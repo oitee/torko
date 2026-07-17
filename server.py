@@ -37,6 +37,7 @@ def api_dashboard_debates():
         q=(request.args.get("q") or "").strip(),
         page=page,
         page_size=page_size,
+        debate_types=request.args.getlist("debate_type"),
     )
 
     return jsonify(
