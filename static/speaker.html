@@ -92,6 +92,36 @@
   .speaker-name { font-size: 18px; font-weight: 700; margin: 0 0 4px; }
   .speaker-meta { color: var(--text-secondary); font-size: 13px; }
 
+  .filter-bar {
+    display: flex;
+    gap: 12px;
+    align-items: flex-end;
+    flex-wrap: wrap;
+    background: var(--surface-1);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 14px;
+    margin-bottom: 16px;
+  }
+  .filter-bar .field { display: flex; flex-direction: column; gap: 4px; }
+  .filter-bar label { font-size: 11px; color: var(--text-secondary); }
+  .filter-bar input, .filter-bar select {
+    padding: 7px 9px;
+    border-radius: 6px;
+    border: 1px solid var(--border);
+    background: var(--page-plane);
+    color: var(--text-primary);
+    font-size: 13px;
+  }
+  .filter-bar .reset {
+    all: unset;
+    cursor: pointer;
+    font-size: 12px;
+    color: var(--series-1);
+    padding-bottom: 8px;
+  }
+  .filter-bar .reset:hover { text-decoration: underline; }
+
   .debate-list { display: flex; flex-direction: column; gap: 10px; }
   .debate-card {
     display: block;
@@ -140,6 +170,7 @@ const contentEl = document.getElementById('speaker-content');
 
 let allSpeakers = [];
 let debounceTimer = null;
+let currentSansadId = null;
 
 async function loadAllSpeakers() {
   const resp = await fetch('/api/dashboard/speakers');
@@ -188,6 +219,7 @@ document.addEventListener('click', (e) => {
 async function loadSpeaker(sansadId, opts = {}) {
   errorEl.style.display = 'none';
   contentEl.innerHTML = '';
+  currentSansadId = sansadId;
   if (opts.pushUrl !== false) {
     history.replaceState(null, '', `?id=${encodeURIComponent(sansadId)}`);
   }
@@ -202,6 +234,8 @@ async function loadSpeaker(sansadId, opts = {}) {
     errorEl.style.display = 'block';
   }
 }
+
+let currentDebates = [];
 
 function renderSpeaker(data) {
   const header = document.createElement('div');
@@ -220,24 +254,126 @@ function renderSpeaker(data) {
     return;
   }
 
+  currentDebates = data.debates;
+  contentEl.appendChild(buildFilterBar(data.debates));
+
   const heading = document.createElement('p');
+  heading.id = 'debate-count';
   heading.style.cssText = 'font-size:13px;font-weight:600;margin:0 0 10px;';
-  heading.textContent = `${data.totalDebates} debate${data.totalDebates === 1 ? '' : 's'} with an attributed turn`;
   contentEl.appendChild(heading);
 
   const list = document.createElement('div');
+  list.id = 'debate-results';
   list.className = 'debate-list';
-  data.debates.forEach(d => {
-    const card = document.createElement('a');
-    card.className = 'debate-card';
-    card.href = `debate.html?id=${encodeURIComponent(d.id)}`;
-    card.innerHTML = `
+  contentEl.appendChild(list);
+
+  applyFilters();
+}
+
+// Filter controls are scoped to THIS speaker's own debates -- only the terms,
+// sessions, types and years they actually appear in -- so no choice yields an
+// empty list by construction, and the dropdowns stay short. Everything filters
+// client-side over the already-fetched list; no extra requests.
+function buildFilterBar(debates) {
+  const terms = [...new Set(debates.map(d => `${d.loksabha}|${d.session}`))]
+    .sort((a, b) => a.split('|').map(Number)[0] - b.split('|').map(Number)[0]
+                 || a.split('|').map(Number)[1] - b.split('|').map(Number)[1]);
+  const types = [...new Set(debates.map(d => d.debateType).filter(Boolean))].sort();
+  const years = [...new Set(debates.map(d => d.debateDate && d.debateDate.slice(0, 4)).filter(Boolean))].sort();
+
+  const bar = document.createElement('div');
+  bar.className = 'filter-bar';
+  bar.innerHTML = `
+    <div class="field">
+      <label for="f-term">Term &amp; session</label>
+      <select id="f-term"><option value="">Any</option>
+        ${terms.map(t => { const [ls, s] = t.split('|'); return `<option value="${t}">LS${ls} · Session ${s}</option>`; }).join('')}
+      </select>
+    </div>
+    <div class="field">
+      <label for="f-type">Debate type</label>
+      <select id="f-type"><option value="">Any</option>
+        ${types.map(t => `<option value="${escapeHtml(t)}">${escapeHtml(t)}</option>`).join('')}
+      </select>
+    </div>
+    <div class="field">
+      <label for="f-year-from">From year</label>
+      <select id="f-year-from"><option value="">Any</option>
+        ${years.map(y => `<option value="${y}">${y}</option>`).join('')}
+      </select>
+    </div>
+    <div class="field">
+      <label for="f-year-to">To year</label>
+      <select id="f-year-to"><option value="">Any</option>
+        ${years.map(y => `<option value="${y}">${y}</option>`).join('')}
+      </select>
+    </div>
+    <div class="field">
+      <label for="f-title">Title contains</label>
+      <input type="text" id="f-title" placeholder="e.g. budget" autocomplete="off">
+    </div>
+    <div class="field">
+      <label for="f-sort">Sort</label>
+      <select id="f-sort">
+        <option value="oldest">Oldest first</option>
+        <option value="newest">Newest first</option>
+        <option value="words">Most words</option>
+      </select>
+    </div>
+    <button type="button" class="reset" id="f-reset">Reset</button>
+  `;
+  bar.querySelectorAll('select').forEach(el => el.addEventListener('change', applyFilters));
+  bar.querySelector('#f-title').addEventListener('input', () => { clearTimeout(filterTimer); filterTimer = setTimeout(applyFilters, 120); });
+  bar.querySelector('#f-reset').addEventListener('click', () => {
+    bar.querySelectorAll('select').forEach(el => el.selectedIndex = 0);
+    bar.querySelector('#f-title').value = '';
+    applyFilters();
+  });
+  return bar;
+}
+
+let filterTimer = null;
+
+function applyFilters() {
+  const term = document.getElementById('f-term').value;
+  const type = document.getElementById('f-type').value;
+  const yFrom = document.getElementById('f-year-from').value;
+  const yTo = document.getElementById('f-year-to').value;
+  const title = document.getElementById('f-title').value.trim().toLowerCase();
+  const sort = document.getElementById('f-sort').value;
+
+  let rows = currentDebates.filter(d => {
+    if (term && `${d.loksabha}|${d.session}` !== term) return false;
+    if (type && d.debateType !== type) return false;
+    const y = d.debateDate && d.debateDate.slice(0, 4);
+    if (yFrom && (!y || y < yFrom)) return false;
+    if (yTo && (!y || y > yTo)) return false;
+    if (title && !cleanTitle(d.title).toLowerCase().includes(title)) return false;
+    return true;
+  });
+
+  rows = rows.slice().sort((a, b) => {
+    if (sort === 'words') return (b.words || 0) - (a.words || 0);
+    const cmp = (a.debateDate || '').localeCompare(b.debateDate || '');
+    return sort === 'newest' ? -cmp : cmp;
+  });
+
+  const heading = document.getElementById('debate-count');
+  heading.textContent = rows.length === currentDebates.length
+    ? `${rows.length} debate${rows.length === 1 ? '' : 's'} with an attributed turn`
+    : `${rows.length} of ${currentDebates.length} debates`;
+
+  const list = document.getElementById('debate-results');
+  if (rows.length === 0) {
+    list.innerHTML = '<p class="empty">No debates match these filters.</p>';
+    return;
+  }
+  list.innerHTML = rows.map(d => `
+    <a class="debate-card" href="debate.html?id=${encodeURIComponent(d.id)}&speaker=${encodeURIComponent(currentSansadId)}">
       <p class="debate-title">${escapeHtml(cleanTitle(d.title))}</p>
       <p class="debate-sub">LS${d.loksabha} · Session ${d.session} · ${d.debateDate || 'undated'} · ${escapeHtml(d.debateType || '')} · this speaker: ${d.interventions} intervention${d.interventions === 1 ? '' : 's'}, ${d.words.toLocaleString()} words${d.sourceUrl ? ` · <span class="source-link" data-src="${escapeHtml(d.sourceUrl)}">sansad.in ↗</span>` : ''}</p>
-    `;
-    list.appendChild(card);
-  });
-  contentEl.appendChild(list);
+    </a>
+  `).join('');
 }
 
 function escapeHtml(s) {
