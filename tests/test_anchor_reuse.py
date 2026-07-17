@@ -122,6 +122,43 @@ class TestSriIsAnHonorificOnlyWhenItLeads:
         assert "sri" in full
 
 
+class TestAMinisterialTitleIsNotAName:
+    """A title describes a job. It is never evidence of who holds it."""
+
+    def test_two_different_ministers_do_not_match_on_office_boilerplate(self):
+        # LS16/8/6812, and a misattribution until it was measured. The name in
+        # the second label sits in SQUARE brackets, which the title-collapse
+        # rule could not see, so the whole title stood as name words. The two
+        # labels then agreed on the/minister/state/ministry/and: six "strong"
+        # word matches, not one of them a name, and Rao Inderjit Singh's words
+        # were filed under Col. Rajyavardhan Rathore (mpCode 4782).
+        assert labels_name_same_person(
+            "THE MINISTER OF STATE OF THE MINISTRY OF PLANNING AND MINISTER OF STATE "
+            "IN THE MINISTRY OF DEFENCE (RAO INDERJIT SINGH)",
+            "THE MINISTER OF STATE IN THE MINISTRY OF INFORMATION AND BROADCASTING "
+            "[COL. RAJYAVARDHAN RATHORE (Retd.)]",
+        ) is False
+
+    def test_a_title_with_the_name_in_square_brackets_collapses_to_the_name(self):
+        assert _name_parts(
+            "THE MINISTER OF STATE IN THE MINISTRY OF INFORMATION AND BROADCASTING "
+            "[COL. RAJYAVARDHAN RATHORE (Retd.)]"
+        ) == (["rjyvrdhan", "rthore"], set())
+
+    def test_the_round_bracket_form_still_collapses(self):
+        full, initials = _name_parts("THE MINISTER OF HOUSING [SHRI M. VENKAIAH NAIDU]")
+        assert full == ["venkaiah", "naidu"] and initials == {"m"}
+
+    def test_office_words_are_dropped_before_folding_not_after(self):
+        # The trap: fold() strips the cluster-internal inherent "a", so the real
+        # name "Anand" folds to "and" -- an office word. Filtering after the fold
+        # deleted the name, collapsed "Anand Kumar" to the key "kumar", and
+        # squashed him into "P. Kumar": a collision between two real people,
+        # manufactured by a stopword list.
+        full, _initials = _name_parts("Shri Anand Kumar")
+        assert full == ["and", "kumar"]
+
+
 class TestNoEvidenceIsNotAgreement:
     """The two callers need opposite answers when nothing could be compared.
 

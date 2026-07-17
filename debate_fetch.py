@@ -47,6 +47,12 @@ _PAREN_RE = re.compile(r"\(([^)]*)\)")
 _HONORIFICS = {
     "shri", "shrimati", "smt", "sushri", "km", "kumari", "ku", "dr", "prof",
     "adv", "advocate", "mr", "mrs", "ms", "sardar", "sarvashri",
+    # Military and service ranks. These lead a real MP's printed name
+    # ("COL. RAJYAVARDHAN RATHORE (Retd.)", "CAPT. AMARINDER SINGH"), and
+    # "retd" trails one. Without them the rank is read as a name word, which
+    # both fails to match the roster and stops a ministerial title from being
+    # recognised as a title at all -- see _normalize_name.
+    "col", "capt", "maj", "gen", "lt", "brig", "adm", "retd",
     # to_latin spellings of Devanagari honorifics (श्री, श्रीमती, सुश्री, कुँवर,
     # डॉ, प्रो, डा), so they are recognised before folding runs.
     "shree", "shreemati", "sushree", "kunvar", "kunvara", "do", "pro", "da",
@@ -73,6 +79,15 @@ def _normalize_name(label: str) -> list[str]:
     tokens (which won't match the romanised list — that gap needs
     transliteration, tracked separately).
     """
+    # Square brackets are parentheses here. The source prints a ministerial
+    # designation both ways -- "THE MINISTER OF ... (SHRI PRALHAD JOSHI)" and
+    # "THE MINISTER OF ... [SHRI M. VENKAIAH NAIDU]" -- and only the round form
+    # was ever recognised. The bracketed form did not merely fail to collapse:
+    # it left the whole title standing as name words, so two DIFFERENT ministers
+    # matched each other on "the/minister/state/ministry/and" alone. That put
+    # Rao Inderjit Singh's words under Col. Rajyavardhan Rathore (mpCode 4782)
+    # in LS16/8/6812 -- six "strong" word matches, and not one of them a name.
+    label = label.replace("[", "(").replace("]", ")")
     # ministerial designation: the name sits in parentheses led by an honorific
     for inside in _PAREN_RE.findall(label):
         head = re.sub(r"[^\w\s]", " ", inside).lower().split()
@@ -104,9 +119,40 @@ _FOLDED_HONORIFICS = {
 }
 
 
+# Office boilerplate: the words every ministerial title shares. NOT a list of
+# portfolios ("planning", "defence") -- those are open-ended and, being unique to
+# one office, are harmless. These are the connectives, and they are dangerous
+# precisely because they are common: two titles that fail to collapse to a name
+# agree on "the/minister/state/ministry/and" and score six *strong* word matches
+# without a single name among them.
+#
+# The bracket fix in _normalize_name collapses the titles we know how to read.
+# This is the backstop for the ones we do not -- "(RAO INDERJIT SINGH)" leads
+# with a word that is an honorific in one MP's name and a surname in another's,
+# so it cannot be collapsed and its title survives. That is the shape of the
+# species this project keeps meeting: not the case we fixed, the next one.
+_OFFICE_WORDS = {
+    "the", "of", "in", "and", "for", "minister", "ministry", "minister's",
+    "state", "department", "deputy", "prime", "union", "cabinet", "office",
+}
+
+
 def _name_parts(name: str) -> tuple[list[str], set[str]]:
-    """Folded name tokens, script-agnostic, split into full words and initials."""
-    toks = [translit.fold(t) for t in _normalize_name(translit.to_latin(name or ""))]
+    """Folded name tokens, script-agnostic, split into full words and initials.
+
+    Office boilerplate is dropped: a ministerial title is a description of a
+    job, and never evidence of which human being holds it.
+
+    Office words are removed BEFORE folding, and the order is load-bearing.
+    Folding strips the cluster-internal inherent "a", so it maps the real name
+    **Anand** onto the office word **and**. Filtering after the fold therefore
+    deleted a name: "Anand Kumar" lost "anand", collapsed to the key "kumar",
+    and collided with "P. Kumar" -- inventing a squash between two real people
+    out of a stopword list. Caught by tests/test_roster_collisions.py, which is
+    exactly what that baseline is for.
+    """
+    plain = [t for t in _normalize_name(translit.to_latin(name or "")) if t not in _OFFICE_WORDS]
+    toks = [translit.fold(t) for t in plain]
     toks = [t for t in toks if t and t not in _FOLDED_HONORIFICS]
     full = [t for t in toks if len(t) >= 3]
     initials = {t[0] for t in toks if 0 < len(t) < 3}
