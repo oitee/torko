@@ -118,7 +118,7 @@ def list_debates(
             text(
                 f"""
                 SELECT d.id, d.loksabha, d.session, d.dbslno, d.title,
-                       d.debate_type, d.debate_date,
+                       d.debate_type, d.debate_date, d.source_url,
                        (SELECT count(*) FROM turns t WHERE t.debate_id = d.id) AS turn_count
                 FROM debates d
                 {where}
@@ -141,6 +141,7 @@ def list_debates(
                     "title": r.title,
                     "debateType": r.debate_type,
                     "debateDate": r.debate_date.isoformat() if r.debate_date else None,
+                    "sourceUrl": r.source_url,
                     "speakerCount": len(present),
                     "turnCount": r.turn_count,
                     "speakersPresent": present,
@@ -155,7 +156,7 @@ def get_debate_detail(loksabha: int, session: int, dbslno: int) -> dict | None:
     with engine.connect() as conn:
         debate = conn.execute(
             text(
-                "SELECT id, loksabha, session, dbslno, title, debate_type, debate_date "
+                "SELECT id, loksabha, session, dbslno, title, debate_type, debate_date, source_url "
                 "FROM debates WHERE loksabha = :ls AND session = :sess AND dbslno = :db"
             ),
             {"ls": loksabha, "sess": session, "db": dbslno},
@@ -206,6 +207,7 @@ def get_debate_detail(loksabha: int, session: int, dbslno: int) -> dict | None:
         "title": debate.title,
         "debateType": debate.debate_type,
         "debateDate": debate.debate_date.isoformat() if debate.debate_date else None,
+        "sourceUrl": debate.source_url,
         "speakerCount": len(present),
         "turnCount": len(turns),
         "speakersPresent": present,
@@ -268,6 +270,7 @@ def get_speaker_detail(sansad_id: str) -> dict | None:
             text(
                 """
                 SELECT d.loksabha, d.session, d.dbslno, d.title, d.debate_type, d.debate_date,
+                       d.source_url,
                        count(*) AS interventions, sum(t.word_count) AS words
                 FROM turns t
                 JOIN persons p ON p.id = t.person_id
@@ -289,6 +292,7 @@ def get_speaker_detail(sansad_id: str) -> dict | None:
             "title": r.title,
             "debateType": r.debate_type,
             "debateDate": r.debate_date.isoformat() if r.debate_date else None,
+            "sourceUrl": r.source_url,
             "interventions": r.interventions,
             "words": int(r.words) if r.words is not None else 0,
         }
