@@ -40,8 +40,8 @@ from debate_fetch import (
     _label_colon_pos,
     _leading_bold,
     annotate_speakers,
-    fetch_debate,
     is_crowd_label,
+    load_debate,
     is_presiding_label,
     role_code_for_label,
     reuse_anchors,
@@ -204,9 +204,15 @@ def main():
     parser.add_argument("--session", type=int, required=True)
     parser.add_argument("--dbslno", type=int, required=True)
     parser.add_argument("--summary-only", action="store_true")
+    parser.add_argument(
+        "--source",
+        choices=("auto", "db", "api"),
+        default="auto",
+        help="Where to read the debate from: the corpus, the API, or corpus-then-API (default)",
+    )
     args = parser.parse_args()
 
-    data = fetch_debate(args.loksabha, args.session, args.dbslno)
+    data = load_debate(args.loksabha, args.session, args.dbslno, source=args.source)
     html = data.get("debateDesc", "")
     if not html:
         print("No debateDesc found for this debate item.")

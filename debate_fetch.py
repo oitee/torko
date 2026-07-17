@@ -494,7 +494,7 @@ def _clean_inline(text: str) -> str:
 
 
 def fetch_debate(loksabha: int, session: int, db_slno: int) -> dict:
-    """Fetch the raw debate-details JSON for one debate item."""
+    """Fetch the raw debate-details JSON for one debate item, over the wire."""
     params = {
         "loksabha": loksabha,
         "sessionNumber": session,
@@ -503,6 +503,52 @@ def fetch_debate(loksabha: int, session: int, db_slno: int) -> dict:
     resp = requests.get(API_URL, params=params, timeout=30)
     resp.raise_for_status()
     return resp.json()
+
+
+def load_debate(loksabha: int, session: int, db_slno: int, source: str = "auto") -> dict:
+    """Get one debate's payload from the corpus, the wire, or whichever works.
+
+    The corpus holds all 64,921 debates, so the wire is no longer the way to
+    read one (internal_docs/025_THE_OPEN_ITEMS.md item 2). `source` picks who
+    answers, and the three modes exist because "fall back quietly" is right in
+    one situation and dangerous in the other:
+
+    - "db"   -- corpus only. Raises LookupError if the debate is not stored, and
+                lets connection errors through. For bulk work: a quiet fallback
+                across 64,921 debates would restore the exact per-debate HTTP
+                cost this is here to remove, and would do it invisibly.
+    - "api"  -- wire only. For checking the corpus against its source, and for a
+                debate published after the last import.
+    - "auto" -- corpus, else wire, on *any* failure including a dead Postgres.
+                The default, and the right one for a human running the CLI on one
+                debate: `db_roster` already promises the CLI works with no
+                Postgres running, and this keeps that promise. The cost of the
+                fallback is one HTTP call, which is the thing that is fine at
+                n=1 and ruinous at n=64,921.
+    """
+    if source not in ("db", "api", "auto"):
+        raise ValueError(f"source must be 'db', 'api' or 'auto', not {source!r}")
+
+    if source == "api":
+        return fetch_debate(loksabha, session, db_slno)
+
+    try:
+        from debate_store import load_debate as load_from_corpus
+
+        payload = load_from_corpus(loksabha, session, db_slno)
+    except Exception:
+        if source == "db":
+            raise
+        payload = None  # "auto": a dead DB is not fatal, it is just slower
+
+    if payload is not None:
+        return payload
+    if source == "db":
+        raise LookupError(
+            f"debate {loksabha}/{session}/{db_slno} is not in the corpus "
+            f"(use --source auto to fall back to the API)"
+        )
+    return fetch_debate(loksabha, session, db_slno)
 
 
 def html_to_clean_text(html: str) -> str:
@@ -740,9 +786,15 @@ def main():
     parser.add_argument("--session", type=int, required=True, help="Session number within the term")
     parser.add_argument("--dbslno", type=int, required=True, help="Debate serial number (dbSlno)")
     parser.add_argument("--summary-only", action="store_true", help="Skip printing segment previews")
+    parser.add_argument(
+        "--source",
+        choices=("auto", "db", "api"),
+        default="auto",
+        help="Where to read the debate from: the corpus, the API, or corpus-then-API (default)",
+    )
     args = parser.parse_args()
 
-    data = fetch_debate(args.loksabha, args.session, args.dbslno)
+    data = load_debate(args.loksabha, args.session, args.dbslno, source=args.source)
     html = data.get("debateDesc", "")
     if not html:
         print("No debateDesc found for this debate item.", file=sys.stderr)
