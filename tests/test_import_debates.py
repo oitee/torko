@@ -1,10 +1,15 @@
 import json
 from datetime import date
 
+import pytest
+import requests
+
+from scripts import import_debates
 from scripts.import_debates import (
     parse_sansad_date,
     rebuild_payload,
     row_from_responses,
+    search_page_retrying,
     unmodelled_keys,
 )
 
@@ -151,3 +156,63 @@ class TestShredIsLossless:
         row = row_from_responses(13, search, payload)
         assert rebuild_payload(row) == payload
         assert row["debate_date"] == date(2004, 2, 3)
+
+
+class TestSearchPageRetrying:
+    def test_a_transient_timeout_does_not_end_the_walk(self, monkeypatch):
+        calls = []
+
+        def flaky(loksabha, page, size=100):
+            calls.append(page)
+            if len(calls) == 1:
+                raise requests.ConnectTimeout("connect timed out")
+            return {"records": [{"session": 1, "dbSlno": 7}]}
+
+        monkeypatch.setattr(import_debates, "search_page", flaky)
+        monkeypatch.setattr(import_debates.time, "sleep", lambda _: None)
+
+        assert search_page_retrying(15, 3)["records"] == [{"session": 1, "dbSlno": 7}]
+        assert len(calls) == 2
+
+    def test_it_gives_up_loudly_rather_than_walking_a_partial_term(self, monkeypatch):
+        def always_down(loksabha, page, size=100):
+            raise requests.ConnectTimeout("connect timed out")
+
+        monkeypatch.setattr(import_debates, "search_page", always_down)
+        monkeypatch.setattr(import_debates.time, "sleep", lambda _: None)
+
+        with pytest.raises(requests.ConnectTimeout):
+            search_page_retrying(15, 3, retries=2)
+
+    def test_it_retries_up_to_the_limit_before_succeeding(self, monkeypatch):
+        attempts = []
+
+        def slow_to_recover(loksabha, page, size=100):
+            attempts.append(page)
+            if len(attempts) < 4:
+                raise requests.ReadTimeout("read timed out")
+            return {"records": []}
+
+        monkeypatch.setattr(import_debates, "search_page", slow_to_recover)
+        monkeypatch.setattr(import_debates.time, "sleep", lambda _: None)
+
+        assert search_page_retrying(15, 3, retries=4) == {"records": []}
+        assert len(attempts) == 4
+
+
+class TestEnumerateRefsProgress:
+    def test_the_walk_reports_progress_and_dedups(self, monkeypatch, capsys):
+        def two_pages(loksabha, page, size=100):
+            if page == 1:
+                return {"_metadata": {"totalPages": 2},
+                        "records": [{"session": 1, "dbSlno": 1}, {"session": 1, "dbSlno": 2}]}
+            # dbSlno 2 repeats -- the search API really does serve a debate twice.
+            return {"records": [{"session": 1, "dbSlno": 2}, {"session": 1, "dbSlno": 3}]}
+
+        monkeypatch.setattr(import_debates, "search_page", two_pages)
+        refs = import_debates.enumerate_refs(15)
+
+        assert sorted(r["dbSlno"] for r in refs) == [1, 2, 3]
+        out = capsys.readouterr().out
+        assert "walking 2 search pages" in out
+        assert "search walk done, 3 distinct debates" in out

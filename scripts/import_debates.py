@@ -23,6 +23,14 @@ from sample_unverified import search_page  # noqa: E402
 TERMS = (13, 14, 15, 16, 17, 18)
 DEBATE_PAGE = "https://sansad.in/ls/debates/view-debate"
 
+# Log a search page slower than this. The endpoint latency is very uneven.
+SLOW_PAGE_SECONDS = 5.0
+
+
+def log(msg: str) -> None:
+    # Flush so that output redirected to a file shows progress.
+    print(f"[{datetime.now():%H:%M:%S}] {msg}", flush=True)
+
 # Keys we model explicitly. Anything else the API returns lands in `extra` rather
 # than being dropped, so the shred stays lossless even if sansad adds a field.
 PAYLOAD_KNOWN = {"contents", "debateDesc", "debateDate", "debateType", "mpPartDetailList"}
@@ -116,37 +124,44 @@ UPSERT = text("""
 
 
 def enumerate_refs(loksabha: int) -> list[dict]:
-    """Every search record for a term, walked page by page. Pages are 1-indexed
-    (page 0 returns HTTP 500).
-
-    Deduplicated on (session, dbSlno), and the dedup is load-bearing twice over.
-    The search API really does serve the same debate twice: a full LS18 walk
-    returns 5,949 records but only 5,899 distinct debates -- ~0.85%, all
-    byte-identical, clustered on adjacent page pairs. That is offset pagination
-    over a collection that is still growing (LS18 is the sitting term; its
-    `totalElements` drifts between calls minutes apart). Closed terms do not do
-    it: LS13 returns exactly its 7,616, no duplicates.
-
-    Load-bearing twice because (1) it keeps the corpus count honest and (2) the
-    batch upsert would otherwise fail outright -- Postgres rejects an
-    ON CONFLICT DO UPDATE that touches the same row twice in one statement.
-
-    THE RESIDUAL RISK, stated because dedup does NOT cover it: the same drift
-    that duplicates a record could in principle *skip* one, and nothing here
-    would notice. Two full LS18 walks minutes apart were compared key-by-key
-    and agreed exactly (5,899 each, zero either way), so it is not happening at
-    a rate we can see -- but "measured once, not found" is not "cannot happen".
-    The mitigation is free: re-running the importer re-walks the search from
-    scratch, so a second run picks up anything a first run never saw. See the
-    reconciliation summary at the end of a run.
-    """
-    meta = search_page(loksabha, 1).get("_metadata", {})
+    # Pages start at 1: page 0 returns HTTP 500.
+    # The search API can return the same debate twice. Deduplicate, or the batch upsert fails.
+    meta = search_page_retrying(loksabha, 1).get("_metadata", {})
     total_pages = max(int(meta.get("totalPages", 1)), 1)
+    log(f"LS{loksabha}: walking {total_pages} search pages")
     seen: dict[tuple[int, int], dict] = {}
+    walk_started = time.time()
     for page in range(1, total_pages + 1):
-        for rec in search_page(loksabha, page).get("records", []):
+        for rec in search_page_retrying(loksabha, page).get("records", []):
             seen.setdefault((int(rec["session"]), int(rec["dbSlno"])), rec)
+        if page % 10 == 0 or page == total_pages:
+            log(f"  LS{loksabha}: search page {page}/{total_pages}  "
+                f"distinct={len(seen)}  {time.time() - walk_started:.0f}s elapsed")
+    log(f"LS{loksabha}: search walk done, {len(seen)} distinct debates "
+        f"in {(time.time() - walk_started) / 60:.1f} min")
     return list(seen.values())
+
+
+def search_page_retrying(loksabha: int, page: int, retries: int = 5) -> dict:
+    # Raise only when every attempt fails: a partial walk would hide a gap.
+    for attempt in range(1, retries + 1):
+        started = time.time()
+        try:
+            payload = search_page(loksabha, page)
+            elapsed = time.time() - started
+            if elapsed > SLOW_PAGE_SECONDS:
+                log(f"  LS{loksabha}: search page {page} was slow ({elapsed:.0f}s) "
+                    f"-- the endpoint is erratic, not stuck")
+            return payload
+        except requests.RequestException as exc:
+            log(f"  LS{loksabha}: search page {page} failed after {time.time() - started:.0f}s "
+                f"(attempt {attempt}/{retries}): {type(exc).__name__}: {exc}")
+            if attempt == retries:
+                raise
+            backoff = 5 * attempt
+            log(f"  LS{loksabha}: retrying search page {page} in {backoff}s")
+            time.sleep(backoff)
+    raise RuntimeError("unreachable")
 
 
 def fetch_one(loksabha: int, rec: dict, retries: int = 3) -> tuple[dict | None, str | None]:
@@ -189,7 +204,7 @@ def import_term(engine, loksabha: int, workers: int, batch_size: int,
     stored = len(refs) - len(todo)
     if limit is not None:
         todo = todo[:limit]
-    print(f"LS{loksabha}: {len(refs)} debates, {stored} already stored, {len(todo)} to fetch")
+    log(f"LS{loksabha}: {len(refs)} debates, {stored} already stored, {len(todo)} to fetch")
     if not todo:
         return 0, [], len(refs)
 
@@ -206,7 +221,9 @@ def import_term(engine, loksabha: int, workers: int, batch_size: int,
                 conn.execute(UPSERT, rows)
         written += len(rows)
         done = min(start + batch_size, len(todo))
-        print(f"  LS{loksabha}: {done}/{len(todo)}  written={written}  errors={len(errors)}", flush=True)
+        log(f"  LS{loksabha}: {done}/{len(todo)}  written={written}  errors={len(errors)}")
+        for err in (e for _, e in results if e):
+            log(f"    error: {err}")
     return written, errors, len(refs)
 
 
@@ -232,8 +249,8 @@ def main() -> None:
     engine = get_engine()
     terms = tuple(sorted(set(args.loksabha))) if args.loksabha else TERMS
     skip = set() if args.refetch else existing_keys(engine)
-    print(f"terms={list(terms)} workers={args.workers} already stored={len(skip)}"
-          f"{' DRY RUN' if args.dry_run else ''}\n")
+    log(f"terms={list(terms)} workers={args.workers} already stored={len(skip)}"
+        f"{' DRY RUN' if args.dry_run else ''}")
 
     started = time.time()
     total, all_errors, enumerated = 0, [], {}
