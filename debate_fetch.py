@@ -342,7 +342,6 @@ def _clean_inline(text: str) -> str:
 
 
 def fetch_debate(loksabha: int, session: int, db_slno: int) -> dict:
-    """Fetch the raw debate-details JSON for one debate item."""
     params = {
         "loksabha": loksabha,
         "sessionNumber": session,
@@ -351,6 +350,32 @@ def fetch_debate(loksabha: int, session: int, db_slno: int) -> dict:
     resp = requests.get(API_URL, params=params, timeout=30)
     resp.raise_for_status()
     return resp.json()
+
+
+def load_debate(loksabha: int, session: int, db_slno: int, source: str = "auto") -> dict:
+    if source not in ("db", "api", "auto"):
+        raise ValueError(f"source must be 'db', 'api' or 'auto', not {source!r}")
+
+    if source == "api":
+        return fetch_debate(loksabha, session, db_slno)
+
+    try:
+        from debate_store import load_debate as load_from_corpus
+
+        payload = load_from_corpus(loksabha, session, db_slno)
+    except Exception:
+        if source == "db":
+            raise
+        payload = None  # In "auto" mode a database error falls back to the API.
+
+    if payload is not None:
+        return payload
+    if source == "db":
+        raise LookupError(
+            f"debate {loksabha}/{session}/{db_slno} is not in the corpus "
+            f"(use --source auto to fall back to the API)"
+        )
+    return fetch_debate(loksabha, session, db_slno)
 
 
 def html_to_clean_text(html: str) -> str:
@@ -516,9 +541,15 @@ def main():
     parser.add_argument("--session", type=int, required=True, help="Session number within the term")
     parser.add_argument("--dbslno", type=int, required=True, help="Debate serial number (dbSlno)")
     parser.add_argument("--summary-only", action="store_true", help="Skip printing segment previews")
+    parser.add_argument(
+        "--source",
+        choices=("auto", "db", "api"),
+        default="auto",
+        help="Where to read the debate from: the corpus, the API, or corpus-then-API (default)",
+    )
     args = parser.parse_args()
 
-    data = fetch_debate(args.loksabha, args.session, args.dbslno)
+    data = load_debate(args.loksabha, args.session, args.dbslno, source=args.source)
     html = data.get("debateDesc", "")
     if not html:
         print("No debateDesc found for this debate item.", file=sys.stderr)
