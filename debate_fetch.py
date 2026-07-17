@@ -43,6 +43,9 @@ _HONORIFICS = {
     "shree", "shreemati", "sushree", "kunvar", "kunvara", "do", "pro", "da",
 }
 
+# "Sri" is an honorific only at the start of a name. Inside a name it is a real part ("Lavu Sri Krishna").
+_LEADING_HONORIFICS = {"sri"}
+
 
 def _normalize_name(label: str) -> list[str]:
     """
@@ -63,7 +66,11 @@ def _normalize_name(label: str) -> list[str]:
             break
     label = _PAREN_RE.sub(" ", label)  # drop remaining (constituency)
     label = re.sub(r"[^\w\s]", " ", label.lower())
-    return [tok for tok in label.split() if tok and tok not in _HONORIFICS]
+    toks = [tok for tok in label.split() if tok and tok not in _HONORIFICS]
+    # Test "sri" only after "shri" is gone, so it is judged at the start of the name.
+    if toks and toks[0] in _LEADING_HONORIFICS:
+        toks = toks[1:]
+    return toks
 
 
 # Honorifics after transliteration and folding (श्री -> "shri"). The cluster rule folds "sardar" to "srdar".
@@ -89,33 +96,23 @@ def _folded_key(name: str) -> str:
 
 
 def _name_agreement(label: str, roster_name: str) -> bool | None:
-    """Do these two names refer to the same person? None when there's no evidence.
-
-    True/False are verdicts. **None means neither name yielded a usable word, so
-    nothing was actually compared** — and the two callers below need opposite
-    answers in that case, which is why this returns three states rather than
-    two. Collapsing it to a bool is what caused a real misattribution:
-    "no evidence" was returned as True,
-    every caller read that as "same person", and one arbitrary name was stamped
-    onto an entire debate.
-
-    A roster word may appear in the label as an initial ("Salarapatty Kuppusamy
-    Kharventhan" / "S.K. KHARVENTHAN"), which counts towards coverage — but
-    initials are weak evidence, so at least one whole word must also match
-    outright before the two names are treated as the same person.
-    """
+    # None means neither side had a usable word. Callers treat that differently.
     lab_full, lab_initials = _name_parts(label)
     ros_full, _ = _name_parts(roster_name)
     if not ros_full or not (lab_full or lab_initials):
         return None  # nothing usable on one side: no evidence either way
 
-    strong = covered = 0
+    strong = weak = unexplained = 0
     for r in ros_full:
         if any(SequenceMatcher(None, r, l).ratio() >= ANCHOR_TOKEN_MIN for l in lab_full):
             strong += 1
-            covered += 1
         elif r[0] in lab_initials:
-            covered += 1
+            weak += 1
+        else:
+            unexplained += 1
+
+    # An unexplained roster word is a disagreement, so initials no longer count.
+    covered = strong if unexplained else strong + weak
     return strong >= 1 and covered / len(ros_full) >= ANCHOR_COVERAGE_MIN
 
 

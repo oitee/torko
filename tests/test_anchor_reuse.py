@@ -1,4 +1,5 @@
 from debate_fetch import (
+    _name_parts,
     _name_agreement,
     anchor_contradicts_label,
     labels_name_same_person,
@@ -29,6 +30,50 @@ class TestNameAgreement:
     def test_no_usable_name_is_none_not_a_verdict(self):
         # Nothing was compared, so the result is None, not False.
         assert _name_agreement("MR. SPEAKER", "") is None
+
+
+class TestAnInitialCannotCarryAnUnexplainedWord:
+    def test_a_shared_surname_plus_a_lucky_initial_is_not_a_person(self):
+        # Real case: LS15/10/6421. Pawan Kumar Bansal must not match P. Kumar (mpCode 4546).
+        assert labels_name_same_person(
+            "संसदीय कार्य मंत्री तथा जल संसाधन मंत्री (श्री पवन कुमार बंसल)",
+            "* SHRI P. KUMAR (TIRUCHIRAPPALLI)",
+        ) is False
+
+    def test_the_unexplained_word_is_what_kills_it_not_the_initial(self):
+        # Every roster word is matched or explained by an initial. This must match.
+        assert labels_name_same_person(
+            "S.K. KHARVENTHAN", "Salarapatty Kuppusamy Kharventhan"
+        ) is True
+
+    def test_an_initial_still_covers_when_the_rest_matches_outright(self):
+        # Real case: LS14/9/6375. A.K. Antony is Arakkaparambil Kurien Antony.
+        assert labels_name_same_person(
+            "THE MINISTER OF DEFENCE (SHRI A.K. ANTONY)", "Sri Arakkaparambil Antony"
+        ) is True
+
+    def test_an_unmatched_word_alone_does_not_reject_when_no_initial_props_it_up(self):
+        # Real case: LS17/1/127. Two whole words match and no initial does the work.
+        assert labels_name_same_person(
+            "श्री अधीर रंजन चौधरी", "SHRI ADHIR RANJAN CHOWDHURY (BAHARAMPUR)"
+        ) is True
+
+    def test_a_longer_roster_name_still_matches_a_shorter_label(self):
+        # LS17/1/1289: Ravi Kishan is Ravi Kishan Shukla.
+        assert labels_name_same_person(
+            "श्री रवि किशन", "श्री रवि किशन शुक्ला ( गोरखपुर )"
+        ) is True
+
+
+class TestSriIsAnHonorificOnlyWhenItLeads:
+    def test_leading_sri_is_dropped_as_an_honorific(self):
+        # The DB roster spells this word in a way that a label never matches.
+        assert _name_parts("Sri Arakkaparambil Antony") == (["arkprmbil", "antony"], set())
+
+    def test_sri_inside_a_name_is_kept_as_part_of_the_name(self):
+        # Real case: Shri Lavu Sri Krishna Devarayalu, mpCode 200. The name contains Sri.
+        full, _initials = _name_parts("Shri Lavu Sri Krishna Devarayalu")
+        assert "sri" in full
 
 
 class TestNoEvidenceIsNotAgreement:
