@@ -60,6 +60,17 @@ def api_dashboard_debate_detail(debate_id):
     return jsonify(detail)
 
 
+@app.route("/api/dashboard/debates/<debate_id>/mp-diff")
+def api_dashboard_debate_mp_diff(debate_id):
+    parsed = dashboard_db.parse_composite_id(debate_id)
+    if parsed is None:
+        return jsonify({"error": f"Malformed debate id {debate_id!r}, expected loksabha-session-dbslno"}), 400
+    diff = dashboard_db.get_mp_diff(*parsed)
+    if diff is None:
+        return jsonify({"error": f"No debate with id {debate_id!r}"}), 404
+    return jsonify(diff)
+
+
 @app.route("/api/dashboard/speakers")
 def api_dashboard_speakers():
     q = (request.args.get("q") or "").strip()

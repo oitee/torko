@@ -114,6 +114,48 @@
     color: var(--text-secondary);
     white-space: pre-wrap;
   }
+
+  .mp-diff {
+    background: var(--surface-1);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 18px;
+    margin-bottom: 20px;
+  }
+  .mp-diff-group { margin-bottom: 14px; }
+  .mp-diff-group:last-child { margin-bottom: 0; }
+  .mp-diff-label {
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--text-secondary);
+    margin: 0 0 6px;
+  }
+  .mp-diff-note {
+    font-size: 11.5px;
+    color: var(--text-muted);
+    margin: 2px 0 8px;
+  }
+  .chip.chip-added {
+    background: rgba(26,127,75,0.12);
+    color: #1a7f4b;
+    border-color: rgba(26,127,75,0.25);
+  }
+  .chip.chip-miss {
+    background: rgba(208,59,59,0.10);
+    color: #b23030;
+    border-color: rgba(208,59,59,0.25);
+  }
+  .chip.chip-ceiling {
+    background: rgba(137,135,129,0.10);
+    color: var(--text-muted);
+    border-color: rgba(137,135,129,0.28);
+  }
+  .chip-reason { font-size: 10px; opacity: 0.85; }
+  @media (prefers-color-scheme: dark) {
+    .chip.chip-added { background: rgba(87,212,147,0.14); color: #57d493; border-color: rgba(87,212,147,0.30); }
+    .chip.chip-miss { background: rgba(224,90,90,0.14); color: #e06a6a; border-color: rgba(224,90,90,0.30); }
+    .chip.chip-ceiling { background: rgba(137,135,129,0.14); color: var(--text-muted); border-color: rgba(137,135,129,0.30); }
+  }
 </style>
 
 <div class="wrap">
@@ -143,7 +185,69 @@ async function load() {
   } catch (err) {
     errorEl.textContent = err.message;
     errorEl.style.display = 'block';
+    return;
   }
+
+  try {
+    const diffResp = await fetch(`/api/dashboard/debates/${encodeURIComponent(debateId)}/mp-diff`);
+    const diff = await diffResp.json();
+    if (diffResp.ok) renderMpDiff(diff);
+  } catch (err) {
+    // Non-fatal: the transcript above is the primary content, the panel is a bonus.
+  }
+}
+
+const REASON_LABEL = {
+  not_printed: 'never printed as a speaker (source-side gap)',
+  role_only: 'present only as the Chair / a crowd label',
+  fold_collision: 'name folds onto another tagged MP — dropped, never guessed',
+  unexplained: 'printed as a speaker, not attributed — a real miss',
+};
+
+function renderMpDiff(diff) {
+  if (!diff.taggedCount && !diff.attributedCount) return;
+
+  const box = document.createElement('div');
+  box.className = 'mp-diff';
+
+  const groups = [];
+
+  groups.push(`
+    <div class="mp-diff-group">
+      <p class="mp-diff-label">Tagged by Sansad and attributed by us (${diff.agreement.length})</p>
+      <div class="speaker-chips">
+        ${diff.agreement.map(m => `<span class="chip">${escapeHtml(m.name || m.sansadId)}</span>`).join('') || '<span class="mp-diff-note">none</span>'}
+      </div>
+    </div>
+  `);
+
+  groups.push(`
+    <div class="mp-diff-group">
+      <p class="mp-diff-label">Attributed by us, not in Sansad's tag list (${diff.attributedNotTagged.length})</p>
+      <p class="mp-diff-note">The transcript prints these MPs as speakers; Sansad's own participant list omits them. Matched from the printed name — this panel counts names matched, not matches independently confirmed correct.</p>
+      <div class="speaker-chips">
+        ${diff.attributedNotTagged.map(m => `<span class="chip chip-added">${escapeHtml(m.name || m.sansadId)}</span>`).join('') || '<span class="mp-diff-note">none</span>'}
+      </div>
+    </div>
+  `);
+
+  const unexplained = diff.taggedNotAttributed.filter(m => m.reason === 'unexplained');
+  const explained = diff.taggedNotAttributed.filter(m => m.reason !== 'unexplained');
+
+  groups.push(`
+    <div class="mp-diff-group">
+      <p class="mp-diff-label">Tagged by Sansad, no turn attributed (${diff.taggedNotAttributed.length})</p>
+      <p class="mp-diff-note">Mostly not our fault — see reason on each chip. Only "unexplained" is a real miss.</p>
+      <div class="speaker-chips">
+        ${unexplained.map(m => `<span class="chip chip-miss" title="${escapeHtml(REASON_LABEL[m.reason] || m.reason)}">${escapeHtml(m.name || m.sansadId)} <span class="chip-reason">(${escapeHtml(m.reason)})</span></span>`).join('')}
+        ${explained.map(m => `<span class="chip chip-ceiling" title="${escapeHtml(REASON_LABEL[m.reason] || m.reason)}">${escapeHtml(m.name || m.sansadId)} <span class="chip-reason">(${escapeHtml(m.reason)})</span></span>`).join('')}
+        ${!diff.taggedNotAttributed.length ? '<span class="mp-diff-note">none</span>' : ''}
+      </div>
+    </div>
+  `);
+
+  box.innerHTML = `<p class="section-title">Sansad's tag list vs. our attribution (${diff.taggedCount} tagged, this debate only)</p>${groups.join('')}`;
+  contentEl.insertBefore(box, contentEl.children[1] || null);
 }
 
 function render(data) {

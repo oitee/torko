@@ -15,6 +15,8 @@ still show up in the transcript (`turns`), tagged by `roleKind`.
 """
 from __future__ import annotations
 
+from collections import Counter
+
 from sqlalchemy import text
 
 from db import get_engine
@@ -212,6 +214,160 @@ def get_debate_detail(loksabha: int, session: int, dbslno: int) -> dict | None:
         "turnCount": len(turns),
         "speakersPresent": present,
         "turns": turns,
+    }
+
+
+def classify_tagged_not_attributed(
+    loksabha: int, raw_html: str, mp_list: list[dict], attributed_codes: set[str]
+) -> list[dict]:
+    """For tagged MPs this debate did NOT attribute a turn to, say why.
+
+    Pure given its inputs (no DB, no network) so it is testable over fixtures.
+    `attributed_codes` is the ground truth of who we actually named a turn for
+    -- normally read straight from the `turns` table, which is the real
+    output of the production pipeline (all resolver tiers, not just anchors).
+
+    The WHY comes from `scripts/audit_sansad_floor.py`'s `audit_debate`: this
+    function reuses its exact reason constants and rebuilds the same three
+    sets it computes (`colliding` fold keys, `role_keys` for Chair/crowd
+    labels, `printed_labels` for every speaker-shaped label in the raw text).
+    It cannot simply CALL `audit_debate`, because that function only returns
+    an aggregate Counter plus the list of UNEXPLAINED misses -- it has no path
+    that names the reason for a specific `not_printed` or `fold_collision` MP,
+    which this per-debate panel needs. So the set-building is duplicated here
+    rather than the classification rules: same reason names, same buckets,
+    same closed set, sourced from the same two modules
+    (`debate_fetch` / `debate_fetch_legacy`) `audit_debate` itself calls.
+    """
+    import html as html_mod
+
+    import debate_fetch
+    import debate_fetch_legacy as legacy
+    from debate_fetch import _folded_key
+    from db_roster import load_db_roster
+    from scripts.audit_sansad_floor import (
+        REASON_FOLD_COLLISION,
+        REASON_NOT_PRINTED,
+        REASON_ROLE_ONLY,
+        REASON_UNEXPLAINED,
+    )
+
+    if not mp_list:
+        return []
+
+    roster = load_db_roster(loksabha)
+    if legacy.looks_legacy(raw_html):
+        segments = legacy.split_by_speaker_legacy(raw_html, mp_list, roster)
+    else:
+        segments = debate_fetch.split_by_speaker(raw_html, mp_list, roster)
+
+    tagged = {str(m["mpCode"]): m["mpName"] for m in mp_list}
+
+    keys = Counter(_folded_key(n) for n in tagged.values() if _folded_key(n))
+    colliding = {k for k, n in keys.items() if n > 1}
+
+    role_keys = set()
+    for seg in segments:
+        label = seg.get("speakerLabel")
+        if label and seg.get("nameSource") in ("presiding", "crowd"):
+            key = _folded_key(debate_fetch.decode_legacy_hindi(label))
+            if key:
+                role_keys.add(key)
+
+    text_body = debate_fetch.html_to_clean_text(html_mod.unescape(raw_html))
+    printed_labels = set()
+    for block in text_body.split("\n\n"):
+        head = block.split(":", 1)[0]
+        if not head or len(head) > 120 or head == block:
+            continue
+        key = _folded_key(debate_fetch.decode_legacy_hindi(head))
+        if key:
+            printed_labels.add(key)
+
+    out = []
+    for code, name in tagged.items():
+        if code in attributed_codes:
+            continue
+        key = _folded_key(name)
+        if key and key in colliding:
+            reason = REASON_FOLD_COLLISION
+        elif key and key in role_keys:
+            reason = REASON_ROLE_ONLY
+        elif key and key in printed_labels:
+            reason = REASON_UNEXPLAINED
+        else:
+            reason = REASON_NOT_PRINTED
+        out.append({"sansadId": code, "name": name, "reason": reason})
+    return out
+
+
+def get_mp_diff(loksabha: int, session: int, dbslno: int) -> dict | None:
+    """Tagged-vs-attributed panel for one debate: agreement, honest misses, added value.
+
+    `agreement` -- tagged by Sansad AND attributed a turn by us.
+    `taggedNotAttributed` -- tagged, no turn, WITH a reason from the closed set
+      in `scripts/audit_sansad_floor.py` (mostly not our fault: `not_printed`
+      and `role_only` are properties of the source or of never-guess, not
+      defects; `unexplained` is the only real miss).
+    `attributedNotTagged` -- MPs we attributed a turn to that Sansad's own
+      participant list never mentions. This is the feature's other half: our
+      added value over the source, not a discrepancy to apologise for.
+
+    Both `taggedCount` and `attributedCount` are counted OVER THIS ONE DEBATE
+    only -- nobody should read a per-debate ratio here as a corpus-wide rate;
+    that question belongs to `scripts/audit_sansad_floor.py --all`.
+    """
+    engine = get_engine()
+    with engine.connect() as conn:
+        debate = conn.execute(
+            text(
+                "SELECT id, raw_html, mp_list_raw FROM debates "
+                "WHERE loksabha = :ls AND session = :sess AND dbslno = :db"
+            ),
+            {"ls": loksabha, "sess": session, "db": dbslno},
+        ).fetchone()
+        if debate is None:
+            return None
+
+        mp_list = debate.mp_list_raw or []
+        if not mp_list:
+            return {
+                "taggedCount": 0,
+                "attributedCount": 0,
+                "agreement": [],
+                "taggedNotAttributed": [],
+                "attributedNotTagged": [],
+            }
+
+        attributed_rows = conn.execute(
+            text(
+                """
+                SELECT DISTINCT p.sansad_id AS sansad_id, sp.name AS name
+                FROM turns t
+                JOIN persons p ON p.id = t.person_id
+                LEFT JOIN speakers sp ON sp.person_id = p.id
+                WHERE t.debate_id = :debate_id
+                """
+            ),
+            {"debate_id": debate.id},
+        ).fetchall()
+
+    attributed = {str(r.sansad_id): r.name for r in attributed_rows}
+    tagged = {str(m["mpCode"]): m["mpName"] for m in mp_list}
+
+    agreement_codes = sorted(set(tagged) & set(attributed))
+    added_codes = sorted(set(attributed) - set(tagged))
+
+    not_attributed = classify_tagged_not_attributed(
+        loksabha, debate.raw_html, mp_list, set(attributed)
+    )
+
+    return {
+        "taggedCount": len(tagged),
+        "attributedCount": len(attributed),
+        "agreement": [{"sansadId": c, "name": tagged[c]} for c in agreement_codes],
+        "taggedNotAttributed": sorted(not_attributed, key=lambda r: r["name"] or ""),
+        "attributedNotTagged": [{"sansadId": c, "name": attributed[c]} for c in added_codes],
     }
 
 
