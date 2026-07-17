@@ -279,7 +279,7 @@ function render(data) {
   const header = document.createElement('div');
   header.className = 'debate-header';
   header.innerHTML = `
-    <p class="debate-title">${escapeHtml(data.title)}</p>
+    <p class="debate-title">${escapeHtml(cleanTitle(data.title))}</p>
     <p class="debate-meta">LS${data.loksabha} · Session ${data.session} · dbSlno ${data.dbslno} · ${data.debateDate || 'undated'} · ${escapeHtml(data.debateType || '')} · ${data.turnCount} turns</p>
     ${data.sourceUrl ? `<p class="debate-meta"><a class="source-link" href="${escapeHtml(data.sourceUrl)}" target="_blank" rel="noopener noreferrer">View original on sansad.in ↗</a></p>` : ''}
     <details class="present-details">
@@ -328,6 +328,19 @@ function badge(verified, source) {
 
 function escapeHtml(s) {
   return (s || '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+}
+
+// Titles come straight from the source HTML: markup (`210<sup>th</sup>`),
+// entities (`&amp;`), stray `\r\n`. Strip tags, decode entities via a detached
+// textarea (text-only, executes nothing), collapse whitespace. Escape at call site.
+function cleanTitle(s) {
+  // Block tags become a space so words don't fuse; inline tags (<sup>, <span>,
+  // <b>…) are dropped so ordinals read "194th", not "194 th".
+  const spaced = (s || '').replace(/<\s*\/?(br|p)\b[^>]*>/gi, ' ');
+  const noTags = spaced.replace(/<[^>]*>/g, '');
+  const ta = document.createElement('textarea');
+  ta.innerHTML = noTags;
+  return ta.value.replace(/\s+/g, ' ').trim();
 }
 
 load();
