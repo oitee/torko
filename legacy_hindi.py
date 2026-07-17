@@ -1,5 +1,8 @@
 import re
 
+# Private-use marker for reph (र्). It is moved before its consonant, then becomes र्.
+_REPH = ""
+
 # CDAC-GIST/ISFOC font table. Keys are applied longest-first, so clusters win over single glyphs.
 ISFOC_MAP = {
     # Whole words that the generic rules mangle
@@ -16,26 +19,41 @@ ISFOC_MAP = {
 
     # Full consonants & half bases
     "BÉE": "क", "BÉD": "क्", "B": "क्",
+    # क and फ are two halves, and a below-base matra sits between them.
+    "BÉÖE": "कु", "BÉßE": "कृ", "{ÉÖE": "फु",
     "JÉ": "ख", "J": "ख्",
     "MÉ": "ग", "M": "ग्",
     "PÉ": "घ", "P": "घ्",
     "b": "ड", "½": "ड़",
     "SÉ": "च", "S": "च्",
-    "EU": "छ",
+    # "EU" is the closing half of क/फ plus छ. छ alone needs its own row.
+    "EU": "छ", "U": "छ",
     "VÉ": "ज", "V": "ज्",
     "ZÉ": "झ", "Z": "झ्",
     "g½": "ढ़", "gÉ": "ढ", "g": "ढ",
+    # A second ढ़ glyph.
+    "fÃ": "ढ़",
     "]": "ट",
     "~": "ठ",
     "hÉ": "ण", "h": "ण्",
     "iÉ": "त", "i": "त्",
+    "kÉ": "त्त",   # "MÉÖhÉ´ÉkÉÉ" -> गुणवत्ता
     "lÉ": "थ", "l": "थ्",
     "n": "द",
+    # Each द-conjunct is one glyph. "u" carries its connector, but "tÉ" takes a separate "É".
+    "u": "द्व", "tÉ": "द्य", "q": "द्द",
+    # ह has a separate half-form glyph.
+    "ÿ": "ह्",
     "vÉ": "ध", "v": "ध्",
     "xÉ": "न", "x": "न्",
     "{É": "प", "{": "प्",
     "{ÉE": "फ", "{ÉD": "फ्",
     "¤É": "ब", "¤": "ब्",
+    # ब्र, भ्र and स्र are single glyphs. The bare half-form is needed because a following
+    # "ÉÉä" consumes the "É" first, and the halant merge below rejoins the pieces.
+    "¥É": "ब्र", "¥": "ब्र्",
+    "§É": "भ्र", "§": "भ्र्",
+    "»É": "स्र", "»": "स्र्",
     "£É": "भ", "£": "भ्",
     "àÉ": "म", "à": "म्",
     "ªÉ": "य", "ª": "य्",
@@ -52,30 +70,48 @@ ISFOC_MAP = {
     "jÉ": "त्र", "j": "त्र्",
     "YÉ": "ज्ञ", "Y": "ज्ञ्",
     "©É": "म्र", "OÉ": "ग्र",
-    "<Ç": "ई", "<": "इ", ">": "ई", "=": "उ",
+    "µÉE": "क्र",
+    "|ÉE": "फ्र",
+    # Subscript र and य are typed after the consonant they join.
+    "Å": "्र",
+    "á": "्य",
+    "<Ç": "ई", "<": "इ", ">ó": "ऊ", ">": "ई", "=": "उ",
     "Aä": "ऐ", "A": "ए",
     "+ÉÉä": "ओ", "+ÉÉè": "औ", "+ÉÉ": "आ", "+É": "अ",
+    # "अ" plus a pre-base "ि" collides with "आ". Without these rows "+ÉÉ" eats the "É" that "ÉÊ" needs.
+    "+ÉÉÊ": "अि",
+    # Same collision for the other glyphs that open with "É".
+    "+ÉÉì": "ऑ", "+ÉÉÎ": "अि", "+ÉÉË": "अिं",
 
     # Matras (vowel signs)
     "ÉÉä": "ो", "Éä": "ो", "ÉÉè": "ौ", "Éè": "ौ",
     "ÉÓ": "ीं", "ÉÒ": "ी", "ÉÊ": "ि", "ÉÚ": "ू", "ÉÖ": "ु",
     # Pre-base short-i with an anusvara. It shifts like "ÉÊ".
     "ÉË": "िं",
+    # "ÉÎ" and "ÉÏ" are wide variants of "ÉÊ" and "ÉË", used before a conjunct.
+    "ÉÎ": "ि", "ÉÏ": "िं",
+    "Éì": "ॉ",
     "ä": "े", "è": "ै", "É": "ा",
 
     # Modifiers
     "Æ": "ं", "Ó": "ं", "&": "ः", "Þ": "ृ", "ß": "ृ",
+    "Ä": "ँ",
     "å": "ें", "é": "ैं", "ÉÆ": "ां", "Éå": "ों", "Éé": "ौं",
-    "°ô": "रु", "°": "रू", "ç": "्", "Ì": "र्ि",
+    "°ô": "रु", "°": "रू", "âó": "रु", "ç": "्", "Ì": "र्ि",
 
     # Reph goes on a marker so the regex below can move it without matching a real "र्".
-    "Ç": "",
+    "Ç": _REPH,
+    # These matras carry the reph in the same glyph. The font builds ो as ा + े.
+    "ÉÔ": _REPH + "ी",
+    "Éæ": _REPH + "ो",
+    "æ": _REPH + "े",
+    "ÉÈ": _REPH + "ां",
+    # "ÉÍ" is not mapped. Its reph belongs to the next consonant, and the shift regexes would misplace it.
     "Â": "",       # invisible filler glyph
     "*": "।",
 }
 
 _SORTED_KEYS = sorted(ISFOC_MAP, key=len, reverse=True)
-_REPH = ""
 
 # Signature of the legacy encoding. This used to be "any Latin-1 supplement
 # character", on the theory that Unicode Devanagari and plain ASCII never
