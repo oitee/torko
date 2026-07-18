@@ -233,6 +233,7 @@
   }
 
   #q, #text { width: 200px; }
+  #results { transition: opacity 0.15s ease; }
 
   .meta { color: var(--text-secondary); font-size: 13px; margin-bottom: 14px; }
   .error { color: #d03b3b; font-size: 14px; margin-bottom: 18px; }
@@ -616,7 +617,11 @@ function buildQuery(page) {
 
 async function search(page = 1) {
   errorEl.style.display = 'none';
-  resultsEl.innerHTML = '';
+  // Keep the current results visible but dimmed so a filter change doesn't
+  // flash to empty; render() clears and restores them on arrival.
+  metaEl.textContent = 'Searching…';
+  resultsEl.style.opacity = '0.45';
+  resultsEl.style.pointerEvents = 'none';
   try {
     const resp = await fetch(`/api/dashboard/debates?${buildQuery(page)}`);
     const data = await resp.json();
@@ -626,12 +631,18 @@ async function search(page = 1) {
     state.total = data.total;
     render(data);
   } catch (err) {
+    resultsEl.style.opacity = '';
+    resultsEl.style.pointerEvents = '';
+    metaEl.textContent = '';
     errorEl.textContent = err.message;
     errorEl.style.display = 'block';
   }
 }
 
 function render(data) {
+  resultsEl.innerHTML = '';
+  resultsEl.style.opacity = '';
+  resultsEl.style.pointerEvents = '';
   metaEl.textContent = `${data.total.toLocaleString()} debate${data.total === 1 ? '' : 's'} match`;
 
   if (data.results.length === 0) {
