@@ -18,7 +18,7 @@ sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 from sqlalchemy import text
 
 from db import get_engine
-from debate_fetch import split_by_speaker
+from debate_fetch import is_crowd_label, is_presiding_label, split_by_speaker
 from debate_fetch_legacy import looks_legacy, split_by_speaker_legacy
 from db_roster import load_db_roster
 
@@ -30,6 +30,24 @@ def person_id_lookup(engine) -> dict[str, int]:
             text("SELECT sansad_id, id FROM persons WHERE sansad_id IS NOT NULL")
         ).fetchall()
     return {str(r.sansad_id): r.id for r in rows}
+
+
+def alias_lookup(engine) -> dict[str, int]:
+    """mpCode (string) -> persons.id, via the mpcode_aliases bridge table.
+
+    The debate anchor code is not always the person's mpsno (see internal_docs
+    033); this maps the ones the source's own labels pinned to a single person.
+    Empty when the table has not been built yet -- a plain no-op, so this script
+    still runs on a fresh DB before scripts/populate_mpcode_aliases.py.
+    """
+    try:
+        with engine.connect() as conn:
+            rows = conn.execute(
+                text("SELECT mp_code, person_id FROM mpcode_aliases")
+            ).fetchall()
+        return {str(r.mp_code): r.person_id for r in rows}
+    except Exception:
+        return {}
 
 
 def role_id_lookup(engine) -> dict[str, tuple[int, str]]:
@@ -56,6 +74,7 @@ def main() -> None:
     engine = get_engine()
     roster_cache: dict[int, list] = {}
     persons = person_id_lookup(engine)
+    aliases = alias_lookup(engine)
     roles = role_id_lookup(engine)
 
     with engine.connect() as conn:
@@ -81,15 +100,26 @@ def main() -> None:
                 role_id, role_kind = roles[seg["roleCode"]]
 
             mp_code = seg.get("mpCode")
+            person_id = persons.get(mp_code) if mp_code else None
+            name_source = seg.get("nameSource")
+            # The anchor code was not this person's mpsno, but the source's own
+            # labels pinned it: adopt the alias, unless this turn is itself a
+            # role turn (role_id set) or its label is presiding/crowd -- those
+            # must never inherit the code's person. See internal_docs 033.
+            if person_id is None and role_id is None and mp_code in aliases:
+                label = seg.get("speakerLabel") or ""
+                if not is_presiding_label(label) and not is_crowd_label(label):
+                    person_id = aliases[mp_code]
+                    name_source = "mpcode-alias"
             values.append({
                 "debate_id": row.id,
                 "seq": seq,
                 "speaker_label": seg.get("speakerLabel"),
                 "mp_code": mp_code,
-                "person_id": persons.get(mp_code) if mp_code else None,
+                "person_id": person_id,
                 "role_id": role_id,
                 "role_kind": role_kind,
-                "name_source": seg.get("nameSource"),
+                "name_source": name_source,
                 "text": seg["text"],
                 "word_count": len(seg["text"].split()),
                 "char_count": len(seg["text"]),
