@@ -17,10 +17,17 @@ sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 
 from sqlalchemy import text
 
+from alias_build import is_synthetic_code
 from db import get_engine
-from debate_fetch import is_crowd_label, is_presiding_label, split_by_speaker
+from debate_fetch import (
+    _folded_key,
+    is_crowd_label,
+    is_presiding_label,
+    split_by_speaker,
+)
 from debate_fetch_legacy import looks_legacy, split_by_speaker_legacy
 from db_roster import load_db_roster
+from label_attribution import build_unique_index, resolve_label_to_person
 
 
 def person_id_lookup(engine) -> dict[str, int]:
@@ -76,6 +83,11 @@ def main() -> None:
     persons = person_id_lookup(engine)
     aliases = alias_lookup(engine)
     roles = role_id_lookup(engine)
+    with engine.connect() as conn:
+        roster_index = build_unique_index(
+            {pid: name for pid, name in conn.execute(text("SELECT id, name FROM persons"))},
+            _folded_key,
+        )
 
     with engine.connect() as conn:
         query = "SELECT id, loksabha, raw_html, mp_list_raw FROM debates ORDER BY id"
@@ -111,6 +123,16 @@ def main() -> None:
                 if not is_presiding_label(label) and not is_crowd_label(label):
                     person_id = aliases[mp_code]
                     name_source = "mpcode-alias"
+            # Ministerial turns: a synthetic role-slot code (>=10000) names no one
+            # person, so attribute by the turn's OWN label instead. See 033.
+            if person_id is None and role_id is None and mp_code and is_synthetic_code(mp_code):
+                pid = resolve_label_to_person(
+                    seg.get("speakerLabel"), roster_index, _folded_key,
+                    is_presiding_label, is_crowd_label,
+                )
+                if pid is not None:
+                    person_id = pid
+                    name_source = "minister-name"
             values.append({
                 "debate_id": row.id,
                 "seq": seq,
