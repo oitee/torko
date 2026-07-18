@@ -609,7 +609,7 @@ async function search(page = 1) {
 }
 
 function render(data) {
-  metaEl.textContent = `${data.total} debate${data.total === 1 ? '' : 's'} match`;
+  metaEl.textContent = `${data.total.toLocaleString()} debate${data.total === 1 ? '' : 's'} match`;
 
   if (data.results.length === 0) {
     resultsEl.innerHTML = `<p style="color:var(--text-muted);font-size:13px;">No debates match these filters — try widening them.</p>`;
@@ -637,7 +637,7 @@ function render(data) {
 
   const totalPages = Math.max(Math.ceil(data.total / data.pageSize), 1);
   paginationEl.style.display = 'flex';
-  pageLabelEl.textContent = `Page ${data.page} of ${totalPages}`;
+  pageLabelEl.textContent = `Page ${data.page.toLocaleString()} of ${totalPages.toLocaleString()}`;
   prevBtn.disabled = data.page <= 1;
   nextBtn.disabled = data.page >= totalPages;
 }
