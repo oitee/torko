@@ -108,6 +108,49 @@
     letter-spacing: 0.05em;
   }
 
+  .heatmap {
+    background: var(--surface-1);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 16px 18px;
+    margin-bottom: 20px;
+    overflow-x: auto;
+  }
+  .heatmap h3 { font-size: 13px; margin: 0 0 12px; font-weight: 600; }
+  .hm-row { display: flex; align-items: center; gap: 8px; margin-bottom: 4px; }
+  .hm-year {
+    width: 40px;
+    flex: none;
+    font-size: 11px;
+    color: var(--text-muted);
+    font-variant-numeric: tabular-nums;
+    text-align: right;
+  }
+  .hm-cells { display: flex; gap: 4px; }
+  .hm-cell {
+    width: 26px;
+    height: 26px;
+    flex: none;
+    border-radius: 5px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 10px;
+    font-variant-numeric: tabular-nums;
+    border: 1px solid var(--border);
+  }
+  .hm-gap { font-size: 11px; color: var(--text-muted); opacity: 0.6; }
+  .hm-legend {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    margin-top: 14px;
+    font-size: 11px;
+    color: var(--text-muted);
+  }
+  .hm-swatch { width: 14px; height: 14px; border-radius: 3px; border: 1px solid var(--border); }
+  .hm-note { font-size: 11px; color: var(--text-muted); margin: 10px 0 0; }
+
   .filter-bar {
     display: flex;
     gap: 12px;
@@ -267,6 +310,13 @@ function renderSpeaker(data) {
   `;
   contentEl.appendChild(header);
 
+  const hm = participationHeatmap(data.debates);
+  if (hm) {
+    const box = document.createElement('div');
+    box.innerHTML = hm;
+    contentEl.appendChild(box.firstElementChild);
+  }
+
   if (data.debates.length === 0) {
     const empty = document.createElement('p');
     empty.className = 'empty';
@@ -421,6 +471,75 @@ function speakerStats(debates) {
   return `<div class="speaker-stats">${tiles.map(([n, l]) =>
     `<div class="stat"><span class="stat-num">${escapeHtml(n)}</span><span class="stat-label">${escapeHtml(l)}</span></div>`
   ).join('')}</div>`;
+}
+
+// A participation heatmap: one row per calendar year (contiguous, so a year the
+// MP was absent shows as a visible gap), cells are the parliamentary sessions
+// active that year, shaded by how many turns we attributed to this MP in that
+// session-year. Same COVERAGE caveat as everything else here — shade is turns we
+// matched, not a verified activity total. Built from the fetched payload; no request.
+function participationHeatmap(debates) {
+  if (!debates || !debates.length) return '';
+  // year -> (loksabha|session -> {ls, session, interventions, debates})
+  const byYear = new Map();
+  debates.forEach(d => {
+    const y = d.debateDate && d.debateDate.slice(0, 4);
+    if (!y || !/^\d{4}$/.test(y)) return;   // undated / malformed excluded
+    const key = `${d.loksabha}|${d.session}`;
+    if (!byYear.has(y)) byYear.set(y, new Map());
+    const m = byYear.get(y);
+    const cur = m.get(key) || { ls: d.loksabha, session: d.session, interventions: 0, debates: 0 };
+    cur.interventions += d.interventions || 0;
+    cur.debates += 1;
+    m.set(key, cur);
+  });
+  const years = [...byYear.keys()].map(Number);
+  if (!years.length) return '';
+  const minY = Math.min(...years), maxY = Math.max(...years);
+
+  let max = 0;
+  byYear.forEach(m => m.forEach(c => { if (c.interventions > max) max = c.interventions; }));
+
+  // 4 intensity levels over [1, max]; 0 turns never appears (only active cells rendered).
+  const level = v => {
+    if (!v || max <= 0) return 0;
+    const r = v / max;
+    if (r > 0.66) return 4;
+    if (r > 0.33) return 3;
+    if (r > 0.12) return 2;
+    return 1;
+  };
+  const pct = { 1: 22, 2: 44, 3: 68, 4: 100 };
+  const shade = lv => `color-mix(in srgb, var(--series-1) ${pct[lv]}%, transparent)`;
+
+  const rows = [];
+  for (let y = minY; y <= maxY; y++) {
+    const m = byYear.get(String(y));
+    if (!m || !m.size) {
+      rows.push(`<div class="hm-row"><span class="hm-year">${y}</span><span class="hm-gap">no attributed turns</span></div>`);
+      continue;
+    }
+    const cells = [...m.values()]
+      .sort((a, b) => a.ls - b.ls || a.session - b.session)
+      .map(c => {
+        const lv = level(c.interventions);
+        const txt = lv >= 3 ? '#fff' : 'var(--text-secondary)';
+        const title = `LS${c.ls} · Session ${c.session} · ${y} · ${c.interventions} intervention${c.interventions === 1 ? '' : 's'} across ${c.debates} debate${c.debates === 1 ? '' : 's'}`;
+        return `<span class="hm-cell" style="background:${shade(lv)};color:${txt}" title="${escapeHtml(title)}">${c.session}</span>`;
+      }).join('');
+    rows.push(`<div class="hm-row"><span class="hm-year">${y}</span><div class="hm-cells">${cells}</div></div>`);
+  }
+
+  const legend = `<div class="hm-legend"><span>Fewer</span>`
+    + [1, 2, 3, 4].map(lv => `<span class="hm-swatch" style="background:${shade(lv)}"></span>`).join('')
+    + `<span>more interventions</span></div>`;
+
+  return `<div class="heatmap">`
+    + `<h3>Participation over time</h3>`
+    + rows.join('')
+    + legend
+    + `<p class="hm-note">Each cell is a session; the number is its session number, the shade how many turns we attributed to this MP. Undated debates are not shown.</p>`
+    + `</div>`;
 }
 
 function escapeHtml(s) {
