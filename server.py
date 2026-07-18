@@ -82,6 +82,16 @@ def index():
     return send_from_directory(app.static_folder, "index.html")
 
 
+@app.route("/analysis")
+def analysis():
+    import pathlib
+
+    base = pathlib.Path(app.static_folder).parent
+    template = (base / "static" / "analysis.html").read_text()
+    data = (base / "fixtures" / "analysis.json").read_text()
+    return template.replace("__DATA__", data, 1)
+
+
 @app.route("/api/distribution")
 def api_distribution():
     try:

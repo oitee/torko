@@ -1,0 +1,284 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Corpus Analysis — Lok Sabha Debates</title>
+<style>
+  :root {
+    --page-plane:     #f9f9f7;
+    --surface-1:      #fcfcfb;
+    --surface-2:      #f2f1ec;
+    --text-primary:   #0b0b0b;
+    --text-secondary: #52514e;
+    --text-muted:     #898781;
+    --gridline:       #e1e0d9;
+    --baseline:       #c3c2b7;
+    --series-1:       #2a78d6;   /* primary accent (blue) */
+    --series-2:       #b8742a;   /* clay — unresolved / caveat */
+    --good:           #3f8f5b;   /* resolved / present */
+    --warn:           #b8742a;
+    --border:         rgba(11,11,11,0.10);
+    --shadow:         0 1px 2px rgba(11,11,11,0.04);
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --page-plane:     #0d0d0d;
+      --surface-1:      #1a1a19;
+      --surface-2:      #232320;
+      --text-primary:   #ffffff;
+      --text-secondary: #c3c2b7;
+      --text-muted:     #898781;
+      --gridline:       #2c2c2a;
+      --baseline:       #383835;
+      --series-1:       #3987e5;
+      --series-2:       #d9954e;
+      --good:           #57ad74;
+      --warn:           #d9954e;
+      --border:         rgba(255,255,255,0.10);
+      --shadow:         none;
+    }
+  }
+  :root[data-theme="dark"] {
+      --page-plane:#0d0d0d; --surface-1:#1a1a19; --surface-2:#232320;
+      --text-primary:#fff; --text-secondary:#c3c2b7; --text-muted:#898781;
+      --gridline:#2c2c2a; --baseline:#383835; --series-1:#3987e5; --series-2:#d9954e;
+      --good:#57ad74; --warn:#d9954e; --border:rgba(255,255,255,0.10); --shadow:none;
+  }
+  :root[data-theme="light"] {
+      --page-plane:#f9f9f7; --surface-1:#fcfcfb; --surface-2:#f2f1ec;
+      --text-primary:#0b0b0b; --text-secondary:#52514e; --text-muted:#898781;
+      --gridline:#e1e0d9; --baseline:#c3c2b7; --series-1:#2a78d6; --series-2:#b8742a;
+      --good:#3f8f5b; --warn:#b8742a; --border:rgba(11,11,11,0.10);
+      --shadow:0 1px 2px rgba(11,11,11,0.04);
+  }
+
+  * { box-sizing: border-box; }
+  body {
+    margin: 0; background: var(--page-plane); color: var(--text-primary);
+    font-family: system-ui, -apple-system, "Segoe UI", sans-serif;
+    line-height: 1.5; font-size: 15px;
+    -webkit-font-smoothing: antialiased;
+  }
+  .wrap { max-width: 1000px; margin: 0 auto; padding: 40px 22px 96px; }
+  .num { font-variant-numeric: tabular-nums; }
+
+  header.masthead { border-bottom: 2px solid var(--text-primary); padding-bottom: 18px; margin-bottom: 8px; }
+  .eyebrow { font-size: 12px; letter-spacing: 0.14em; text-transform: uppercase; color: var(--series-1); font-weight: 600; }
+  h1 { font-size: 30px; line-height: 1.1; margin: 8px 0 6px; text-wrap: balance; letter-spacing: -0.02em; }
+  .dek { color: var(--text-secondary); font-size: 15px; max-width: 64ch; margin: 0; }
+  .meta { color: var(--text-muted); font-size: 12px; margin-top: 10px; }
+
+  .caveat {
+    display: flex; gap: 10px; font-size: 13px; color: var(--text-secondary);
+    background: var(--surface-2); border-left: 3px solid var(--series-2);
+    border-radius: 0 6px 6px 0; padding: 12px 14px; margin: 22px 0 6px;
+  }
+  .caveat b { color: var(--text-primary); }
+
+  section { margin-top: 48px; }
+  h2 { font-size: 13px; letter-spacing: 0.1em; text-transform: uppercase; color: var(--text-secondary);
+       border-bottom: 1px solid var(--gridline); padding-bottom: 8px; margin: 0 0 20px; }
+  h3 { font-size: 15px; margin: 24px 0 12px; }
+  p.note { font-size: 13.5px; color: var(--text-secondary); max-width: 68ch; }
+  p.note b { color: var(--text-primary); }
+
+  /* stat tiles */
+  .tiles { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 12px; }
+  .tile { background: var(--surface-1); border: 1px solid var(--border); border-radius: 10px; padding: 16px; box-shadow: var(--shadow); }
+  .tile .k { font-size: 12px; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.06em; }
+  .tile .v { font-size: 26px; font-weight: 650; margin-top: 4px; letter-spacing: -0.02em; }
+  .tile .s { font-size: 12px; color: var(--text-secondary); margin-top: 2px; }
+
+  /* charts */
+  .bars { display: flex; flex-direction: column; gap: 7px; margin: 8px 0; }
+  .bar-row { display: grid; grid-template-columns: 130px 1fr 74px; align-items: center; gap: 10px; font-size: 13px; }
+  .bar-row .lbl { color: var(--text-secondary); text-align: right; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .bar-track { background: var(--surface-2); border-radius: 4px; height: 20px; overflow: hidden; }
+  .bar-fill { height: 100%; background: var(--series-1); border-radius: 4px; min-width: 2px; }
+  .bar-fill.clay { background: var(--series-2); }
+  .bar-fill.good { background: var(--good); }
+  .bar-row .val { text-align: right; color: var(--text-primary); font-variant-numeric: tabular-nums; }
+
+  /* tables */
+  .tbl-wrap { overflow-x: auto; border: 1px solid var(--border); border-radius: 10px; }
+  table { border-collapse: collapse; width: 100%; font-size: 13.5px; }
+  th, td { padding: 9px 12px; text-align: left; border-bottom: 1px solid var(--gridline); white-space: nowrap; }
+  th { font-size: 11px; text-transform: uppercase; letter-spacing: 0.06em; color: var(--text-muted); font-weight: 600; background: var(--surface-1); position: sticky; top: 0; }
+  td.n, th.n { text-align: right; font-variant-numeric: tabular-nums; }
+  tr:last-child td { border-bottom: none; }
+  .pill { display: inline-block; font-size: 11px; padding: 1px 7px; border-radius: 999px; background: var(--surface-2); color: var(--text-secondary); }
+
+  .grid2 { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; }
+  @media (max-width: 720px) { .grid2 { grid-template-columns: 1fr; } .bar-row { grid-template-columns: 96px 1fr 64px; } }
+
+  .footnote { margin-top: 56px; padding-top: 18px; border-top: 1px solid var(--gridline); font-size: 12px; color: var(--text-muted); }
+</style>
+</head>
+<body>
+<div class="wrap" id="app">Loading…</div>
+
+<script id="analysis-data" type="application/json">__DATA__</script>
+<script>
+const D = JSON.parse(document.getElementById('analysis-data').textContent);
+const fmt = n => n == null ? '—' : n.toLocaleString('en-IN');
+const pct = n => n == null ? '—' : n.toFixed(1) + '%';
+
+function bars(items, {label, value, valfmt=fmt, cls='', max=null}) {
+  const mx = max ?? Math.max(...items.map(value));
+  return `<div class="bars">` + items.map(it => {
+    const w = mx ? (value(it) / mx * 100) : 0;
+    const c = typeof cls === 'function' ? cls(it) : cls;
+    return `<div class="bar-row"><div class="lbl" title="${label(it)}">${label(it)}</div>`
+      + `<div class="bar-track"><div class="bar-fill ${c}" style="width:${w.toFixed(1)}%"></div></div>`
+      + `<div class="val">${valfmt(value(it))}</div></div>`;
+  }).join('') + `</div>`;
+}
+
+function tile(k, v, s='') {
+  return `<div class="tile"><div class="k">${k}</div><div class="v num">${v}</div>`
+    + (s ? `<div class="s">${s}</div>` : '') + `</div>`;
+}
+
+function table(cols, rows) {
+  return `<div class="tbl-wrap"><table><thead><tr>`
+    + cols.map(c => `<th class="${c.n?'n':''}">${c.h}</th>`).join('')
+    + `</tr></thead><tbody>`
+    + rows.map(r => `<tr>` + cols.map(c => `<td class="${c.n?'n':''}">${c.f(r)}</td>`).join('') + `</tr>`).join('')
+    + `</tbody></table></div>`;
+}
+
+function render() {
+  const o = D.overview, sz = D.size, sk = D.skew, sp = D.speakers, lg = D.large, kw = D.keywords;
+  const el = document.getElementById('app');
+
+  el.innerHTML = `
+  <header class="masthead">
+    <div class="eyebrow">Torko · Corpus Analysis</div>
+    <h1>What 65,000 debates look like once every turn is a person, and every intervention a speech</h1>
+    <p class="dek">The parser turned printed transcripts into <b>${fmt(o.turns_total)} speaking turns</b>; stitching folds interruptions back together into <b>${fmt(o.speeches_total)} speeches</b> across ${fmt(o.debates_with_speeches)} debates and ${fmt(o.distinct_speakers)} identified MPs. This is the shape of that corpus.</p>
+    <div class="meta">Population-wide (no sampling). Generated ${new Date().toISOString().slice(0,10)}.</div>
+  </header>
+
+  <div class="caveat"><span>⚠</span><div><b>Coverage, not accuracy.</b> Every count here measures what we <i>matched or grouped</i>, never whether we matched the <i>right</i> person. A speech owned by MP X contains only X's own turns — interruptions stay separate — so a speech can never carry another person's words. Presiding-officer and crowd turns never own a speech.</div></div>
+
+  <section>
+    <h2>The corpus at a glance</h2>
+    <div class="tiles">
+      ${tile('Debates', fmt(o.debates_total), fmt(o.debates_with_speeches)+' with a speech')}
+      ${tile('Speaking turns', fmt(o.turns_total), 'raw parser fragments')}
+      ${tile('Speeches', fmt(o.speeches_total), 'stitched interventions')}
+      ${tile('Words spoken', fmt(o.words_total), 'in stitched speeches')}
+      ${tile('Identified MPs', fmt(o.distinct_speakers), 'with ≥1 speech')}
+      ${tile('Unresolved speeches', fmt(o.speeches_unresolved), pct(100*o.speeches_unresolved/o.speeches_total)+' of speeches')}
+    </div>
+  </section>
+
+  <section>
+    <h2>How big is a speech?</h2>
+    <div class="grid2">
+      <div>
+        <div class="tiles">
+          ${tile('Mean', fmt(Math.round(sz.all.mean)), 'words')}
+          ${tile('Median', fmt(sz.all.median), 'words')}
+          ${tile('Mode', fmt(sz.mode[0].word_count), sz.mode[0].n.toLocaleString()+' speeches')}
+        </div>
+        <p class="note">Mean (${fmt(sz.all.mean)}) sits far above the median (${fmt(sz.all.median)}): the distribution is <b>heavily right-skewed</b>. Half of all speeches are under ${fmt(sz.all.median)} words; the 99th percentile is ${fmt(sz.all.p99)} and the longest single speech runs <b>${fmt(sz.all.mx)} words</b>. The mode sitting at ${fmt(sz.mode[0].word_count)} is an artefact of stitching — interjections of ≤25 words are bridged into their neighbour, so the shortest surviving speeches pile up just above that floor.</p>
+      </div>
+      <div>
+        <h3>Speeches by length (words)</h3>
+        ${bars(sz.histogram, {label: h=>h.bucket, value: h=>h.n})}
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <h2>The skew — who holds the words</h2>
+    <div class="grid2">
+      <div>
+        ${bars([
+          {l:'Longest 1%', v:sk.top1},
+          {l:'Top 5%', v:sk.top5},
+          {l:'Top 10%', v:sk.top10},
+          {l:'Shortest 50%', v:sk.bottom50},
+        ], {label:x=>x.l, value:x=>x.v, valfmt:pct, cls:x=>x.l.startsWith('Shortest')?'clay':'', max:100})}
+      </div>
+      <div>
+        <p class="note">The longest <b>1% of speeches carry ${pct(sk.top1)}</b> of all words spoken; the top 10% carry ${pct(sk.top10)}. The shortest half of all speeches together account for just ${pct(sk.bottom50)}. This is skewed — but far <i>less</i> so than at the debate level, where the top 1% of debates hold ~46% of all text. A giant debate is giant because it has <i>many</i> speeches, not a few enormous ones.</p>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <h2>Speaker differences</h2>
+    <p class="note">Across ${fmt(o.distinct_speakers)} MPs, the median MP gives <b>${fmt(sp.per_speaker_dist.median)} speeches</b>; the mean is ${fmt(sp.per_speaker_dist.mean)} (skewed by the regulars) and the busiest gives ${fmt(sp.per_speaker_dist.mx)}. Volume and length pull apart: the highest-<i>count</i> speakers are procedural workhorses with short interventions; others speak less often but at length.</p>
+    <div class="grid2">
+      <div>
+        <h3>Most speeches</h3>
+        ${table([
+          {h:'MP', f:r=>r.name},
+          {h:'Party', f:r=>`<span class="pill">${r.party||'—'}</span>`},
+          {h:'Speeches', n:1, f:r=>fmt(r.speeches)},
+          {h:'Median len', n:1, f:r=>fmt(r.median_len)},
+        ], sp.top_by_speeches.slice(0,12))}
+      </div>
+      <div>
+        <h3>Most words</h3>
+        ${table([
+          {h:'MP', f:r=>r.name},
+          {h:'Party', f:r=>`<span class="pill">${r.party||'—'}</span>`},
+          {h:'Words', n:1, f:r=>fmt(r.words)},
+          {h:'Mean len', n:1, f:r=>fmt(r.mean_len)},
+        ], sp.top_by_words.slice(0,12))}
+      </div>
+    </div>
+    <p class="note" style="margin-top:14px">Party is a <b>last-term snapshot</b>, not party-at-time-of-speech — a known caveat: any MP who changed parties has their whole history labelled with the party they ended in.</p>
+  </section>
+
+  <section>
+    <h2>Large debates &amp; the recurring core</h2>
+    <div class="grid2">
+      <div>
+        <h3>Speakers scale with debate size</h3>
+        ${bars(lg.participation, {label:p=>p.bucket+' words', value:p=>p.avg_speakers, valfmt:n=>n.toFixed(1), cls:'good'})}
+        <p class="note">${fmt(lg.participation[0].debates)} debates (${pct(100*lg.participation[0].debates/o.debates_with_speeches)}) are single-speaker one-liners — the RULE-377 / Special Mention business. Only the ${fmt(lg.participation[4].debates)} debates above 50k words draw the full house (avg ${fmt(lg.participation[4].avg_speakers)}, up to ${fmt(lg.participation[4].max_speakers)} speakers).</p>
+      </div>
+      <div>
+        <h3>Present in the ${lg.top_n} largest debates</h3>
+        ${bars(lg.core_speakers.slice(0,12), {label:s=>s.name, value:s=>s.in_debates, valfmt:n=>n+'/'+lg.top_n})}
+      </div>
+    </div>
+    <p class="note" style="margin-top:14px"><b>There is a core, but not a monopoly.</b> A handful of parliamentary regulars appear in up to <b>${lg.core_speakers[0].in_debates} of the ${lg.top_n} largest debates</b> (${pct(100*lg.core_speakers[0].in_debates/lg.top_n)}). Yet those debates still draw <b>${fmt(lg.concentration.distinct_speakers)} distinct speakers</b>, and the 20 most-recurrent among them account for only ${pct(lg.concentration.top20_share)} of all speeches there. The big debates have familiar faces and a long tail both.</p>
+  </section>
+
+  <section>
+    <h2>The keyword layer — an official topic index, free</h2>
+    <p class="note">Sansad tags each debate with topic keywords (<code>keywordUsed</code>). We store them: <b>${fmt(kw.coverage.tagged)} of ${fmt(kw.coverage.debates_total)} debates (${pct(100*kw.coverage.tagged/kw.coverage.debates_total)})</b> carry ≥1 tag, drawn from <b>${fmt(kw.coverage.distinct_tags)} distinct tags</b> (avg ${kw.coverage.avg_tags_per_tagged} per tagged debate). A live re-fetch of ${'277'} debates matched our stored tags <b>exactly, 277/277</b> — the tags are stable and reliable.</p>
+    <div class="grid2">
+      <div>
+        <h3>Tagging rate by term</h3>
+        ${bars(kw.by_term, {label:t=>'LS'+t.loksabha, value:t=>t.pct, valfmt:pct, max:100, cls:'good'})}
+        <p class="note">The untagged third is <b>not</b> a legacy problem — LS13 is the <i>best</i>-tagged term. It is a debate-<i>type</i> problem (below).</p>
+      </div>
+      <div>
+        <h3>Tagging rate by debate type</h3>
+        ${bars(kw.by_type.filter(t=>t.n>1500).slice(0,10), {label:t=>t.debate_type.length>22?t.debate_type.slice(0,21)+'…':t.debate_type, value:t=>t.pct, valfmt:pct, max:100, cls:t=>t.pct>=60?'good':'clay'})}
+      </div>
+    </div>
+    <p class="note" style="margin-top:14px">Keywords are missing <b>exactly where a topic tag is meaningless</b> — procedural business like Papers Laid (0.4%), Committees (3.3%), Obituaries (3.1%) — and present where debates are topical (Rule-377 89.8%, Special Mention 83.8%). That makes the layer more trustworthy, not less.</p>
+    <h3 style="margin-top:28px">Most-used tags</h3>
+    <div class="grid2">
+      <div>${bars(kw.top_tags.slice(0,12), {label:t=>t.tag, value:t=>t.n})}</div>
+      <div>${bars(kw.top_tags.slice(12,24), {label:t=>t.tag, value:t=>t.n, max:kw.top_tags[0].n})}</div>
+    </div>
+    <p class="note" style="margin-top:14px"><b>The vocabulary is not clean.</b> "Road Construction" and "Road Development", "Compensation" and "Compensations", four separate Railway tags — near-synonyms proliferate. Of ${fmt(kw.coverage.distinct_tags)} tags, ${fmt(kw.freq_shape.find(f=>f.bucket==='1').tags)} are used exactly once while ${fmt(kw.freq_shape.find(f=>f.bucket==='100+').tags)} heavy tags cover ${fmt(kw.freq_shape.find(f=>f.bucket==='100+').uses)} uses. This is why the plan is to <b>embed the tag vocabulary and let a human curate clusters</b>, not treat raw tags as a controlled index.</p>
+  </section>
+
+  <div class="footnote">
+    Torko — Lok Sabha debate parser. Numbers computed over the full corpus in Postgres via <code>scripts/analyze_speeches.py</code>. Speeches produced by <code>speech_stitch.py</code> (contiguous same-speaker turns, bridging presiding interjections and ≤25-word heckles). Coverage is not accuracy; presiding officers and crowd labels are excluded from speech ownership by design.
+  </div>`;
+}
+render();
+</script>
+</body>
+</html>

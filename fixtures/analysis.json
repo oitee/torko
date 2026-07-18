@@ -1,0 +1,996 @@
+{
+  "overview": {
+    "debates_total": 64921,
+    "debates_with_turns": 64880,
+    "debates_with_speeches": 63654,
+    "turns_total": 526977,
+    "speeches_total": 175680,
+    "speeches_person": 132993,
+    "speeches_unresolved": 42687,
+    "words_total": 71847933,
+    "distinct_speakers": 2057
+  },
+  "size": {
+    "all": {
+      "n": 175680,
+      "mean": 408.97,
+      "sd": 1001.26,
+      "p25": 64,
+      "median": 175,
+      "p75": 421,
+      "p90": 1063,
+      "p99": 3120.21,
+      "mn": 0,
+      "mx": 103632
+    },
+    "person_owned": {
+      "n": 132993,
+      "mean": 454.41,
+      "sd": 1100.81,
+      "p25": 86,
+      "median": 197,
+      "p75": 499,
+      "p90": 1157,
+      "p99": 3284,
+      "mn": 0,
+      "mx": 103632
+    },
+    "mode": [
+      {
+        "word_count": 26,
+        "n": 2176
+      },
+      {
+        "word_count": 27,
+        "n": 1913
+      },
+      {
+        "word_count": 28,
+        "n": 1834
+      },
+      {
+        "word_count": 29,
+        "n": 1619
+      },
+      {
+        "word_count": 30,
+        "n": 1559
+      },
+      {
+        "word_count": 31,
+        "n": 1471
+      }
+    ],
+    "histogram": [
+      {
+        "bucket": "0-50",
+        "n": 35944
+      },
+      {
+        "bucket": "51-100",
+        "n": 23792
+      },
+      {
+        "bucket": "101-250",
+        "n": 51462
+      },
+      {
+        "bucket": "251-500",
+        "n": 25462
+      },
+      {
+        "bucket": "501-1000",
+        "n": 19846
+      },
+      {
+        "bucket": "1001-2500",
+        "n": 16136
+      },
+      {
+        "bucket": "2501-5000",
+        "n": 2562
+      },
+      {
+        "bucket": "5000+",
+        "n": 476
+      }
+    ]
+  },
+  "skew": {
+    "top1": 13.11,
+    "top5": 33.53,
+    "top10": 49.18,
+    "bottom50": 9.41
+  },
+  "by_term": [
+    {
+      "loksabha": 13,
+      "speeches": 29439,
+      "mean": 362.28,
+      "median": 131,
+      "mx": 8402,
+      "words": 10665184
+    },
+    {
+      "loksabha": 14,
+      "speeches": 34725,
+      "mean": 414.3,
+      "median": 147,
+      "mx": 103632,
+      "words": 14386478
+    },
+    {
+      "loksabha": 15,
+      "speeches": 28598,
+      "mean": 431.9,
+      "median": 199,
+      "mx": 14036,
+      "words": 12351583
+    },
+    {
+      "loksabha": 16,
+      "speeches": 40081,
+      "mean": 396.25,
+      "median": 187,
+      "mx": 16898,
+      "words": 15882193
+    },
+    {
+      "loksabha": 17,
+      "speeches": 30108,
+      "mean": 430.76,
+      "median": 191,
+      "mx": 18496,
+      "words": 12969365
+    },
+    {
+      "loksabha": 18,
+      "speeches": 12729,
+      "mean": 439.4,
+      "median": 192,
+      "mx": 20499,
+      "words": 5593130
+    }
+  ],
+  "speakers": {
+    "per_speaker_dist": {
+      "mean": 64.65,
+      "median": 28,
+      "p90": 151,
+      "mx": 1747
+    },
+    "top_by_speeches": [
+      {
+        "name": "Priya Ranjan Dasmunsi",
+        "party": "INC",
+        "speeches": 1747,
+        "words": 509976,
+        "median_len": 78
+      },
+      {
+        "name": "Bhartruhari Mahtab",
+        "party": "BJP",
+        "speeches": 1666,
+        "words": 993314,
+        "median_len": 244
+      },
+      {
+        "name": "N K Premachandran",
+        "party": "RSP",
+        "speeches": 1242,
+        "words": 518778,
+        "median_len": 169.5
+      },
+      {
+        "name": "Adhir Ranjan Chowdhury",
+        "party": "INC",
+        "speeches": 1204,
+        "words": 539333,
+        "median_len": 169
+      },
+      {
+        "name": "Basudeb Acharia",
+        "party": "CPI(M)",
+        "speeches": 1189,
+        "words": 421368,
+        "median_len": 86
+      },
+      {
+        "name": "Arjun Ram Meghwal",
+        "party": "BJP",
+        "speeches": 1142,
+        "words": 510546,
+        "median_len": 162.5
+      },
+      {
+        "name": "Raghuvansh Prasad Singh",
+        "party": "RJD",
+        "speeches": 1057,
+        "words": 564151,
+        "median_len": 244
+      },
+      {
+        "name": "Vijay Kumar Malhotra",
+        "party": "BJP",
+        "speeches": 1034,
+        "words": 230963,
+        "median_len": 56
+      },
+      {
+        "name": "Pawan Kumar Bansal",
+        "party": "INC",
+        "speeches": 1010,
+        "words": 306463,
+        "median_len": 84
+      },
+      {
+        "name": "Om Birla",
+        "party": "BJP",
+        "speeches": 945,
+        "words": 181777,
+        "median_len": 68
+      },
+      {
+        "name": "Sougata Ray",
+        "party": "AITC",
+        "speeches": 835,
+        "words": 306435,
+        "median_len": 188
+      },
+      {
+        "name": "Jagdambika Pal",
+        "party": "BJP",
+        "speeches": 834,
+        "words": 489701,
+        "median_len": 218.5
+      },
+      {
+        "name": "Nishikant Dubey",
+        "party": "BJP",
+        "speeches": 814,
+        "words": 509043,
+        "median_len": 197
+      },
+      {
+        "name": "Mulayam Singh Yadav",
+        "party": "SP",
+        "speeches": 701,
+        "words": 354505,
+        "median_len": 149
+      },
+      {
+        "name": "Somnath Chatterjee",
+        "party": "Not Available",
+        "speeches": 672,
+        "words": 248842,
+        "median_len": 91.5
+      },
+      {
+        "name": "Varkala Radhakrishnan",
+        "party": "CPI(M)",
+        "speeches": 633,
+        "words": 257784,
+        "median_len": 199
+      },
+      {
+        "name": "Prabhunath Singh",
+        "party": "RJD",
+        "speeches": 629,
+        "words": 229199,
+        "median_len": 150
+      },
+      {
+        "name": "M.A. Kharabela Swain",
+        "party": "BJP",
+        "speeches": 607,
+        "words": 263090,
+        "median_len": 79
+      },
+      {
+        "name": "Mallikarjun Kharge",
+        "party": "INC",
+        "speeches": 581,
+        "words": 77750,
+        "median_len": 63
+      },
+      {
+        "name": "Palaniappan Chidambaram",
+        "party": "INC",
+        "speeches": 576,
+        "words": 433139,
+        "median_len": 158
+      },
+      {
+        "name": "Bhairon Prasad Mishra",
+        "party": "BJP",
+        "speeches": 576,
+        "words": 74956,
+        "median_len": 42
+      },
+      {
+        "name": "Shailendra Kumar",
+        "party": "SP",
+        "speeches": 568,
+        "words": 285960,
+        "median_len": 227.5
+      },
+      {
+        "name": "Pushpendra Singh Chandel",
+        "party": "BJP",
+        "speeches": 548,
+        "words": 77924,
+        "median_len": 37
+      },
+      {
+        "name": "Ganesh Singh",
+        "party": "BJP",
+        "speeches": 547,
+        "words": 267746,
+        "median_len": 219
+      },
+      {
+        "name": "Rajiv Pratap Rudy",
+        "party": "BJP",
+        "speeches": 540,
+        "words": 212419,
+        "median_len": 123.5
+      }
+    ],
+    "top_by_words": [
+      {
+        "name": "Bhartruhari Mahtab",
+        "party": "BJP",
+        "speeches": 1666,
+        "words": 993314,
+        "mean_len": 596.23
+      },
+      {
+        "name": "Raghuvansh Prasad Singh",
+        "party": "RJD",
+        "speeches": 1057,
+        "words": 564151,
+        "mean_len": 533.73
+      },
+      {
+        "name": "Adhir Ranjan Chowdhury",
+        "party": "INC",
+        "speeches": 1204,
+        "words": 539333,
+        "mean_len": 447.95
+      },
+      {
+        "name": "N K Premachandran",
+        "party": "RSP",
+        "speeches": 1242,
+        "words": 518778,
+        "mean_len": 417.7
+      },
+      {
+        "name": "Arjun Ram Meghwal",
+        "party": "BJP",
+        "speeches": 1142,
+        "words": 510546,
+        "mean_len": 447.06
+      },
+      {
+        "name": "Priya Ranjan Dasmunsi",
+        "party": "INC",
+        "speeches": 1747,
+        "words": 509976,
+        "mean_len": 291.92
+      },
+      {
+        "name": "Nishikant Dubey",
+        "party": "BJP",
+        "speeches": 814,
+        "words": 509043,
+        "mean_len": 625.36
+      },
+      {
+        "name": "Jagdambika Pal",
+        "party": "BJP",
+        "speeches": 834,
+        "words": 489701,
+        "mean_len": 587.17
+      },
+      {
+        "name": "Palaniappan Chidambaram",
+        "party": "INC",
+        "speeches": 576,
+        "words": 433139,
+        "mean_len": 751.98
+      },
+      {
+        "name": "Basudeb Acharia",
+        "party": "CPI(M)",
+        "speeches": 1189,
+        "words": 421368,
+        "mean_len": 354.39
+      },
+      {
+        "name": "Supriya Sule",
+        "party": "NCPSP",
+        "speeches": 495,
+        "words": 369518,
+        "mean_len": 746.5
+      },
+      {
+        "name": "Mulayam Singh Yadav",
+        "party": "SP",
+        "speeches": 701,
+        "words": 354505,
+        "mean_len": 505.71
+      },
+      {
+        "name": "Anurag Singh Thakur",
+        "party": "BJP",
+        "speeches": 396,
+        "words": 317717,
+        "mean_len": 802.32
+      },
+      {
+        "name": "Pranab Mukherjee",
+        "party": "INC",
+        "speeches": 517,
+        "words": 310746,
+        "mean_len": 601.06
+      },
+      {
+        "name": "Pawan Kumar Bansal",
+        "party": "INC",
+        "speeches": 1010,
+        "words": 306463,
+        "mean_len": 303.43
+      },
+      {
+        "name": "Sougata Ray",
+        "party": "AITC",
+        "speeches": 835,
+        "words": 306435,
+        "mean_len": 366.99
+      },
+      {
+        "name": "Shailendra Kumar",
+        "party": "SP",
+        "speeches": 568,
+        "words": 285960,
+        "mean_len": 503.45
+      },
+      {
+        "name": "Shashi Tharoor",
+        "party": "INC",
+        "speeches": 394,
+        "words": 276122,
+        "mean_len": 700.82
+      },
+      {
+        "name": "Asaduddin Owaisi",
+        "party": "AIMIM",
+        "speeches": 365,
+        "words": 269247,
+        "mean_len": 737.66
+      },
+      {
+        "name": "Ganesh Singh",
+        "party": "BJP",
+        "speeches": 547,
+        "words": 267746,
+        "mean_len": 489.48
+      },
+      {
+        "name": "M.A. Kharabela Swain",
+        "party": "BJP",
+        "speeches": 607,
+        "words": 263090,
+        "mean_len": 433.43
+      },
+      {
+        "name": "Rupchand Pal",
+        "party": "CPI(M)",
+        "speeches": 521,
+        "words": 260348,
+        "mean_len": 499.71
+      },
+      {
+        "name": "Varkala Radhakrishnan",
+        "party": "CPI(M)",
+        "speeches": 633,
+        "words": 257784,
+        "mean_len": 407.24
+      },
+      {
+        "name": "Ram Kripal Yadav",
+        "party": "BJP",
+        "speeches": 488,
+        "words": 257331,
+        "mean_len": 527.32
+      },
+      {
+        "name": "Somnath Chatterjee",
+        "party": "Not Available",
+        "speeches": 672,
+        "words": 248842,
+        "mean_len": 370.3
+      }
+    ]
+  },
+  "large": {
+    "participation": [
+      {
+        "bucket": "0-1k",
+        "debates": 59208,
+        "avg_speakers": 1.01,
+        "max_speakers": 12
+      },
+      {
+        "bucket": "1-5k",
+        "debates": 2225,
+        "avg_speakers": 4.79,
+        "max_speakers": 26
+      },
+      {
+        "bucket": "5-20k",
+        "debates": 1349,
+        "avg_speakers": 9.88,
+        "max_speakers": 37
+      },
+      {
+        "bucket": "20-50k",
+        "debates": 630,
+        "avg_speakers": 23.69,
+        "max_speakers": 75
+      },
+      {
+        "bucket": "50k+",
+        "debates": 242,
+        "avg_speakers": 61.81,
+        "max_speakers": 139
+      }
+    ],
+    "top_n": 500,
+    "core_speakers": [
+      {
+        "name": "Bhartruhari Mahtab",
+        "in_debates": 244,
+        "words": 399611
+      },
+      {
+        "name": "N K Premachandran",
+        "in_debates": 177,
+        "words": 232026
+      },
+      {
+        "name": "Supriya Sule",
+        "in_debates": 143,
+        "words": 241743
+      },
+      {
+        "name": "Asaduddin Owaisi",
+        "in_debates": 142,
+        "words": 199244
+      },
+      {
+        "name": "Adhir Ranjan Chowdhury",
+        "in_debates": 136,
+        "words": 193231
+      },
+      {
+        "name": "Jagdambika Pal",
+        "in_debates": 125,
+        "words": 188458
+      },
+      {
+        "name": "Kaushalendra Kumar",
+        "in_debates": 121,
+        "words": 84431
+      },
+      {
+        "name": "E T Mohammed Basheer",
+        "in_debates": 120,
+        "words": 92437
+      },
+      {
+        "name": "Nishikant Dubey",
+        "in_debates": 117,
+        "words": 193036
+      },
+      {
+        "name": "Ganesh Singh",
+        "in_debates": 115,
+        "words": 147016
+      },
+      {
+        "name": "Sougata Ray",
+        "in_debates": 101,
+        "words": 102687
+      },
+      {
+        "name": "P. Karunakaran",
+        "in_debates": 99,
+        "words": 130204
+      },
+      {
+        "name": "Kirit Premjibhai Solanki",
+        "in_debates": 92,
+        "words": 76796
+      },
+      {
+        "name": "Arjun Ram Meghwal",
+        "in_debates": 91,
+        "words": 59209
+      },
+      {
+        "name": "Rajesh Ranjan",
+        "in_debates": 91,
+        "words": 93715
+      },
+      {
+        "name": "Hanuman Beniwal",
+        "in_debates": 90,
+        "words": 117102
+      },
+      {
+        "name": "Raghuvansh Prasad Singh",
+        "in_debates": 88,
+        "words": 135161
+      },
+      {
+        "name": "Virendra Kumar",
+        "in_debates": 88,
+        "words": 99733
+      },
+      {
+        "name": "M.A. Kharabela Swain",
+        "in_debates": 88,
+        "words": 98246
+      },
+      {
+        "name": "Kalyan Banerjee",
+        "in_debates": 87,
+        "words": 130876
+      },
+      {
+        "name": "Pralhad Joshi",
+        "in_debates": 85,
+        "words": 90824
+      },
+      {
+        "name": "Prabodh Panda",
+        "in_debates": 78,
+        "words": 74077
+      },
+      {
+        "name": "Jayshreeben Patel",
+        "in_debates": 78,
+        "words": 97130
+      },
+      {
+        "name": "Kodikunnil Suresh",
+        "in_debates": 76,
+        "words": 75031
+      },
+      {
+        "name": "K C Venugopal",
+        "in_debates": 75,
+        "words": 80179
+      }
+    ],
+    "concentration": {
+      "distinct_speakers": 1772,
+      "person_speeches": 29218,
+      "top20_share": 14.31
+    }
+  },
+  "keywords": {
+    "coverage": {
+      "debates_total": 64921,
+      "tagged": 45787,
+      "distinct_tags": 6976,
+      "avg_tags_per_tagged": 3.13
+    },
+    "by_term": [
+      {
+        "loksabha": 13,
+        "tot": 7616,
+        "tagged": 6193,
+        "pct": 81.3
+      },
+      {
+        "loksabha": 14,
+        "tot": 11027,
+        "tagged": 7942,
+        "pct": 72.0
+      },
+      {
+        "loksabha": 15,
+        "tot": 11216,
+        "tagged": 6685,
+        "pct": 59.6
+      },
+      {
+        "loksabha": 16,
+        "tot": 15831,
+        "tagged": 10795,
+        "pct": 68.2
+      },
+      {
+        "loksabha": 17,
+        "tot": 13272,
+        "tagged": 9361,
+        "pct": 70.5
+      },
+      {
+        "loksabha": 18,
+        "tot": 5959,
+        "tagged": 4811,
+        "pct": 80.7
+      }
+    ],
+    "by_type": [
+      {
+        "debate_type": "MATTERS UNDER RULE-377",
+        "n": 22323,
+        "pct": 89.8
+      },
+      {
+        "debate_type": "SPECIAL MENTION",
+        "n": 15101,
+        "pct": 83.8
+      },
+      {
+        "debate_type": "SPECIAL MENTION (ZERO HOUR)",
+        "n": 6918,
+        "pct": 85.6
+      },
+      {
+        "debate_type": "PARLIAMENTARY COMMITTEES",
+        "n": 4406,
+        "pct": 3.3
+      },
+      {
+        "debate_type": "PRIVATE MEMBERS' BILLS",
+        "n": 3101,
+        "pct": 70.6
+      },
+      {
+        "debate_type": "STATEMENT BY MINISTER",
+        "n": 2500,
+        "pct": 24.4
+      },
+      {
+        "debate_type": "GOVERNMENT BILLS",
+        "n": 2247,
+        "pct": 63.6
+      },
+      {
+        "debate_type": "PAPERS LAID ON THE TABLE",
+        "n": 1436,
+        "pct": 0.4
+      },
+      {
+        "debate_type": "SUBMISSIONS BY MEMBERS",
+        "n": 842,
+        "pct": 82.5
+      },
+      {
+        "debate_type": "MESSAGES FROM RAJYA SABHA",
+        "n": 625,
+        "pct": 6.6
+      },
+      {
+        "debate_type": "ELECTION TO COMMITTEES/BOARDS",
+        "n": 510,
+        "pct": 1.6
+      },
+      {
+        "debate_type": "OBITUARY REFERENCE",
+        "n": 389,
+        "pct": 3.1
+      },
+      {
+        "debate_type": "RULING BY THE SPEAKER",
+        "n": 388,
+        "pct": 13.1
+      },
+      {
+        "debate_type": "ANNOUNCEMENT BY THE CHAIR",
+        "n": 365,
+        "pct": 13.4
+      },
+      {
+        "debate_type": "OBSERVATION BY THE CHAIR",
+        "n": 341,
+        "pct": 26.1
+      }
+    ],
+    "top_tags": [
+      {
+        "tag": "Farmers' Welfare",
+        "n": 1750
+      },
+      {
+        "tag": "Fund Allocation",
+        "n": 1386
+      },
+      {
+        "tag": "Road Construction",
+        "n": 1181
+      },
+      {
+        "tag": "Financial Aid",
+        "n": 1124
+      },
+      {
+        "tag": "Road Development",
+        "n": 1120
+      },
+      {
+        "tag": "Railway Projects",
+        "n": 1003
+      },
+      {
+        "tag": "Railway Service",
+        "n": 994
+      },
+      {
+        "tag": "Corruption",
+        "n": 903
+      },
+      {
+        "tag": "Education",
+        "n": 813
+      },
+      {
+        "tag": "Employment Opportunities",
+        "n": 775
+      },
+      {
+        "tag": "Medical Facilities",
+        "n": 761
+      },
+      {
+        "tag": "Rehabilitation",
+        "n": 745
+      },
+      {
+        "tag": "Drinking Water",
+        "n": 711
+      },
+      {
+        "tag": "Natural Calamities",
+        "n": 666
+      },
+      {
+        "tag": "Medical Treatment",
+        "n": 658
+      },
+      {
+        "tag": "Infrastructure Development",
+        "n": 638
+      },
+      {
+        "tag": "Compensations",
+        "n": 619
+      },
+      {
+        "tag": "Subsidies",
+        "n": 604
+      },
+      {
+        "tag": "Reservation Policy",
+        "n": 581
+      },
+      {
+        "tag": "Maintenance and Repair",
+        "n": 570
+      },
+      {
+        "tag": "Tourism Promotion",
+        "n": 553
+      },
+      {
+        "tag": "Tourism Development",
+        "n": 549
+      },
+      {
+        "tag": "Unemployment",
+        "n": 514
+      },
+      {
+        "tag": "Railway Passenger Amenities",
+        "n": 506
+      },
+      {
+        "tag": "Railway Facilities",
+        "n": 494
+      },
+      {
+        "tag": "Law and Order",
+        "n": 493
+      },
+      {
+        "tag": "Compensation",
+        "n": 492
+      },
+      {
+        "tag": "Terrorism",
+        "n": 481
+      },
+      {
+        "tag": "Civil Aviation",
+        "n": 480
+      },
+      {
+        "tag": "Higher Education",
+        "n": 478
+      },
+      {
+        "tag": "Railway Halts",
+        "n": 472
+      },
+      {
+        "tag": "Crop Damages",
+        "n": 459
+      },
+      {
+        "tag": "Central Schools",
+        "n": 444
+      },
+      {
+        "tag": "Basic Amenities",
+        "n": 444
+      },
+      {
+        "tag": "Land Acquisition",
+        "n": 441
+      },
+      {
+        "tag": "Farmers",
+        "n": 438
+      },
+      {
+        "tag": "National Highways",
+        "n": 430
+      },
+      {
+        "tag": "Project Implementation",
+        "n": 424
+      },
+      {
+        "tag": "Government Policy",
+        "n": 419
+      },
+      {
+        "tag": "Minimum Support  Prices (MSP)",
+        "n": 414
+      }
+    ],
+    "freq_shape": [
+      {
+        "bucket": "1",
+        "tags": 1657,
+        "uses": 1657
+      },
+      {
+        "bucket": "2-5",
+        "tags": 2256,
+        "uses": 6953
+      },
+      {
+        "bucket": "6-20",
+        "tags": 1733,
+        "uses": 18964
+      },
+      {
+        "bucket": "21-100",
+        "tags": 1034,
+        "uses": 44426
+      },
+      {
+        "bucket": "100+",
+        "tags": 296,
+        "uses": 71256
+      }
+    ]
+  }
+}
