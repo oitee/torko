@@ -51,14 +51,47 @@
 
   form.filters {
     display: flex;
+    flex-direction: column;
     gap: 14px;
-    align-items: flex-end;
-    flex-wrap: wrap;
     background: var(--surface-1);
     border: 1px solid var(--border);
     border-radius: 10px;
     padding: 16px;
     margin-bottom: 24px;
+  }
+  .search-hero { display: flex; gap: 10px; }
+  .hero-input {
+    flex: 1;
+    min-width: 0;
+    padding: 13px 16px;
+    border-radius: 8px;
+    border: 1px solid var(--border);
+    background: var(--page-plane);
+    color: var(--text-primary);
+    font-size: 15px;
+  }
+  .hero-input::placeholder { color: var(--text-muted); }
+  .hero-input:focus {
+    outline: none;
+    border-color: var(--series-1);
+    box-shadow: 0 0 0 2px rgba(42,120,214,0.18);
+  }
+  .search-hero button { padding: 0 24px; font-size: 15px; }
+  .search-hint { font-size: 11.5px; color: var(--text-muted); margin: -6px 0 0; }
+  .sub-filters {
+    display: flex;
+    gap: 14px;
+    align-items: flex-end;
+    flex-wrap: wrap;
+    padding-top: 14px;
+    border-top: 1px solid var(--border);
+  }
+  .sub-filters-label {
+    align-self: center;
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: var(--text-muted);
   }
   .field { display: flex; flex-direction: column; gap: 4px; }
   .field label { font-size: 12px; color: var(--text-secondary); }
@@ -232,7 +265,7 @@
     box-shadow: 0 0 0 2px rgba(42,120,214,0.18);
   }
 
-  #q, #text { width: 200px; }
+  #q { width: 200px; }
   #results { transition: opacity 0.15s ease; }
 
   .meta { color: var(--text-secondary); font-size: 13px; margin-bottom: 14px; }
@@ -295,6 +328,14 @@
   </div>
 
   <form class="filters" id="filter-form">
+    <div class="search-hero">
+      <input type="text" id="text" class="hero-input" placeholder="Search the transcripts — a word or phrase said in the House…" autocomplete="off">
+      <button type="submit">Search</button>
+    </div>
+    <p class="search-hint">Full-text over the turns we&rsquo;ve parsed &mdash; a coverage search, not a verified index. Older disguised-Hindi debates aren&rsquo;t searchable yet.</p>
+
+    <div class="sub-filters">
+    <span class="sub-filters-label">Refine</span>
     <div class="field">
       <label for="date_from">From</label>
       <div class="date-wrap">
@@ -341,12 +382,8 @@
       <label for="q">Title contains</label>
       <input type="text" id="q" placeholder="e.g. airport">
     </div>
-    <div class="field">
-      <label for="text">Transcript contains</label>
-      <input type="text" id="text" placeholder="keyword in what was said">
-    </div>
-    <button type="submit">Filter</button>
     <button type="button" class="secondary" id="reset-btn">Reset</button>
+    </div>
   </form>
 
   <div id="meta" class="meta"></div>
