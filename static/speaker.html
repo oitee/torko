@@ -91,6 +91,22 @@
   }
   .speaker-name { font-size: 18px; font-weight: 700; margin: 0 0 4px; }
   .speaker-meta { color: var(--text-secondary); font-size: 13px; }
+  .speaker-stats {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 28px;
+    margin-top: 16px;
+    padding-top: 14px;
+    border-top: 1px solid var(--border);
+  }
+  .stat { display: flex; flex-direction: column; gap: 2px; }
+  .stat-num { font-size: 20px; font-weight: 700; font-variant-numeric: tabular-nums; line-height: 1.1; }
+  .stat-label {
+    font-size: 10.5px;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+  }
 
   .filter-bar {
     display: flex;
@@ -131,8 +147,12 @@
     padding: 14px 16px;
     text-decoration: none;
     color: inherit;
+    transition: border-color 0.12s ease, box-shadow 0.12s ease;
   }
-  .debate-card:hover { border-color: var(--series-1); }
+  .debate-card:hover {
+    border-color: var(--series-1);
+    box-shadow: 0 2px 10px rgba(0,0,0,0.06);
+  }
   .source-link { color: var(--series-1); cursor: pointer; }
   .source-link:hover { text-decoration: underline; }
   .debate-title { font-size: 14px; font-weight: 600; margin: 0 0 6px; }
@@ -243,6 +263,7 @@ function renderSpeaker(data) {
   header.innerHTML = `
     <p class="speaker-name">${escapeHtml(data.speaker.name)}</p>
     <p class="speaker-meta">${escapeHtml(data.speaker.party || 'Party unknown')} · ${escapeHtml(data.speaker.constituency || 'Constituency unknown')} · sansadId ${escapeHtml(data.speaker.sansadId)}</p>
+    ${speakerStats(data.debates)}
   `;
   contentEl.appendChild(header);
 
@@ -376,8 +397,34 @@ function applyFilters() {
   `).join('');
 }
 
+// A summary strip over the debates already fetched — no new request. Everything
+// here is COVERAGE (debates/turns where we attributed a turn to this MP), not a
+// verified activity total; the caveat above the header states that once.
+function speakerStats(debates) {
+  if (!debates || !debates.length) return '';
+  const interventions = debates.reduce((s, d) => s + (d.interventions || 0), 0);
+  const words = debates.reduce((s, d) => s + (d.words || 0), 0);
+  const years = debates.map(d => d.debateDate && +d.debateDate.slice(0, 4)).filter(Boolean);
+  const terms = new Set(debates.map(d => d.loksabha)).size;
+  const span = years.length
+    ? (Math.min(...years) === Math.max(...years)
+        ? `${Math.min(...years)}`
+        : `${Math.min(...years)}–${Math.max(...years)}`)
+    : '—';
+  const tiles = [
+    [debates.length.toLocaleString(), debates.length === 1 ? 'debate' : 'debates'],
+    [interventions.toLocaleString(), interventions === 1 ? 'intervention' : 'interventions'],
+    [words.toLocaleString(), 'words'],
+    [span, 'active'],
+    [terms.toLocaleString(), terms === 1 ? 'term' : 'terms'],
+  ];
+  return `<div class="speaker-stats">${tiles.map(([n, l]) =>
+    `<div class="stat"><span class="stat-num">${escapeHtml(n)}</span><span class="stat-label">${escapeHtml(l)}</span></div>`
+  ).join('')}</div>`;
+}
+
 function escapeHtml(s) {
-  return (s || '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+  return ('' + (s ?? '')).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 }
 
 // Titles come straight from the source HTML: markup (`210<sup>th</sup>`),
