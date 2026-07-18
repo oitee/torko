@@ -117,16 +117,25 @@
     overflow-x: auto;
   }
   .heatmap h3 { font-size: 13px; margin: 0 0 12px; font-weight: 600; }
-  .hm-row { display: flex; align-items: center; gap: 8px; margin-bottom: 4px; }
+  .hm-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+    gap: 8px 18px;
+  }
+  .hm-row { display: flex; align-items: center; gap: 8px; }
   .hm-year {
-    width: 40px;
+    width: 34px;
     flex: none;
     font-size: 11px;
     color: var(--text-muted);
     font-variant-numeric: tabular-nums;
     text-align: right;
+    cursor: pointer;
+    border-radius: 4px;
+    padding: 2px 3px;
   }
-  .hm-cells { display: flex; gap: 4px; }
+  .hm-year:hover { color: var(--series-1); background: rgba(42,120,214,0.10); }
+  .hm-cells { display: flex; gap: 4px; flex-wrap: wrap; }
   .hm-cell {
     width: 26px;
     height: 26px;
@@ -138,8 +147,12 @@
     font-size: 10px;
     font-variant-numeric: tabular-nums;
     border: 1px solid var(--border);
+    cursor: pointer;
+    transition: outline-color 0.1s ease;
+    outline: 2px solid transparent;
+    outline-offset: 1px;
   }
-  .hm-gap { font-size: 11px; color: var(--text-muted); opacity: 0.6; }
+  .hm-cell:hover { outline-color: var(--series-1); }
   .hm-legend {
     display: flex;
     align-items: center;
@@ -512,22 +525,21 @@ function participationHeatmap(debates) {
   const pct = { 1: 22, 2: 44, 3: 68, 4: 100 };
   const shade = lv => `color-mix(in srgb, var(--series-1) ${pct[lv]}%, transparent)`;
 
+  // Only years the MP actually appears in — empty years are dropped, not shown
+  // as gaps — and the rows flow into as many columns as the width allows.
   const rows = [];
   for (let y = minY; y <= maxY; y++) {
     const m = byYear.get(String(y));
-    if (!m || !m.size) {
-      rows.push(`<div class="hm-row"><span class="hm-year">${y}</span><span class="hm-gap">no attributed turns</span></div>`);
-      continue;
-    }
+    if (!m || !m.size) continue;
     const cells = [...m.values()]
       .sort((a, b) => a.ls - b.ls || a.session - b.session)
       .map(c => {
         const lv = level(c.interventions);
         const txt = lv >= 3 ? '#fff' : 'var(--text-secondary)';
-        const title = `LS${c.ls} · Session ${c.session} · ${y} · ${c.interventions} intervention${c.interventions === 1 ? '' : 's'} across ${c.debates} debate${c.debates === 1 ? '' : 's'}`;
-        return `<span class="hm-cell" style="background:${shade(lv)};color:${txt}" title="${escapeHtml(title)}">${c.session}</span>`;
+        const title = `LS${c.ls} · Session ${c.session} · ${y} · ${c.interventions} intervention${c.interventions === 1 ? '' : 's'} across ${c.debates} debate${c.debates === 1 ? '' : 's'} — click to filter`;
+        return `<span class="hm-cell" data-term="${c.ls}|${c.session}" style="background:${shade(lv)};color:${txt}" title="${escapeHtml(title)}">${c.session}</span>`;
       }).join('');
-    rows.push(`<div class="hm-row"><span class="hm-year">${y}</span><div class="hm-cells">${cells}</div></div>`);
+    rows.push(`<div class="hm-row"><span class="hm-year" data-year="${y}" title="Filter to ${y}">${y}</span><div class="hm-cells">${cells}</div></div>`);
   }
 
   const legend = `<div class="hm-legend"><span>Fewer</span>`
@@ -536,9 +548,9 @@ function participationHeatmap(debates) {
 
   return `<div class="heatmap">`
     + `<h3>Participation over time</h3>`
-    + rows.join('')
+    + `<div class="hm-grid">${rows.join('')}</div>`
     + legend
-    + `<p class="hm-note">Each cell is a session; the number is its session number, the shade how many turns we attributed to this MP. Undated debates are not shown.</p>`
+    + `<p class="hm-note">Each cell is a session, shaded by how many turns we attributed to this MP. Click a session to filter the list below to it, or a year to filter to that year. Undated debates are not shown.</p>`
     + `</div>`;
 }
 
@@ -566,6 +578,34 @@ document.addEventListener('click', e => {
   e.preventDefault();
   e.stopPropagation();
   window.open(link.dataset.src, '_blank', 'noopener');
+});
+
+// Clicking a heatmap cell filters the list below to that term & session; clicking
+// a year label filters to that year. Both drive the existing filter bar, so the
+// heading and results stay in sync with a route the user could reach by hand.
+function setFilter(id, value) {
+  const el = document.getElementById(id);
+  if (!el) return;
+  el.value = value;
+  applyFilters();
+  const count = document.getElementById('debate-count');
+  if (count) count.scrollIntoView({ behavior: 'smooth', block: 'start' });
+}
+document.addEventListener('click', e => {
+  const cell = e.target.closest('.hm-cell[data-term]');
+  if (cell) {
+    document.getElementById('f-year-from').value = '';
+    document.getElementById('f-year-to').value = '';
+    setFilter('f-term', cell.dataset.term);
+    return;
+  }
+  const year = e.target.closest('.hm-year[data-year]');
+  if (year) {
+    // A year can hold sessions from more than one term, so filter by year, not term.
+    document.getElementById('f-term').value = '';
+    document.getElementById('f-year-from').value = year.dataset.year;
+    setFilter('f-year-to', year.dataset.year);
+  }
 });
 
 loadAllSpeakers();
