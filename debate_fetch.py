@@ -287,12 +287,25 @@ def build_speaker_index(mp_part_detail_list: list[dict], db_roster: list[dict] |
     by_join_ordered: dict[str, dict] = {}
     by_join_sorted: dict[str, dict] = {}
     tokenised: list[tuple[set, dict]] = []
+    # Track which distinct mpCodes each key points at, so a key naming two
+    # different people can be dropped afterwards. `setdefault` alone kept the
+    # FIRST of two identical names -- a silent guess between two humans, the
+    # same never-guess hole `_folded_lookup` and the name-partial tier already
+    # close. The exact/join tiers now close it too.
+    str_codes: dict[str, set] = {}
+    ord_codes: dict[str, set] = {}
+    sort_codes: dict[str, set] = {}
     for m in mp_part_detail_list:
         toks = _normalize_name(m["mpName"])
-        by_str.setdefault(" ".join(toks), m)
-        by_join_ordered.setdefault("".join(toks), m)
-        by_join_sorted.setdefault("".join(sorted(toks)), m)
+        ks, ko, kt = " ".join(toks), "".join(toks), "".join(sorted(toks))
+        by_str.setdefault(ks, m); str_codes.setdefault(ks, set()).add(m["mpCode"])
+        by_join_ordered.setdefault(ko, m); ord_codes.setdefault(ko, set()).add(m["mpCode"])
+        by_join_sorted.setdefault(kt, m); sort_codes.setdefault(kt, set()).add(m["mpCode"])
         tokenised.append((set(toks), m))
+    # Drop any key that names more than one distinct person: never guess.
+    by_str = {k: v for k, v in by_str.items() if len(str_codes[k]) == 1}
+    by_join_ordered = {k: v for k, v in by_join_ordered.items() if len(ord_codes[k]) == 1}
+    by_join_sorted = {k: v for k, v in by_join_sorted.items() if len(sort_codes[k]) == 1}
 
     by_folded = _folded_lookup(mp_part_detail_list)
     by_folded_db = _folded_lookup(db_roster) if db_roster else {}
@@ -489,6 +502,36 @@ def annotate_speakers(
     index = build_speaker_index(mp_part_detail_list, db_roster)
     for seg in segments:
         if seg.get("mpCode"):
+            # An anchor is the strongest evidence we have, but the source
+            # sometimes attaches an <A name="code*part"> to a paragraph whose
+            # PRINTED speaker is a different person -- e.g. a turn plainly
+            # labelled "DR. UDIT RAJ (NORTH WEST DELHI)" carrying code 4717,
+            # which is Meenakashi Lekhi. Trusting the hidden code there files
+            # one MP's words under another, silently: nothing on the debate page
+            # looks wrong. So when the printed label INDEPENDENTLY resolves to a
+            # *different* person than the anchor code, the two witnesses
+            # disagree and the visible printed name wins (never-guess: we do not
+            # keep a contradicted anchor). Only a POSITIVE re-identification
+            # overrides -- resolve_speaker returning None (no evidence) or the
+            # SAME code leaves the anchor standing, so a transliteration variant
+            # of the same name ("श्री रामजीलाल सुमन" / "Ramji Lal Suman"), which
+            # fails to match or matches the same code, never triggers this.
+            # Only the debate's OWN participant list may override an anchor.
+            # A "name-db" match is the last-resort cross-debate roster fallback,
+            # explicitly weaker than an anchor the source printed -- it must
+            # never override one (see test_a_db_roster_never_costs_an_anchored
+            # _resolution and the name-db invariant). The list-based tiers
+            # (name-exact/join/partial/translit) ARE this debate's own evidence,
+            # so a contradiction there is a genuine two-witness conflict.
+            label = seg.get("speakerLabel")
+            if label:
+                src, entry = resolve_speaker(label, index)
+                if entry and src != "name-db" and str(entry["mpCode"]) != str(seg["mpCode"]):
+                    seg["anchorRejected"] = str(seg["mpCode"])
+                    seg["mpCode"] = str(entry["mpCode"])
+                    seg["mpName"] = entry["mpName"]
+                    seg["nameSource"] = "anchor-overridden"
+                    continue
             seg["nameSource"] = "anchor"
             continue
         if not seg.get("speakerLabel"):
