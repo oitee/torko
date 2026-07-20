@@ -148,12 +148,21 @@ def build_speaker_index(mp_part_detail_list: list[dict], db_roster: list[dict] |
     by_join_ordered: dict[str, dict] = {}
     by_join_sorted: dict[str, dict] = {}
     tokenised: list[tuple[set, dict]] = []
+    # The mpCodes behind each key, so a key that names two people can be dropped.
+    str_codes: dict[str, set] = {}
+    ord_codes: dict[str, set] = {}
+    sort_codes: dict[str, set] = {}
     for m in mp_part_detail_list:
         toks = _normalize_name(m["mpName"])
-        by_str.setdefault(" ".join(toks), m)
-        by_join_ordered.setdefault("".join(toks), m)
-        by_join_sorted.setdefault("".join(sorted(toks)), m)
+        ks, ko, kt = " ".join(toks), "".join(toks), "".join(sorted(toks))
+        by_str.setdefault(ks, m); str_codes.setdefault(ks, set()).add(m["mpCode"])
+        by_join_ordered.setdefault(ko, m); ord_codes.setdefault(ko, set()).add(m["mpCode"])
+        by_join_sorted.setdefault(kt, m); sort_codes.setdefault(kt, set()).add(m["mpCode"])
         tokenised.append((set(toks), m))
+    # Drop any key that names more than one person.
+    by_str = {k: v for k, v in by_str.items() if len(str_codes[k]) == 1}
+    by_join_ordered = {k: v for k, v in by_join_ordered.items() if len(ord_codes[k]) == 1}
+    by_join_sorted = {k: v for k, v in by_join_sorted.items() if len(sort_codes[k]) == 1}
 
     by_folded = _folded_lookup(mp_part_detail_list)
     by_folded_db = _folded_lookup(db_roster) if db_roster else {}
@@ -274,6 +283,18 @@ def annotate_speakers(
     index = build_speaker_index(mp_part_detail_list, db_roster)
     for seg in segments:
         if seg.get("mpCode"):
+            # The source sometimes puts a wrong anchor on a paragraph. If the printed label
+            # resolves to a different person, the printed name wins.
+            # A "name-db" match is weaker than an anchor and never overrides one.
+            label = seg.get("speakerLabel")
+            if label:
+                src, entry = resolve_speaker(label, index)
+                if entry and src != "name-db" and str(entry["mpCode"]) != str(seg["mpCode"]):
+                    seg["anchorRejected"] = str(seg["mpCode"])
+                    seg["mpCode"] = str(entry["mpCode"])
+                    seg["mpName"] = entry["mpName"]
+                    seg["nameSource"] = "anchor-overridden"
+                    continue
             seg["nameSource"] = "anchor"
             continue
         if not seg.get("speakerLabel"):
