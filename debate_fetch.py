@@ -548,6 +548,27 @@ def split_by_speaker(
     segments = [s for s in segments if s["text"] or s["speakerLabel"]]
     annotate_speakers(segments, mp_part_detail_list, db_roster)
 
+    # LS14 has modern anchors but legacy-font Hindi. Decode after annotate_speakers,
+    # because resolve_speaker already decodes the label itself.
+    for seg in segments:
+        seg["text"] = decode_legacy_hindi(seg["text"])
+        seg["speakerLabel"] = decode_legacy_hindi(seg["speakerLabel"] or "") or None
+        seg["mpName"] = decode_legacy_hindi(seg["mpName"] or "") or None
+
+    # Classify chair and crowd labels again, because the encoded label "+ÉvªÉFÉ àÉcÉänªÉ" did not match before.
+    for seg in segments:
+        if seg.get("mpCode") is not None or seg.get("nameSource") != "unresolved":
+            continue
+        # Test crowd before presiding.
+        if is_crowd_label(seg["speakerLabel"]):
+            seg["nameSource"] = "crowd"
+            seg["mpName"] = seg["speakerLabel"]
+            seg["roleCode"] = "members_crowd"
+        elif is_presiding_label(seg["speakerLabel"]):
+            seg["nameSource"] = "presiding"
+            seg["mpName"] = seg["speakerLabel"]
+            seg["roleCode"] = role_code_for_label(seg["speakerLabel"])
+
     reuse_anchors(segments)
     return segments
 
