@@ -1,6 +1,16 @@
 from legacy_hindi import decode_legacy_hindi, looks_encoded
 from debate_fetch_legacy import split_by_speaker_legacy
 
+# The whole-word glyph sequence for श्री, the honorific that opens most Hindi speaker labels.
+_CARRIER = "gÉÉÒ "
+_CARRIER_DECODED = "श्री "
+
+
+def decode_fragment(fragment: str) -> str:
+    out = decode_legacy_hindi(_CARRIER + fragment)
+    assert out.startswith(_CARRIER_DECODED), f"carrier itself failed to decode: {out!r}"
+    return out[len(_CARRIER_DECODED):]
+
 
 class TestLooksEncoded:
     def test_legacy_glyphs_are_encoded(self):
@@ -37,7 +47,8 @@ class TestDecodeLegacyHindi:
         assert decode_legacy_hindi("…(Interruptions)") == "…(Interruptions)"
 
     def test_star_becomes_danda_in_hindi_run(self):
-        assert decode_legacy_hindi("cè*").endswith("है।")
+        # In a Hindi run * is the danda. In English it is a footnote marker.
+        assert decode_fragment("cè*").endswith("है।")
 
     def test_pre_base_short_i_with_anusvara_becomes_singh(self):
         # ÉË is the pre-base glyph for ि and ं.
@@ -102,7 +113,7 @@ class TestTableGapsThatStrandedResidue:
         assert decode_legacy_hindi("{ÉfÃxÉä") == "पढ़ने"
 
     def test_candrabindu(self):
-        assert decode_legacy_hindi("cÚÄ") == "हूँ"
+        assert decode_fragment("cÚÄ") == "हूँ"
         assert decode_legacy_hindi("+ÉÉÄJÉÉå") == "आँखों"
 
     def test_independent_uu_and_ru(self):
@@ -132,7 +143,7 @@ class TestTableGapsThatStrandedResidue:
         assert decode_legacy_hindi("+ÉSUÉÒ") == "अच्छी"
 
     def test_da_conjuncts(self):
-        assert decode_legacy_hindi("uÉ®É") == "द्वारा"
+        assert decode_fragment("uÉ®É") == "द्वारा"
         assert decode_legacy_hindi("ÉÊuiÉÉÒªÉ") == "द्वितीय"
         assert decode_legacy_hindi("´ÉètÉ") == "वैद्य"
         assert decode_legacy_hindi("ÉÊ´É¶´ÉÉÊ´ÉtÉÉãÉªÉ") == "विश्वविद्यालय"
