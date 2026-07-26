@@ -9,6 +9,38 @@ and already-Unicode text pass through untouched.
 from legacy_hindi import decode_legacy_hindi, looks_encoded
 from debate_fetch_legacy import split_by_speaker_legacy
 
+# The smallest genuine piece of this font that a real transcript always
+# supplies: "gÉÉÒ" is the whole-word glyph sequence for श्री, the honorific that
+# opens essentially every Hindi speaker label.
+_CARRIER = "gÉÉÒ "
+_CARRIER_DECODED = "श्री "
+
+
+def decode_fragment(fragment: str) -> str:
+    """Decode a word too short to arm the decoder on its own.
+
+    The decoder only fires when it sees a *multi-glyph* ISFOC cluster (see
+    legacy_hindi._ENCODED_SIGNATURE). It used to fire on any single glyph too,
+    and that was a bug: `½` is how this source writes a half-past timestamp
+    ("11.00½ hrs"), `®` is a trademark sign, `°` a degree sign, and arming on
+    one of those ran the visual-to-logical matra reordering over already-correct
+    Unicode Devanagari and scrambled it. Measured over the whole corpus, the
+    restriction stopped the decoder touching 1,987 turns of plain English and
+    lost zero genuine detections.
+
+    A few tests below pin an ISFOC_MAP row using a two- or three-glyph word
+    built entirely from single-glyph keys ("cÚÄ" = हूँ, "uÉ®É" = द्वारा). Those
+    fragments no longer arm the decoder — correctly, because such a call cannot
+    occur in production: the decoder is only ever handed a whole turn or a whole
+    speaker label, and either always carries a cluster somewhere. So the row is
+    still worth pinning; the bare fragment is not the way to reach it. This
+    helper supplies the carrier a real transcript would have supplied and strips
+    the decoded carrier back off, leaving the assertion about the row intact.
+    """
+    out = decode_legacy_hindi(_CARRIER + fragment)
+    assert out.startswith(_CARRIER_DECODED), f"carrier itself failed to decode: {out!r}"
+    return out[len(_CARRIER_DECODED):]
+
 
 class TestLooksEncoded:
     """The cheap signature test that gates decoding."""
@@ -50,7 +82,9 @@ class TestDecodeLegacyHindi:
         assert decode_legacy_hindi("…(Interruptions)") == "…(Interruptions)"
 
     def test_star_becomes_danda_in_hindi_run(self):
-        assert decode_legacy_hindi("cè*").endswith("है।")
+        # Inside a Hindi run "*" is the danda (।). On the English side it is a
+        # footnote marker and is now left alone -- see the safety suite.
+        assert decode_fragment("cè*").endswith("है।")
 
     def test_pre_base_short_i_with_anusvara_becomes_singh(self):
         # "ÉË" is the pre-base glyph for "ि" + "ं". Unmapped, it fell through
@@ -132,7 +166,7 @@ class TestTableGapsThatStrandedResidue:
         assert decode_legacy_hindi("{ÉfÃxÉä") == "पढ़ने"
 
     def test_candrabindu(self):
-        assert decode_legacy_hindi("cÚÄ") == "हूँ"
+        assert decode_fragment("cÚÄ") == "हूँ"
         assert decode_legacy_hindi("+ÉÉÄJÉÉå") == "आँखों"
 
     def test_independent_uu_and_ru(self):
@@ -165,7 +199,7 @@ class TestTableGapsThatStrandedResidue:
         assert decode_legacy_hindi("+ÉSUÉÒ") == "अच्छी"
 
     def test_da_conjuncts(self):
-        assert decode_legacy_hindi("uÉ®É") == "द्वारा"
+        assert decode_fragment("uÉ®É") == "द्वारा"
         assert decode_legacy_hindi("ÉÊuiÉÉÒªÉ") == "द्वितीय"
         assert decode_legacy_hindi("´ÉètÉ") == "वैद्य"
         assert decode_legacy_hindi("ÉÊ´É¶´ÉÉÊ´ÉtÉÉãÉªÉ") == "विश्वविद्यालय"

@@ -205,15 +205,25 @@ _SORTED_KEYS = sorted(ISFOC_MAP, key=len, reverse=True)
 # touched by a second decode pass either, so it must not count as evidence
 # that one is needed.
 #
-# The keys considered are further limited to ones containing an actual
-# Latin-1 supplement character. Plenty of ISFOC_MAP keys are pure ASCII
-# (e.g. "*" -> "।", used for redaction markers) and appear constantly in
-# ordinary English transcript text that has nothing to do with this font;
-# without this restriction, a bare "*" on its own line would arm the decoder
-# for a passage that was never encoded to begin with.
+# The keys considered are further limited to those of length >= 2. Genuine
+# ISFOC text is a run of multi-glyph clusters ("BÉE", "ÉÊ", "ºÉ") -- that is
+# how the font composes a Devanagari letter out of half-forms and matras in
+# the first place, so a real encoded passage always contains at least one
+# such sequence. A single-character key, by contrast, is indistinguishable
+# from ordinary punctuation the moment it stands alone: "½" is ISFOC_MAP's
+# glyph for ड़, but Lok Sabha transcripts print it constantly as the "half"
+# in "11.00½ hrs" timestamps; "®" is ISFOC_MAP's र, but it is also the
+# registered-trademark sign; "°" is रू, but also a degree sign; "*" is ।, but
+# also an ordinary footnote marker or redaction asterisk in English. None of
+# these single glyphs occurring on their own is evidence of the legacy font
+# -- only a real multi-glyph cluster is -- so a key must be at least two
+# characters long, as well as contain a Latin-1 supplement character, to
+# count as the signature.
 _ENCODED_SIGNATURE = re.compile(
     "|".join(
-        re.escape(k) for k in _SORTED_KEYS if any("¡" <= ch <= "ÿ" for ch in k)
+        re.escape(k)
+        for k in _SORTED_KEYS
+        if len(k) >= 2 and any("¡" <= ch <= "ÿ" for ch in k)
     )
 )
 
@@ -265,7 +275,13 @@ def decode_legacy_hindi(text: str) -> str:
     # joins and literal "­" escapes that arrive as text rather than bytes.
     text = re.sub(r"\\+\s*\.{3,}\s*", "", text)
     text = text.replace("\\u00ad", "\xad").replace("u00ad", "")
-    text = text.replace("\\\n", "").replace("\\", "").replace("\n", "")
+    # Only the line-continuation artifact ("\\\n", copy-paste damage that
+    # splits one word across two lines) is collapsed here. A bare "\n" is a
+    # real paragraph break and must survive: deleting it used to glue the
+    # last word of one paragraph to the first word of the next, so the
+    # joined blob stopped looking like a whitespace-delimited English token
+    # and lost its protection from the substitution pass below.
+    text = text.replace("\\\n", "").replace("\\", "")
     # The letter ष is encoded with a soft-hyphen (U+00AD) plus its connector; it
     # MUST become ष here, before any cleanup would otherwise drop the invisible
     # soft-hyphen and make ष vanish (e.g. "सुषमा" → "सुामा").
@@ -276,7 +292,9 @@ def decode_legacy_hindi(text: str) -> str:
     out = []
     for token in re.split(r"(\s+)", text):
         if _is_protected_english_token(token):
-            out.append(token.replace("*", "।"))
+            # An asterisk on an English token is a footnote marker or
+            # redaction mark, not a danda -- leave it alone.
+            out.append(token)
             continue
         for key in _SORTED_KEYS:
             token = token.replace(key, ISFOC_MAP[key])
