@@ -89,3 +89,52 @@ def stitch_turns(turns: list[Turn]) -> list[Speech]:
             cur = None
 
     return speeches
+
+
+def check_integrity(
+    *,
+    speech_count: int,
+    speech_turn_total: int,
+    speech_word_total: int,
+    linked_turn_count: int,
+    linked_turn_words: int,
+    owner_disagreements: int,
+) -> list[str]:
+    """Return the failure messages. An empty list means the tables agree."""
+    failures: list[str] = []
+
+    # Check emptiness first: sums over an empty set always agree.
+    if speech_count > 0 and linked_turn_count == 0:
+        failures.append(
+            f"{speech_count:,} speeches exist but NOT ONE turn carries a speech_id -- "
+            "speeches are stale w.r.t. turns (re-run scripts/populate_speeches.py). "
+            "This is the exact condition the old word-sum check could not see."
+        )
+        return failures  # everything below would compare against an empty set
+
+    if speech_count == 0 and linked_turn_count == 0:
+        failures.append(
+            "no speeches and no linked turns: nothing was measured, so nothing is proven"
+        )
+        return failures
+
+    if linked_turn_count != speech_turn_total:
+        failures.append(
+            f"linked turns ({linked_turn_count:,}) != sum(speeches.turn_count) "
+            f"({speech_turn_total:,}): {abs(linked_turn_count - speech_turn_total):,} "
+            "turns are claimed by a speech that does not hold them, or vice versa"
+        )
+
+    if linked_turn_words != speech_word_total:
+        failures.append(
+            f"speech words ({speech_word_total:,}) != linked turn words "
+            f"({linked_turn_words:,}), delta {speech_word_total - linked_turn_words:+,}"
+        )
+
+    if owner_disagreements:
+        failures.append(
+            f"{owner_disagreements:,} speeches name a different person than the turn "
+            "at their own seq_start -- these put words in the wrong human's mouth"
+        )
+
+    return failures

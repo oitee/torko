@@ -1,14 +1,3 @@
-"""
-Populate the `turns` table from every debate already in `debates.raw_html`.
-
-Read-only against `debates` -- writes only to `turns`. Idempotent: turns are
-upserted on (debate_id, seq), so a crashed run is resumed by just re-running
-the whole script.
-
-Turns only, not stitched speeches -- speechification is a later todo.
-
-Run: source .venv/bin/activate && python3 scripts/populate_turns.py [--limit N]
-"""
 import argparse
 import sys
 from pathlib import Path
@@ -79,16 +68,23 @@ def main() -> None:
             _folded_key,
         )
 
+    # Read ids first and fetch each body inside the loop. This keeps one raw_html in memory at a time.
     with engine.connect() as conn:
-        query = "SELECT id, loksabha, raw_html, mp_list_raw FROM debates ORDER BY id"
+        query = "SELECT id FROM debates ORDER BY id"
         if args.limit:
             query += f" LIMIT {int(args.limit)}"
-        debate_rows = conn.execute(text(query)).fetchall()
+        debate_ids = [r[0] for r in conn.execute(text(query)).fetchall()]
 
-    print(f"{len(debate_rows)} debates to process")
+    print(f"{len(debate_ids)} debates to process", flush=True)
 
     total_turns = 0
-    for n, row in enumerate(debate_rows, 1):
+    for n, debate_id in enumerate(debate_ids, 1):
+        with engine.connect() as conn:
+            row = conn.execute(
+                text("SELECT id, loksabha, raw_html, mp_list_raw FROM debates WHERE id = :i"),
+                {"i": debate_id},
+            ).one()
+
         if row.loksabha not in roster_cache:
             roster_cache[row.loksabha] = load_db_roster(row.loksabha)
         db_roster = roster_cache[row.loksabha]
@@ -133,12 +129,22 @@ def main() -> None:
                 "char_count": len(seg["text"]),
             })
 
-        if values:
-            with engine.begin() as conn:
-                conn.execute(
-                    text("DELETE FROM turns WHERE debate_id = :debate_id"),
-                    {"debate_id": row.id},
-                )
+        # Delete even when values is empty, so a debate that now parses to zero turns loses its old rows.
+        with engine.begin() as conn:
+            # The delete invalidates speeches: they span the old turns. Re-run populate_speeches.py afterwards.
+            conn.execute(
+                text("UPDATE turns SET speech_id = NULL WHERE debate_id = :debate_id"),
+                {"debate_id": row.id},
+            )
+            conn.execute(
+                text("DELETE FROM speeches WHERE debate_id = :debate_id"),
+                {"debate_id": row.id},
+            )
+            conn.execute(
+                text("DELETE FROM turns WHERE debate_id = :debate_id"),
+                {"debate_id": row.id},
+            )
+            if values:
                 conn.execute(
                     text(
                         """
@@ -152,12 +158,19 @@ def main() -> None:
                     ),
                     values,
                 )
-            total_turns += len(values)
+                total_turns += len(values)
 
         if n % 500 == 0:
-            print(f"  {n}/{len(debate_rows)} debates, {total_turns} turns so far")
+            print(f"  {n}/{len(debate_ids)} debates, {total_turns} turns so far", flush=True)
 
-    print(f"done: {len(debate_rows)} debates, {total_turns} turns")
+    print(f"done: {len(debate_ids)} debates, {total_turns} turns", flush=True)
+    print(
+        "\nSPEECHES ARE NOW EMPTY FOR EVERY DEBATE TOUCHED ABOVE. This is deliberate --\n"
+        "a speech is a grouping over turns and cannot survive the turns being replaced.\n"
+        "Re-run:  python3 -u scripts/populate_speeches.py\n"
+        "Then:    python3 -u scripts/populate_speeches.py --verify   (must exit 0)",
+        flush=True,
+    )
 
 
 if __name__ == "__main__":
