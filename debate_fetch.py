@@ -948,6 +948,46 @@ def split_by_speaker(
     segments = [s for s in segments if s["text"] or s["speakerLabel"]]
     annotate_speakers(segments, mp_part_detail_list, db_roster)
 
+    # Anchor format and font encoding are independent axes (see
+    # internal_docs/036_THE_AUDIT_AND_FIX_LIST.md, T4): LS14 carries modern
+    # "code*part" anchors but its Hindi is still stored in the old
+    # pre-Unicode ISFOC font, so this reader needs the same decode pass
+    # split_by_speaker_legacy already runs. decode_legacy_hindi is a no-op on
+    # already-clean text, so this costs nothing on LS15-18.
+    #
+    # Decode AFTER annotate_speakers, not before -- mirroring what
+    # split_by_speaker_legacy actually does (not the audit's paraphrase of
+    # it). resolve_speaker() already calls decode_legacy_hindi internally on
+    # the label to build the name-translit fold key; decoding the label here
+    # first would turn that into an unconditional second decode pass over
+    # already-decoded text, and the decoder's own docstring warns its
+    # visual-to-logical matra reordering is one-way, not an involution --
+    # safe only because looks_encoded refuses to re-fire on decoded output.
+    # This ordering sidesteps the question rather than leaning on that guard.
+    for seg in segments:
+        seg["text"] = decode_legacy_hindi(seg["text"])
+        seg["speakerLabel"] = decode_legacy_hindi(seg["speakerLabel"] or "") or None
+        seg["mpName"] = decode_legacy_hindi(seg["mpName"] or "") or None
+
+    # After decoding, re-classify segments that came back unresolved because
+    # annotate_speakers ran on the still-encoded label and could not
+    # recognise, say, "+ÉvªÉFÉ àÉcÉänªÉ" as अध्यक्ष महोदय -- the Chair. Same
+    # post-decode pass as split_by_speaker_legacy, same reasoning.
+    for seg in segments:
+        if seg.get("mpCode") is not None or seg.get("nameSource") != "unresolved":
+            continue
+        # Crowd before Chair, same reasoning as annotate_speakers above: the
+        # two categories stay disjoint by construction rather than by
+        # hoping the regexes never overlap.
+        if is_crowd_label(seg["speakerLabel"]):
+            seg["nameSource"] = "crowd"
+            seg["mpName"] = seg["speakerLabel"]
+            seg["roleCode"] = "members_crowd"
+        elif is_presiding_label(seg["speakerLabel"]):
+            seg["nameSource"] = "presiding"
+            seg["mpName"] = seg["speakerLabel"]
+            seg["roleCode"] = role_code_for_label(seg["speakerLabel"])
+
     reuse_anchors(segments)
     return segments
 
