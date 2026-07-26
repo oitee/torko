@@ -143,3 +143,79 @@ def stitch_turns(turns: list[Turn]) -> list[Speech]:
             cur = None
 
     return speeches
+
+
+def check_integrity(
+    *,
+    speech_count: int,
+    speech_turn_total: int,
+    speech_word_total: int,
+    linked_turn_count: int,
+    linked_turn_words: int,
+    owner_disagreements: int,
+) -> list[str]:
+    """Is the stored `speeches` table still true about the stored `turns`?
+
+    Pure: takes six already-counted numbers and returns a list of human-readable
+    failures (empty list == healthy). Kept out of the DB layer so the one case
+    that actually bit us can be unit-tested with no Postgres running.
+
+    WHY THIS FUNCTION EXISTS, AND WHY THE ORDER OF THE CHECKS IS LOAD-BEARING
+    ------------------------------------------------------------------------
+    The old integrity proof was "the words in `speeches` equal the words in the
+    turns linked to them, exactly", computed by joining `turns` to `speeches` on
+    `turns.speech_id`. `scripts/populate_turns.py` deletes and re-inserts every
+    turn of a debate it re-parses, and the fresh rows carry `speech_id = NULL`.
+    After a re-parse, therefore, NOTHING was linked -- the join matched no rows,
+    both sides of the comparison summed to zero, zero equalled zero, and the
+    check reported "exact" while `speeches` described turns that no longer
+    existed. 598 speeches were naming a different human than their own first
+    turn at the time this was written, and the check said everything was fine.
+
+    So the emptiness checks come FIRST and are unconditional. A comparison over
+    an empty set is not evidence of agreement; it is evidence of nothing, and
+    this project has now been bitten six times by a number that measured
+    nothing while reading like a proof (see CLAUDE.md, "coverage is not
+    accuracy"). `linked_turn_count == 0` while `speech_count > 0` is a hard
+    failure here, not a pass.
+    """
+    failures: list[str] = []
+
+    # -- emptiness first: a vacuous comparison must never be able to pass -----
+    if speech_count > 0 and linked_turn_count == 0:
+        failures.append(
+            f"{speech_count:,} speeches exist but NOT ONE turn carries a speech_id -- "
+            "speeches are stale w.r.t. turns (re-run scripts/populate_speeches.py). "
+            "This is the exact condition the old word-sum check could not see."
+        )
+        return failures  # everything below would compare against an empty set
+
+    if speech_count == 0 and linked_turn_count == 0:
+        failures.append(
+            "no speeches and no linked turns: nothing was measured, so nothing is proven"
+        )
+        return failures
+
+    # -- then the shape: does every speech's turn budget actually exist? ------
+    if linked_turn_count != speech_turn_total:
+        failures.append(
+            f"linked turns ({linked_turn_count:,}) != sum(speeches.turn_count) "
+            f"({speech_turn_total:,}): {abs(linked_turn_count - speech_turn_total):,} "
+            "turns are claimed by a speech that does not hold them, or vice versa"
+        )
+
+    # -- only now is the word comparison meaningful --------------------------
+    if linked_turn_words != speech_word_total:
+        failures.append(
+            f"speech words ({speech_word_total:,}) != linked turn words "
+            f"({linked_turn_words:,}), delta {speech_word_total - linked_turn_words:+,}"
+        )
+
+    # -- and the one that is poison rather than bookkeeping ------------------
+    if owner_disagreements:
+        failures.append(
+            f"{owner_disagreements:,} speeches name a different person than the turn "
+            "at their own seq_start -- these put words in the wrong human's mouth"
+        )
+
+    return failures

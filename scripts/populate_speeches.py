@@ -23,15 +23,75 @@ sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 from sqlalchemy import text
 
 from db import get_engine
-from speech_stitch import stitch_turns
+from speech_stitch import check_integrity, stitch_turns
+
+
+def verify(engine) -> int:
+    """Corpus-wide integrity check. Returns a process exit code (0 == healthy).
+
+    Every number below is counted over the WHOLE table, not a sample, and the
+    emptiness cases are checked first -- see speech_stitch.check_integrity for
+    why that ordering is the whole point of this function existing.
+    """
+    with engine.connect() as conn:
+        speech_count, speech_turn_total, speech_word_total = conn.execute(
+            text(
+                "SELECT count(*), coalesce(sum(turn_count),0), coalesce(sum(word_count),0) "
+                "FROM speeches"
+            )
+        ).one()
+        linked_turn_count, linked_turn_words = conn.execute(
+            text(
+                "SELECT count(*), coalesce(sum(word_count),0) FROM turns "
+                "WHERE speech_id IS NOT NULL"
+            )
+        ).one()
+        owner_disagreements = conn.execute(
+            text(
+                """SELECT count(*) FROM speeches s
+                   JOIN turns t ON t.debate_id = s.debate_id AND t.seq = s.seq_start
+                   WHERE s.person_id IS DISTINCT FROM t.person_id"""
+            )
+        ).scalar()
+
+    print(f"  speeches                  {speech_count:>12,}", flush=True)
+    print(f"  sum(speeches.turn_count)  {speech_turn_total:>12,}", flush=True)
+    print(f"  turns carrying speech_id  {linked_turn_count:>12,}", flush=True)
+    print(f"  sum(speeches.word_count)  {speech_word_total:>12,}", flush=True)
+    print(f"  words in linked turns     {linked_turn_words:>12,}", flush=True)
+    print(f"  owner disagreements       {owner_disagreements:>12,}", flush=True)
+
+    failures = check_integrity(
+        speech_count=speech_count,
+        speech_turn_total=speech_turn_total,
+        speech_word_total=speech_word_total,
+        linked_turn_count=linked_turn_count,
+        linked_turn_words=linked_turn_words,
+        owner_disagreements=owner_disagreements,
+    )
+    if not failures:
+        print("\nOK: speeches agree with turns, over a non-empty set.", flush=True)
+        return 0
+    print("\nFAILED:", flush=True)
+    for f in failures:
+        print(f"  - {f}", flush=True)
+    return 1
 
 
 def main() -> None:
     ap = argparse.ArgumentParser()
     ap.add_argument("--limit", type=int, default=None, help="cap debates, for a dry run")
+    ap.add_argument(
+        "--verify",
+        action="store_true",
+        help="check speeches against turns and exit non-zero on drift; write nothing",
+    )
     args = ap.parse_args()
 
     engine = get_engine()
+
+    if args.verify:
+        sys.exit(verify(engine))
 
     with engine.connect() as conn:
         q = "SELECT DISTINCT debate_id FROM turns ORDER BY debate_id"

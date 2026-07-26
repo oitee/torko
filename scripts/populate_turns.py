@@ -1,13 +1,22 @@
 """
 Populate the `turns` table from every debate already in `debates.raw_html`.
 
-Read-only against `debates` -- writes only to `turns`. Idempotent: turns are
-upserted on (debate_id, seq), so a crashed run is resumed by just re-running
-the whole script.
+Read-only against `debates`. Writes `turns`, and DELETES `speeches` for every
+debate it touches (see below). Idempotent per debate: delete-then-insert in one
+transaction -- NOT an upsert, despite what this docstring said for a long time;
+there is no ON CONFLICT clause anywhere in here. Re-running the whole script is
+how a crashed run is resumed.
 
-Turns only, not stitched speeches -- speechification is a later todo.
+**Running this invalidates `speeches`.** A speech is a span over turns, and this
+script replaces the turns. Leaving the old speech rows behind is what let 598
+speeches end up naming a different human being than their own first turn, while
+the integrity check -- which joined on the `speech_id` this script had just
+NULLed -- happily reported "exact" over an empty set. So the speeches for each
+re-parsed debate are deleted here, deliberately: poison becomes loss, and loss
+is the trade this project always takes. Re-run scripts/populate_speeches.py
+afterwards, then `--verify` it.
 
-Run: source .venv/bin/activate && python3 scripts/populate_turns.py [--limit N]
+Run: source .venv/bin/activate && python3 -u scripts/populate_turns.py [--limit N]
 """
 import argparse
 import sys
@@ -89,16 +98,29 @@ def main() -> None:
             _folded_key,
         )
 
+    # IDs first, bodies one at a time. The previous version selected `raw_html`
+    # for every debate and called .fetchall(), pulling the entire 539 MB corpus
+    # into RAM before debate #1 was parsed -- the peak was at startup, before any
+    # progress had printed. Fetching each body by primary key inside the loop
+    # costs one indexed round-trip per debate (the loop already does several
+    # writes per debate) and holds one debate in memory at a time. Same rows,
+    # same order, so the output is unchanged.
     with engine.connect() as conn:
-        query = "SELECT id, loksabha, raw_html, mp_list_raw FROM debates ORDER BY id"
+        query = "SELECT id FROM debates ORDER BY id"
         if args.limit:
             query += f" LIMIT {int(args.limit)}"
-        debate_rows = conn.execute(text(query)).fetchall()
+        debate_ids = [r[0] for r in conn.execute(text(query)).fetchall()]
 
-    print(f"{len(debate_rows)} debates to process")
+    print(f"{len(debate_ids)} debates to process", flush=True)
 
     total_turns = 0
-    for n, row in enumerate(debate_rows, 1):
+    for n, debate_id in enumerate(debate_ids, 1):
+        with engine.connect() as conn:
+            row = conn.execute(
+                text("SELECT id, loksabha, raw_html, mp_list_raw FROM debates WHERE id = :i"),
+                {"i": debate_id},
+            ).one()
+
         if row.loksabha not in roster_cache:
             roster_cache[row.loksabha] = load_db_roster(row.loksabha)
         db_roster = roster_cache[row.loksabha]
@@ -147,12 +169,34 @@ def main() -> None:
                 "char_count": len(seg["text"]),
             })
 
-        if values:
-            with engine.begin() as conn:
-                conn.execute(
-                    text("DELETE FROM turns WHERE debate_id = :debate_id"),
-                    {"debate_id": row.id},
-                )
+        # The DELETE is UNCONDITIONAL -- outside `if values:` -- because a debate
+        # that now parses to zero segments must lose its old rows too. Guarding
+        # the delete behind `if values` was harmless into an empty table and
+        # wrong on every re-run after a parser change: a rule that legitimately
+        # stops emitting a turn (e.g. the heading-line blocklist) would leave the
+        # old turn sitting there forever, invisible, indistinguishable from a
+        # real one.
+        with engine.begin() as conn:
+            # Speeches are a grouping OVER turns and are invalidated by this
+            # delete: the new turn rows come back with speech_id = NULL, so any
+            # surviving speech row would describe turns that no longer exist and
+            # would keep asserting an owner that this re-parse may have changed.
+            # Dropping them converts poison (a speech naming the wrong human)
+            # into loss (no speech at all), which is the trade this project
+            # always takes. Re-run scripts/populate_speeches.py afterwards.
+            conn.execute(
+                text("UPDATE turns SET speech_id = NULL WHERE debate_id = :debate_id"),
+                {"debate_id": row.id},
+            )
+            conn.execute(
+                text("DELETE FROM speeches WHERE debate_id = :debate_id"),
+                {"debate_id": row.id},
+            )
+            conn.execute(
+                text("DELETE FROM turns WHERE debate_id = :debate_id"),
+                {"debate_id": row.id},
+            )
+            if values:
                 conn.execute(
                     text(
                         """
@@ -166,12 +210,19 @@ def main() -> None:
                     ),
                     values,
                 )
-            total_turns += len(values)
+                total_turns += len(values)
 
         if n % 500 == 0:
-            print(f"  {n}/{len(debate_rows)} debates, {total_turns} turns so far")
+            print(f"  {n}/{len(debate_ids)} debates, {total_turns} turns so far", flush=True)
 
-    print(f"done: {len(debate_rows)} debates, {total_turns} turns")
+    print(f"done: {len(debate_ids)} debates, {total_turns} turns", flush=True)
+    print(
+        "\nSPEECHES ARE NOW EMPTY FOR EVERY DEBATE TOUCHED ABOVE. This is deliberate --\n"
+        "a speech is a grouping over turns and cannot survive the turns being replaced.\n"
+        "Re-run:  python3 -u scripts/populate_speeches.py\n"
+        "Then:    python3 -u scripts/populate_speeches.py --verify   (must exit 0)",
+        flush=True,
+    )
 
 
 if __name__ == "__main__":
