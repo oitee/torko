@@ -137,6 +137,39 @@ class TestSplitBySpeakerLegacy:
         segs = split_by_speaker_legacy(html, [])
         assert [s["speakerLabel"] for s in segs] == ["MR. SPEAKER"]
 
+    def test_legacy_title_guard_unchanged(self):
+        # T7: the guard moved into the shared is_heading_label helper, but
+        # the legacy reader's original behaviour -- drop the "Title:" line
+        # entirely, don't glue it onto the previous speaker -- must not
+        # regress. (Bold, like test_bold_title_line_is_skipped above: a
+        # mixed-case "Title:" has no ALL-CAPS signal of its own, so bold is
+        # what makes it a label candidate at all in the legacy path.)
+        html = (
+            "<p>MR. SPEAKER: Motion moved.</p>"
+            "<p><b>Title:</b> Discussion on drought in several parts of the country.</p>"
+        )
+        segs = split_by_speaker_legacy(html, [])
+        assert [s["speakerLabel"] for s in segs] == ["MR. SPEAKER"]
+        assert segs[0]["text"] == "Motion moved."   # heading not glued on
+
+    def test_motion_re_line_is_not_a_turn(self):
+        html = (
+            "<p><b>Motion Re:</b> Need for a comprehensive policy on drought relief.</p>"
+            "<p>MR. SPEAKER: Hello.</p>"
+        )
+        segs = split_by_speaker_legacy(html, [])
+        assert [s["speakerLabel"] for s in segs] == ["MR. SPEAKER"]
+
+    def test_timestamp_line_is_not_a_turn(self):
+        html = "<p><b>17.00 hrs:</b> The House then adjourned.</p><p>MR. SPEAKER: Hello.</p>"
+        segs = split_by_speaker_legacy(html, [])
+        assert [s["speakerLabel"] for s in segs] == ["MR. SPEAKER"]
+
+    def test_mp_named_title_is_unaffected(self):
+        html = "<p>SHRI TITLE SINGH: Contrived but proves the exact-match rule.</p>"
+        (seg,) = split_by_speaker_legacy(html, [])
+        assert seg["speakerLabel"] == "SHRI TITLE SINGH"
+
     def test_star_prefix_stripped_in_legacy_caps_label(self):
         html = "<p>*57 SHRI N. K. PREMACHANDRAN (KOLLAM): My speech.</p>"
         (seg,) = split_by_speaker_legacy(html, [])

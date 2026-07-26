@@ -784,6 +784,48 @@ def _anchor_id(para_soup) -> tuple[str | None, str | None]:
     return None, None
 
 
+# Sansad renders a handful of document-structure lines exactly like a speaker
+# label -- bold (or ALL-CAPS) text at a paragraph start, terminated by a colon
+# within LABEL_MAX_CHARS -- even though nobody is speaking:
+#   "Title: Discussion on the situation arising out of drought..."
+#   "Motion Re: Need for a comprehensive policy on..."
+#   "17.00 hrs" / "11.00½ hrs"  (a sitting-time stamp, sometimes with its own
+#   trailing colon depending on how the transcript punctuates it)
+# See internal_docs/036_THE_AUDIT_AND_FIX_LIST.md, T7.
+_HEADING_LABELS = {"title", "motion re"}
+_HEADING_TIMESTAMP_RE = re.compile(r"^\d{1,2}[.:]\d{2}(½)?\s*hrs\.?$", re.IGNORECASE)
+
+
+def is_heading_label(label: str) -> bool:
+    """Return True when `label` is a document heading, not a speaker.
+
+    `label` must already be the isolated label text -- the substring before
+    the colon that opens the paragraph, with STAR_PREFIX_RE's index-marker
+    prefix (e.g. "*57") already stripped, exactly as `split_by_speaker` and
+    `split_by_speaker_legacy` compute it before building a turn. This is an
+    EXACT-match test against a short, literal blocklist ({"title", "motion
+    re"}, case-insensitive) plus one pattern for a bare sitting-time stamp
+    ("17.00 hrs", "11.00½ hrs") -- never a substring or prefix test, and
+    never a guess at whether a label "looks like" a heading.
+
+    Deliberately NOT covered, on purpose: labels that merely contain or start
+    with one of these words. "SHRI TITLE SINGH" and "MOTION RE CONSTITUTION
+    (MOVER'S REPLY)" -- if a real member's own label were ever spelled that
+    way -- must still open a turn. A shape-based heuristic ("starts with a
+    capitalised phrase", "has no honorific") would eventually swallow a real
+    MP whose label happens to match the shape, which is a poison-the-data bug
+    (see CLAUDE.md's "never guess" invariant), not a noise bug. If a new
+    heading species turns up in the corpus, add its literal text here rather
+    than loosening this into a heuristic.
+    """
+    if not label:
+        return False
+    normalized = label.strip().rstrip(":").lower()
+    if normalized in _HEADING_LABELS:
+        return True
+    return bool(_HEADING_TIMESTAMP_RE.match(normalized))
+
+
 def split_by_speaker(
     html: str, mp_part_detail_list: list[dict], db_roster: list[dict] | None = None
 ) -> list[dict]:
@@ -832,6 +874,27 @@ def split_by_speaker(
             c = plain.find(":")
             if 0 < c <= LABEL_MAX_CHARS:
                 colon = c
+
+        if colon is not None and is_heading_label(STAR_PREFIX_RE.sub("", plain[:colon]).strip()):
+            # A document heading ("Title: ...", "Motion Re: ...", a bare
+            # sitting-time stamp), not a speaker turn. Drop the paragraph --
+            # a heading belongs to nobody.
+            #
+            # `current = None` is the load-bearing half of this, and dropping
+            # the paragraph WITHOUT it turns a noise fix into a poison bug.
+            # A heading's own body usually runs on into the paragraphs that
+            # follow it; with `current` still pointing at the last real
+            # speaker, every one of those paragraphs falls through to the
+            # continuation branch below and is appended to THEIR turn.
+            # Measured before this line existed: 527 heading lines sit
+            # mid-document, and 100 of them are immediately preceded by an
+            # identified person -- e.g. debate 53155, where 286 words of
+            # "List Of Members Who Have Associated Themselves With The Issues
+            # Raised..." would have been filed as Rajmohan Unnithan's speech.
+            # Closing the turn instead leaves that text as an unattributed
+            # segment, which is what it is: loss, not poison.
+            current = None
+            continue
 
         # An anchor is itself definitive proof of a turn start, so open a new
         # turn on either signal — a colon-delimited label or a bare anchor
@@ -884,6 +947,7 @@ def split_by_speaker(
 
     segments = [s for s in segments if s["text"] or s["speakerLabel"]]
     annotate_speakers(segments, mp_part_detail_list, db_roster)
+
     reuse_anchors(segments)
     return segments
 
