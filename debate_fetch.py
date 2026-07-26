@@ -446,6 +446,20 @@ def _anchor_id(para_soup) -> tuple[str | None, str | None]:
     return None, None
 
 
+# These lines look like speaker labels but nobody speaks: "Title: ...", "Motion Re: ..." and "17.00 hrs".
+_HEADING_LABELS = {"title", "motion re"}
+_HEADING_TIMESTAMP_RE = re.compile(r"^\d{1,2}[.:]\d{2}(½)?\s*hrs\.?$", re.IGNORECASE)
+
+
+def is_heading_label(label: str) -> bool:
+    if not label:
+        return False
+    normalized = label.strip().rstrip(":").lower()
+    if normalized in _HEADING_LABELS:
+        return True
+    return bool(_HEADING_TIMESTAMP_RE.match(normalized))
+
+
 def split_by_speaker(
     html: str, mp_part_detail_list: list[dict], db_roster: list[dict] | None = None
 ) -> list[dict]:
@@ -479,6 +493,11 @@ def split_by_speaker(
             c = plain.find(":")
             if 0 < c <= LABEL_MAX_CHARS:
                 colon = c
+
+        if colon is not None and is_heading_label(STAR_PREFIX_RE.sub("", plain[:colon]).strip()):
+            # Do not remove "current = None". Heading text that follows would join the last speaker.
+            current = None
+            continue
 
         # An anchor alone also starts a turn.
         if colon is not None:
@@ -528,6 +547,7 @@ def split_by_speaker(
 
     segments = [s for s in segments if s["text"] or s["speakerLabel"]]
     annotate_speakers(segments, mp_part_detail_list, db_roster)
+
     reuse_anchors(segments)
     return segments
 

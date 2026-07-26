@@ -17,6 +17,7 @@ from debate_fetch import (
     _leading_bold,
     annotate_speakers,
     is_crowd_label,
+    is_heading_label,
     load_debate,
     is_presiding_label,
     role_code_for_label,
@@ -75,8 +76,9 @@ def split_by_speaker_legacy(
         mp_code = anchor_here or pending_mp_code
         pending_mp_code = None
 
-        if colon is not None and STAR_PREFIX_RE.sub("", plain[:colon]).strip().rstrip(":").lower() == "title":
-            # document title line ("Title: <debate title>"), not a speaker turn
+        if colon is not None and is_heading_label(STAR_PREFIX_RE.sub("", plain[:colon]).strip()):
+            # A heading ends the open turn, so its later paragraphs do not join the last speaker.
+            current = None
             continue
 
         if colon is not None or mp_code is not None:
