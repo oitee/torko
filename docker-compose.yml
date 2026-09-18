@@ -12,10 +12,10 @@ services:
       - "${POSTGRES_PORT:-5432}:5432"
     volumes:
       - pgdata:/var/lib/postgresql/data
-      # This is a powerful command - runs the sql files in alphatical order inside db/init folder:
-      # For now commenting out so that we are manually setting up things. Will un-comment later
-      # so that users can use this out-of-the-box
-      #- ./db/init:/docker-entrypoint-initdb.d:ro
+      # Runs the sql files in db/init in alphabetical order, on FIRST start only
+      # (Postgres runs this directory only when the data volume is empty).
+      # An existing pgdata volume is never touched by this.
+      - ./db/init:/docker-entrypoint-initdb.d:ro
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-postgres} -d ${POSTGRES_DB:-torko}"]
       interval: 5s
