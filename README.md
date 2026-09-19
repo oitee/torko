@@ -64,6 +64,12 @@ source .venv/bin/activate
 pip install -r requirements.txt
 ```
 
+Copy the example environment file and set a database password.
+
+```bash
+cp .env.example .env
+```
+
 Start the database with this command.
 
 ```bash
@@ -92,7 +98,7 @@ The fifth command rebuilds the data for the corpus statistics page.
 Start the web server with this command.
 
 ```bash
-source .venv/bin/activate && python3 server.py
+source .venv/bin/activate && set -a && source .env && set +a && python3 server.py
 ```
 
 Open the dashboard at this address: http://localhost:5050/dashboard.html
@@ -185,10 +191,10 @@ Torko links all three spellings of Adhir Ranjan Chowdhury's name from the earlie
 
 ## Tests
 
-Torko ships 514 tests. The tests run with no network access. The full run takes about 1 second.
+Torko ships 519 tests. The tests run with no network access. 4 tests read the local database, so load `.env` first. The full run takes about 1 second.
 
 ```bash
-python3 -m pytest
+set -a && source .env && set +a && python3 -m pytest
 ```
 
 ## License
