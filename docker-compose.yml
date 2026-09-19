@@ -4,12 +4,14 @@ services:
     # with contrib. Both are enabled by the init script below.
     image: pgvector/pgvector:pg16
     container_name: torko_db
+    restart: unless-stopped
+    mem_limit: ${POSTGRES_MEM_LIMIT:-2g}
     environment:
       - POSTGRES_USER=${POSTGRES_USER:-postgres}
       - POSTGRES_DB=${POSTGRES_DB:-torko}
-      - POSTGRES_HOST_AUTH_METHOD=trust
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD:?Set POSTGRES_PASSWORD in .env}
     ports:
-      - "${POSTGRES_PORT:-5432}:5432"
+      - "127.0.0.1:${POSTGRES_PORT:-5432}:5432"
     volumes:
       - pgdata:/var/lib/postgresql/data
       # Runs the sql files in db/init in alphabetical order, on FIRST start only

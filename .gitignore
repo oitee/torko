@@ -3,6 +3,7 @@
 __pycache__/
 *.pyc
 server.log
+.env
 
 # internal docs
 internal_docs/

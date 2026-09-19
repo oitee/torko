@@ -21,11 +21,13 @@ from debate_fetch_legacy import looks_legacy, split_by_speaker_legacy
 
 app = Flask(__name__, static_folder="static", static_url_path="")
 
+MAX_PAGE_SIZE = 100
+
 
 @app.route("/api/dashboard/debates")
 def api_dashboard_debates():
     page = max(request.args.get("page", 1, type=int), 1)
-    page_size = max(request.args.get("pageSize", 20, type=int), 1)
+    page_size = min(max(request.args.get("pageSize", 20, type=int), 1), MAX_PAGE_SIZE)
 
     result = dashboard_db.list_debates(
         date_from=request.args.get("date_from"),
