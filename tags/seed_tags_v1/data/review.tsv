@@ -1,0 +1,110 @@
+tag	field	value	note
+Bengali Language	merge	Bengali	manual review, 2026-10-02
+Gram Panchayats	merge	Panchayats	manual review, 2026-09-26
+Jammu & Kashmir	description	State in the northern region of India.	manual review, 2026-09-26: meaning from a manual review, wording by an LLM
+Non-Governmental Organisations (NGO)	description	A non-profit and independent body, separate from government control, that works on social, environmental, or humanitarian problems.	manual review, 2026-09-26: meaning from a manual review, wording by an LLM
+Panchayats	description	Village councils for local governance.	manual review, 2026-09-26: meaning from a manual review, wording by an LLM
+Panchayati Raj	description	Constitutional village-level system of self-government.	manual review, 2026-09-26: meaning from a manual review, wording by an LLM
+Micro Small and Medium Interprises (MSME)	description	Smaller businesses, classed as micro, small, or medium by size and employee count, as distinct from large corporate bodies. The tag spells Enterprises wrongly.	manual review, 2026-09-26: meaning from a manual review, wording by an LLM
+Governor	description	Constitutional de jure head of a state or provincial government, as distinct from the Chief Minister, the elected de facto head.	manual review, 2026-09-26: meaning from a manual review, wording by an LLM
+BIFR	description	Board for Industrial and Financial Reconstruction. A government agency that revived or closed industrial companies in financial trouble. Now dissolved.	manual review, 2026-09-26: meaning from a manual review, wording by an LLM
+UPSC	description	Union Public Service Commission. A constitutional body that recruits the All India Services.	manual review, 2026-09-26: meaning from a manual review, wording by an LLM
+Chief Minister	description	Elected de facto head of a state or provincial government, as distinct from the Governor, the de jure constitutional head.	manual review, 2026-09-26: meaning from a manual review, wording by an LLM
+Prime Minister	description	Elected de facto head of state of India, as distinct from the President, the de jure constitutional head.	manual review, 2026-09-26: meaning from a manual review, wording by an LLM
+President	description	Constitutional de jure head of state of India, as distinct from the Prime Minister, the elected de facto head.	manual review, 2026-09-26: meaning from a manual review, wording by an LLM
+NALCO	description	National Aluminium Company Limited. A central public sector enterprise that runs a bauxite, alumina, aluminium, and power complex.	manual review, 2026-09-26: meaning from a manual review, wording by an LLM
+Sahara India	description	Large Indian business group that met regulatory action and financial crises over unverified and illegal bond issues.	manual review, 2026-09-26: meaning from a manual review, wording by an LLM
+Bharat Aluminium Co. Ltd (BALCO)	description	Bharat Aluminium Company Ltd. An aluminium maker, once state owned, now owned by the Vedanta group.	manual review, 2026-09-26: meaning from a manual review, wording by an LLM
+Bengali	description	Language and people of the eastern region of India, mainly West Bengal and Assam, and of the neighbouring country Bangladesh.	manual review, 2026-10-02: meaning from a manual review, wording by an LLM
+Mahatma Gandhi	description	Father of the nation of India. Independence leader and freedom fighter.	manual review, 2026-09-26: meaning from a manual review, wording by an LLM
+Chief Justice	description	The senior-most judge of a court, usually a High Court at provincial level or the Supreme Court at national level.	manual review, 2026-09-26: meaning from a manual review, wording by an LLM
+Vice-chancellor	description	The apex head of administration of a university.	manual review, 2026-09-26: meaning from a manual review, wording by an LLM
+Attorney General	description	The highest legal officer of the country, and the senior-most lawyer of the central government.	manual review, 2026-09-26: meaning from a manual review, wording by an LLM
+Chief Election Commissioner	description	Head of the Election Commission, the body that conducts elections.	manual review, 2026-09-26: meaning from a manual review, wording by an LLM
+Ex-prime Minister	description	Former elected head of state of India.	manual review, 2026-09-26: meaning from a manual review, wording by an LLM
+Lieutenant Governors	description	Head of a state administration, appointed by the central government for a union territory.	manual review, 2026-09-26: meaning from a manual review, wording by an LLM
+Ficci	description	Federation of Indian Chambers of Commerce and Industry. A non-governmental trade association and advocacy group in India.	manual review, 2026-09-26: meaning from a manual review, wording by an LLM
+INA	description	Indian National Army. An armed force that Indian nationalists formed to free India from British rule.	manual review, 2026-09-26: meaning from a manual review, wording by an LLM
+Leader of Opposition	description	Leader of the opposition block in parliament or in a state legislative assembly.	manual review, 2026-09-26: meaning from a manual review, wording by an LLM
+Business of the House	drop		manual review, 2026-10-02: junk tag, reviewed
+Committee Reports	drop		manual review, 2026-10-02: junk tag, reviewed
+Point of Order	drop		manual review, 2026-10-02: junk tag, reviewed
+	drop		manual review, 2026-10-02: junk tag, reviewed
+Obituary References	drop		manual review, 2026-10-02: junk tag, reviewed
+Parliament Procedures	drop		manual review, 2026-10-02: junk tag, reviewed
+Adjournment	drop		manual review, 2026-10-02: junk tag, reviewed
+Calling Attention	drop		manual review, 2026-10-02: junk tag, reviewed
+Agenda	drop		manual review, 2026-10-02: junk tag, reviewed
+Discussion	drop		manual review, 2026-10-02: junk tag, reviewed
+Indian	drop		manual review, 2026-10-02: junk tag, reviewed
+Legislative Business	drop		manual review, 2026-10-02: junk tag, reviewed
+Offensive Language	drop		manual review, 2026-10-02: junk tag, reviewed
+Parliamentary Notices	drop		manual review, 2026-10-02: junk tag, reviewed
+Multinational Enterprises	type	topic	manual review, 2026-10-02: a subject, not one named body
+Contempt of House	type	topic	manual review, 2026-10-02: a subject, not one named law
+Minorities	domain	Social Justice and Reservation	manual review, 2026-10-02: no ministry domain before
+Poor	domain	Economy, Finance and Taxation	manual review, 2026-10-02: no ministry domain before
+Scheduled Tribes	domain	Tribal Affairs	manual review, 2026-10-02: no ministry domain before
+Below Poverty Line	domain	Economy, Finance and Taxation	manual review, 2026-10-02: no ministry domain before
+Scheduled Castes and Scheduled Tribes	domain	Social Justice and Reservation	manual review, 2026-10-02: no ministry domain before
+Scheduled Castes	domain	Social Justice and Reservation	manual review, 2026-10-02: no ministry domain before
+Muslims	domain	Society and Communities	manual review, 2026-10-02: no ministry domain before
+Accidents	domain	Disasters and Relief	manual review, 2026-10-02: no ministry domain before
+Poverty	domain	Economy, Finance and Taxation	manual review, 2026-10-02: no ministry domain before
+Religion	domain	Society and Communities	manual review, 2026-10-02: no ministry domain before
+Basic Needs	domain	Economy, Finance and Taxation	manual review, 2026-10-02: no ministry domain before
+Development	domain	Economy, Finance and Taxation	manual review, 2026-10-02: no ministry domain before
+Tamilians	domain	Society and Communities	manual review, 2026-10-02: no ministry domain before
+Bangladeshi	domain	Home Affairs and Law and Order	manual review, 2026-10-02: no ministry domain before
+Non-Resident Indians	domain	External Affairs	manual review, 2026-10-02: no ministry domain before
+Civilization	domain	Culture, Tourism and Sports	manual review, 2026-10-02: no ministry domain before
+Disparity	domain	Social Justice and Reservation	manual review, 2026-10-02: no ministry domain before
+Indian Citizens	domain	Home Affairs and Law and Order	manual review, 2026-10-02: no ministry domain before
+Insects	domain	Agriculture and Farmers	manual review, 2026-10-02: no ministry domain before
+Self-help	domain	Rural Development	manual review, 2026-10-02: no ministry domain before
+Civil Society	domain	Society and Communities	manual review, 2026-10-02: no ministry domain before
+Independence Movement	domain	Culture, Tourism and Sports	manual review, 2026-10-02: no ministry domain before
+Millennium Development Goal	domain	External Affairs	manual review, 2026-10-02: no ministry domain before
+Population Increase	domain	Health and Family Welfare	manual review, 2026-10-02: no ministry domain before
+Religious Communities	domain	Society and Communities	manual review, 2026-10-02: no ministry domain before
+Saffronisation	domain	Social Justice and Reservation	manual review, 2026-10-02: no ministry domain before
+Family Size	domain	Health and Family Welfare	manual review, 2026-10-02: no ministry domain before
+INA	domain	Defence	manual review, 2026-10-02: no ministry domain before
+Underdevelopment	domain	Economy, Finance and Taxation	manual review, 2026-10-02: no ministry domain before
+Death	drop		manual review, 2026-10-02: general word with no subject
+Facilities	drop		manual review, 2026-10-02: general word with no subject
+Losses	drop		manual review, 2026-10-02: general word with no subject
+Projects	drop		manual review, 2026-10-02: general word with no subject
+Reports	drop		manual review, 2026-10-02: general word with no subject
+Recommendations	drop		manual review, 2026-10-02: general word with no subject
+Allegations	drop		manual review, 2026-10-02: general word with no subject
+Misuse	drop		manual review, 2026-10-02: general word with no subject
+Shortage	drop		manual review, 2026-10-02: general word with no subject
+Felicitation	drop		manual review, 2026-10-02: general word with no subject
+Delay	drop		manual review, 2026-10-02: general word with no subject
+15-point Programme	drop		manual review, 2026-10-02: general word with no subject
+Behaviour	drop		manual review, 2026-10-02: general word with no subject
+Exploration	drop		manual review, 2026-10-02: general word with no subject
+Organisations	drop		manual review, 2026-10-02: general word with no subject
+Public Awareness	drop		manual review, 2026-10-02: general word with no subject
+Release	drop		manual review, 2026-10-02: general word with no subject
+Conflicts	drop		manual review, 2026-10-02: general word with no subject
+Achievements	drop		manual review, 2026-10-02: general word with no subject
+Adventure	drop		manual review, 2026-10-02: general word with no subject
+Age	drop		manual review, 2026-10-02: general word with no subject
+Childhood	drop		manual review, 2026-10-02: general word with no subject
+Capacity	drop		manual review, 2026-10-02: general word with no subject
+Captivity	drop		manual review, 2026-10-02: general word with no subject
+Dependence	drop		manual review, 2026-10-02: general word with no subject
+Efficiency	drop		manual review, 2026-10-02: general word with no subject
+Eradication	drop		manual review, 2026-10-02: general word with no subject
+Expiry Date	drop		manual review, 2026-10-02: general word with no subject
+Geographical Area	drop		manual review, 2026-10-02: general word with no subject
+Human Relations	drop		manual review, 2026-10-02: general word with no subject
+Speaker	type	role	manual review, 2026-10-02: clear type error
+Engineers	type	group	manual review, 2026-10-02: clear type error
+Magistrates	type	group	manual review, 2026-10-02: clear type error
+Locomotives	type	topic	manual review, 2026-10-02: clear type error
+Satellites	type	topic	manual review, 2026-10-02: clear type error
+Ambulance	type	topic	manual review, 2026-10-02: clear type error
+Laboratory Equipment	type	topic	manual review, 2026-10-02: clear type error

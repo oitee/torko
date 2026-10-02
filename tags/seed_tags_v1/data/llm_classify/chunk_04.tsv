@@ -1,0 +1,400 @@
+Local Trains	topic	Railways	Local rail services for urban and commuter transportation.	-
+Master Plans	topic	Urban Development and Housing	Comprehensive urban development strategies and land-use zoning.	-
+medical assistance	topic	Health and Family Welfare	Healthcare support and financial aid for medical treatment.	-
+Medical Examination	topic	Health and Family Welfare	Medical tests and health assessments for individuals.	-
+Mid-Day-Meals	scheme	Education	Government school meal programme to improve nutrition and attendance.	-
+Milk Producers	institution	Agriculture and Farmers	Dairy farmers and milk-producing cooperatives.	-
+Mining Sector	topic	Industry, Trade and Commerce	Extraction and commerce of minerals and natural resources.	-
+Mobile Towers	topic	Science, Technology and Telecom	Telecommunications infrastructure for mobile wireless networks.	-
+Monsoon	topic	Agriculture and Farmers	Seasonal rain patterns affecting agriculture and water supply.	-
+Narcotics	topic	Home Affairs and Law and Order	Illegal drugs and substance abuse control measures.	-
+National Crime Record Bureau	institution	Home Affairs and Law and Order	Government agency maintaining crime statistics and records.	-
+National Textile Corporation (NTC)	institution	Industry, Trade and Commerce	State-owned textile manufacturing and trade enterprise.	-
+Offenders	topic	Home Affairs and Law and Order	People convicted or accused of criminal offenses.	-
+Parliamentary Zero Hour	topic	Parliament and Procedure	Parliamentary session time for raising urgent matters.	-
+Passengers	topic	Railways	People using rail and public transport services.	-
+Passenger Train	topic	Railways	Rail service for transporting passengers long distance.	-
+Piracy	topic	Home Affairs and Law and Order	Illegal maritime activities and maritime crime.	-
+Prime Minister	person	-	Head of government of India.	-
+Project Tiger	scheme	Environment, Forests and Climate	Wildlife conservation programme for endangered tiger populations.	-
+Railways Lines	topic	Railways	Rail routes and network infrastructure systems.	-
+Rajdhani Express	topic	Railways	Premium long-distance passenger train service.	-
+SAARC	institution	External Affairs	South Asian Association for Regional Cooperation.	-
+Sexual Abuse	topic	Home Affairs and Law and Order	Criminal violation of bodily autonomy and consent.	-
+Sikhism	topic	Culture, Tourism and Sports	Religious belief system and community of Sikhs.	-
+Soil Fertility	topic	Agriculture and Farmers	Soil quality and productivity for farming.	-
+Supply and Demand	topic	Economy, Finance and Taxation	Economic balance between product supply and consumer demand.	-
+Tenders	topic	Elections and Governance	Public bids and procurement processes for contracts.	-
+Tribal Culture	topic	Tribal Affairs	Traditions customs and heritage of tribal communities.	-
+Tribal Rights	topic	Tribal Affairs	Legal protections and entitlements for tribal populations.	-
+Tribals Recognition	topic	Tribal Affairs	Government identification and official status of tribal groups.	-
+Tuberculosis	topic	Health and Family Welfare	Infectious disease and public health response measures.	-
+Vendors	topic	Industry, Trade and Commerce	Individual traders and street merchants.	-
+Victims	topic	Home Affairs and Law and Order	People harmed by crime or natural disaster.	-
+Water Bodies	topic	Water and Drinking Water	Rivers lakes and wetlands requiring conservation.	-
+Weaker Sections	topic	Social Justice and Reservation	Economically disadvantaged population groups.	-
+	junk	-	Meaning unclear.	-
+Agricultural facilities	topic	Agriculture and Farmers	Infrastructure for farming and agricultural production.	-
+Animals	topic	Agriculture and Farmers	Fauna livestock and animal husbandry management.	-
+Anti Social Elements	topic	Home Affairs and Law and Order	Criminal groups and antisocial behavior.	-
+Artists	person	Culture, Tourism and Sports	Creative professionals and performers.	-
+Automobile Industry	topic	Industry, Trade and Commerce	Manufacturing and trade of motor vehicles.	-
+Cases	topic	Law, Justice and Constitution	Legal proceedings and court matters.	-
+Certificates	topic	Elections and Governance	Official government documents and credentials.	-
+Child Marriage	topic	Women and Children	Underage marriage and legal reform efforts.	-
+Common Minimum Programme	topic	Elections and Governance	Coalition government's shared policy framework.	-
+Communicable Diseases	topic	Health and Family Welfare	Infectious diseases and public health control measures.	-
+Complaints	topic	Elections and Governance	Formal grievances and official disputes.	-
+Criminal Investigation	topic	Home Affairs and Law and Order	Police investigation of criminal offenses.	-
+Dearness Allowance(DA)	scheme	Labour and Employment	Inflation adjustment allowance for government employees.	-
+Decentralisation	topic	Elections and Governance	Transfer of power from central to local government.	-
+Deen Dayal Upadhyay Gram Jyoti Yojana	scheme	Rural Development	Rural electrification and energy access programme.	-
+Department of Personnel and Training (DoPT)	institution	Elections and Governance	Government department managing civil service recruitment.	-
+Economy	topic	Economy, Finance and Taxation	Economic conditions productivity and growth.	-
+Employment Assurance Scheme (EAS)	scheme	Labour and Employment	Government employment guarantee in rural areas.	-
+Employment Creation	topic	Labour and Employment	Generation of new job opportunities.	-
+Epidemic Diseases	topic	Health and Family Welfare	Widespread disease outbreaks and control measures.	-
+Ethics	topic	Elections and Governance	Moral standards and conduct in governance.	-
+Explosives	topic	Defence	Weapons ammunition and explosive materials.	-
+Farmers' Agitation	topic	Agriculture and Farmers	Farm worker protests and demonstrations.	-
+Food Adulteration	topic	Food and Public Distribution	Contamination and fraud in food products.	-
+Foreign Aid	topic	External Affairs	International financial and humanitarian assistance.	-
+Foreign Banks	institution	Economy, Finance and Taxation	International banking institutions operating in India.	-
+Government Bills	topic	Parliament and Procedure	Proposed legislation introduced in parliament.	-
+Haj Pilgrimage	topic	Culture, Tourism and Sports	Islamic pilgrimage to Saudi Arabia.	-
+Harijan Atrocities	topic	Social Justice and Reservation	Violence and discrimination against scheduled castes.	-
+Implementation	topic	Elections and Governance	Execution of policies and programmes.	-
+Insolvency	topic	Economy, Finance and Taxation	Business bankruptcy and financial distress.	-
+Intellectual Property	law	Science, Technology and Telecom	Patent copyright and trademark protection laws.	-
+International Trade	topic	Industry, Trade and Commerce	Cross-border commerce and trade agreements.	-
+Laboratories	institution	Science, Technology and Telecom	Research and testing facilities.	-
+Land Acquistion	topic	Rural Development	Land acquisition for development projects. (Spelling: Acquisition)	-
+Law	topic	Law, Justice and Constitution	Legal framework and jurisprudence.	-
+Medical Practice	topic	Health and Family Welfare	Healthcare professional conduct and standards.	-
+Merger	topic	Industry, Trade and Commerce	Corporate consolidation and business combination.	-
+Metro Railway Development	topic	Urban Development and Housing	Rapid transit system development in cities.	-
+Middleman	topic	Economy, Finance and Taxation	Intermediary in commerce and transactions.	-
+Model Railway Stations	topic	Railways	Modern railway station infrastructure and design.	-
+National Calamity	topic	Disasters and Relief	Natural disaster and emergency response.	-
+National Heritage	topic	Culture, Tourism and Sports	Cultural and historical sites of national importance.	-
+National Parks	place	Environment, Forests and Climate	Protected wilderness areas for conservation.	-
+National Policy	topic	Elections and Governance	Government-wide strategic framework and direction.	-
+Non-banking Companies	institution	Economy, Finance and Taxation	Financial institutions outside traditional banking.	-
+Non-plan Expenditure	topic	Economy, Finance and Taxation	Government spending outside five-year plans. (Spelling: non-plan)	-
+Petrochemicals	topic	Industry, Trade and Commerce	Chemical products derived from petroleum.	-
+Petrol Pumps	institution	Energy	Retail fuel distribution stations.	-
+Plant Diseases	topic	Agriculture and Farmers	Crop diseases and agricultural pest management.	-
+Political Morality	topic	Elections and Governance	Ethical standards in political conduct.	-
+Political Systems	topic	Elections and Governance	Forms and structures of government.	-
+Power Transmission	topic	Energy	Electricity distribution and grid infrastructure.	-
+Pradhan Mantri Jeevan Jyoti Bima Yojana	scheme	Labour and Employment	Life insurance scheme for low-income workers.	-
+Prostitution	topic	Social Justice and Reservation	Sex work and exploitation issues.	-
+Public Distribution System	scheme	Food and Public Distribution	Government food grain and essential commodity supply.	-
+Question of Privilege	topic	Parliament and Procedure	Parliamentary procedure for raising privilege matters.	-
+Radio Channels	institution	Media and Broadcasting	Radio broadcast networks and stations.	-
+Railway Employees	topic	Railways	Rail industry workers and staff.	-
+Refund	topic	Economy, Finance and Taxation	Return of payments or money.	-
+Relief Material	topic	Disasters and Relief	Supplies provided during emergencies.	-
+Religious Fundamentalism	topic	Home Affairs and Law and Order	Extremist religious ideology and movements.	-
+Residential Areas	place	Urban Development and Housing	Housing communities and residential zones.	-
+Road Projects	topic	Roads and Highways	Highway and road construction initiatives.	-
+Sales	topic	Industry, Trade and Commerce	Commercial transactions and revenue.	-
+Science and Technology	topic	Science, Technology and Telecom	Scientific research and technological advancement.	-
+Secondary Education	topic	Education	High school and upper secondary schooling.	-
+Sericulture	topic	Agriculture and Farmers	Silk production and sericulture industry.	-
+Space Research	topic	Science, Technology and Telecom	Aerospace and space exploration programmes.	-
+Sugar	topic	Agriculture and Farmers	Sugar production and sugarcane farming.	-
+Tax Concession	topic	Economy, Finance and Taxation	Tax exemptions and reduced rates.	-
+Ticket Booking	topic	Railways	Railway ticket reservation and sales.	-
+Undertrials	topic	Law, Justice and Constitution	Persons awaiting trial in criminal cases.	-
+VIP Security	topic	Home Affairs and Law and Order	Protection of high-ranking officials.	-
+Voters	topic	Elections and Governance	People eligible and registered to vote.	-
+Voters List	topic	Elections and Governance	Electoral roll and voter registration records.	-
+Wakf Board	institution	Culture, Tourism and Sports	Islamic charitable trust management organization.	-
+Wakf Property	topic	Culture, Tourism and Sports	Religious property held in Islamic trusts.	-
+Water Managment	topic	Water and Drinking Water	Water resource planning and distribution. (Spelling: Management)	-
+White Paper	topic	Elections and Governance	Government policy document and statement.	-
+Administrative Powers	topic	Elections and Governance	Authority and discretionary powers of officials.	-
+Agricultural Economy	topic	Agriculture and Farmers	Economic activity and value in farming.	-
+Airport Development	topic	Civil Aviation and Shipping	Construction and expansion of airport facilities.	-
+Authority	topic	Elections and Governance	Government power and jurisdiction.	-
+Central and Sales Tax	law	Economy, Finance and Taxation	Taxation system and revenue collection laws.	-
+Child Mortality	topic	Health and Family Welfare	Infant and child death rates and prevention.	-
+Citizens	topic	Elections and Governance	People with legal status in the nation.	-
+Communication Facilities	topic	Science, Technology and Telecom	Infrastructure for telephone and postal services.	-
+Contempt of Courts	law	Law, Justice and Constitution	Violation of judicial authority and orders.	-
+Cost	topic	Economy, Finance and Taxation	Expense and financial burden.	-
+Council of Ministers	institution	Elections and Governance	Cabinet of government ministers.	-
+Credit Policy	topic	Economy, Finance and Taxation	Government lending and credit regulations.	-
+Criminal Law	law	Home Affairs and Law and Order	Laws governing criminal offenses and penalties.	-
+Deen Dayal Upadhyaya Grameen Kaushal Yojana	scheme	Labour and Employment	Rural vocational training and skill development.	-
+Defence Budget	topic	Defence	Military spending and defence expenditure.	-
+Delhi Municipal Corporation	institution	Urban Development and Housing	Local governing body of Delhi city.	-
+Diplomacy	topic	External Affairs	International relations and diplomatic negotiations.	-
+Disability Benefits	scheme	Social Justice and Reservation	Welfare payments for persons with disabilities.	-
+Discipline	topic	Elections and Governance	Conduct standards and enforcement mechanisms.	-
+Divyang	topic	Social Justice and Reservation	Persons with physical or sensory disabilities.	-
+Drought Prone Area Programme	scheme	Agriculture and Farmers	Rural development in drought-affected regions.	-
+Economic Liberalisation	topic	Economy, Finance and Taxation	Market opening and reduction of trade controls.	-
+Educational Qualification	topic	Education	Academic degrees and professional certifications.	-
+Electricity Charges	topic	Energy	Utility billing and electricity pricing.	-
+Embassies	institution	External Affairs	Foreign diplomatic offices in India.	-
+Employment Exchanges	institution	Labour and Employment	Government job placement agencies.	-
+Energy Security	topic	Energy	Ensuring reliable energy supply and independence.	-
+Equipment	topic	Defence	Military and industrial machinery and tools.	-
+Famine	topic	Disasters and Relief	Severe food shortage and starvation crisis.	-
+FCI	institution	Food and Public Distribution	Food Corporation of India grain agency.	-
+Fishing Industry	topic	Agriculture and Farmers	Commercial fish production and trade.	-
+Foreign Exchange Reserves	topic	Economy, Finance and Taxation	Government currency holdings and reserves.	-
+Freedom Of Speech	law	Home Affairs and Law and Order	Constitutional right to express ideas.	-
+Handloom Workers	topic	Industry, Trade and Commerce	Weavers and artisans in handloom textiles.	-
+Haryana	place	-	Northern Indian state.	-
+Inland Water Transport	topic	Civil Aviation and Shipping	River and canal navigation systems.	-
+Japan	place	-	East Asian country.	-
+Jewellery	topic	Industry, Trade and Commerce	Precious metal and gemstone adornments.	-
+Journalists	person	Media and Broadcasting	News reporters and media professionals.	-
+Jurisdiction	topic	Law, Justice and Constitution	Authority and territory of legal systems.	-
+Khadi and Village Industry	scheme	Industry, Trade and Commerce	Government support for traditional handloom industries.	-
+Land Distribution	topic	Rural Development	Allocation of land to farming populations.	-
+Landless Farmers	topic	Agriculture and Farmers	Farm workers without land ownership.	-
+Law Enactment	topic	Parliament and Procedure	Process of creating new legislation.	-
+Leather Industry	topic	Industry, Trade and Commerce	Hide and leather product manufacturing.	-
+Legislatures	institution	Elections and Governance	Bodies that make laws.	-
+LIC	institution	Economy, Finance and Taxation	Life Insurance Corporation of India.	-
+Local Authorities	institution	Elections and Governance	Municipal and local government bodies.	-
+Malaria Eradication Programme	scheme	Health and Family Welfare	Disease control campaign against malaria.	-
+Medical Insurance Scheme	scheme	Health and Family Welfare	Health coverage and insurance programs.	-
+Mines Mafia	topic	Home Affairs and Law and Order	Organized crime in mining operations.	-
+Mining Lease	topic	Energy	Permits for mineral extraction operations.	-
+MLA(s)	person	Elections and Governance	State assembly members.	-
+Mother Language	topic	Culture, Tourism and Sports	Native or first language of a person.	-
+Museums	institution	Culture, Tourism and Sports	Public institutions preserving cultural artifacts.	-
+Nagaland	place	-	Northeastern Indian state.	-
+National Green Tribunal	institution	Environment, Forests and Climate	Judicial body for environmental cases.	-
+News Media	topic	Media and Broadcasting	Newspaper and broadcast news organizations.	-
+Newspapers	topic	Media and Broadcasting	Print media publications.	-
+Onions	topic	Food and Public Distribution	Agricultural crop and food commodity.	-
+Parliamentary Etiquette	topic	Parliament and Procedure	Conduct standards in parliamentary proceedings.	-
+Pharmaceuticals	topic	Science, Technology and Telecom	Drug and medicine manufacturing.	-
+Power Production	topic	Energy	Electricity generation from all sources.	-
+Practice and Procedure	topic	Parliament and Procedure	Parliament's rules and operational processes.	-
+Prasar Bharati	institution	Media and Broadcasting	National public broadcasting corporation.	-
+President	person	-	Head of state of India.	-
+Privilege Motion	topic	Parliament and Procedure	Formal complaint about breach of privileges.	-
+Property Rights	law	Law, Justice and Constitution	Legal ownership and use of assets.	-
+Publicity	topic	Media and Broadcasting	Advertising and public information.	-
+Pulses	topic	Food and Public Distribution	Legume crops for food supply.	-
+Railway Property	topic	Railways	Assets and infrastructure of railways.	-
+Railway Signals	topic	Railways	Railway signalling and traffic control systems.	-
+Railway Tickets	topic	Railways	Train travel passes and documentation.	-
+Railway Workshop	topic	Railways	Facilities for rail vehicle maintenance.	-
+Readymade Garments	topic	Industry, Trade and Commerce	Manufactured clothing and apparel.	-
+Regional Passport Offices	institution	External Affairs	Local agencies issuing travel documents.	-
+Retail Marketing	topic	Industry, Trade and Commerce	Sale of goods directly to consumers.	-
+Social Protection	topic	Social Justice and Reservation	Government welfare and social safety nets.	-
+Social Reform	topic	Social Justice and Reservation	Movement for social change and improvement.	-
+Super Speciality Hospital	institution	Health and Family Welfare	Advanced medical facility with specialist departments.	-
+Supply	topic	Economy, Finance and Taxation	Availability of goods for sale.	-
+Surpluses	topic	Economy, Finance and Taxation	Excess supply beyond demand.	-
+Tax Payers	topic	Economy, Finance and Taxation	Individuals and businesses paying taxes.	-
+Telephone Exchanges	institution	Science, Technology and Telecom	Communication infrastructure centers.	-
+Tiger Reserve	place	Environment, Forests and Climate	Protected wildlife area for tiger conservation.	-
+Trade Development	topic	Industry, Trade and Commerce	Promotion and growth of commerce.	-
+Trade Policy	law	Industry, Trade and Commerce	Government regulations on international trade.	-
+Underground Water	topic	Water and Drinking Water	Groundwater and subsurface water resources.	-
+Voter List	topic	Elections and Governance	Electoral roll and voter registration records.	Voters List
+Yoga Education	topic	Education	Physical and philosophical practice of yoga.	-
+Affiliation	topic	Elections and Governance	Association with organizations or movements.	-
+Afghanistan	place	-	South Asian country.	-
+Agricultural Technology	topic	Agriculture and Farmers	Modern farming methods and innovations.	-
+Air Quality Index	topic	Environment, Forests and Climate	Measurement of air pollution levels.	-
+Arbitration	topic	Law, Justice and Constitution	Dispute resolution through neutral mediators.	-
+Backwardness	topic	Social Justice and Reservation	Economic and social underdevelopment.	-
+Bajrang Dal	institution	Culture, Tourism and Sports	Hindu nationalist organization.	-
+Barrages	topic	Water and Drinking Water	Water obstruction structures and dams.	-
+Bird Sanctuary	place	Environment, Forests and Climate	Protected area for bird conservation.	-
+Board of Directors	institution	Elections and Governance	Governing body of organizations.	-
+Casual Workers	topic	Labour and Employment	Temporary and irregular employees.	-
+Child Protection	topic	Women and Children	Safeguarding of minors from harm.	-
+Company Law	law	Industry, Trade and Commerce	Legal regulations governing corporations.	-
+Conspiracy	topic	Home Affairs and Law and Order	Planned illegal activity involving multiple persons.	-
+Conventions	topic	External Affairs	International agreements and protocols.	-
+Demand and Supply	topic	Economy, Finance and Taxation	Market forces of product need and availability.	Supply and Demand
+Deportation	topic	External Affairs	Forced removal of non-citizens from country.	-
+Diesel Oil	topic	Energy	Petroleum product for engines and vehicles.	-
+Direct Tax Code (DTC)	law	Economy, Finance and Taxation	Proposed taxation law framework.	-
+Documents	topic	Elections and Governance	Official written records and credentials.	-
+Donations	topic	Economy, Finance and Taxation	Voluntary financial contributions.	-
+Driving Licence	topic	Roads and Highways	Official permit for vehicle operation.	-
+Equal Opportunity	law	Labour and Employment	Anti-discrimination and fair employment principles.	-
+Financial Loss	topic	Economy, Finance and Taxation	Reduction in economic value.	-
+Financial Management	topic	Economy, Finance and Taxation	Administration of money and resources.	-
+Financial Resources	topic	Economy, Finance and Taxation	Money and capital available for use.	-
+Food Crops	topic	Agriculture and Farmers	Cultivated plants for human consumption.	-
+Food Safety	topic	Food and Public Distribution	Hygiene and quality standards for food.	-
+Fund Diversion	topic	Economy, Finance and Taxation	Misuse of allocated money or resources.	-
+Girl Education	topic	Education	Schooling and learning for females.	-
+Heavy Industry	topic	Industry, Trade and Commerce	Manufacturing of large industrial equipment.	-
+Holidays	topic	Elections and Governance	Official rest days and celebrations.	-
+Homeless	topic	Social Justice and Reservation	People without housing or shelter.	-
+Indian Council of Medical Research (ICMR)	institution	Science, Technology and Telecom	Medical and health research organization.	-
+Indian Culture	topic	Culture, Tourism and Sports	Heritage traditions and customs of India.	-
+Indian Navy	institution	Defence	Naval military force of India.	-
+Industrial Training Institutes	institution	Labour and Employment	Vocational training facilities.	-
+Interest Payments	topic	Economy, Finance and Taxation	Debt service and interest charges.	-
+Inter-State Rivers	place	Water and Drinking Water	Water bodies crossing state boundaries.	-
+Iraq	place	-	Middle Eastern country.	-
+Job Termination	topic	Labour and Employment	Dismissal or end of employment.	-
+Khadi & Village Industries	scheme	Industry, Trade and Commerce	Support for traditional textile and handicraft production. (Spelling: &)	-
+Landless	topic	Agriculture and Farmers	People without land ownership.	Landless Farmers
+Land Oustees	topic	Rural Development	People displaced by development projects.	-
+Lawyers	person	Law, Justice and Constitution	Legal professionals and advocates.	-
+Line of Control	place	Defence	Border between India and Pakistan.	-
+Loan Waving	topic	Economy, Finance and Taxation	Forgiveness of outstanding debt. (Spelling: Waiving)	-
+Maritime Transport	topic	Civil Aviation and Shipping	Sea-based cargo and passenger movement.	-
+Massacre	topic	Home Affairs and Law and Order	Mass killing and violence.	-
+Motor Vehicles	topic	Industry, Trade and Commerce	Automobiles and motor vehicle regulations.	-
+Nationalism	topic	Elections and Governance	Patriotic sentiment and national pride.	-
+Naxalism Control	topic	Home Affairs and Law and Order	Counter-insurgency against left-wing extremism.	-
+Negligence	topic	Law, Justice and Constitution	Failure to exercise reasonable care.	-
+Nomination	topic	Elections and Governance	Selection or appointment process.	-
+Non-proliferation Treaty	law	External Affairs	Treaty limiting nuclear weapons spread.	-
+Oil Companies	institution	Energy	Petroleum production enterprises.	-
+Paramedical Personnel	topic	Health and Family Welfare	Healthcare workers below physician level.	-
+Pension Reforms	topic	Labour and Employment	Changes to retirement benefit systems.	-
+Per Capita Income	topic	Economy, Finance and Taxation	Average income per person.	-
+Personal Law	law	Law, Justice and Constitution	Laws governing family and personal matters.	-
+Physical Attack	topic	Home Affairs and Law and Order	Violence and assault.	-
+Pilgrimes	topic	Culture, Tourism and Sports	Persons undertaking religious journeys. (Spelling: Pilgrims)	-
+Police Brutality	topic	Home Affairs and Law and Order	Excessive force by law enforcement.	-
+Poultry	topic	Agriculture and Farmers	Chicken and bird raising for food.	-
+Pradhan Mantri Jan Arogya Yojana	scheme	Health and Family Welfare	Health insurance scheme for poor and vulnerable.	-
+Prevention	topic	Home Affairs and Law and Order	Measures to stop illegal activity.	-
+Profits	topic	Economy, Finance and Taxation	Business revenue minus expenses.	-
+Public Enterprises	institution	Industry, Trade and Commerce	Government-owned business organizations.	-
+Public Sector Undertaking	institution	Industry, Trade and Commerce	Government-run public service organization.	-
+Qualifications	topic	Education	Educational credentials and expertise standards.	-
+Rain	topic	Agriculture and Farmers	Precipitation and weather patterns.	-
+Religious Groups	topic	Culture, Tourism and Sports	Communities organized around belief systems.	-
+Repairs	topic	Elections and Governance	Maintenance and fixing of infrastructure.	-
+Retirement Age	topic	Labour and Employment	Age at which workers stop employment.	-
+Right to Work	law	Labour and Employment	Constitutional right to earn a livelihood.	-
+Rural Roads Development	topic	Roads and Highways	Construction of roads in farm areas.	-
+Rural Welfare	topic	Rural Development	Development and support for rural communities.	-
+Sarkaria Commission	institution	Elections and Governance	Commission on centre-state relations.	-
+Shipping	topic	Civil Aviation and Shipping	Maritime cargo transport and logistics.	-
+Slum Development Projects	topic	Urban Development and Housing	Infrastructure improvement in poor urban areas.	-
+Small Enterprises	institution	Industry, Trade and Commerce	Small-scale businesses and merchants.	-
+Spices	topic	Agriculture and Farmers	Aromatic seasonings and spice crop production.	-
+Staff Welfare	topic	Labour and Employment	Employee benefits and working conditions.	-
+Standards	topic	Science, Technology and Telecom	Quality and safety specifications.	-
+Steel Authority of India Limited (SAIL)	institution	Industry, Trade and Commerce	State-owned steel manufacturing corporation.	-
+Subways	topic	Urban Development and Housing	Underground pedestrian passages in cities.	-
+Technology	topic	Science, Technology and Telecom	Tools and technical methods.	-
+Telangana	place	-	South Indian state.	-
+Telecom Regulatory Authority Of India (trai)	institution	Science, Technology and Telecom	Independent regulator of telecommunications.	-
+Theft	topic	Home Affairs and Law and Order	Stealing and property crime.	-
+Tractors	topic	Agriculture and Farmers	Farm machinery and equipment.	-
+Trade Promotion	topic	Industry, Trade and Commerce	Support and encouragement of commerce.	-
+ULFA	institution	Home Affairs and Law and Order	Separatist organization in northeast India.	-
+Urbanisation	topic	Urban Development and Housing	Growth and expansion of cities.	-
+Vaccines	topic	Health and Family Welfare	Preventive immunizations and vaccination programs.	-
+Water Transport	topic	Civil Aviation and Shipping	Transportation by water bodies.	-
+Agencies	institution	Elections and Governance	Government organizations and departments.	-
+Agroindustry	topic	Agriculture and Farmers	Processing and trade of agricultural products.	-
+Aligarh Muslim University	institution	Education	Educational institution in north India.	-
+Anganwaris	institution	Social Justice and Reservation	Community nutrition centers for mothers and children.	-
+Animal Breeding	topic	Agriculture and Farmers	Selective raising of livestock.	-
+Anti Dumping	law	Industry, Trade and Commerce	Trade laws against unfair pricing.	-
+Appropriation Bill	topic	Parliament and Procedure	Legislation authorizing government expenditures.	-
+Bamboo Based Industry	topic	Industry, Trade and Commerce	Handicrafts and products made from bamboo.	-
+Bankruptcy and Insolvency Code	law	Economy, Finance and Taxation	Laws governing business failure and debt.	-
+Benefit Plans	topic	Labour and Employment	Employee compensation and welfare programs.	-
+Bills Introduction	topic	Parliament and Procedure	Process of proposing new legislation.	-
+Bio-diesel	topic	Energy	Renewable fuel from plant sources.	-
+Bio-diversity	topic	Environment, Forests and Climate	Variety of plant and animal life.	-
+Broadcasting Programme	topic	Media and Broadcasting	Television and radio content transmission.	-
+Buffer Stocks	topic	Food and Public Distribution	Emergency grain reserves held by government.	-
+Calamity Relief Fund (CRF)	scheme	Disasters and Relief	Government fund for disaster victims.	-
+Caste Certificate	topic	Social Justice and Reservation	Document proving caste for affirmative action.	-
+Civil Rights	law	Home Affairs and Law and Order	Fundamental freedoms and personal liberties.	-
+Civil Service	institution	Elections and Governance	Government administrative workforce.	-
+Committee Report	topic	Parliament and Procedure	Document of parliamentary committee findings.	-
+Communication Services	topic	Science, Technology and Telecom	Telephone postal and internet services.	-
+Community Development	topic	Rural Development	Local improvement initiatives and infrastructure.	-
+Currency Notes	topic	Economy, Finance and Taxation	Paper money and currency denominations.	-
+Dedicated Freight Corridors	topic	Railways	Exclusive rail lines for cargo transport.	-
+Deemed Universities	institution	Education	Higher education institutions with autonomous status.	-
+Defence Land	topic	Defence	Military property and military installations.	-
+Demand	topic	Economy, Finance and Taxation	Consumer want and market requirement.	-
+Developing Countries	place	External Affairs	Nations with emerging economies.	-
+Directive Principles	law	Law, Justice and Constitution	Constitutional guidance on social policy.	-
+Disaster Managment	topic	Disasters and Relief	Planning and response to emergencies. (Spelling: Management)	-
+Dividends	topic	Economy, Finance and Taxation	Profits distributed to shareholders.	-
+Dowry	topic	Social Justice and Reservation	Marriage payment and related legal issues.	-
+Dowry Deaths	topic	Women and Children	Deaths caused by dowry-related violence.	-
+Drug Peddling	topic	Home Affairs and Law and Order	Illegal drug trafficking and sales.	-
+Election Expenditure	topic	Elections and Governance	Spending during political elections.	-
+Electric Vehicles	topic	Industry, Trade and Commerce	Vehicles powered by electricity.	-
+Elephants	topic	Environment, Forests and Climate	Large mammals and their conservation.	-
+Enforcement Directorate	institution	Home Affairs and Law and Order	Agency investigating financial crimes.	-
+Ethnic Conflict	topic	Home Affairs and Law and Order	Communal violence and group tensions.	-
+Fake Currency	topic	Home Affairs and Law and Order	Counterfeit money and currency fraud.	-
+Fee Regulation	topic	Education	Standards and controls on educational charges.	-
+Flood Prone Areas	place	Disasters and Relief	Regions susceptible to flooding.	-
+Food Contamination	topic	Food and Public Distribution	Spoilage and unsafe food.	-
+Food Parks	topic	Agriculture and Farmers	Food processing and storage infrastructure.	-
+Forest Products	topic	Environment, Forests and Climate	Timber and non-timber forest resources.	-
+Freedom of Expression	law	Home Affairs and Law and Order	Right to communicate ideas freely.	-
+Fuel	topic	Energy	Energy sources for engines and heating. (Duplicate with Fuels)	Fuels
+Fuels	topic	Energy	Substances burned for energy and power.	-
+Girls	topic	Women and Children	Female children and young women.	-
+Green House Gases	topic	Environment, Forests and Climate	Emissions contributing to climate change.	-
+Handicraft Promotion	topic	Industry, Trade and Commerce	Support for traditional artisan crafts.	-
+Handloom Products	topic	Industry, Trade and Commerce	Textiles and fabrics woven by hand.	-
+Indira Gandhi Canal Project	institution	Agriculture and Farmers	Large irrigation infrastructure in Rajasthan.	-
+Industrial Merger	topic	Industry, Trade and Commerce	Combination of manufacturing companies.	-
+Insurance Agents	topic	Economy, Finance and Taxation	Sales professionals for insurance products.	-
+Jails	institution	Home Affairs and Law and Order	Government detention facilities for prisoners.	-
+Jan Aushadhi Scheme	scheme	Health and Family Welfare	Government generic medicine stores.	-
+Jute Workers	topic	Industry, Trade and Commerce	Laborers in jute manufacturing.	-
+Lakes	place	Water and Drinking Water	Water bodies for natural and irrigation use.	-
+Local Administration	institution	Elections and Governance	Municipal and local government systems.	-
+Mills	institution	Industry, Trade and Commerce	Industrial facilities for processing materials.	-
+NALCO	institution	Industry, Trade and Commerce	Aluminum manufacturing corporation.	-
+National Health Policy	scheme	Health and Family Welfare	Government health system framework and goals.	-
+National Pension System	scheme	Labour and Employment	Retirement savings and pension scheme.	-
+National Water Policy	scheme	Water and Drinking Water	Government strategy for water management.	-
+Night Shelters	institution	Social Justice and Reservation	Emergency housing for homeless persons.	-
+Non-conventional Energy Sources	topic	Energy	Renewable and alternative energy.	-
+Non-Governmental Organisation	institution	Elections and Governance	Voluntary civil society organizations.	-
+Non-Plan Expenditures	topic	Economy, Finance and Taxation	Government spending outside development plans.	-
+ONGC	institution	Energy	State-owned oil and gas corporation.	-
+Online Trading	topic	Industry, Trade and Commerce	E-commerce and internet-based sales.	-
+Ordinances	topic	Elections and Governance	Executive orders with legislative effect.	-
+Parliament House	institution	Elections and Governance	Building where parliament meets.	-
+Petroleum Exploration	topic	Energy	Oil and gas drilling and discovery.	-
+Petroleum Refineries	institution	Energy	Oil processing facilities.	-
+Plan Outlay	topic	Economy, Finance and Taxation	Budget allocation in five-year plans.	-
+Police Firing	topic	Home Affairs and Law and Order	Shooting incidents involving law enforcement.	-
+Population Policy	topic	Elections and Governance	Government strategy on population growth.	-
+Potato	topic	Agriculture and Farmers	Staple food crop and commodity.	-
+Power Cuts	topic	Energy	Interruption in electricity supply.	-
+Powerlooms	institution	Industry, Trade and Commerce	Textile manufacturing machines and facilities.	-
+Pricing	topic	Economy, Finance and Taxation	Setting and regulation of product costs.	-
+Privileges Committee	institution	Parliament and Procedure	Parliament body handling privilege breaches.	-
+Proportional Representation	law	Elections and Governance	Electoral system based on vote share.	-
+Proxy War	topic	Defence	Conflict through supporting third parties.	-
+Rail Coach Factory	institution	Railways	Government facility for manufacturing train cars.	-
+Railway Bookings	topic	Railways	Reservations and advance bookings for trains.	-
+Regional Development	topic	Economy, Finance and Taxation	Growth and improvement of specific regions.	-
+Religious Conversion	topic	Culture, Tourism and Sports	Change of religious belief and community.	-
+Religious Conversions	topic	Culture, Tourism and Sports	Multiple instances of changing religion.	Religious Conversion
+Renewable Resources	topic	Environment, Forests and Climate	Sustainable sources of materials and energy.	-
+Repatriation	topic	External Affairs	Return of persons to their home country.	-
+Research Centres	institution	Science, Technology and Telecom	Organizations conducting research.	-
+Research Institutions	institution	Science, Technology and Telecom	Organizations for scientific investigation.	-
+Riots	topic	Home Affairs and Law and Order	Violent public disturbances.	-
+SAIL	institution	Industry, Trade and Commerce	State-owned steel corporation. (Duplicate of Steel Authority)	-
+Sardar Sarovar Dam & Power Project	institution	Water and Drinking Water	Large irrigation and power infrastructure.	-
+Savings	topic	Economy, Finance and Taxation	Retention of money for future use.	-

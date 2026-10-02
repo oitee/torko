@@ -1,0 +1,11 @@
+{
+  "stage": "classify",
+  "date": "2026-09-26",
+  "model": "claude-haiku-4-5-20251001",
+  "runner": "offline LLM batch run, one run for each input chunk",
+  "prompt": "prompts/classify_v1.md",
+  "input": "results/chunks/ (tags_raw.tsv in files of 400 lines)",
+  "output_format": "tag, type, domain, description, duplicate_of",
+  "edited_after_run": "Yes. A manual rule corrected 328 domains that were not in the spec list, for example 'economy' to 'Economy, Finance and Taxation'. The correction was made inside these files. The unedited output was not kept.",
+  "cost": "Not metered separately."
+}

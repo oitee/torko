@@ -19,3 +19,8 @@ CLAUDE.local.md
 
 # generated dashboard fixture (server reads Postgres now)
 fixtures/
+
+# seed tag list: files that scripts/build_seed_tags.py rebuilds
+tags/*/results/chunks/
+tags/*/results/merge_in/
+tags/*/atlas/tags.json

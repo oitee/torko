@@ -1,0 +1,27 @@
+same canonical name: 'Recruitment', groups joined
+attached: 'Crop Insurance ' -> 'Crop Insurance'
+attached: 'Central Bureau of Investigation(CBI) ' -> 'CBI'
+attached: 'One-Rank-One-Pension ' -> 'One-Rank-One-Pension'
+attached: 'Esic' -> 'ESIC'
+attached: 'Telecom Regulatory Authority Of India (trai)' -> 'Telecom Regulatory Authority Of India (TRAI)'
+attached: ' Diammonium Phosphate (DAP)' -> 'Diammonium Phosphate (DAP)'
+attached: "Students'  Islamic Movement of India (SIMI)" -> "Students' Islamic Movement of India (SIMI)"
+attached: 'National Cadet Corp (NCC) ' -> 'National Cadet Corp (NCC)'
+UNATTACHED: 'Border Roads Organisation'
+UNATTACHED: 'Central Industrial Security Forces'
+UNATTACHED: 'Commission for Agricul. Costs and Prices'
+attached: 'Dgca' -> 'DGCA'
+attached: 'National Judicial Appointment Commission ' -> 'National Judicial Appointment Commission'
+attached: 'Nfdc' -> 'NFDC'
+attached: ' Automated Teller Machine (ATM)' -> 'Automated Teller Machine (ATM)'
+attached: 'Bhel' -> 'BHEL'
+attached: 'Central Administrative Tribunal (CAT) ' -> 'Central Administrative Tribunal (CAT)'
+attached: 'Fao' -> 'FAO'
+attached: 'National Company Law Appellate Tribunal (NCLAT) ' -> 'National Company Law Appellate Tribunal (NCLAT)'
+attached: 'Ncc' -> 'NCC'
+attached: 'Ndmc' -> 'NDMC'
+attached: 'Research And Analysis Wing (raw)' -> 'Research And Analysis Wing (RAW)'
+applied 11 edits from fixes_assembly.tsv
+applied 252 edits from fixes_types.tsv
+applied 109 edits from review.tsv
+dropped 44 keywords on purpose: ['', '15-point Programme', 'Achievements', 'Adjournment', 'Adventure', 'Age', 'Agenda', 'Allegations', 'Behaviour', 'Business of the House', 'Calling Attention', 'Capacity', 'Captivity', 'Childhood', 'Committee Reports', 'Conflicts', 'Death', 'Delay', 'Dependence', 'Discussion', 'Efficiency', 'Eradication', 'Expiry Date', 'Exploration', 'Facilities', 'Felicitation', 'Geographical Area', 'Human Relations', 'Indian', 'Legislative Business', 'Losses', 'Misuse', 'Obituary References', 'Offensive Language', 'Organisations', 'Parliament Procedures', 'Parliamentary Notices', 'Point of Order', 'Projects', 'Public Awareness', 'Recommendations', 'Release', 'Reports', 'Shortage']

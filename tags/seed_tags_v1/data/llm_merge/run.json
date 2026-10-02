@@ -1,0 +1,14 @@
+{
+  "stage": "merge",
+  "date": "2026-09-26",
+  "model": "claude-sonnet-5",
+  "runner": "offline LLM batch run, one run for each input pack",
+  "runs": 22,
+  "runs_note": "A usage limit stopped some runs. 5 of them had already written a complete file. The others ran again.",
+  "prompt": "prompts/merge_v1.md",
+  "input": "results/merge_in/ (stage 1 output, packed by type and domain)",
+  "output_format": "canonical_tag, type, domain, description, aliases, total_debate_count",
+  "special_pack": "junk___plus3.tsv: one run decided again on the 96 rows that stage 1 called junk.",
+  "edited_after_run": "No. All repairs after the run are in data/fixes_assembly.tsv.",
+  "cost": "Not metered separately."
+}

@@ -1,0 +1,291 @@
+Thermal Power Plants	institution	Energy	Power generation facilities using thermal energy	-	36
+Hydroelectric Power Plants	institution	Energy	Power plants that generate electricity using flowing or falling water.	Hydroeclectric Power Plants	40
+Coal Industry	institution	Energy	Sector extracting and supplying coal for energy	-	31
+Power Plants	institution	Energy	Facilities that generate electricity for public or industrial use.	Power Plant|Electric Power Plants	41
+Solar Power Plants	institution	Energy	Facilities generating electricity from solar energy	-	28
+Nuclear Power Plants	institution	Energy	Facilities generating electricity from nuclear energy	-	27
+Hydel Power Projects	institution	Energy	Hydroelectric power generation projects	-	26
+Gas Pipelines	institution	Energy	Infrastructure for transporting natural gas	-	25
+Electricity Boards	institution	Energy	Agencies responsible for power generation and distribution.	-	22
+Gas Agencies	institution	Energy	Organizations distributing cooking gas to households.	-	22
+NTPC	institution	Energy	National Thermal Power Corporation, major power producer.	-	22
+Oil Refineries	institution	Energy	Industrial plants that process crude oil into fuel and other products.	Petroleum Refineries|Petroleum Refinery	38
+Petrol Pumps	institution	Energy	Retail fuel distribution stations.	-	15
+Oil Companies	institution	Energy	Petroleum production enterprises.	-	13
+ONGC	institution	Energy	State-owned oil and gas corporation.	-	12
+Pipelines	institution	Energy	Infrastructure for transporting oil, gas, and other fluids.	-	11
+Gas Based Power Plants	institution	Energy	Facilities generating electricity from natural gas combustion.	-	10
+Indian Oil Corporation	institution	Energy	Government petroleum company exploring, refining, and marketing oil products.	-	10
+Nuclear Reactors	institution	Energy	Facilities generating heat and electricity through nuclear fission process.	-	9
+Coal Based Thermal Plants	institution	Energy	Power stations burning coal to generate electricity	-	8
+Coal India Ltd	institution	Energy	Major government-owned company that mines and supplies coal in India.	Coal India Ltd.	10
+Hindustan Petroleum Corporation	institution	Energy	Major government-owned oil and gas company in India	-	8
+Central Coalfield Ltd	institution	Energy	Government coal mining company in central India	-	7
+Damodar Valley Corporation (DVC)	institution	Energy	Power and water utility company.	-	6
+GAIL	institution	Energy	Gas utility company.	-	6
+Neyveli Lignite Corporation	institution	Energy	Coal mining company.	-	6
+Bharat Petroleum Corporation	institution	Energy	Oil company.	-	5
+National Hydro-electric Power Corpn	institution	Energy	Government company that builds and runs hydroelectric power stations in India.	Nhpc	7
+Central Electricity Authority	institution	Energy	Agency regulating electricity sector	-	4
+Biogas Plants	institution	Energy	Facilities generating energy from biomass.	-	3
+Eastern Coalfields Ltd	institution	Energy	Government coal mining company.	-	3
+Electricity Regulatory Authority	institution	Energy	Body regulating electricity supply and tariffs.	-	3
+Petrochemical Industry	institution	Energy	Companies producing chemicals from petroleum.	-	3
+BHEL	institution	Energy	Government power equipment manufacturing company	-	2
+Coal Ministry	institution	Energy	Ministry overseeing coal sector development	-	2
+Dabhol Power Company	institution	Energy	Private company generating power at Dabhol	-	2
+Oil Marketing Companies	institution	Energy	Organizations distributing petroleum products	-	2
+Wind Power Plant	institution	Energy	Facility generating electricity from wind using turbine technology.	-	2
+Supreme Court	institution	Law, Justice and Constitution	Highest judicial authority in India.	-	190
+Courts	institution	Law, Justice and Constitution	Judicial institutions and their operations	-	73
+Judiciary	institution	Law, Justice and Constitution	The system of courts and judges	-	72
+High Courts	institution	Law, Justice and Constitution	Senior courts at the state level in the Indian court system.	High Court	97
+Appellate Tribunal	institution	Law, Justice and Constitution	Court hearing appeals from lower courts	-	29
+Fast Track Court	institution	Law, Justice and Constitution	Court with expedited procedures for quick justice	-	29
+Special Courts	institution	Law, Justice and Constitution	Courts with jurisdiction over specific cases.	-	22
+Tribunal	institution	Law, Justice and Constitution	Judicial body for dispute resolution.	-	22
+Law Commission	institution	Law, Justice and Constitution	Body responsible for legal research and reform.	-	21
+Trusts	institution	Law, Justice and Constitution	Legal entities holding and managing property or assets for beneficiaries.	-	12
+CAG	institution	Law, Justice and Constitution	Constitutional officer who audits government accounts and spending in India.	C&AG	15
+Land Records	institution	Law, Justice and Constitution	Official documentation of land ownership and property rights.	-	11
+Enquiry Commission	institution	Law, Justice and Constitution	Official body investigating allegations and gathering evidence for government.	-	10
+Trial Courts	institution	Law, Justice and Constitution	Lower courts that conduct trials and hear cases	-	9
+Debt Recovery Tribunals	institution	Law, Justice and Constitution	Courts handling recovery of unpaid debts	-	8
+Constituent Assembly	institution	Law, Justice and Constitution	Body that drafted India's Constitution	-	7
+Consumer Courts	institution	Law, Justice and Constitution	Special courts handling consumer protection cases	-	7
+Central Information Commission	institution	Law, Justice and Constitution	Freedom of information body.	-	5
+Indian Judicial Service	institution	Law, Justice and Constitution	Proposed civil service that would recruit judges through an all-India exam.	All India Judicial Services	7
+Lok Adalats	institution	Law, Justice and Constitution	Alternative dispute resolution forums	-	5
+Administrative Tribunals	institution	Law, Justice and Constitution	Courts handling administrative disputes	-	4
+Enforcement & Vigilance Cell	institution	Law, Justice and Constitution	Unit monitoring regulatory compliance	-	4
+Arbitration Council of India	institution	Law, Justice and Constitution	Body resolving disputes through arbitration.	-	3
+Bar Council of India	institution	Law, Justice and Constitution	Regulatory body for lawyers and legal profession.	-	3
+Commercial Court	institution	Law, Justice and Constitution	Court handling commercial and business disputes.	-	3
+Constitutional Bench	institution	Law, Justice and Constitution	Court division handling constitutional matters.	-	3
+Family Courts	institution	Law, Justice and Constitution	Courts handling marriage and family disputes.	-	3
+Juvenile Courts	institution	Law, Justice and Constitution	Courts handling cases involving children and young people.	-	3
+Liberhan Commission	institution	Law, Justice and Constitution	Commission investigating riots in Ayodhya.	-	3
+National Judicial Appointment Commission	institution	Law, Justice and Constitution	Body selecting judges for higher courts.	-	3
+Central Administrative Tribunal (CAT)	institution	Law, Justice and Constitution	Court hearing appeals against government administrative decisions	-	?
+Central Industrial Tribunal	institution	Law, Justice and Constitution	Court handling industrial disputes between employers and workers	-	2
+Constitution Review Committee	institution	Law, Justice and Constitution	Body examining and studying constitutional provisions	-	2
+Cyber Appellate Tribunal	institution	Law, Justice and Constitution	Court hearing appeals against cybercrime decisions	-	2
+Delhi Bar Association	institution	Law, Justice and Constitution	Organization of lawyers practicing in Delhi	-	2
+International Court	institution	Law, Justice and Constitution	Court with jurisdiction over international disputes	-	2
+Magistrates	institution	Law, Justice and Constitution	Judicial officers presiding over lower courts	-	2
+National Company Law Appellate Tribunal (NCLAT)	institution	Law, Justice and Constitution	Higher court for corporate and commercial law appeals	-	2
+World Intellectual Property Org	institution	Law, Justice and Constitution	United Nations agency protecting intellectual property rights internationally.	-	2
+Post Offices	institution	Science, Technology and Telecom	Facilities for mail and parcel services	-	49
+BSNL	institution	Science, Technology and Telecom	State-owned telecommunications company	-	39
+Mobile Network	institution	Science, Technology and Telecom	Wireless telecommunications service providers	-	32
+International Atomic Energy Agency(IAEA)	institution	Science, Technology and Telecom	UN nuclear watchdog organization.	-	16
+Laboratories	institution	Science, Technology and Telecom	Research and testing facilities.	-	15
+Telephone Exchanges	institution	Science, Technology and Telecom	Infrastructure facility managing telephone connections and call routing.	Telephone Exchange	26
+Indian Council of Medical Research (ICMR)	institution	Science, Technology and Telecom	Medical and health research organization.	-	13
+Telecom Regulatory Authority Of India (TRAI)	institution	Science, Technology and Telecom	Government body that regulates telecom services and prices in India.	TRAI	15
+Research Institutions	institution	Science, Technology and Telecom	Organisations that carry out scientific or technical research.	Research Centres|Research Institutes	35
+MTNL	institution	Science, Technology and Telecom	Government telecom company providing phone and internet service in two cities.	Mahanagar Telephone Nigam Ltd	17
+Satellites	institution	Science, Technology and Telecom	Artificial objects orbiting earth for communication and observation.	-	11
+Indian Space Research Organisation (ISRO)	institution	Science, Technology and Telecom	India's government agency for space research and satellite launches.	ISRO	18
+Testing Laboratory	institution	Science, Technology and Telecom	Facilities conducting quality and safety testing of products and materials.	-	10
+BHIM (Bharat Interface For Money)	institution	Science, Technology and Telecom	Mobile payment app for digital transactions in India	-	8
+Bureau Of Indian Standards	institution	Science, Technology and Telecom	National body that sets quality standards for Indian products, formerly called ISI.	Indian Standards Institution	10
+CSIR	institution	Science, Technology and Telecom	Council of Scientific and Industrial Research organization	-	7
+BARC	institution	Science, Technology and Telecom	Atomic research organization.	-	5
+Internet Service Provider (ISP)	institution	Science, Technology and Telecom	Company providing internet access	-	4
+Post And Telegraphs	institution	Science, Technology and Telecom	Government department for postal and telegraph services.	-	4
+Public Telephones	institution	Science, Technology and Telecom	Government-operated phone booths for public use.	-	4
+Science Institutes	institution	Science, Technology and Telecom	Organizations conducting scientific research and education.	-	4
+VSNL	institution	Science, Technology and Telecom	Government telecommunications company providing services.	Videsh Sanchar Nigam Limited (VSNL)	7
+Data Bank	institution	Science, Technology and Telecom	Repository storing and managing organized information.	-	3
+Engineers	institution	Science, Technology and Telecom	Professionals who design and build infrastructure and machines.	-	3
+IDPL	institution	Science, Technology and Telecom	Government pharmaceutical production company.	-	3
+Laboratory Equipment	institution	Science, Technology and Telecom	Instruments used in scientific testing and analysis.	-	3
+National institutes	institution	Science, Technology and Telecom	Top-level research and educational institutions.	-	3
+Bharat Electronics Ltd	institution	Science, Technology and Telecom	Government company manufacturing electronics	-	2
+Department of Telecommunications	institution	Science, Technology and Telecom	Government department overseeing telephone and internet	-	2
+Observatory	institution	Science, Technology and Telecom	Facility for astronomical or meteorological observation	-	2
+Satellite Earth Station	institution	Science, Technology and Telecom	Facility for satellite communication reception	-	2
+Seismic Observatories	institution	Science, Technology and Telecom	Facilities for earthquake monitoring	-	2
+Metro Railways	institution	Railways	Urban rapid rail transit systems.	-	115
+Indian Railways	institution	Railways	Government rail organization.	-	90
+Railway Wagons	institution	Railways	Train cars for cargo or passengers	-	68
+Railway Coach Factories	institution	Railways	Government factories that build railway passenger coaches.	Rail Coach Factory	69
+Railway Bridges	institution	Railways	Bridge structures that carry railway tracks over rivers or other obstacles.	Railway Bridge	83
+Railway Protection Force (RPF)	institution	Railways	Security force that protects railway passengers and property.	Railway Protection Force	65
+Railway Recruitment Board	institution	Railways	Body hiring railway workers	-	45
+Railway Overbridges	institution	Railways	Bridges constructed over railway tracks	-	33
+Railway Tracks	institution	Railways	Infrastructure on which trains operate	-	32
+Railway Underpass	institution	Railways	Passages built beneath railway tracks	-	30
+Vande Bharat Express	institution	Railways	High-speed rail service connecting Indian cities	-	26
+Railway Division	institution	Railways	Administrative subdivisions of the railway system.	-	22
+Railway Hospital	institution	Railways	Medical facilities for railway employees.	-	19
+Locomotives	institution	Railways	Powered rail vehicles used to pull passenger and freight trains.	-	11
+Goods Train	institution	Railways	Train composed of cars carrying cargo and freight items.	-	10
+Rail Networks	institution	Railways	Interconnected system of railway lines covering geographic regions.	-	10
+Railway Board	institution	Railways	Government authority overseeing railway operations and administration.	-	10
+Railway Retiring Rooms	institution	Railways	Accommodation facilities for railway staff	-	8
+Eastern Railway	institution	Railways	Railway division covering eastern regions	-	7
+Shatabdi Express	institution	Railways	High-speed train service for daytime travel	-	7
+Konkan Railway Corporation	institution	Railways	Railway company.	-	6
+Government Railway Police (GRP)	institution	Railways	State police force responsible for law and order on railway premises.	Railway Police Force	7
+Integral Coach Factory	institution	Railways	State manufacturer of railway coaches	-	4
+Railway Ministry	institution	Railways	Government department managing railway system operations.	-	4
+IRCTC	institution	Railways	Government company managing railway bookings and catering.	-	3
+Mobile Electric Magnetic Unit (MEMU)	institution	Railways	Suburban train service using electric power.	-	3
+North East Frontier Railways	institution	Railways	Railway division serving northeast India.	-	3
+Northern Railway	institution	Railways	Railway division serving northern India.	-	3
+Railway Convention Committee	institution	Railways	Body setting terms between government and railways.	-	3
+Railway Mail Service	institution	Railways	Postal service operating on trains.	-	3
+South Eastern Railways	institution	Railways	Railway division serving southeast India.	-	3
+Rail Vikas Nigam Limited	institution	Railways	Government company constructing railway infrastructure	-	2
+Railway Agencies	institution	Railways	Organizations managing railway operations	-	2
+Railway Reforms Committee	institution	Railways	Committee examining railway modernization	-	2
+Police	institution	Home Affairs and Law and Order	Government law enforcement agency responsible for public safety and crime.	Police force|Police Service	124
+CBI	institution	Home Affairs and Law and Order	India's federal agency that investigates serious and corruption-related crimes.	Central Bureau of Investigation(CBI)|Central Bureau of Investigation	63
+Intelligence Agencies	institution	Home Affairs and Law and Order	Government bodies that gather and analyse security-related information.	Intelligence Services	45
+National Investigative Agency (NIA)	institution	Home Affairs and Law and Order	Agency investigating terror and national security crimes	-	26
+Delhi Police	institution	Home Affairs and Law and Order	Police force of Delhi	-	25
+Police Stations	institution	Home Affairs and Law and Order	Local law enforcement outposts.	-	22
+Border Security Force (BSF)	institution	Home Affairs and Law and Order	Paramilitary force that guards India's international land borders.	Border Security Force|BSF	29
+National Crime Record Bureau	institution	Home Affairs and Law and Order	Government agency maintaining crime statistics and records.	-	16
+ULFA	institution	Home Affairs and Law and Order	Separatist organization in northeast India.	-	13
+Enforcement Directorate	institution	Home Affairs and Law and Order	Agency investigating financial crimes.	-	12
+Jails	institution	Home Affairs and Law and Order	Government facilities that hold people who are convicted or awaiting trial.	Prisons	15
+Central Reserve Police Force (CRPF)	institution	Home Affairs and Law and Order	Paramilitary force that handles internal security and riot control in India.	CRPF	22
+National Human Rights Commission	institution	Home Affairs and Law and Order	Government body that investigates and protects human rights in India.	National Human Rights Commission(NHRC)|Human Rights Commission	21
+Homeguards	institution	Home Affairs and Law and Order	Local security force assisting police	-	5
+Home Ministry	institution	Home Affairs and Law and Order	Government department for internal security	-	5
+ITBP	institution	Home Affairs and Law and Order	Paramilitary border security force	-	5
+DNA Databank	institution	Home Affairs and Law and Order	Repository of DNA profiles	-	4
+Narcotics Control Bureau	institution	Home Affairs and Law and Order	Agency enforcing drug control and prevention.	-	4
+Passport Seva Kendra	institution	Home Affairs and Law and Order	Government office issuing passports and travel documents.	-	4
+Special Protection Group	institution	Home Affairs and Law and Order	Agency providing security to political leaders.	-	4
+Anti Narcotic Task Force	institution	Home Affairs and Law and Order	Organization combating illegal drug production and trafficking.	-	3
+Bomb Detection Squad	institution	Home Affairs and Law and Order	Security unit detecting and disarming explosive devices.	-	3
+Central Industrial Security Force	institution	Home Affairs and Law and Order	Paramilitary force that guards airports, government buildings, and key industries.	Cisf	8
+Interpol	institution	Home Affairs and Law and Order	International police organization for cross-border crime.	-	3
+Special Investigation Team	institution	Home Affairs and Law and Order	Police team formed to investigate a specific serious case.	Special Investigation Team (SIT)	5
+Indian Police Service	institution	Home Affairs and Law and Order	Civil service for police officers	-	2
+NSCN(IM)	institution	Home Affairs and Law and Order	Armed group operating in northeast India	-	2
+Women Police Stations	institution	Home Affairs and Law and Order	Police stations staffed by women officers assisting female crime victims.	-	2
+NABARD	institution	Agriculture and Farmers	National bank for agricultural development	-	64
+Fertilizer Industry	institution	Agriculture and Farmers	Sector producing and supplying fertilizers for agriculture	-	35
+NAFED	institution	Agriculture and Farmers	National Agricultural Cooperative Marketing Federation	-	29
+Cooperatives	institution	Agriculture and Farmers	Organizations jointly owned by members for mutual benefit	-	28
+Krishi Vigyan Kendras	institution	Agriculture and Farmers	Agricultural science centers.	-	18
+Milk Producers	institution	Agriculture and Farmers	Dairy farmers and milk-producing cooperatives.	-	16
+Indira Gandhi Canal Project	institution	Agriculture and Farmers	Large irrigation infrastructure in Rajasthan.	-	12
+Veterinary Hospital	institution	Agriculture and Farmers	Medical facility for treatment of animals	-	9
+Indian Council of Agricultural Research	institution	Agriculture and Farmers	Government body that leads and funds agricultural research in India.	Indian Council of Agricultral Research (ICAR)|ICAR	14
+Tea Board	institution	Agriculture and Farmers	Government body for tea industry.	-	6
+Tobacco Board	institution	Agriculture and Farmers	Government body for tobacco.	-	6
+Spices Board	institution	Agriculture and Farmers	Agency regulating spice exports	-	5
+Agricultural Centres	institution	Agriculture and Farmers	Facilities for agricultural research	-	4
+Commission for Agricultural Costs and Prices	institution	Agriculture and Farmers	Government body that recommends minimum support prices for farm crops.	Agricultural Price Commission	6
+IFFCO	institution	Agriculture and Farmers	Cooperative for agricultural inputs	-	4
+Agricultural Cooperatives	institution	Agriculture and Farmers	Member-owned organizations of farmers for collective benefit.	-	3
+Agricultural Produce Marketing Committee	institution	Agriculture and Farmers	Organization regulating agricultural commodity trading.	-	3
+Animal Welfare Board	institution	Agriculture and Farmers	Body ensuring protection and welfare of animals.	-	3
+APEDA	institution	Agriculture and Farmers	Agency promoting export of agricultural and food products.	-	3
+Coconut Development Board	institution	Agriculture and Farmers	Organization promoting coconut cultivation and industry.	-	3
+Extension Services	institution	Agriculture and Farmers	Government support programs for farmers.	-	3
+KRIBHCO	institution	Agriculture and Farmers	Cooperative fertilizer producer owned by farmers.	-	3
+Multi State Cooperative Societies	institution	Agriculture and Farmers	Organizations spanning multiple states for collective benefit.	-	3
+Seed Processing Plants	institution	Agriculture and Farmers	Facilities preparing seeds for agricultural use.	-	3
+Central Institute of Coastal Engineering for Fishery (CICEF)	institution	Agriculture and Farmers	Research and training center for coastal fisheries	-	2
+Coffee Board	institution	Agriculture and Farmers	Authority regulating coffee production and trade	-	2
+Coir Board	institution	Agriculture and Farmers	Authority promoting coir industry and products	-	2
+Fertilizers & Chemicals Travancore	institution	Agriculture and Farmers	Government company producing fertilizers in Kerala	-	2
+Gas Based Fertilizer Plants	institution	Agriculture and Farmers	Factories making fertilizers using natural gas	-	2
+Hindustan Fertilizer Corporation	institution	Agriculture and Farmers	Government company manufacturing fertilizers	-	2
+National Coop. Development Corporation	institution	Agriculture and Farmers	Government agency promoting cooperative societies	-	2
+Primary Agricultural Credit Societies	institution	Agriculture and Farmers	Village-level cooperative societies that give farmers short-term credit.	PACS	4
+Defence Forces	institution	Defence	The armed forces responsible for defending India.	Defence Services|Military	88
+Army	institution	Defence	The land-based branch of India's armed forces.	Indian Army	39
+ISI	institution	Defence	Pakistan's military intelligence agency.	Inter Services Intelligence (ISI)	53
+Sainik Schools	institution	Defence	Military training schools for youth.	-	21
+Air Force	institution	Defence	The air-based branch of India's armed forces.	Indian Air Force	27
+Defence Res & Dev Organisation (DRDO)	institution	Defence	Organization developing defense technology.	-	16
+Indian Navy	institution	Defence	The sea-based branch of India's armed forces.	Navy	17
+Defence Ministry	institution	Defence	Government ministry responsible for military and national security.	-	11
+Ordnance Factories	institution	Defence	Government factories that make weapons and ammunition for the armed forces.	Ordinance factory	15
+Defence Canteens	institution	Defence	Stores providing supplies to military personnel	-	8
+Civil Defence	institution	Defence	Organization protecting civilians during emergencies	-	7
+Hindustan Aeronautics Ltd	institution	Defence	Government aircraft manufacturing and aerospace company	-	7
+Border Roads Organisation (BRO)	institution	Defence	Military organisation that builds and maintains roads in border areas.	Border Road Organisation (BRO)	11
+Coast Guard Organisation	institution	Defence	Maritime military force.	-	6
+M/s Bofors Of Sweden	institution	Defence	International weapons company.	-	6
+National Security Guards (NSGs)	institution	Defence	Elite force that protects VIPs and responds to major security threats.	National Security Guards(NSGs)	7
+Sainik Boards	institution	Defence	Military recruitment and welfare boards.	-	4
+Al-Qaeda	institution	Defence	International terrorist organization.	-	3
+Assam Rifles	institution	Defence	Paramilitary force operating in northeastern India.	-	3
+Indian National Army	institution	Defence	Military force established during independence struggle.	-	3
+Defence Research Centre	institution	Defence	Laboratory researching military technologies and equipment	-	2
+Military Bases	institution	Defence	Armed forces installations for troops and equipment	-	2
+Naval Academy	institution	Defence	Military educational institution training naval officers	-	2
+NCC	institution	Defence	Youth military organization for school and college students	-	2
+Research And Analysis Wing (RAW)	institution	Defence	Foreign intelligence agency of India	-	2
+Archaeological Survey of India (ASI)	institution	Culture, Tourism and Sports	Government body responsible for archaeological sites and heritage preservation	-	36
+Vishwa Hindu Parishad	institution	Culture, Tourism and Sports	Hindu nationalist organisation active in religious and cultural affairs.	Vishnu Hindu Parishad (VHP)	30
+Rashtriya Swayam Sewak Sangh (RSS)	institution	Culture, Tourism and Sports	Hindu nationalist organizational body	-	27
+Sports Centres	institution	Culture, Tourism and Sports	Facilities for sports and recreation	-	25
+Sports Authority Of India	institution	Culture, Tourism and Sports	Government agency promoting sports and athletes.	-	21
+Wakf Board	institution	Culture, Tourism and Sports	Islamic charitable trust management organization.	-	15
+Museums	institution	Culture, Tourism and Sports	Public institutions preserving cultural artifacts.	-	14
+Bajrang Dal	institution	Culture, Tourism and Sports	Hindu nationalist organization.	-	13
+Sports Federations	institution	Culture, Tourism and Sports	Organizations governing and promoting sports activities at national level.	-	10
+National Memorials	institution	Culture, Tourism and Sports	Monuments and sites commemorating important national events and figures.	-	9
+ITDC	institution	Culture, Tourism and Sports	Indian Tourism Development Corporation managing tourism	-	8
+Hotels	institution	Culture, Tourism and Sports	Facilities providing accommodation to travelers	-	7
+Libraries	institution	Culture, Tourism and Sports	Institutions providing access to books and information	-	7
+Religious Institutions	institution	Culture, Tourism and Sports	Places of worship and religious organizations	-	7
+UNESCO	institution	Culture, Tourism and Sports	United Nations cultural organization.	-	6
+Archives	institution	Culture, Tourism and Sports	Repository of historical documents	-	4
+International Cricket Council	institution	Culture, Tourism and Sports	Governing body for cricket	-	4
+Board Of Control For Cricket In India	institution	Culture, Tourism and Sports	Organization governing cricket in India.	-	3
+Church	institution	Culture, Tourism and Sports	Religious place of worship for Christians.	-	3
+Cultural Organization	institution	Culture, Tourism and Sports	Body promoting cultural activities.	-	3
+Entertainment Industry	institution	Culture, Tourism and Sports	Companies that produce films, music, and performances.	-	3
+Hotel Industry	institution	Culture, Tourism and Sports	Companies operating hotels and lodging facilities.	-	3
+Indian Olympic Association	institution	Culture, Tourism and Sports	Organisation managing India sports participation in Olympics.	-	3
+NFDC	institution	Culture, Tourism and Sports	State company producing Indian films.	-	3
+Shiromani Gurudwara Prabandhak Committee	institution	Culture, Tourism and Sports	Organization managing Sikh places of worship.	-	3
+Travel Agencies	institution	Culture, Tourism and Sports	Companies providing travel planning and booking.	-	3
+Film Institutions	institution	Culture, Tourism and Sports	Organizations involved in film production and training	-	2
+Gandhian Institute of Studies	institution	Culture, Tourism and Sports	Research organization studying Gandhi's philosophy	-	2
+Indian Council of Historical Research (ICHR)	institution	Culture, Tourism and Sports	Research organization studying Indian history	-	2
+National Anti-Doping Agency	institution	Culture, Tourism and Sports	Body enforcing rules against prohibited substances in sports	-	2
+Netaji Birth Centenary Committee	institution	Culture, Tourism and Sports	Committee commemorating birth anniversary of Subhas Chandra Bose	-	2
+Swadeshi Jagran Manch	institution	Culture, Tourism and Sports	Organization promoting indigenous Indian economic and social development.	-	2
+World Trade Organisation (WTO)	institution	External Affairs	International body that sets rules for trade between countries.	WTO	70
+United Nations (UN)	institution	External Affairs	International organisation of countries that works for peace and cooperation.	UN|UNO	52
+Passport Offices	institution	External Affairs	Government offices that issue passports and other travel documents.	Regional Passport Offices|passport office|Regional Passport Office	59
+UN Security Council	institution	External Affairs	United Nations body responsible for international peace	-	29
+SAARC	institution	External Affairs	South Asian Association for Regional Cooperation.	-	16
+Embassies	institution	External Affairs	Foreign diplomatic offices in India.	-	14
+Lashkar-e-Taiba	institution	External Affairs	Terrorist organization designated for attacks on Indian military and civilians.	-	9
+ASEAN	institution	External Affairs	Association of Southeast Asian Nations regional bloc	-	7
+GATT	institution	External Affairs	General Agreement on Tariffs and Trade framework	-	7
+Nuclear Supplier Group	institution	External Affairs	International body controlling nuclear technology trade	-	7
+Taliban	institution	External Affairs	Political and military organization.	-	7
+International Labour Organisation (I.L.O.)	institution	External Affairs	United Nations labor agency.	-	6
+International Monetary Fund (IMF)	institution	External Affairs	International organisation that lends money to countries and advises on finance.	IMF	9
+European Union (EU)	institution	External Affairs	European countries union.	-	5
+Foreign Investment Promotion Board (FIPB)	institution	External Affairs	Foreign investment facilitator.	-	5
+Ministry Of External Affairs	institution	External Affairs	Indian government ministry that manages relations with other countries.	External Affairs Ministry	7
+Indian Foreign Service	institution	External Affairs	Diplomatic service representing India abroad.	-	3
+Indian High Commission	institution	External Affairs	Diplomatic office representing India in commonwealth nations.	-	3
+NATO	institution	External Affairs	Military alliance of western nations.	-	3
+Non Aligned Movement (NAM)	institution	External Affairs	Group of nations not allied to major powers.	-	3
+UN General Assembly	institution	External Affairs	Primary body of the United Nations.	-	3
+FAO	institution	External Affairs	United Nations organization on food and agriculture	-	2
+OECD	institution	External Affairs	International organization of developed nations	-	2
+OPEC	institution	External Affairs	International organization of petroleum exporting countries	-	2
+Shanghai Cooperation Organisation	institution	External Affairs	Regional security and economic alliance	-	2
+Anganwadi	institution	Women and Children	Community center for nutrition.	-	79
+Children Homes	institution	Women and Children	Residential facilities providing care for orphaned or abandoned children.	-	9
+Womens Hostels	institution	Women and Children	Residential facilities for women students or workers	-	8
+UNICEF	institution	Women and Children	International organization for child welfare	-	5
+Juvenile Homes	institution	Women and Children	Facilities for juvenile offenders	-	4
+National Commission For Women	institution	Women and Children	Government body addressing women's grievances and rights	-	2

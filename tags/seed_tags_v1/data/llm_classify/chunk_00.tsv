@@ -1,0 +1,400 @@
+Farmers' Welfare	topic	Agriculture and Farmers	Government support and welfare programs for farmers.	-
+Fund Allocation	topic	Economy, Finance and Taxation	Distribution of financial resources across government programs and sectors.	-
+Road Construction	topic	Roads and Highways	Building new roads and highways to improve transportation infrastructure.	-
+Financial Aid	topic	Economy, Finance and Taxation	Government provision of money to individuals, businesses, or institutions.	-
+Road Development	topic	Roads and Highways	Improving and expanding the road network in various regions.	Road Construction
+Railway Projects	topic	Railways	Development and implementation of railway infrastructure and services.	-
+Railway Service	topic	Railways	Operation of trains and rail transportation services for passengers and cargo.	Railway Projects
+Corruption	topic	Home Affairs and Law and Order	Illegal and unethical conduct by government officials or public servants.	-
+Education	topic	Education	Provision of schooling and learning opportunities for students.	-
+Employment Opportunities	topic	Labour and Employment	Job creation and availability of work positions in the economy.	-
+Medical Facilities	topic	Health and Family Welfare	Healthcare infrastructure including hospitals, clinics, and diagnostic centers.	-
+Rehabilitation	topic	Social Justice and Reservation	Support programs to help people recover from disasters or other hardships.	-
+Drinking Water	topic	Water and Drinking Water	Supply of safe drinking water to households and communities.	-
+Natural Calamities	topic	Disasters and Relief	Natural disasters including floods, earthquakes, and other climate-related events.	-
+Medical Treatment	topic	Health and Family Welfare	Healthcare services and treatment provided to patients.	-
+Infrastructure Development	topic	Urban Development and Housing	Building and improving physical infrastructure like roads, water systems, and utilities.	-
+Compensations	topic	Economy, Finance and Taxation	Payments made to individuals for losses or damages.	Compensation
+Subsidies	topic	Economy, Finance and Taxation	Government financial support to reduce costs for consumers or businesses.	-
+Reservation Policy	law	Law, Justice and Constitution	Constitutional provisions for representation of scheduled castes and tribes.	-
+Maintenance and Repair	topic	Urban Development and Housing	Upkeep and restoration of infrastructure and facilities.	-
+Tourism Promotion	topic	Culture, Tourism and Sports	Government initiatives to attract visitors and develop tourism industry.	-
+Tourism Development	topic	Culture, Tourism and Sports	Growth and expansion of tourism infrastructure and services.	Tourism Promotion
+Unemployment	topic	Labour and Employment	Lack of jobs and people unable to find employment.	-
+Railway Passenger Amenities	topic	Railways	Facilities and services provided to railway passengers.	-
+Railway Facilities	topic	Railways	Infrastructure and services that support railway operations.	Railway Passenger Amenities
+Law and Order	topic	Home Affairs and Law and Order	Maintenance of public peace and enforcement of laws.	-
+Compensation	topic	Economy, Finance and Taxation	Payment made to individuals for losses or damages.	-
+Terrorism	topic	Home Affairs and Law and Order	Violent acts intended to create fear and intimidate populations.	-
+Civil Aviation	topic	Civil Aviation and Shipping	Airlines and airport operations for air transportation.	-
+Higher Education	topic	Education	University and college level education beyond secondary school.	-
+Railway Halts	topic	Railways	Stations where trains stop to pick up or drop off passengers.	-
+Crop Damages	topic	Agriculture and Farmers	Loss or destruction of agricultural crops due to various causes.	-
+Basic Amenities	topic	Urban Development and Housing	Essential services and facilities for living including water, electricity, and sanitation.	-
+Central Schools	institution	Education	Schools administered and funded by the central government.	-
+Land Acquisition	topic	Law, Justice and Constitution	Government purchase or taking of private land for public purposes.	-
+Farmers	topic	Agriculture and Farmers	People engaged in agriculture and crop production.	-
+National Highways	place	-	Major roads managed by the central government connecting different regions.	-
+Project Implementation	topic	Elections and Governance	Execution and completion of government projects and programs.	-
+Government Policy	topic	Elections and Governance	Rules and plans set by government to guide public action.	-
+Minimum Support  Prices (MSP)	scheme	Agriculture and Farmers	Government guarantee of minimum prices for agricultural commodities.	-
+Security Measures	topic	Home Affairs and Law and Order	Actions taken to protect people, property, and national interests.	-
+Relief Measures	topic	Disasters and Relief	Government assistance to people affected by disasters or hardships.	-
+Development Programmes	topic	Elections and Governance	Government initiatives to promote economic and social progress.	-
+Irrigation Development	topic	Water and Drinking Water	Building and improving irrigation systems for agriculture.	-
+Agricultural Sector	topic	Agriculture and Farmers	The industry of farming and crop production.	-
+Flood Control	topic	Water and Drinking Water	Systems and measures to prevent and manage flooding.	-
+Welfare Measures	topic	Social Justice and Reservation	Government programs to improve living standards and well-being.	-
+Inquiry	topic	Law, Justice and Constitution	Official investigation into a matter or incident.	Investigation
+Employment	topic	Labour and Employment	Jobs and work available in the economy.	-
+Safety Measures	topic	Home Affairs and Law and Order	Actions taken to prevent accidents and injuries.	-
+Tribal Welfare	topic	Tribal Affairs	Government support and programs for tribal communities.	-
+Railway Lines	topic	Railways	Routes and tracks along which trains travel.	-
+Air Services	topic	Civil Aviation and Shipping	Airlines and aviation transportation services.	-
+Loan Waiving	topic	Economy, Finance and Taxation	Forgiveness of loan repayment obligations by government.	-
+Wages	topic	Labour and Employment	Payment for work done by employees.	Salary
+Fishermen Welfare	topic	Rural Development	Government support and development programs for fishing communities.	-
+Industrial Revival	topic	Industry, Trade and Commerce	Efforts to restore and revive struggling industrial sectors.	-
+Water Shortage	topic	Water and Drinking Water	Insufficient supply of water for drinking and agriculture.	-
+Social Security	topic	Social Justice and Reservation	Government programs to provide income and social protection.	-
+Language Promotion	topic	Education	Efforts to encourage use and learning of Indian languages.	-
+Employment Generation	topic	Labour and Employment	Creation of new jobs and work opportunities.	Employment Opportunities
+Minorities	topic	-	Communities that are religious, ethnic, or linguistic minorities.	-
+Industrial Development	topic	Industry, Trade and Commerce	Growth and expansion of manufacturing and industrial sectors.	-
+Mahatma Gandhi National Rural Employment Guarantee Act (MNREGA)	scheme	Rural Development	Government scheme guaranteeing 100 days of paid work annually to rural laborers.	-
+Gauge Conversion	topic	Railways	Changing the distance between railway tracks to improve compatibility.	-
+Irrigation	topic	Water and Drinking Water	Supply of water to farmland through artificial systems.	-
+Investigation	topic	Law, Justice and Constitution	Formal inquiry to find facts about an incident or matter.	-
+Labour Welfare	topic	Labour and Employment	Government support and protection programs for workers.	-
+Centrally Sponsored Schemes	scheme	Elections and Governance	Government programs co-funded by central and state governments.	-
+Railway Over Bridge	place	-	Structure carrying a railway line over another road or railway.	-
+Drought Relief	topic	Disasters and Relief	Government assistance to areas affected by drought conditions.	-
+Public Distribution System (PDS)	scheme	Food and Public Distribution	Government system for distribution of essential food items to poor families.	-
+Recruitment	topic	Elections and Governance	Hiring of new employees by government departments or organizations.	-
+Pollution Control	topic	Environment, Forests and Climate	Measures to reduce and prevent environmental pollution.	-
+Disease Control	topic	Health and Family Welfare	Government programs to prevent and manage diseases.	-
+Poor	topic	-	People living in poverty with insufficient income and resources.	-
+Trains	topic	Railways	Rail vehicles for transportation of passengers and cargo.	-
+Railway Crossings	topic	Railways	Intersections where railway lines cross roads or other tracks.	-
+Train Services	topic	Railways	Operation and management of train transportation services.	Trains
+Water Supply	topic	Water and Drinking Water	Distribution of water through pipes and systems to households.	-
+Fund Utilization	topic	Economy, Finance and Taxation	Use of allocated financial resources for intended purposes.	-
+Price Rise	topic	Economy, Finance and Taxation	Increase in costs of goods and services over time.	Inflation
+Research and Development	topic	Science, Technology and Telecom	Investment in creating new technologies and scientific advancement.	-
+Financial Assistance	topic	Economy, Finance and Taxation	Money provided by government to support individuals or organizations.	-
+Below Poverty Line	topic	-	People living below the official threshold for minimum income.	-
+Pension Schemes	scheme	Social Justice and Reservation	Government programs providing regular payments to retired workers.	-
+Prime Minister Gram Sadak Yojana (PMGSY)	scheme	Rural Development	Government program providing all-weather road connectivity to rural areas.	-
+Foreign Direct Investment (FDI)	topic	Economy, Finance and Taxation	Investment in Indian businesses by foreign companies and investors.	-
+Foreign Policy	topic	External Affairs	Government strategy and relations with other countries.	-
+Remunerative Prices	topic	Agriculture and Farmers	Fair prices for agricultural products that provide adequate farmer income.	-
+Rural Electrification	topic	Energy	Provision of electricity supply to villages and rural areas.	-
+Flood Damage	topic	Disasters and Relief	Loss and destruction caused by flooding in communities.	-
+Death	topic	-	Loss of human life.	-
+Medical Education	topic	Education	Training and instruction for students in medical and healthcare fields.	-
+National Security	topic	Defence	Protection of the nation from external military threats.	-
+Chemical Fertilizers	topic	Agriculture and Farmers	Manufactured nutrients applied to increase agricultural crop production.	-
+Dams	place	-	Structures built across rivers to control water flow and flooding.	-
+Goods and Services Tax (GST)	law	Economy, Finance and Taxation	Unified indirect tax on supply of goods and services.	-
+Railways	topic	Railways	Systems and operations of rail transportation.	-
+Farmers' Suicide	topic	Agriculture and Farmers	Deaths of farmers due to debt and economic distress.	-
+Inflation	topic	Economy, Finance and Taxation	Sustained increase in prices of goods and services.	-
+New Railway Line	topic	Railways	Construction of new railway routes and tracks.	Railway Projects
+Privatisation	topic	Economy, Finance and Taxation	Transfer of government-owned enterprises to private sector ownership.	-
+Appointment	topic	Elections and Governance	Hiring or assignment of officials to government positions.	-
+Modernisation	topic	Industry, Trade and Commerce	Update of facilities and systems to current standards and technology.	Modernization
+Tax Exemption	topic	Economy, Finance and Taxation	Waiving of tax obligations for certain individuals or entities.	-
+Road Accidents	topic	Roads and Highways	Collisions and crashes involving vehicles on roads.	-
+Railway Station	place	-	Facility where trains stop for passengers and cargo operations.	-
+Power Generation	topic	Energy	Production of electricity from various energy sources.	-
+Reservation	topic	Social Justice and Reservation	System of reserved seats for scheduled castes and tribes.	-
+Textile Industry	topic	Industry, Trade and Commerce	Manufacturing of cloth and textile products.	-
+Punishments	topic	Law, Justice and Constitution	Penalties imposed on individuals convicted of crimes.	Punishment
+Bank Loans	topic	Economy, Finance and Taxation	Money borrowed from banks that must be repaid with interest.	-
+Sports Promotion	topic	Culture, Tourism and Sports	Government initiatives to encourage and develop sports activities.	-
+Industrial Closure	topic	Industry, Trade and Commerce	Shutdown of manufacturing facilities and industries.	-
+Rural Development	topic	Rural Development	Improvement of infrastructure and services in rural areas.	-
+Crop Insurance 	scheme	Agriculture and Farmers	Government scheme protecting farmers against crop losses.	-
+Railway Development	topic	Railways	Expansion and improvement of railway infrastructure and services.	-
+Elections	topic	Elections and Governance	Process of selecting representatives through voting.	-
+Supreme Court	institution	Law, Justice and Constitution	Highest judicial authority in India.	-
+Irrigation Projects	topic	Water and Drinking Water	Large-scale construction of irrigation systems for agriculture.	-
+Gross Domestic Product	topic	Economy, Finance and Taxation	Total economic value of goods and services produced by a nation.	-
+Inter-linking of rivers	topic	Water and Drinking Water	Proposed project to connect different river systems.	-
+Rural Areas	place	-	Communities and regions outside cities with agricultural focus.	-
+Telecommunication Services	topic	Science, Technology and Telecom	Provision of telephone, internet, and communication services.	-
+Women Empowerment	topic	Women and Children	Programs to increase women's rights and economic participation.	-
+CBI Inquiry	topic	Law, Justice and Constitution	Investigation by Central Bureau of Investigation.	-
+Atrocities	topic	Home Affairs and Law and Order	Cruel and violent acts against groups of people.	-
+Irrigation Facilities	topic	Water and Drinking Water	Infrastructure supporting irrigation system operations.	-
+Economic Development	topic	Economy, Finance and Taxation	Growth and improvement in economic indicators and prosperity.	-
+MPLADS	scheme	Elections and Governance	Member of Parliament Local Area Development Scheme.	-
+Agriculture	topic	Agriculture and Farmers	Practice of farming and cultivation of crops.	-
+Black Money	topic	Economy, Finance and Taxation	Income not reported to tax authorities.	-
+Educational Institutions	institution	Education	Schools and colleges providing formal education.	-
+Health Facilities	topic	Health and Family Welfare	Infrastructure providing healthcare services to communities.	-
+Water Pollution	topic	Environment, Forests and Climate	Contamination of water sources with harmful substances.	-
+Water Contamination	topic	Environment, Forests and Climate	Introduction of harmful substances into water supplies.	Water Pollution
+Food Security	topic	Food and Public Distribution	Availability of sufficient food for adequate nutrition.	-
+Agitation	topic	Home Affairs and Law and Order	Organized protests and demonstrations by groups demanding change.	-
+Airports	institution	Civil Aviation and Shipping	Facilities for air transportation.	-
+Hospitals	institution	Health and Family Welfare	Medical facilities for treatment of patients.	-
+Health Hazards	topic	Health and Family Welfare	Environmental and occupational threats to public health.	-
+Women	topic	-	Female members of society and communities.	-
+Price Control	topic	Economy, Finance and Taxation	Government regulation of prices.	-
+Scams	topic	Home Affairs and Law and Order	Fraudulent schemes to deceive and defraud people.	-
+Health Care	topic	Health and Family Welfare	Medical services and treatment for maintaining health.	-
+Legislation	topic	Law, Justice and Constitution	Process of creating and enacting laws.	-
+Agricultural Insurance	scheme	Agriculture and Farmers	Government scheme protecting farmers against losses.	-
+Backward Classes	topic	-	Socially and economically disadvantaged communities.	-
+Fundamental Rights	law	Law, Justice and Constitution	Basic rights guaranteed to all citizens.	-
+Public Private Partnership (PPP)	scheme	Elections and Governance	Joint ventures between government and private companies.	-
+Regional Languages	topic	Education	Languages spoken in different regions.	-
+Sugar Industry	topic	Industry, Trade and Commerce	Production of sugar from sugarcane.	-
+Food Corporation of India (FCI)	institution	Food and Public Distribution	Government corporation managing food procurement.	-
+Human Rights	topic	Law, Justice and Constitution	Basic freedoms and protections owed to all people.	-
+Social Justice	topic	Social Justice and Reservation	Fairness and equal treatment in society.	-
+Welfare Schemes	scheme	Social Justice and Reservation	Government programs to improve well-being.	-
+Central Assistance	topic	Elections and Governance	Financial support by central government to states.	-
+Enquiry	topic	Law, Justice and Constitution	Official examination to find facts.	-
+Road Transport	topic	Roads and Highways	Movement of passengers and cargo on roads.	-
+Agricultural Production	topic	Agriculture and Farmers	Output of crops and livestock from farming.	-
+Sanitation	topic	Water and Drinking Water	Maintenance of cleanliness and hygiene.	-
+Railway Accidents	topic	Railways	Collisions and crashes involving trains.	-
+Liquified Petroleum Gas (LPG)	topic	Energy	Gaseous fuel used for cooking and heating.	-
+Water Disputes	topic	Law, Justice and Constitution	Disagreements between states over water sharing.	-
+Environmental Protection	topic	Environment, Forests and Climate	Conservation and safeguarding of natural environment.	-
+Tribal Areas	place	-	Regions where tribal communities live.	-
+Irregularities	topic	Home Affairs and Law and Order	Violations of rules and improper conduct.	-
+Water Management	topic	Water and Drinking Water	Planning and administration of water resources.	-
+Tourism	topic	Culture, Tourism and Sports	Travel and recreational activities.	-
+Unorganised Sector	topic	Labour and Employment	Employment without formal contracts.	-
+Flood Relief	topic	Disasters and Relief	Government assistance to flooded areas.	-
+Jammu & Kashmir	place	-	Northern region of India.	-
+Employees	topic	-	People employed by organizations.	-
+Malnutrition	topic	Health and Family Welfare	Poor nutrition causing weakness.	-
+Muslims	topic	-	Followers of Islam and Muslim communities.	-
+Scheme Implementation	topic	Elections and Governance	Execution and rollout of government programs.	-
+Police Atrocities	topic	Home Affairs and Law and Order	Excessive or illegal use of force by police.	-
+Power Shortage	topic	Energy	Insufficient supply of electricity.	-
+Public Health	topic	Health and Family Welfare	Health and well-being of populations.	-
+Traffic Congestion	topic	Roads and Highways	Excessive traffic causing delays.	-
+Interest Rate	topic	Economy, Finance and Taxation	Percentage charged on borrowed money.	-
+Bridges	place	-	Structures spanning obstacles.	-
+Foreign Relations	topic	External Affairs	Diplomatic interactions with other countries.	-
+Internal Security	topic	Home Affairs and Law and Order	Protection of citizens from internal threats.	-
+Parliamentary Business	topic	Parliament and Procedure	Legislative activities and debates.	-
+Power Supply	topic	Energy	Distribution of electricity.	-
+Religious Places	place	-	Temples, mosques, churches, and places of worship.	-
+Border Areas	place	-	Regions along international boundaries.	-
+Private Sector	topic	Industry, Trade and Commerce	Businesses owned by private entities.	-
+Investments	topic	Economy, Finance and Taxation	Money put into businesses for returns.	-
+Medical Colleges	institution	Education	Higher education institutions for medical training.	-
+Reserve Bank of India (RBI)	institution	Economy, Finance and Taxation	Central bank managing monetary policy.	-
+Medical Hospitals	institution	Health and Family Welfare	Healthcare facilities.	-
+Mid-Day-Meal Scheme	scheme	Education	Government program providing free meals to school children.	-
+Monitoring	topic	Elections and Governance	Oversight and tracking of programs.	-
+Court Benches	topic	Law, Justice and Constitution	Divisions of courts at various levels.	-
+Government Schemes	topic	Elections and Governance	Programs and initiatives by government.	-
+Pakistan	place	-	Neighboring country in South Asia.	-
+Punishment	topic	Law, Justice and Constitution	Penalty imposed for crime.	-
+Industrial Sickness	topic	Industry, Trade and Commerce	Financial distress of industrial units.	-
+Infiltration	topic	Home Affairs and Law and Order	Unauthorized entry across borders.	-
+Violence	topic	Home Affairs and Law and Order	Use of physical force to harm people.	-
+Health Services	topic	Health and Family Welfare	Medical services delivered to patients.	-
+Petroleum Products	topic	Energy	Products derived from crude oil.	-
+Scheduled Tribes	topic	-	Communities recognized as tribal minorities.	-
+Soil Erosion	topic	Environment, Forests and Climate	Wearing away of topsoil.	-
+State Reorganisation	topic	Elections and Governance	Changes to borders of states.	-
+Preservation of Cultural Heritage	topic	Culture, Tourism and Sports	Protection of historical and cultural sites.	-
+Women Welfare	topic	Women and Children	Government programs for women's well-being.	-
+Railway Safety	topic	Railways	Measures to ensure safe railway operations.	-
+Income Tax	law	Economy, Finance and Taxation	Tax imposed on income.	-
+Water Conservation	topic	Environment, Forests and Climate	Measures to protect water resources.	-
+Cultural Heritage	topic	Culture, Tourism and Sports	Historical sites, arts, and traditions.	-
+School Education	topic	Education	Primary and secondary education.	-
+Transportation	topic	Roads and Highways	Movement of people and goods.	-
+Railway Electrification	topic	Railways	Conversion of railway lines to electric power.	-
+Railway Reservation	topic	Railways	System for booking railway seats.	-
+Drought	topic	Disasters and Relief	Prolonged shortage of rainfall.	-
+Railway Line	topic	Railways	Track and route used by trains.	-
+AIIMS	institution	Health and Family Welfare	All India Institute of Medical Sciences.	-
+Black Market	topic	Home Affairs and Law and Order	Illegal trade in goods outside official channels.	-
+Kendriya Vidyalayas	institution	Education	Central government schools.	-
+Arrears	topic	Economy, Finance and Taxation	Outstanding payments due.	-
+Natural Disasters	topic	Disasters and Relief	Uncontrolled forces causing destruction.	-
+Pilgrimage	topic	Culture, Tourism and Sports	Religious journeys to sacred places.	-
+Budget Allocation	topic	Economy, Finance and Taxation	Division of government funds.	-
+Excise Duty	law	Economy, Finance and Taxation	Tax on manufacture of goods.	-
+Pension	topic	Labour and Employment	Payment to retired workers.	-
+Quality Education	topic	Education	Teaching that develops competence.	-
+Salary	topic	Labour and Employment	Regular payment to employees.	-
+Coal Mining	topic	Energy	Extraction of coal from deposits.	-
+Foodgrains	topic	Food and Public Distribution	Crops produced for food.	-
+Land Compensation	topic	Law, Justice and Constitution	Payment for acquired land.	-
+Minimum Wage	topic	Labour and Employment	Lowest wage legally required.	-
+River Pollution	topic	Environment, Forests and Climate	Contamination of rivers.	-
+Road Connectivity	topic	Roads and Highways	Availability of road links.	-
+States	place	-	Administrative divisions of India.	-
+Technical Education	topic	Education	Instruction in practical skills.	-
+Development Projects	topic	Elections and Governance	Government initiatives for infrastructure.	-
+Illegal Activities	topic	Home Affairs and Law and Order	Criminal acts.	-
+Monitoring Mechanism	topic	Elections and Governance	System for oversight.	-
+Banning	topic	Home Affairs and Law and Order	Government prohibition.	-
+Democracy	topic	Elections and Governance	System based on voting.	-
+Metro Railways	institution	Railways	Urban rapid rail transit systems.	-
+Paramilitary Forces	topic	Defence	Armed groups supporting military.	-
+Project Delays	topic	Elections and Governance	Postponement of project deadlines.	-
+Road Traffic	topic	Roads and Highways	Movement of vehicles on roads.	-
+Agricultural Labourers	topic	-	Workers employed in agriculture.	-
+Sarva Shiksha Abhiyan	scheme	Education	Government initiative for universal education.	-
+Accidents	topic	-	Unplanned events causing injury.	-
+Environmental Pollution	topic	Environment, Forests and Climate	Introduction of harmful substances.	-
+Fraudulant Practices	topic	Home Affairs and Law and Order	Deliberate deception for gain.	-
+Indira Awaas Yojana	scheme	Rural Development	Government scheme for housing.	-
+Medical Services	topic	Health and Family Welfare	Healthcare services.	-
+Scheduled Castes and Scheduled Tribes	topic	-	Communities officially recognized as disadvantaged.	-
+SC & ST	topic	-	Scheduled Castes and Scheduled Tribes.	-
+Tribals	topic	-	Indigenous populations.	-
+Disinvestment	topic	Economy, Finance and Taxation	Sale of government stakes in companies.	-
+Naxalism	topic	Home Affairs and Law and Order	Leftist militant movement.	-
+Skill Development	topic	Labour and Employment	Training to improve competencies.	-
+Erosion Control	topic	Environment, Forests and Climate	Measures to prevent erosion.	-
+Floods	topic	Disasters and Relief	Overflow of water covering land.	-
+Infrastructure Facilities	topic	Urban Development and Housing	Physical structures supporting activities.	-
+Land Encroachment	topic	Home Affairs and Law and Order	Illegal occupation of land.	-
+Act Amendment	topic	Law, Justice and Constitution	Modification of existing laws.	-
+Agricultural Products	topic	Agriculture and Farmers	Outputs from farming.	-
+Freedom Fighters	person	-	Historical figures who fought for independence.	-
+Political Parties	topic	Elections and Governance	Organizations in elections.	-
+Scheduled Tribes (STs)	topic	-	Indigenous communities.	-
+Express Trains	topic	Railways	Fast trains for passengers.	-
+Job Opportunities	topic	Labour and Employment	Available employment positions.	-
+Railway Transport	topic	Railways	Transportation services by trains.	-
+Educational Facilities	topic	Education	Infrastructure for teaching.	-
+Other Backward Classes (OBCs)	topic	-	Socially disadvantaged communities.	-
+Water Sharing	topic	Law, Justice and Constitution	Distribution of river water.	-
+Non-Governmental Organisations (NGO)	institution	Elections and Governance	Independent organizations.	-
+Power Projects	topic	Energy	Installations for electricity generation.	-
+Secularism	topic	Elections and Governance	State neutrality toward religion.	-
+Water Scarcity	topic	Water and Drinking Water	Shortage of fresh water.	-
+Central Universities	institution	Education	Universities funded by government.	-
+Construction	topic	Urban Development and Housing	Building of structures.	-
+Exports	topic	Economy, Finance and Taxation	Goods sent to other countries.	-
+Postal Services	topic	Science, Technology and Telecom	Government mail delivery.	-
+Railway Network	topic	Railways	System of railway lines.	-
+Banking Systems	topic	Economy, Finance and Taxation	Financial institutions.	-
+Food Procurement	topic	Food and Public Distribution	Government purchase of food.	-
+Backward Areas	place	-	Regions with low development.	-
+Export Promotion	topic	Economy, Finance and Taxation	Government initiatives for exports.	-
+Facilities	topic	-	Infrastructure and services.	-
+Higher Education Institutions	institution	Education	Colleges and universities.	-
+Modernization	topic	Industry, Trade and Commerce	Updating to current standards.	-
+Novel Coronavirus (COVID -19)	topic	Health and Family Welfare	Pandemic disease.	-
+Support Prices	topic	Agriculture and Farmers	Guaranteed minimum prices.	-
+Taxation	topic	Economy, Finance and Taxation	System of collecting taxes.	-
+Water level	topic	Water and Drinking Water	Height of water.	-
+Poverty	topic	-	State of living with insufficient income.	-
+Sports Facilities	topic	Culture, Tourism and Sports	Infrastructure for sports.	-
+Awareness Programme	topic	Elections and Governance	Government initiatives for awareness.	-
+Central Government	topic	Elections and Governance	Union government.	-
+Coastal Areas	place	-	Regions adjacent to oceans.	-
+Court Judgements	topic	Law, Justice and Constitution	Decisions by courts.	-
+Exploitation	topic	Home Affairs and Law and Order	Unjust treatment of people.	-
+Loans	topic	Economy, Finance and Taxation	Money borrowed.	-
+Scheduled Castes	topic	-	Communities officially recognized.	-
+Students	topic	-	People in formal education.	-
+Child Development	topic	Women and Children	Growth and welfare of children.	-
+Desiltation	topic	Water and Drinking Water	Removal of silt.	-
+Foreign Investments	topic	Economy, Finance and Taxation	Capital from abroad.	-
+Judicial System	topic	Law, Justice and Constitution	Courts and justice institutions.	-
+Old Age Benefits	topic	Social Justice and Reservation	Support for elderly.	-
+Self-help Groups	topic	Social Justice and Reservation	Groups pooling resources.	-
+Agricultural Development	topic	Agriculture and Farmers	Improvement in farming.	-
+Bihar	place	-	Eastern Indian state.	-
+Constitutional Amendment	law	Law, Justice and Constitution	Modification to the Constitution.	-
+Expenditure	topic	Economy, Finance and Taxation	Government spending.	-
+Banks	institution	Economy, Finance and Taxation	Financial institutions.	-
+Cases Pending	topic	Law, Justice and Constitution	Legal cases awaiting decision.	-
+Food Processing	topic	Industry, Trade and Commerce	Manufacture of food products.	-
+Non-Performing Assets	topic	Economy, Finance and Taxation	Loans with payment failures.	-
+Panchayats	institution	Elections and Governance	Village councils.	-
+Pay Commission	topic	Labour and Employment	Bodies reviewing salaries.	-
+Railway Connectivity	topic	Railways	Availability of rail links.	-
+Train Stoppage	topic	Railways	Halting of trains.	-
+Central Government Clearance	topic	Elections and Governance	Approval by central government.	-
+Terrorists	person	-	Individuals engaged in terrorism.	-
+Climate Change	topic	Environment, Forests and Climate	Changes in climate patterns.	-
+Crop Procurement	topic	Agriculture and Farmers	Government purchase of crops.	-
+Public Undertakings	institution	Industry, Trade and Commerce	Businesses owned by government.	-
+Railway Fares	topic	Railways	Prices for railway transport.	-
+Scholarships	topic	Education	Financial support for students.	-
+Economic And Social Development	topic	Economy, Finance and Taxation	Improvement in growth and welfare.	-
+Indian Railways	institution	Railways	Government rail organization.	-
+Railway Freight	topic	Railways	Transportation of cargo.	-
+Communalism	topic	Home Affairs and Law and Order	Politics based on religion.	-
+Economic Growth	topic	Economy, Finance and Taxation	Increase in production.	-
+Fiscal Deficit	topic	Economy, Finance and Taxation	Excess of spending over revenue.	-
+Poverty Alleviation	topic	Social Justice and Reservation	Programs to reduce poverty.	-
+Crimes	topic	Home Affairs and Law and Order	Acts violating criminal laws.	-
+Land Allotment	topic	Rural Development	Distribution of government land.	-
+Medical Facilites	topic	Health and Family Welfare	Healthcare infrastructure. Spelling: Facilities.	-
+Wild Animals	topic	Environment, Forests and Climate	Undomesticated animal species.	-
+Government Employees	topic	-	People employed by government.	-
+Pilgrim Centres	place	-	Religious places for pilgrims.	-
+Rape	topic	Home Affairs and Law and Order	Violent sexual assault crime.	-
+River Embankments	topic	Water and Drinking Water	Structures controlling rivers.	-
+Unemployed Youth	topic	-	Young people without jobs.	-
+Disaster Management	topic	Disasters and Relief	Response systems for disasters.	-
+Scheduled Castes (SCs)	topic	-	Communities officially recognized.	-
+Transparency	topic	Elections and Governance	Openness of information.	-
+Agricultural Loan	topic	Agriculture and Farmers	Credit for agriculture.	-
+Election Commission	institution	Elections and Governance	Body overseeing elections.	-
+Medicine	topic	Health and Family Welfare	Substances for curing disease.	-
+SC & ST Welfare	topic	-	Support for scheduled communities.	-
+Uttar Pradesh	place	-	Northern Indian state.	-
+Imports	topic	Economy, Finance and Taxation	Goods purchased from abroad.	-
+Integrated Child Development Services (ICDS)	scheme	Women and Children	Government program for children.	-
+Caste System	topic	-	Hierarchical social structure.	-
+Regional Imbalances	topic	Elections and Governance	Unequal development across regions.	-
+Agricultural Credit	topic	Agriculture and Farmers	Loans for farming.	-
+Animal Protection	topic	Environment, Forests and Climate	Laws protecting animals.	-
+Fishery Industry	topic	Industry, Trade and Commerce	Fishing and seafood production.	-
+Pending Cases	topic	Law, Justice and Constitution	Undecided legal cases.	-
+Public Sector Undertakings	topic	Industry, Trade and Commerce	Government-managed businesses.	-
+Right to Education	law	Education	Constitutional right to education.	-
+Swachh Bharat Abhiyan	scheme	Urban Development and Housing	Government sanitation mission.	-
+Air Pollution	topic	Environment, Forests and Climate	Contamination of air.	-
+Armed Forces	topic	Defence	Military organization.	-
+Security	topic	Home Affairs and Law and Order	Protection against threats.	-
+Tribal Development	topic	Tribal Affairs	Improvement for tribal communities.	-
+Anganwadi	institution	Women and Children	Community center for nutrition.	-
+Child Welfare	topic	Women and Children	Programs for children.	-
+Cold Storage	topic	Agriculture and Farmers	Preservation facilities.	-
+Crop Failure	topic	Agriculture and Farmers	Loss of crops.	-
+Foreign Exchange	topic	Economy, Finance and Taxation	Currency in trade.	-
+Losses	topic	-	Financial or material losses.	-
+Schools	institution	Education	Educational institutions.	-
+Central Government Grants	topic	Economy, Finance and Taxation	Financial assistance to states.	-
+Communal Riots	topic	Home Affairs and Law and Order	Violent religious conflicts.	-
+Fertilizers	topic	Agriculture and Farmers	Substances for soil improvement.	-
+Wildlife Protection	topic	Environment, Forests and Climate	Conservation of animals.	-
+Workers	topic	-	People in occupations.	-
+Demands For Grants	topic	Parliament and Procedure	Parliamentary debate procedure.	-
+Quality Standards	topic	Elections and Governance	Benchmarks for quality.	-
+Railway Platform	place	-	Area for train boarding.	-
+Sugar Mills	institution	Industry, Trade and Commerce	Facilities for sugar production.	-
+Tea Industry	topic	Industry, Trade and Commerce	Cultivation of tea.	-
+Electricity	topic	Energy	Supply of electrical power.	-
+Make-in-India	topic	Industry, Trade and Commerce	Government manufacturing initiative.	-
+Organic Farming	topic	Agriculture and Farmers	Farming without synthetic chemicals.	-
+Roads	topic	Roads and Highways	Pathways for vehicles.	-
+Telephone Connections	topic	Science, Technology and Telecom	Provision of telephone service.	-
+Adjournment Motions	topic	Parliament and Procedure	Parliamentary debate procedure.	-
+Fishermen	topic	-	People in fishing.	-
+Justice	topic	Law, Justice and Constitution	Fair treatment through courts.	-
+Price Hike	topic	Economy, Finance and Taxation	Sudden price increases.	-
+Religion	topic	-	Systems of faith.	-
+Service Conditions	topic	Labour and Employment	Terms of employment.	-
+Small Scale Industries	topic	Industry, Trade and Commerce	Small manufacturing businesses.	-
+Social Welfare	topic	Social Justice and Reservation	Programs for disadvantaged people.	-

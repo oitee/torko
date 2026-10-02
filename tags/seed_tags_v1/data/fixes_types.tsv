@@ -1,0 +1,253 @@
+tag	field	value	note
+National Highways	subtype	facility	Reviewed on 2026-09-26
+Railway Over Bridge	subtype	facility	Reviewed on 2026-09-26
+Dams	subtype	facility	Reviewed on 2026-09-26
+Railway Station	subtype	facility	Reviewed on 2026-09-26
+Rural Areas	subtype	area_type	Reviewed on 2026-09-26
+North Eastern Region	subtype	region	Reviewed on 2026-09-26
+Religious Places	subtype	area_type	Reviewed on 2026-09-26
+Tribal Areas	subtype	area_type	Reviewed on 2026-09-26
+Jammu & Kashmir	subtype	state	Reviewed on 2026-09-26
+Bridges	subtype	facility	Reviewed on 2026-09-26
+Border Areas	subtype	area_type	Reviewed on 2026-09-26
+Pakistan	subtype	country	Reviewed on 2026-09-26
+States	subtype	place_class	Reviewed on 2026-09-26
+Freedom Fighters	type	group	Reviewed on 2026-09-26
+Backward Areas	subtype	area_type	Reviewed on 2026-09-26
+Coastal Areas	subtype	area_type	Reviewed on 2026-09-26
+Bihar	subtype	state	Reviewed on 2026-09-26
+Terrorists	type	group	Reviewed on 2026-09-26
+Pilgrim Centres	subtype	area_type	Reviewed on 2026-09-26
+Uttar Pradesh	subtype	state	Reviewed on 2026-09-26
+Railway Platform	subtype	facility	Reviewed on 2026-09-26
+Drought Prone Areas	subtype	area_type	Reviewed on 2026-09-26
+Foreign Countries	subtype	place_class	Reviewed on 2026-09-26
+Special Economic Zones	subtype	area_type	Reviewed on 2026-09-26
+Rivers	subtype	place_class	Reviewed on 2026-09-26
+Nepal	subtype	country	Reviewed on 2026-09-26
+Rajasthan	subtype	state	Reviewed on 2026-09-26
+Kerala	subtype	state	Reviewed on 2026-09-26
+Canals	subtype	facility	Reviewed on 2026-09-26
+Odisha	subtype	state	Reviewed on 2026-09-26
+Water Reservoirs	subtype	facility	Reviewed on 2026-09-26
+West Bengal	subtype	state	Reviewed on 2026-09-26
+Forest Areas	subtype	area_type	Reviewed on 2026-09-26
+Judges	type	group	Reviewed on 2026-09-26
+Villages	subtype	place_class	Reviewed on 2026-09-26
+Teachers	type	group	Reviewed on 2026-09-26
+Assam	subtype	state	Reviewed on 2026-09-26
+Tamil Nadu	subtype	state	Reviewed on 2026-09-26
+Agricultural Land	subtype	area_type	Reviewed on 2026-09-26
+Criminals	type	group	Reviewed on 2026-09-26
+Ram Janma-bhumi Babri Masjid	subtype	landmark	Reviewed on 2026-09-26
+Temples	subtype	facility	Reviewed on 2026-09-26
+Railway Under Bridge (RUB)	subtype	facility	Reviewed on 2026-09-26
+Naxalites	type	group	Reviewed on 2026-09-26
+Gujarat	subtype	state	Reviewed on 2026-09-26
+Ganga River	subtype	river	Reviewed on 2026-09-26
+Pilgrims	type	group	Reviewed on 2026-09-26
+USA	subtype	country	Reviewed on 2026-09-26
+Bangladesh	subtype	country	Reviewed on 2026-09-26
+Railway Zones	subtype	place_class	Reviewed on 2026-09-26
+Manipur	subtype	state	Reviewed on 2026-09-26
+Martyrs	type	group	Reviewed on 2026-09-26
+Historical Places	subtype	area_type	Reviewed on 2026-09-26
+Maharashtra	subtype	state	Reviewed on 2026-09-26
+Monuments	subtype	facility	Reviewed on 2026-09-26
+Tourist Centres	subtype	area_type	Reviewed on 2026-09-26
+Andhra Pradesh	subtype	state	Reviewed on 2026-09-26
+Refugees	type	group	Reviewed on 2026-09-26
+School Buildings	subtype	facility	Reviewed on 2026-09-26
+Hill Areas	subtype	area_type	Reviewed on 2026-09-26
+Wildlife Sanctuary	subtype	area_type	Reviewed on 2026-09-26
+Inland Waterways	subtype	facility	Reviewed on 2026-09-26
+Archaeological Sites	subtype	area_type	Reviewed on 2026-09-26
+Investors	type	group	Reviewed on 2026-09-26
+Governor	type	role	Reviewed on 2026-09-26
+Sri Lanka	subtype	country	Reviewed on 2026-09-26
+China	subtype	country	Reviewed on 2026-09-26
+Hindus	type	group	Reviewed on 2026-09-26
+Gulf Countries	subtype	place_class	Reviewed on 2026-09-26
+Jharkhand	subtype	state	Reviewed on 2026-09-26
+Special Category States	subtype	place_class	Reviewed on 2026-09-26
+Karnataka	subtype	state	Reviewed on 2026-09-26
+Neighbouring Countries	subtype	place_class	Reviewed on 2026-09-26
+Delhi	subtype	union_territory	Reviewed on 2026-09-26
+Union Territories	subtype	place_class	Reviewed on 2026-09-26
+Punjab	subtype	state	Reviewed on 2026-09-26
+Madhya Pradesh	subtype	state	Reviewed on 2026-09-26
+Sportsman	type	group	Reviewed on 2026-09-26
+Districts	subtype	place_class	Reviewed on 2026-09-26
+Uttarakhand	subtype	state	Reviewed on 2026-09-26
+Bodoland	subtype	region	Reviewed on 2026-09-26
+Chhattisgarh	subtype	state	Reviewed on 2026-09-26
+Cauvery River	subtype	river	Reviewed on 2026-09-26
+Urban Areas	subtype	area_type	Reviewed on 2026-09-26
+Himachal Pradesh	subtype	state	Reviewed on 2026-09-26
+Telangana	subtype	state	Reviewed on 2026-09-26
+Arunachal Pradesh	subtype	state	Reviewed on 2026-09-26
+Bundelkhand	subtype	region	Reviewed on 2026-09-26
+Chief Minister	type	role	Reviewed on 2026-09-26
+Prime Minister	type	role	Reviewed on 2026-09-26
+Artists	type	group	Reviewed on 2026-09-26
+National Parks	subtype	area_type	Reviewed on 2026-09-26
+Residential Areas	subtype	area_type	Reviewed on 2026-09-26
+Haryana	subtype	state	Reviewed on 2026-09-26
+Japan	subtype	country	Reviewed on 2026-09-26
+Journalists	type	group	Reviewed on 2026-09-26
+MLA(s)	type	group	Reviewed on 2026-09-26
+Nagaland	subtype	state	Reviewed on 2026-09-26
+President	type	role	Reviewed on 2026-09-26
+Tiger Reserve	subtype	area_type	Reviewed on 2026-09-26
+Afghanistan	subtype	country	Reviewed on 2026-09-26
+Bird Sanctuary	subtype	area_type	Reviewed on 2026-09-26
+Inter-State Rivers	subtype	place_class	Reviewed on 2026-09-26
+Iraq	subtype	country	Reviewed on 2026-09-26
+Lawyers	type	group	Reviewed on 2026-09-26
+Line of Control	subtype	boundary	Reviewed on 2026-09-26
+Pakistan Occupied Kashmir (PoK)	subtype	region	Reviewed on 2026-09-26
+Developing Countries	subtype	place_class	Reviewed on 2026-09-26
+Flood Prone Areas	subtype	area_type	Reviewed on 2026-09-26
+Lakes	subtype	place_class	Reviewed on 2026-09-26
+Vidarbha	subtype	region	Reviewed on 2026-09-26
+Constituencies	subtype	place_class	Reviewed on 2026-09-26
+Developed Countries	subtype	place_class	Reviewed on 2026-09-26
+Lakshadweep	subtype	union_territory	Reviewed on 2026-09-26
+Brahmaputra River	subtype	river	Reviewed on 2026-09-26
+Desert	subtype	place_class	Reviewed on 2026-09-26
+Metropolitan Cities	subtype	place_class	Reviewed on 2026-09-26
+National Capital Region	subtype	region	Reviewed on 2026-09-26
+Ram Temple	subtype	landmark	Reviewed on 2026-09-26
+Bombay	subtype	city	Reviewed on 2026-09-26
+Fishing Grounds	subtype	area_type	Reviewed on 2026-09-26
+India	subtype	country	Reviewed on 2026-09-26
+Krishna River	subtype	river	Reviewed on 2026-09-26
+Ladakh	subtype	union_territory	Reviewed on 2026-09-26
+Mahanadi River	subtype	river	Reviewed on 2026-09-26
+Mauritius	subtype	country	Reviewed on 2026-09-26
+National Monuments	subtype	facility	Reviewed on 2026-09-26
+Resettlement Colonies	subtype	area_type	Reviewed on 2026-09-26
+Scientists	type	group	Reviewed on 2026-09-26
+Tripura	subtype	state	Reviewed on 2026-09-26
+Unauthorized Colonies	subtype	area_type	Reviewed on 2026-09-26
+Andaman & N Islands	subtype	union_territory	Reviewed on 2026-09-26
+Borders	subtype	place_class	Reviewed on 2026-09-26
+Chandigarh	subtype	union_territory	Reviewed on 2026-09-26
+Line of Actual Control	subtype	boundary	Reviewed on 2026-09-26
+Polling Stations	subtype	facility	Reviewed on 2026-09-26
+Protected Monuments	subtype	facility	Reviewed on 2026-09-26
+Russia	subtype	country	Reviewed on 2026-09-26
+Sea	subtype	place_class	Reviewed on 2026-09-26
+Sikkim	subtype	state	Reviewed on 2026-09-26
+Tibet	subtype	region	Reviewed on 2026-09-26
+Chief Justice	type	role	Reviewed on 2026-09-26
+Ecological Sensitive Area	subtype	area_type	Reviewed on 2026-09-26
+Goa	subtype	state	Reviewed on 2026-09-26
+Middle East	subtype	region	Reviewed on 2026-09-26
+Myanmar	subtype	country	Reviewed on 2026-09-26
+United Arab Emirates	subtype	country	Reviewed on 2026-09-26
+Vice-chancellor	type	role	Reviewed on 2026-09-26
+Bhutan	subtype	country	Reviewed on 2026-09-26
+Gorkhaland	subtype	region	Reviewed on 2026-09-26
+Heritage Sites	subtype	area_type	Reviewed on 2026-09-26
+Himalayas	subtype	region	Reviewed on 2026-09-26
+Industrial Areas	subtype	area_type	Reviewed on 2026-09-26
+International Boundries	subtype	place_class	Reviewed on 2026-09-26
+Iran	subtype	country	Reviewed on 2026-09-26
+Malaysia	subtype	country	Reviewed on 2026-09-26
+Meghalaya	subtype	state	Reviewed on 2026-09-26
+Mizoram	subtype	state	Reviewed on 2026-09-26
+Narmada River	subtype	river	Reviewed on 2026-09-26
+Oil Fields	subtype	area_type	Reviewed on 2026-09-26
+Railway Junction	subtype	facility	Reviewed on 2026-09-26
+Railway Land	subtype	area_type	Reviewed on 2026-09-26
+Railway Yards	subtype	facility	Reviewed on 2026-09-26
+Taj Mahal	subtype	landmark	Reviewed on 2026-09-26
+Territorial Waters	subtype	place_class	Reviewed on 2026-09-26
+UNESCO World Heritage Site	subtype	area_type	Reviewed on 2026-09-26
+United Kingdom (UK)	subtype	country	Reviewed on 2026-09-26
+Attorney General	type	role	Reviewed on 2026-09-26
+Brazil	subtype	country	Reviewed on 2026-09-26
+Chief Election Commissioner	type	role	Reviewed on 2026-09-26
+Disturbed Areas	subtype	area_type	Reviewed on 2026-09-26
+Fishing Ports	subtype	facility	Reviewed on 2026-09-26
+France	subtype	country	Reviewed on 2026-09-26
+Heritage City	subtype	area_type	Reviewed on 2026-09-26
+Hills	subtype	place_class	Reviewed on 2026-09-26
+International Waterways	subtype	place_class	Reviewed on 2026-09-26
+Polavaram Dam	subtype	landmark	Reviewed on 2026-09-26
+Pondicherry	subtype	union_territory	Reviewed on 2026-09-26
+Saudi Arabia	subtype	country	Reviewed on 2026-09-26
+South India	subtype	region	Reviewed on 2026-09-26
+Suburban Areas	subtype	area_type	Reviewed on 2026-09-26
+Yamuna River	subtype	river	Reviewed on 2026-09-26
+Beaches	subtype	place_class	Reviewed on 2026-09-26
+Beas River	subtype	river	Reviewed on 2026-09-26
+Cauvery Basin	subtype	region	Reviewed on 2026-09-26
+Cities	subtype	place_class	Reviewed on 2026-09-26
+Daman & Diu	subtype	union_territory	Reviewed on 2026-09-26
+Deltas	subtype	place_class	Reviewed on 2026-09-26
+Ex-prime Minister	type	role	Reviewed on 2026-09-26
+Foreign Students	type	group	Reviewed on 2026-09-26
+Godavari River	subtype	river	Reviewed on 2026-09-26
+Handicapped Students	type	group	Reviewed on 2026-09-26
+Harijans	type	group	Reviewed on 2026-09-26
+Himalayan Rivers	subtype	place_class	Reviewed on 2026-09-26
+Israel	subtype	country	Reviewed on 2026-09-26
+Kachchh Region	subtype	region	Reviewed on 2026-09-26
+Kargil	subtype	region	Reviewed on 2026-09-26
+Kashmiri Pandits	type	group	Reviewed on 2026-09-26
+Konkan Region	subtype	region	Reviewed on 2026-09-26
+Lieutenant Governors	type	role	Reviewed on 2026-09-26
+Mullapperiyar Dam	subtype	landmark	Reviewed on 2026-09-26
+Naxalite Area	subtype	area_type	Reviewed on 2026-09-26
+Palestine	subtype	country	Reviewed on 2026-09-26
+Peasants	type	group	Reviewed on 2026-09-26
+Prostitutes	type	group	Reviewed on 2026-09-26
+Satluj Yamuna Link Canal	subtype	landmark	Reviewed on 2026-09-26
+Seamen	type	group	Reviewed on 2026-09-26
+Street Children	type	group	Reviewed on 2026-09-26
+Switzerland	subtype	country	Reviewed on 2026-09-26
+Tehri Dam	subtype	landmark	Reviewed on 2026-09-26
+Tenant Farmers	type	group	Reviewed on 2026-09-26
+Thiruvananthapuram	subtype	city	Reviewed on 2026-09-26
+Tribal Women	type	group	Reviewed on 2026-09-26
+War Memorial	subtype	facility	Reviewed on 2026-09-26
+Architects	type	group	Reviewed on 2026-09-26
+Betta-Kuruba Community	type	group	Reviewed on 2026-09-26
+Bhagirathi River	subtype	river	Reviewed on 2026-09-26
+Canada	subtype	country	Reviewed on 2026-09-26
+Commercial Centre	subtype	area_type	Reviewed on 2026-09-26
+Damodar River	subtype	river	Reviewed on 2026-09-26
+Doha	subtype	city	Reviewed on 2026-09-26
+Eastern India	subtype	region	Reviewed on 2026-09-26
+Ecological Park	subtype	area_type	Reviewed on 2026-09-26
+Ex-MPs	type	group	Reviewed on 2026-09-26
+Foreign Diplomats	type	group	Reviewed on 2026-09-26
+Forensic Experts	type	group	Reviewed on 2026-09-26
+Golden Temple	subtype	landmark	Reviewed on 2026-09-26
+Greenland	subtype	region	Reviewed on 2026-09-26
+Gurudwaras	subtype	facility	Reviewed on 2026-09-26
+High Court Judges	type	group	Reviewed on 2026-09-26
+Hilly States	subtype	place_class	Reviewed on 2026-09-26
+Holy Land	subtype	region	Reviewed on 2026-09-26
+Husband	type	group	Reviewed on 2026-09-26
+INA	type	institution	Reviewed on 2026-09-26
+Indo-Pak Border	subtype	boundary	Reviewed on 2026-09-26
+Islands	subtype	place_class	Reviewed on 2026-09-26
+Italy	subtype	country	Reviewed on 2026-09-26
+Jain Tirtha	subtype	facility	Reviewed on 2026-09-26
+Leader of Opposition	type	role	Reviewed on 2026-09-26
+Maldives	subtype	country	Reviewed on 2026-09-26
+Mithila	subtype	region	Reviewed on 2026-09-26
+National River	subtype	place_class	Reviewed on 2026-09-26
+North Bengal	subtype	region	Reviewed on 2026-09-26
+Overseas Territories	subtype	place_class	Reviewed on 2026-09-26
+Ranchi	subtype	city	Reviewed on 2026-09-26
+Saraswati River	subtype	river	Reviewed on 2026-09-26
+Somalia	subtype	country	Reviewed on 2026-09-26
+South Africa	subtype	country	Reviewed on 2026-09-26
+South Asia	subtype	region	Reviewed on 2026-09-26
+Sunderbans	subtype	region	Reviewed on 2026-09-26
+Swarna Rekha River	subtype	river	Reviewed on 2026-09-26
+Towns	subtype	place_class	Reviewed on 2026-09-26

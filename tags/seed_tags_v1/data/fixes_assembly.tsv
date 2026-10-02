@@ -1,0 +1,12 @@
+tag	field	value	note
+Contempt Of House	merge	Contempt of House	manual rule, 2026-09-26, assembly repair: duplicate canonical name
+Agroindustry	merge	Agro-industry	manual rule, 2026-09-26, assembly repair: duplicate canonical name
+Economic and Social Development	merge	Economic And Social Development	manual rule, 2026-09-26, assembly repair: duplicate canonical name
+Basic  Needs	merge	Basic Needs	manual rule, 2026-09-26, assembly repair: duplicate canonical name
+Multi National Enterprises	merge	Multinational Enterprises	manual rule, 2026-09-26, assembly repair: duplicate canonical name
+Ex-servicemen	merge	ex-Servicemen	manual rule, 2026-09-26, assembly repair: duplicate canonical name
+Border Roads Organisation (BRO)	add_alias	Border Roads Organisation	manual rule, 2026-09-26, assembly repair: source spelling that the merge run changed
+Central Industrial Security Force	add_alias	Central Industrial Security Forces	manual rule, 2026-09-26, assembly repair: source spelling that the merge run changed
+Commission for Agricultural Costs and Prices	add_alias	Commission for Agricul. Costs and Prices	manual rule, 2026-09-26, assembly repair: source spelling that the merge run changed
+Maintenance and Repair	add_alias	Maintenance	manual rule, 2026-09-26, assembly repair: spelling without the trailing space
+Scheduled Castes and Scheduled Tribes (Prevention of Atrocities) Act	add_alias	The Scheduled Castes and the Scheduled Tribes (Prevention of Atrocities) Act	manual rule, 2026-09-26, assembly repair: spelling without the trailing space
