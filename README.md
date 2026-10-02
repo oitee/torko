@@ -51,7 +51,8 @@ This table defines the terms that this project uses.
 | **Attributed turn**   | A turn that Torko links to one member successfully.                                                                                       |                                                                  |
 | **Unattributed turn** | A turn that Torko cannot link to one member conclusively. Torko leaves the name blank. It does not guess.                                 |                                                                  |
 | **Debate category**   | The type of business that sansad.in assigns to each debate. There are 76 categories.                                                      | `MATTERS UNDER RULE-377`                                         |
-| **Topic tag**         | A subject keyword that sansad.in attaches to a debate. 70.5% of debates have one or more tags.                                            | `Coastal Areas`                                                  |
+| **sansad.in keyword** | A subject keyword that sansad.in attaches to a whole debate. 70.5% of debates have one or more keywords.                                  | `Coastal Areas`                                                  |
+| **Tag**               | A subject in Torko's own vocabulary. Torko gives tags to each speech, not to a whole debate.                                              | `Road Construction`                                              |
 | **Old-font Hindi**    | Hindi text in debates before about 2009, stored in a pre-Unicode font. It looks like broken Latin letters until Torko decodes it.         | `gÉÉÒ` = श्री                                                    |
 
 ## Run it
@@ -154,7 +155,7 @@ Torko links all three spellings of Adhir Ranjan Chowdhury's name from the earlie
 | Turns with no identified speaker (chair excluded) | 111,286                                                                           |
 | Speeches of 100 words or more with a named person | 97,043                                                                            |
 | Debate categories                                 | 76                                                                                |
-| Official topic tags                               | 6,976 distinct tags, on 70.5% of debates                                          |
+| sansad.in keywords                                | 6,976 distinct keywords, on 70.5% of debates                                      |
 | Average speech length                             | 415 words                                                                         |
 | Longest single speech                             | 103,632 words                                                                     |
 | Debates per term                                  | LS13: 7,616. LS14: 11,027. LS15: 11,216. LS16: 15,831. LS17: 13,272. LS18: 5,959. |
@@ -175,13 +176,23 @@ Torko links all three spellings of Adhir Ranjan Chowdhury's name from the earlie
 
 ## Next steps
 
-**1. Semantic search.** Today, search matches exact words. The next step is search by meaning. A query such as "water scarcity in rural districts" will also find speeches that use other words for the same idea. Each speech of 100 words or more will be converted into an embedding. There are 97,043 such speeches. PostgreSQL will store the embeddings with the `pgvector` extension. One query will combine meaning, exact words, and filters such as party and year. Each result will link to the official source.
+**1. Tags for each speech.** sansad.in attaches keywords to a whole debate, not to a single speech. One large debate can carry 59 keywords, and most of them do not apply to any single speech in it. Some subjects also have no keyword at all. For example, members discuss jallikattu in 26 debates, but only 1 of them has a keyword for it. Torko will give each speech its own tags and a one-line summary. Torko will record which model produced each tag, and on which date. With these tags, a user can rank members by subject and see how a subject changes over time.
 
-**2. AI topic tags.** sansad.in tags a whole debate, not a single speech. One large debate can carry 59 tags, and most of them do not apply to any single speech in it. Some topics also have no tag at all. For example, members discuss jallikattu in 26 debates, but only 1 of them has a tag for it. Use an LLM to give each speech its own topic labels (such as places mentioned, subject-matter etc.) and a one-line summary. We will record which model produced each label, and on which date. With these labels, a user can rank members by topic and see how a topic changes over time.
+The plan has these steps:
+
+1. Build a seed list of tags from the sansad.in keywords. **Done.**
+2. Store the tags in PostgreSQL, and convert each tag into an embedding. An embedding is a list of numbers that represents the meaning of a text.
+3. For each speech, an LLM writes a summary and lists the main entities in the speech. An entity is a subject, a place, a person, a law, or a scheme.
+4. For each entity, Torko finds the 10 nearest tags by exact name and by meaning. An LLM then chooses one of them, or none.
+5. Torko keeps each entity with no matching tag. After one full term, Torko groups these entities by meaning. A group that appears in 10 or more speeches becomes a new tag.
+
+**The seed list.** The seed list holds 4,473 tags. They come from the 5,319 sansad.in keywords that appear in 2 or more debates. Two LLM steps made the list. One model gave each keyword a type, a domain, and a description. A second model grouped the keywords that mean the same thing, for example `Compensation` and `Compensations`. A sample of the list was then manually reviewed. The repository keeps every model output and every review decision. A script rebuilds the list from those files and calls no model. See [`tags/seed_tags_v1/README.md`](tags/seed_tags_v1/README.md).
+
+**2. Semantic search.** Today, search matches exact words. The next step after tags is search by meaning. A query such as "water scarcity in rural districts" will also find speeches that use other words for the same idea. Each speech of 100 words or more will be converted into an embedding. There are 97,043 such speeches. PostgreSQL will store the embeddings with the `pgvector` extension. One query will combine meaning, exact words, and filters such as party and year. Each result will link to the official source.
 
 **Ideas we may explore after these steps.** We may pick the following based on what the first two steps show.
 
-- **Connections between topics and members.** Torko already records which member spoke in which debate, and who interrupted whom. Speech-level topics will add a new layer to these links. Then Torko can answer questions such as "Which members raised both coastal erosion and cyclone relief?"
+- **Connections between topics and members.** Torko already records which member spoke in which debate, and who interrupted whom. Speech-level tags will add a new layer to these links. Then Torko can answer questions such as "Which members raised both coastal erosion and cyclone relief?"
 
 - **Questions in plain language.** A user types a question. A small LLM converts it into filters for a known query and shows those filters to the user. The database, not the LLM, produces every result.
 
@@ -191,7 +202,7 @@ Torko links all three spellings of Adhir Ranjan Chowdhury's name from the earlie
 
 ## Tests
 
-Torko ships 519 tests. The tests run with no network access. 4 tests read the local database, so load `.env` first. The full run takes about 1 second.
+Torko ships 532 tests. The tests run with no network access. 4 tests read the local database, so load `.env` first. The full run takes about 1 second.
 
 ```bash
 set -a && source .env && set +a && python3 -m pytest
