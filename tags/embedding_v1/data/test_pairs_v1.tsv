@@ -1,0 +1,75 @@
+entity_text	acceptable_tags	kind	note
+queer	Transgender|Self- perceived gender identity|Sexual Behaviour	synonym	No tag uses the word queer.
+Unlawful Activities (Prevention) Act	Terrorism	law	No tag for this law. Trap: the tag Illegal Activities has the alias Unlawful Activities.
+Bharatiya Nyaya Sanhita	NONE|Criminal Law	law	2023 law that replaced the Indian Penal Code. Indian Penal Code is a different law, so it is not acceptable.
+Central Armed Police Forces	Paramilitary Forces	synonym	
+Aditya birla group	Industrial Houses|Corporate Houses	specific	No tag for Birla.
+Monetary Policy Committee	Monetary Policy|Reserve Bank of India (RBI)	specific	
+financial crisis	Financial Crisis|Economic Crisis|Economic Recession|Recession	control	Exact tag name exists. The other names are near-duplicate tags.
+notebandi	Demonetisation	hindi_latin	
+berozgari	Unemployment	hindi_latin	
+gau raksha	Cow Protection	hindi_latin	
+bidi mazdoor	Beedi Workers	hindi_latin	
+anganwadi didis	Anganwadi	hindi_latin	
+jati janganana	Caste Census	hindi_latin	
+OROP	One-Rank-One-Pension	short_form	The tag has no alias OROP.
+Coalgate	Coal Blocks	short_form	Nickname of the coal block allocation scandal.
+EWS quota	Economic Weaker Section (EWS)	short_form	
+NPA crisis	Non-Performing Assets	short_form	
+Agnipath scheme	Agniveer	short_form	Agnipath is the scheme. Agniveer is the name of the recruit.
+Galwan clash	Indo-China Relation|China	specific	
+electoral bonds	Political Funding	specific	
+Saradha scam	Chit Fund Companies	specific	
+Vijay Mallya loan default	Bank Frauds|Non-Performing Assets	specific	
+Mullaperiyar dam	Dams|Water Disputes	specific	
+Kudankulam plant	Nuclear Power Plants|Nuclear Energy	specific	
+Wayanad landslide	Landslides	specific	
+IPL	Cricket	specific	
+Section 124A	Sedition	law	
+GST compensation to states	Goods and Services Tax (GST)	law	
+Covid second wave oxygen shortage	Novel Coronavirus (COVID -19)|Oxygen	specific	
+Section 377	Sexual Behaviour|Transgender	law	
+Sabarimala women entry	Religious Places|Gender Discrimination	specific	
+heatwave deaths	Natural Calamities|Disaster Management|Disasters	specific	
+protest against the three farm bills	Farm Laws	synonym	
+virtual digital assets	Crypto Currency|bitcoin	synonym	
+deepfakes	Artificial Intelligence|Social Media	synonym	
+Pegasus snooping on journalists	Right to Privacy|Data Privacy	synonym	
+mob attacks on cattle traders	Mob Lynching|Cow Protection	synonym	
+demonitisation	Demonetisation	misspelling	
+Kashmiri Pundits	Kashmiri Pandits	misspelling	
+Naxalwad	Naxalism|Naxalites	misspelling	
+hate speech	NONE	none	No tag fits.
+euthanasia	NONE	none	No tag fits.
+Bharat Jodo Yatra	NONE	none	Political march. No tag fits.
+Orissa	Odisha	place	Old name of the state.
+Uttaranchal	Uttarakhand	place	Old name of the state.
+Mumbai	Bombay	place	The tag uses the old name.
+Puducherry	Pondicherry	place	The tag uses the old name.
+Gilgit-Baltistan	Pakistan Occupied Kashmir (PoK)	place	
+Ganges pollution	Ganga River|Namami Ganga Mission	place	
+Siachen glacier	Glaciers	place	
+PM-KISAN instalment	Pradhan Mantri Kisan Samman Nidhi Yojana	scheme	
+Jan Dhan accounts	Pradhan Mantri Jan Dhan Yojana	scheme	
+Ayushman card	National Health Protection Scheme (Ayushman Bharat)	scheme	
+khichdi in schools	Mid-Day-Meal Scheme	scheme	
+toilets under Swachh Bharat	Swachh Bharat Abhiyan|Toilet Facilities	scheme	
+PMAY houses	Pradhan Mantri Awaas Yojana	scheme	
+PMGSY roads	Prime Minister Gram Sadak Yojana (PMGSY)	scheme	
+Ujjwala gas connections	Cooking Gas|Liquified Petroleum Gas (LPG)	scheme	No Ujjwala tag exists.
+Make in India	Atmanirbhar Bharat	scheme	decision: Atmanirbhar Bharat is acceptable. No Make in India tag exists.
+adivasis	Scheduled Tribes	group	
+Dalit atrocities	Dalits|Scheduled Castes	group	
+gig workers	Unorganised Workers|Unorganised Sector	group	
+safai karamchari	Manual Scavengers	group	Hindi term for sanitation workers.
+tea garden labourers	Plantation Workers|Tea Gardens	group	
+Pradhan Mantri	Prime Minister	role	Hindi title.
+Mukhyamantri	Chief Minister	role	Hindi title.
+Rajyapal	Governor	role	Hindi title.
+Bapu	Mahatma Gandhi	person	
+street vendors	NONE	none	No tag fits.
+Sethusamudram project	NONE	none	No tag fits.
+Delhi mayor election	NONE	none	No tag fits.
+Uniform Civil Code	Uniform Civil Code	control	Exact tag name exists.
+Operation Sindoor	Operation Sindoor	control	Exact tag name exists.
+drinking water	Drinking Water|Potable Water	control	Exact tag name exists. Potable Water is a near-duplicate tag.

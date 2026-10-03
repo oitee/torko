@@ -27,7 +27,7 @@ What each step does:
 
 1. **Classify.** Each run got 400 keywords. For each keyword, it gave a type (for example `topic`, `law`, `place`), a domain from a fixed list of 28 that follow the Union ministries, and a description of below 20 words.
 2. **Merge near-duplicates.** The keywords were grouped by type and domain, because near-duplicates usually share both. Each run got one pack of at most 350 keywords. It put the keywords that mean the same thing into one group, chose one name for the group, and made the other names aliases. The rule was: when unsure, do not merge.
-3. **Assemble.** The script joins the groups into one list. It makes sure that each keyword appears exactly one time. When the merge run changed the spelling of a keyword, for example `Nfdc` to `NFDC`, the script attaches the original spelling as an alias.
+3. **Assemble.** The script joins the groups into one list. It makes sure that each keyword appears exactly one time. When the merge run changed the spelling of a keyword, for example `Nfdc` to `NFDC`, the script attaches the original spelling as an alias. Some sansad.in keywords start or end with a space, for example ` Caste Census`. The script removes these spaces from the tag name and keeps the original spelling as an alias. 5 tag names had such spaces.
 4. **Repair the assembly.** A manual repair merged 6 groups with near-identical names, for example `Agroindustry` and `Agro-industry`, and attached 3 keywords that the script could not place.
 5. **Fix the types.** The classify run had put job titles and classes of people under `person`. A rule was manually set during review: `person` is one named human, `role` is an office that one person holds at a time, and `group` is a class of many people. A manual fix applied the rule to each tag. It also gave each place a subtype, to separate real geography (`state`, `river`) from general areas (`Drought Prone Areas`).
 6. **Review.** A sample of the list was manually reviewed and each decision was written as one line in `data/review.tsv`.
@@ -62,6 +62,10 @@ The script calls no model. It reads `data/` and writes `results/` and `atlas/tag
 | `results/assembly_log.txt` | Every repair that the assembly step made. |
 | `results/chunks/`, `results/merge_in/` | The exact inputs of steps 1 and 2. |
 | `atlas/index.html` | A browser view of the tag list. |
+
+## After this folder
+
+`scripts/load_tags.py` loads `results/seed_tags_v1.tsv` into the database table `tags`. The vectors for each tag, the test pairs, and the result of the comparison of task types are in `tags/embedding_v1/`. Read its `README.md`.
 
 ## Known faults
 

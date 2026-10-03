@@ -1256,7 +1256,7 @@ Financial Aspects	topic		Economy, Finance and Taxation	The money-related side of
 Government Service	topic		Elections and Governance	Employment in government sector.	-	20
 Houses	topic		Urban Development and Housing	Residential structures for dwelling.	-	20
 Industrial Production	topic		Industry, Trade and Commerce	Manufacturing output of industries.	-	20
-Insurance Regulatory and Development Authority (IRDA 	institution		Economy, Finance and Taxation	Government regulator of insurance industry in India.	-	20
+Insurance Regulatory and Development Authority (IRDA	institution		Economy, Finance and Taxation	Government regulator of insurance industry in India.	Insurance Regulatory and Development Authority (IRDA 	20
 Kargil War	topic		Defence	A military conflict fought between India and Pakistan in 1999.	-	20
 Militants	topic		Home Affairs and Law and Order	Armed groups engaged in insurgency.	-	20
 Municipal Corporations	topic		Urban Development and Housing	Local government bodies that run public services in large cities.	-	20
@@ -1893,7 +1893,6 @@ Waste Treatment	topic		Environment, Forests and Climate	The processing of solid 
 Water Quality	topic		Water and Drinking Water	Characteristics of water determining its suitability for use.	-	11
 Women Safety	topic		Women and Children	Protection measures ensuring personal security of women in public and private.	-	11
 Women atrocities	topic		Women and Children	Violence and harm committed against women in society.	-	11
- Caste Census	law		Elections and Governance	Survey to count population by caste groups for government statistics.	-	10
 All India Council of Technical Education (AICTE)	institution		Education	National body regulating technical education in India	All India Council Of Technical Education	10
 Arms Supply	topic		Defence	The provision or purchase of weapons for military use.	Weapon Procurement	10
 Autonomous Body	institution		Elections and Governance	Semi-independent organization operating under government authority and oversight.	-	10
@@ -1902,6 +1901,7 @@ Border Roads	topic		Roads and Highways	Roads built and kept up in areas near Ind
 Bureau Of Indian Standards	institution		Science, Technology and Telecom	National body that sets quality standards for Indian products, formerly called ISI.	Indian Standards Institution	10
 CG Grants	topic		Elections and Governance	Financial grants from the central government to states.	Central Governmental Grants	10
 Cable Operators	topic		Media and Broadcasting	Businesses that supply cable television and broadband to homes.	-	10
+Caste Census	law		Elections and Governance	Survey to count population by caste groups for government statistics.	 Caste Census	10
 Central Board of Direct Taxes (CBDT)	institution		Economy, Finance and Taxation	Authority administering income tax and direct taxes in India.	-	10
 Chargesheet	topic		Home Affairs and Law and Order	Formal accusation document filed against an accused person by police.	-	10
 Cheques	topic		Economy, Finance and Taxation	Written orders for payment drawn on bank accounts.	-	10
@@ -2385,7 +2385,7 @@ Industrial Projects	topic		Industry, Trade and Commerce	Large undertakings in th
 Infiltrators	topic		Home Affairs and Law and Order	Persons illegally entering from neighboring countries	-	7
 Inter-Services Intelligence	institution		External Affairs	Pakistan's main military intelligence agency.	-	7
 Land Leasing	topic		Agriculture and Farmers	Rental arrangement for use of agricultural land	-	7
-Land Pooling 	topic		Urban Development and Housing	Consolidation of land parcels for development	-	7
+Land Pooling	topic		Urban Development and Housing	Consolidation of land parcels for development	Land Pooling 	7
 Land Rights	law		Social Justice and Reservation	Legal ownership and usage rights of land	-	7
 Libraries	institution		Culture, Tourism and Sports	Institutions providing access to books and information	-	7
 Line of Actual Control	place	boundary	-	De facto border between India and China	-	7
@@ -3142,7 +3142,7 @@ Post And Telegraphs	institution		Science, Technology and Telecom	Government depa
 Posting	topic		Labour and Employment	The assignment of a government employee to a specific job location or role.	-	4
 Power Demand	topic		Energy	The amount of electricity that consumers require.	-	4
 Power Distribution Losses	topic		Energy	Electricity lost while being carried through the grid to consumers.	-	4
-Pradhan Mantri Garib Kalyan Anna Yojana (PM-GKAY) 	scheme		Food and Public Distribution	Government scheme that gave free food grains to poor families.	-	4
+Pradhan Mantri Garib Kalyan Anna Yojana (PM-GKAY)	scheme		Food and Public Distribution	Government scheme that gave free food grains to poor families.	Pradhan Mantri Garib Kalyan Anna Yojana (PM-GKAY) 	4
 Pre-Matric Scholarship	scheme		Education	Government scholarship for students below the secondary school level.	-	4
 Presiding Officers	topic		Parliament and Procedure	Officials who manage parliament's sessions and debates.	-	4
 Primary Agricultural Credit Societies	institution		Agriculture and Farmers	Village-level cooperative societies that give farmers short-term credit.	PACS	4
@@ -4183,7 +4183,7 @@ National Games	topic		Culture, Tourism and Sports	Multi-sport event bringing ath
 National Gene Fund	scheme		Science, Technology and Telecom	Government fund that supports research into genes and genetic conservation.	-	2
 National Horticulture Mission	scheme		Agriculture and Farmers	Government program that supports growing fruit and vegetables.	-	2
 National Institute of Medicinal Plants	institution		Health and Family Welfare	Research organization for medicinal plant studies	-	2
-National Institute of Pharmaceuticals  Education and Research (NIPER) 	institution		Health and Family Welfare	Higher education institution for pharmaceutical science	-	2
+National Institute of Pharmaceuticals  Education and Research (NIPER)	institution		Health and Family Welfare	Higher education institution for pharmaceutical science	National Institute of Pharmaceuticals  Education and Research (NIPER) 	2
 National Integration Council	institution		Elections and Governance	Advisory body on communal harmony and national integration	-	2
 National Interest	topic		Elections and Governance	Collective benefit and welfare of the nation	-	2
 National Livelihood Mission	scheme		Social Justice and Reservation	Government program that supports skill development and self-employment for the poor.	-	2

@@ -97,3 +97,18 @@ def test_split_moves_one_alias_into_a_new_group():
 def test_split_of_a_name_that_is_not_an_alias_stops_the_build():
     with pytest.raises(SystemExit):
         apply_edit({"A": group("A")}, "A", "split", "B")
+
+
+def test_assemble_removes_outer_spaces_from_a_tag_name_and_keeps_the_source_spelling():
+    merged = [[" Caste Census", "law", "-", "d", "-", "10"]]
+    groups, log = assemble(merged, {" Caste Census": 10})
+    assert groups[0]["tag"] == "Caste Census"
+    assert groups[0]["aliases"] == [" Caste Census"]
+    assert check_cover(finish(groups, {" Caste Census": 10}), {" Caste Census": 10}) == []
+    assert any("outer spaces removed: ' Caste Census'" in line for line in log)
+
+
+def test_assemble_stops_when_a_trimmed_name_is_the_name_of_another_group():
+    merged = [["Land Pooling ", "topic", "-", "d", "-", "2"], ["Land Pooling", "topic", "-", "d", "-", "3"]]
+    with pytest.raises(SystemExit):
+        assemble(merged, {"Land Pooling ": 2, "Land Pooling": 3})

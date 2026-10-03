@@ -96,6 +96,21 @@ def assemble(merged: list[list[str]], counts: dict[str, int]) -> tuple[list[dict
             log.append(f"attached: {name!r} -> {hit['tag']!r}")
         else:
             log.append(f"UNATTACHED: {name!r}")
+
+    # Some sansad.in keywords start or end with a space, for example " Caste Census".
+    # The tag name loses the spaces. The source spelling stays as an alias, so the
+    # cover check still finds the keyword.
+    for g in list(groups.values()):
+        clean = g["tag"].strip()
+        if clean == g["tag"]:
+            continue
+        if clean in groups:
+            raise SystemExit(f"outer spaces: {g['tag']!r} without its spaces is the name of another group")
+        log.append(f"outer spaces removed: {g['tag']!r} -> {clean!r}")
+        del groups[g["tag"]]
+        g["aliases"].insert(0, g["tag"])
+        g["tag"] = clean
+        groups[clean] = g
     return list(groups.values()), log
 
 

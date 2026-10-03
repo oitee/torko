@@ -21,6 +21,11 @@ attached: 'National Company Law Appellate Tribunal (NCLAT) ' -> 'National Compan
 attached: 'Ncc' -> 'NCC'
 attached: 'Ndmc' -> 'NDMC'
 attached: 'Research And Analysis Wing (raw)' -> 'Research And Analysis Wing (RAW)'
+outer spaces removed: 'Insurance Regulatory and Development Authority (IRDA ' -> 'Insurance Regulatory and Development Authority (IRDA'
+outer spaces removed: 'National Institute of Pharmaceuticals  Education and Research (NIPER) ' -> 'National Institute of Pharmaceuticals  Education and Research (NIPER)'
+outer spaces removed: ' Caste Census' -> 'Caste Census'
+outer spaces removed: 'Pradhan Mantri Garib Kalyan Anna Yojana (PM-GKAY) ' -> 'Pradhan Mantri Garib Kalyan Anna Yojana (PM-GKAY)'
+outer spaces removed: 'Land Pooling ' -> 'Land Pooling'
 applied 11 edits from fixes_assembly.tsv
 applied 252 edits from fixes_types.tsv
 applied 109 edits from review.tsv
