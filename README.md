@@ -181,12 +181,14 @@ Torko links all three spellings of Adhir Ranjan Chowdhury's name from the earlie
 The plan has these steps:
 
 1. Build a seed list of tags from the sansad.in keywords. **Done.**
-2. Store the tags in PostgreSQL, and convert each tag into an embedding. An embedding is a list of numbers that represents the meaning of a text.
-3. For each speech, an LLM writes a summary and lists the main entities in the speech. An entity is a subject, a place, a person, a law, or a scheme.
+2. Store the tags in PostgreSQL, and convert each tag into an embedding. An embedding is a list of numbers that represents the meaning of a text. **Done.**
+3. For each speech, an LLM writes a summary and lists the main entities in the speech. An entity is a subject, a place, a person, a law, or a scheme. **Started:** a first sample for review, see [`tags/extraction_v1/README.md`](tags/extraction_v1/README.md).
 4. For each entity, Torko finds the 10 nearest tags by exact name and by meaning. An LLM then chooses one of them, or none.
 5. Torko keeps each entity with no matching tag. After one full term, Torko groups these entities by meaning. A group that appears in 10 or more speeches becomes a new tag.
 
 **The seed list.** The seed list holds 4,473 tags. They come from the 5,319 sansad.in keywords that appear in 2 or more debates. Two LLM steps made the list. One model gave each keyword a type, a domain, and a description. A second model grouped the keywords that mean the same thing, for example `Compensation` and `Compensations`. A sample of the list was then manually reviewed. The repository keeps every model output and every review decision. A script rebuilds the list from those files and calls no model. See [`tags/seed_tags_v1/README.md`](tags/seed_tags_v1/README.md).
+
+**The tag embeddings.** Each tag is stored in PostgreSQL with an embedding from Google `gemini-embedding-001`. A test of 74 hand-written pairs of entity and tag compared two settings of the model. With the better setting, the correct tag is among the 10 nearest tags for 62 of the 68 pairs that have a correct tag (91%). See [`tags/embedding_v1/README.md`](tags/embedding_v1/README.md).
 
 **2. Semantic search.** Today, search matches exact words. The next step after tags is search by meaning. A query such as "water scarcity in rural districts" will also find speeches that use other words for the same idea. Each speech of 100 words or more will be converted into an embedding. There are 97,043 such speeches. PostgreSQL will store the embeddings with the `pgvector` extension. One query will combine meaning, exact words, and filters such as party and year. Each result will link to the official source.
 
@@ -202,7 +204,7 @@ The plan has these steps:
 
 ## Tests
 
-Torko ships 532 tests. The tests run with no network access. 4 tests read the local database, so load `.env` first. The full run takes about 1 second.
+Torko ships 554 tests. The tests run with no network access. 4 tests read the local database, so load `.env` first. The full run takes about 1 second.
 
 ```bash
 set -a && source .env && set +a && python3 -m pytest

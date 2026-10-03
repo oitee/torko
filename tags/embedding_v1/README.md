@@ -12,13 +12,13 @@ A vector from one model cannot be compared with a vector from another model. A v
 
 ## The decisions
 
-| Decision | Value |
-|---|---|
-| Model | Google `gemini-embedding-001` |
-| Size | 1,536 numbers for each vector, scaled to length 1 (Google asks for this below 3,072 numbers) |
-| Text for each tag | name, aliases, type, domain, and description, in one line |
-| Storage | PostgreSQL with the pgvector extension, tables `tags` and `tag_embeddings` (`db/init/10-tags.sql`) |
-| Index | none, because a full scan of 4,473 rows takes a few milliseconds |
+| Decision          | Value                                                                                              |
+| ----------------- | -------------------------------------------------------------------------------------------------- |
+| Model             | Google `gemini-embedding-001`                                                                      |
+| Size              | 1,536 numbers for each vector, scaled to length 1 (Google asks for this below 3,072 numbers)       |
+| Text for each tag | name, aliases, type, domain, and description, in one line                                          |
+| Storage           | PostgreSQL with the pgvector extension, tables `tags` and `tag_embeddings` (`db/init/10-tags.sql`) |
+| Index             | none, because a full scan of 4,473 rows takes a few milliseconds                                   |
 
 Example of the text for one tag:
 
@@ -57,7 +57,7 @@ The shared code is in `tag_embed.py`. The tests are in `tests/test_tag_embed.py`
 
 ## The test pairs
 
-`data/test_pairs_v1.tsv` holds 74 pairs. The owner approved each pair. Each line holds four fields, separated by tab characters:
+`data/test_pairs_v1.tsv` holds 74 pairs. Each pair was manually approved. Each line holds four fields, separated by tab characters:
 
 | Field | Meaning |
 |---|---|
@@ -92,6 +92,8 @@ Arm B is equal to or better than arm A in each kind. The largest differences are
 
 **Done.** Both arms are embedded for all 4,473 tags. The comparison ran on 74 pairs.
 
-**Next.** The owner chooses the winning arm. Then the vectors of the other arm are deleted from `tag_embeddings`, and the owner copies the two tables to the server with `pg_dump`.
+**Done** Choose the winning arm, namely, Arm B.
+
+**Next**. The vectors of the other arm are deleted from `tag_embeddings`.
 
 **Unknown.** How the rates change on real subjects that an LLM takes from speeches. The test pairs were written by hand.
