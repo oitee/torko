@@ -182,9 +182,10 @@ The plan has these steps:
 
 1. Build a seed list of tags from the sansad.in keywords. **Done.**
 2. Store the tags in PostgreSQL, and convert each tag into an embedding. An embedding is a list of numbers that represents the meaning of a text. **Done.**
-3. For each speech, an LLM writes a summary and lists the main entities in the speech. An entity is a subject, a place, a person, a law, or a scheme. **Started:** a first sample for review, see [`tags/extraction_v1/README.md`](tags/extraction_v1/README.md).
-4. For each entity, Torko finds the 10 nearest tags by exact name and by meaning. An LLM then chooses one of them, or none.
-5. Torko keeps each entity with no matching tag. After one full term, Torko groups these entities by meaning. A group that appears in 10 or more speeches becomes a new tag.
+3. For each speech, an LLM writes a one-sentence summary and lists at most 8 topics and at most 8 named entities: laws, schemes, institutions, places, persons, groups of people, and offices. **Started:** the script stores each answer in PostgreSQL and never sends the same speech twice. See [`tags/extraction_v1/README.md`](tags/extraction_v1/README.md).
+4. A decision model checks each topic and entity against the speech, and keeps only the real subjects. A decision model cannot write text. It picks from fixed answers and gives a probability for each one.
+5. For each kept entity, Torko finds the 20 nearest tags by exact name and by meaning. The decision model then chooses one of them, or none. A link needs a high probability, because a wrong tag is worse than no tag.
+6. Torko keeps each entity with no matching tag. After one full term, Torko groups these entities by meaning. A group that appears in 10 or more speeches, in 3 or more debates, becomes a candidate tag. An LLM names it, and it stays marked as unverified until a person reviews it. Then the unmatched entities are matched again against the larger list.
 
 **The seed list.** The seed list holds 4,473 tags. They come from the 5,319 sansad.in keywords that appear in 2 or more debates. Two LLM steps made the list. One model gave each keyword a type, a domain, and a description. A second model grouped the keywords that mean the same thing, for example `Compensation` and `Compensations`. A sample of the list was then manually reviewed. The repository keeps every model output and every review decision. A script rebuilds the list from those files and calls no model. See [`tags/seed_tags_v1/README.md`](tags/seed_tags_v1/README.md).
 
@@ -204,7 +205,7 @@ The plan has these steps:
 
 ## Tests
 
-Torko ships 554 tests. The tests run with no network access. 4 tests read the local database, so load `.env` first. The full run takes about 1 second.
+Torko ships 561 tests. The tests run with no network access. 4 tests read the local database, so load `.env` first. The full run takes about 1 second.
 
 ```bash
 set -a && source .env && set +a && python3 -m pytest
