@@ -1,0 +1,25 @@
+entity_name_id	type	name	n_speeches	status	p	tag	next_options	owner
+81	institution	Supreme Court of India	2	linked	1.00	Supreme Court	Constitution 0.00, High Courts 0.00, Constituent Assembly 0.00	right
+83	place	United States	2	linked	1.00	USA	Indo-US relations 0.00, Canada 0.00, Indo-US Nuclear Deal 0.00	right
+92	place	Uttar Pradesh	2	linked	1.00	Uttar Pradesh	Liberhan Commission 0.00, States 0.00, Universal Immunisation Programme 0.00	right
+74	institution	Election Commission of India	1	linked	1.00	Election Commission	Government Of India 0.00, Chief Election Commissioner 0.00, National Emblem 0.00	right
+94	institution	Forest Department	1	linked	0.74	Ministry of Environment and Forests	NONE 0.25, Forestry 0.01, Forest Conservation 0.00	right
+75	place	Ladakh	1	linked	0.96	Ladakh	Jammu & Kashmir 0.03, NONE 0.01, Kargil 0.00	right
+95	scheme	National Mission for Clean Ganga	1	linked	0.88	Namami Ganga Mission	NONE 0.11, National Ganga River Basin Authority 0.01, Swachh Bharat Abhiyan 0.00	wrong
+101	place	Pakistan-administered Kashmir	1	linked	1.00	Pakistan Occupied Kashmir (PoK)	Article 370 0.00, Line of Control 0.00, Jammu & Kashmir 0.00	right
+100	other	Shimla Agreement	1	linked	0.92	Shimla Agreement	Memorandum of Understanding (MoU) 0.03, Agreements 0.03, Bilateral Agreements 0.01	right
+80	other	Simla Agreement	1	linked	1.00	Shimla Agreement	Nuclear Agreement 0.00, Indo-Pak Border 0.00, Memorandum of Understanding (MoU) 0.00	right
+85	law	Arbitration and Conciliation Act	1	none	0.51		NONE 0.51, Arbitration 0.47, Arbitration Agreement 0.02	right
+97	person	Atal Bihari Vajpayee	1	none	0.53		Ex-prime Minister 0.53, NONE 0.32, Prime Minister 0.13	right
+79	place	Bayyaram	1	none	0.90		NONE 0.90, Telangana 0.10, Polavaram Dam 0.00	right
+76	group	Gujjar Bakarwal	1	none	0.66		NONE 0.66, Nomadic Tribes 0.12, Scheduled Tribes 0.10	right
+93	place	Jaunpur	1	none	0.79		NONE 0.79, Uttar Pradesh 0.21, Ram Janma-bhumi Babri Masjid 0.00	right
+73	place	Kannauj	1	none	0.77		NONE 0.77, Uttar Pradesh 0.12, Heritage City 0.11	right
+78	place	Kazipet	1	none	0.85		NONE 0.85, Telangana 0.15, SCs & STs lists 0.00	right
+102	place	Lakhimpur Kheri	1	none	0.63		NONE 0.63, Uttar Pradesh 0.37, Minimum Support  Prices (MSP) 0.00	right
+99	group	Lawyers	1	none	0.59		Lawyers 0.59, Advocates 0.41, Legal Profession 0.00	missed
+72	place	Meerut	1	none	0.89		NONE 0.89, Uttar Pradesh 0.11, Liberhan Commission 0.00	right
+71	place	Muzaffarnagar	1	none	0.89		NONE 0.89, Uttar Pradesh 0.11, Ram Janma-bhumi Babri Masjid 0.00	right
+77	person	Rajnath Singh	1	none	0.78		NONE 0.78, Member of Parliament 0.14, Defence Ministry 0.08	right
+98	other	Thirukkural	1	none	0.53		Tamil Literature 0.53, NONE 0.36, Moral Values 0.11	right
+84	person	Zulfikar Ali Bhutto	1	none	0.92		NONE 0.92, Ex-prime Minister 0.03, Political Leaders 0.02	right

@@ -1,0 +1,132 @@
+item_id	speech_id	list	type	model_type	name	mention	p_keep	p_refers	kept	owner
+9	260741	topic	topic		River Pollution	प्रदूषण	0.99	-	yes	
+10	260741	topic	topic		River Cleaning	प्रदूषण मुक्त करने	0.99	-	yes	
+11	260741	other	place		Kali River	काली नदी	1.00	0.65	yes	
+12	260741	other	place		Ganga River	गंगा	1.00	0.90	yes	
+13	260741	other	scheme		Namami Gange Programme	नमामि गंगे	1.00	0.89	yes	
+14	260741	other	institution	scheme	National Mission for Clean Ganga	नेशनल मिशन फॉर क्लीन गंगा (NMCG)	0.97	0.89	yes	
+15	260741	other	place		Uttar Pradesh	उत्तर प्रदेश	0.99	0.89	yes	
+16	260741	other	place		Muzaffarnagar	मुजफफरनगर	0.98	0.88	yes	
+17	260741	other	place		Meerut	मेरठ	0.74	0.83	yes	
+18	260741	other	place		Kannauj	कन्नौज	0.95	0.83	yes	
+19	348672	topic	topic		President's Rule	राष्ट्रपति शासन	1.00	-	yes	
+20	348672	topic	topic		Reservation policy	आरक्षण	0.99	-	yes	
+21	348672	topic	topic		Elections	चुनाव	0.98	-	yes	
+22	348672	topic	topic		Border security and shelling	सीज़फायर	0.99	-	yes	
+23	348672	topic	topic		Local governance	पंचायत	0.92	-	yes	
+24	348672	other	place		Jammu and Kashmir	जम्मू - कश्मीर	1.00	0.92	yes	
+25	348672	other	law		Jammu and Kashmir Reservation Act, 2004	जम्मू - कश्मीर आरक्षण अधिनियम, 2004	1.00	0.87	yes	
+26	348672	other	institution		Election Commission	चुनाव आयोग	0.98	0.89	yes	
+27	348672	other	place		Ladakh	लद्दाख	0.76	0.89	yes	
+28	348672	other	place		Pakistan	पाकिस्तान	1.00	0.91	yes	
+29	348672	other	group		Gujjar Bakarwal	गुर्जर बकरवाल	0.70	0.87	yes	
+30	348672	other	person		Rajnath Singh	श्रीमान् राजनाथ सिंह जी	0.64	0.91	yes	
+31	348672	other	person		Narendra Modi	नरेन्द्र मोदी	0.43	0.91	no	
+32	348687	topic	topic		President's rule	धारा 356	0.56	-	no	
+33	348687	topic	topic		Assembly elections	विधान सभा का चुनाव	0.81	-	yes	
+34	348687	topic	topic		Reservation	रिजर्वेशन में अमेंडमेंट	0.90	-	yes	
+35	348687	topic	topic		Border security and welfare	इंटरनेशनल बार्डर	0.58	-	no	
+36	348687	topic	topic		Peace and human touch	इंसानियत, कश्मीरियत	0.99	-	yes	
+37	348687	other	place		Jammu and Kashmir	जम्मू - कश्मीर	1.00	0.93	yes	
+38	348687	other	person		Sheikh Abdullah	शेख अब्दुल्ला साहब	0.17	0.92	no	
+39	348687	other	person		Indira Gandhi	श्रीमती इंदिरा गांधी जी	0.03	0.95	no	
+40	348687	other	person		Rajiv Gandhi	श्री राजीव गांधी जी	0.02	0.94	no	
+41	348687	other	person		Narendra Modi	आदरणीय प्रधान मंत्री नरेन्द्र मोदी जी	0.08	0.96	no	
+42	348687	other	person		Atal Bihari Vajpayee	वाजपेयी जी	0.73	0.86	yes	
+43	348687	other	person		H. D. Deve Gowda	श्री एच. डी. देवेगौड़ा जी	0.39	0.93	no	
+44	348687	other	institution		Election Commission of India	चुनाव आयोग	0.95	0.87	yes	
+1	348688	topic	topic		Reservation	रिजर्वेशन	0.95	-	yes	
+2	348688	topic	topic		Border safety and bunkers	बंकर्स	0.98	-	yes	
+3	348688	topic	topic		Youth employment and industrial development	युवाओं के पास नौकरी नहीं थी	0.71	-	yes	
+4	348688	topic	topic		Panchayat elections	पंचायत के चुनाव	0.71	-	yes	
+5	348688	topic	topic		Tourism	टूरिज्म	0.03	-	no	
+6	348688	other	place		Jammu and Kashmir	जम्मू एण्ड कश्मीर	1.00	0.93	yes	
+7	348688	other	law		Jammu and Kashmir Reservation (Amendment) Bill, 2019	रिजर्वेशन पर जो बिल आया है	0.93	0.75	yes	
+8	348688	other	person		Kalvakuntla Chandrashekar Rao	के. सी. आर. जी	0.64	0.59	no	
+45	347763	topic	topic		State reorganization assurances	assurances given to the state of Telegana	1.00	-	yes	
+46	347763	topic	topic		Railway coach factory	Railway Coach Factory was assured at Kazipet	0.03	-	no	
+47	347763	topic	topic		Steel plant	Steel Plant was assured at Bayyaram	0.03	-	no	
+48	347763	topic	topic		Tribal university	Tribal University was assured in the Act	0.97	-	yes	
+49	347763	other	place		Telangana	Telangana	1.00	0.91	yes	
+50	347763	other	law		Andhra Pradesh Reorganisation Act	Andhra Pradesh Reorganisation Act	1.00	0.88	yes	
+51	347763	other	place		Kazipet	Kazipet	0.79	0.79	yes	
+52	347763	other	place		Bayyaram	Bayyaram	0.79	0.67	yes	
+60	346044	topic	topic		Agricultural pricing	remunerative price for their agricultural produce	1.00	-	yes	
+61	346044	topic	topic		Farmers' distress	plight of farmers of this country	0.99	-	yes	
+62	346044	topic	topic		Farmers' suicide	forced to commit suicides	0.12	-	no	
+63	346044	topic	topic		Agricultural subsidies	subsidy for fertilizers and raw material	0.44	-	no	
+64	346044	other	place		Tenkasi	Tenkasi parliamentary constituency	0.06	0.79	no	
+65	346044	other	law	other	Thirukkural	Thirukkural	0.85	0.87	yes	
+66	346044	other	group		Farmers	farmers	1.00	0.76	yes	
+67	346044	other	person		M. K. Stalin	Thalapathi Thiru M.K Stalin	0.01	0.88	no	
+68	346044	other	person		Udhayanidhi Stalin	Thiru Udhayanidhi Stalin	0.00	0.87	no	
+53	345769	topic	topic		Air connectivity	सुबह की फ्लाइट	1.00	-	yes	
+54	345769	other	place		Bhavnagar	भावनगर	1.00	0.92	yes	
+55	345769	other	place		Mumbai	मुंबई	1.00	0.94	yes	
+56	345769	other	place		Alang Ship Breaking Yard	शिपब्रेकिंग यार्ड	0.39	0.81	no	
+57	345769	other	place		Velavadar Blackbuck National Park	ब्लैक बग की नेशनल सेंन्चुरी	0.18	0.70	no	
+58	345769	other	place		Pipavav Port	पीपावा पोर्ट	0.11	0.86	no	
+59	345769	other	place		Palitana	पालीताना	0.14	0.85	no	
+69	345470	topic	topic		Kashmir mediation claim	कश्मीर मुद्दे पर किसी तृतीय पक्ष का हस्तक्षेप नहीं होगा	1.00	-	yes	
+70	345470	topic	topic		Bilateral relations	शिमला एग्रीमेंट के मुताबिक कश्मीर मुद्दा बाइलेटरल है	0.86	-	yes	
+71	345470	other	person		Narendra Modi	नरेन्द्र मोदी जी	1.00	0.94	yes	
+72	345470	other	person		Donald Trump	ट्रंप साहब	1.00	0.93	yes	
+73	345470	other	person		Indira Gandhi	इंदिरा गाँधी जी	0.83	0.94	yes	
+74	345470	other	law	other	Simla Agreement	शिमला एग्रीमेंट	0.99	0.92	yes	
+75	345470	other	place		United States	अमेरिका	0.99	0.93	yes	
+76	345470	other	place		Pakistan	पाकिस्तान	0.86	0.92	yes	
+77	345470	other	place	?	Kashmir	कश्मीर	1.00	0.91	yes	
+78	345470	other	person		Zulfikar Ali Bhutto	भुट्टो	0.68	0.82	yes	
+85	345472	topic	topic		Kashmir mediation claim	कश्मीर के सवाल पर किसी की मध्यस्थता	0.99	-	yes	
+86	345472	topic	topic		India-Pakistan relations	पाकिस्तान के साथ	0.73	-	yes	
+87	345472	topic	topic		National sovereignty and pride	राष्ट्रीय स्वाभिमान	0.90	-	yes	
+88	345472	other	place		United States	अमेरिका	0.98	0.93	yes	
+89	345472	other	place		Pakistan	पाकिस्तान	0.99	0.92	yes	
+90	345472	other	place		Jammu and Kashmir	कश्मीर	0.99	0.65	yes	
+91	345472	other	person		Donald Trump	मिस्टर ट्रम्प	0.99	0.92	yes	
+92	345472	other	person		Narendra Modi	प्रधान मंत्री मोदी जी	0.95	0.93	yes	
+93	345472	other	person		S. Jaishankar	विदेश मंत्री श्री जयशंकर जी	0.99	0.92	yes	
+94	345472	other	law	other	Shimla Agreement	शिमला समझौते	1.00	0.89	yes	
+95	345472	other	place		Pakistan-administered Kashmir	पाक अधिकृत जम्मू - कश्मीर	0.98	0.91	yes	
+96	344219	topic	topic		Arbitration	Indian arbitration system	0.98	-	yes	
+97	344219	topic	topic		Arbitration Council	Arbitration Council	0.95	-	yes	
+98	344219	topic	topic		Foreign Arbitrators	foreigners can also be arbitrators	0.98	-	yes	
+99	344219	other	law		Arbitration and Conciliation Act	Arbitration Act, 1996	0.76	0.77	yes	
+100	344219	other	institution		High-Level Committee to Review Institutionalisation of Arbitration Mechanism in India	High-Level Committee	0.91	0.52	no	
+101	344219	other	law		Companies Act	Companies Act	0.99	0.56	no	
+102	344219	other	place		United Kingdom	U.K.	0.20	0.87	no	
+103	344219	other	place		Hong Kong	Hong Kong	0.13	0.86	no	
+104	344219	other	place		Singapore	Singapore	0.11	0.87	no	
+105	344219	other	role		Law Minister of India	Law Minister	0.99	0.74	yes	
+106	344219	other	group		Lawyers	lawyers	0.85	0.63	yes	
+79	344220	topic	topic		Arbitration	Arbitration Act	0.99	-	yes	
+80	344220	topic	topic		Dispute resolution	Dispute is between two parties	0.99	-	yes	
+81	344220	topic	topic		Judicial jurisdiction	High Court and the hon. Supreme Court	0.99	-	yes	
+82	344220	other	institution		Supreme Court of India	Supreme Court	0.99	0.85	yes	
+83	344220	other	institution		High Court	High Court	1.00	0.79	yes	
+84	344220	other	institution		Ministry of Jal Shakti	जल शक्ति	0.21	0.70	no	
+107	344225	topic	topic		Arbitration	Arbitration Council of India	0.97	-	yes	
+108	344225	topic	topic		Ease of Doing Business	Ease of Doing Business	0.38	-	no	
+109	344225	topic	topic		Judiciary	appointment of Chief Justice	0.94	-	yes	
+110	344225	other	institution		Arbitration Council of India	Arbitration Council of India	1.00	0.82	yes	
+111	344225	other	institution		Supreme Court of India	Supreme Court	0.98	0.87	yes	
+112	344225	other	institution		High Court	High Court	0.99	0.76	yes	
+113	344225	other	person		B.N. Srikrishna	Justice Srikrishna	0.32	0.64	no	
+120	342375	topic	topic		Rail connectivity	रेल कनेक्टिविटी	0.99	-	yes	
+121	342375	topic	topic		Railway line construction	नया रेलमार्ग	0.99	-	yes	
+122	342375	other	place		Gujarat	गुजरात	1.00	0.91	yes	
+123	342375	other	place		Chanasma	चाणस् ‍ मा	1.00	0.89	yes	
+124	342375	other	place		Radhanpur	राधनपुर	1.00	0.90	yes	
+125	342375	other	place		Kutch	कच्छ	1.00	0.86	yes	
+126	342375	other	place		Kandla	कांडला	0.55	0.85	no	
+127	342375	other	place		Pakistan	पाकिस्तान	0.98	0.93	yes	
+114	340402	topic	topic		Rail connectivity	पलिया, निघासन, बेलरायां और सिंघाई रेल मार्ग	1.00	-	yes	
+115	340402	topic	topic		Railway gauge conversion	आमान परिवर्तन	0.18	-	no	
+116	340402	topic	topic		Railway survey	सर्वे	0.98	-	yes	
+117	340402	other	place		Lakhimpur Kheri	लखीमपुर खीरी	0.98	0.89	yes	
+118	340402	other	place		Uttar Pradesh	यू० पी०	0.74	0.82	yes	
+119	340402	other	institution		Forest Department	वन विभाग	0.99	0.87	yes	
+134	340545	topic	topic		Crop damage by stray animals	छुट्टा पशुओं	1.00	-	yes	
+135	340545	topic	topic		Agricultural compensation	वाजिब मुआवजा	0.99	-	yes	
+136	340545	other	place		Jaunpur	जौनपुर	0.99	0.85	yes	
+137	340545	other	group		Farmers	किसान	1.00	0.93	yes	
