@@ -31,3 +31,22 @@ def resolve_label_to_person(
     if not key:
         return None
     return unique_person_by_key.get(key)
+
+
+def normalize_label(label: str | None) -> str:
+    """The form that the table label_aliases stores. A lookup must use it too."""
+    return " ".join((label or "").split())
+
+
+def label_alias_person(
+    aliases: dict[tuple[int, str], int],
+    loksabha: int,
+    label: str | None,
+    is_presiding: Callable[[str], bool],
+    is_crowd: Callable[[str], bool],
+) -> int | None:
+    """`aliases` maps (term, normalised label) to a person id."""
+    key = normalize_label(label)
+    if not key or is_presiding(key) or is_crowd(key):
+        return None
+    return aliases.get((loksabha, key))

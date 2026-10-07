@@ -16,7 +16,7 @@ from debate_fetch import (
 )
 from debate_fetch_legacy import looks_legacy, split_by_speaker_legacy
 from db_roster import load_db_roster
-from label_attribution import build_unique_index, resolve_label_to_person
+from label_attribution import build_unique_index, label_alias_person, resolve_label_to_person
 
 
 def person_id_lookup(engine) -> dict[str, int]:
@@ -35,6 +35,18 @@ def alias_lookup(engine) -> dict[str, int]:
                 text("SELECT mp_code, person_id FROM mpcode_aliases")
             ).fetchall()
         return {str(r.mp_code): r.person_id for r in rows}
+    except Exception:
+        return {}
+
+
+def label_alias_lookup(engine) -> dict[tuple[int, str], int]:
+    # Empty when the table does not exist yet.
+    try:
+        with engine.connect() as conn:
+            rows = conn.execute(
+                text("SELECT loksabha, speaker_label, person_id FROM label_aliases")
+            ).fetchall()
+        return {(r.loksabha, r.speaker_label): r.person_id for r in rows}
     except Exception:
         return {}
 
@@ -61,6 +73,7 @@ def main() -> None:
     roster_cache: dict[int, list] = {}
     persons = person_id_lookup(engine)
     aliases = alias_lookup(engine)
+    label_aliases = label_alias_lookup(engine)
     roles = role_id_lookup(engine)
     with engine.connect() as conn:
         roster_index = build_unique_index(
@@ -115,6 +128,16 @@ def main() -> None:
                 if pid is not None:
                     person_id = pid
                     name_source = "minister-name"
+            # A label that the parser could not link, but that label_aliases links
+            # to one member for this term. Used last, so it never overrides the parser.
+            if person_id is None and role_id is None:
+                pid = label_alias_person(
+                    label_aliases, row.loksabha, seg.get("speakerLabel"),
+                    is_presiding_label, is_crowd_label,
+                )
+                if pid is not None:
+                    person_id = pid
+                    name_source = "label-alias"
             values.append({
                 "debate_id": row.id,
                 "seq": seq,
