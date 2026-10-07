@@ -6,7 +6,7 @@ An entity is a subject that a reader can search for: a topic, a law, a scheme, a
 
 The answers go into the database tables `speech_extractions` and `speech_items` (`db/init/11-extractions.sql`). A sample run also writes a review file into `results/`.
 
-The script is idempotent. The database holds at most one extraction per speech: the unique key is `speech_id`. The script never sends a speech to a model when the database already holds an extraction for it, whatever model made that extraction. The `model` column is metadata for review and audit only. An extraction made with an older prompt version is "stale": the script counts it and skips it, and `--redo-stale` replaces it. `--force` replaces every selected extraction, also an extraction made with the current version. The script deletes an old extraction in the same transaction that stores the new one. So a failed answer keeps the old extraction. A speech with no extraction and a failed answer stays without one, and the next run tries again.
+The script is idempotent. The database holds at most one extraction per speech: the unique key is `speech_id`. The script never sends a speech to a model when the database already holds an extraction for it, whatever model made that extraction. The column `model_id` names the model that made the extraction. It points to the table `models`, which holds one row for each model name. This column is metadata for review and audit only. The model name `rule-stub` means a fixed answer with no model call. It is used for a procedural speech, for example papers laid on the Table, and for a speech with no text. The script never counts a `rule-stub` extraction as stale. An extraction made with an older prompt version is "stale": the script counts it and skips it, and `--redo-stale` replaces it. `--force` replaces every selected extraction, also an extraction made with the current version. The script deletes an old extraction in the same transaction that stores the new one. So a failed answer keeps the old extraction. A speech with no extraction and a failed answer stays without one, and the next run tries again.
 
 ## Prompt versions
 
@@ -21,6 +21,12 @@ The rules:
 The script does not check rule 1. A person must follow it.
 
 On 2026-10-03, all 136 rows in the database were set to `v1`. Some of these rows came from an earlier text of `extract_v1.md`, before rule 7 (papers laid on the Table) was added. A decision accepted this small inaccuracy.
+
+## Which speeches have an extraction
+
+The scope is every speech of LS 17 and LS 18 with a known member and 99 or more words. Every speech in this scope has an extraction since 2026-10-07: 27,290 speeches.
+
+Most of these rows came from earlier batch runs outside this script, with prompt versions `v1` and `v2`. Each row records the model name and the prompt version of its batch run. A one-off loader stored their answers with the same checks that the script uses. The database then holds 28,394 extractions. 1,103 of them are for speeches under 99 words, because the batch runs counted the words in a different way.
 
 ## How to run it
 
@@ -41,7 +47,7 @@ The options:
 | `--all` | off | Every qualifying speech in the year or term. No review file. |
 | `--debates` | 10 | The number of random debates. |
 | `--per-debate` | 3 | The largest number of random speeches from one debate. |
-| `--min-words`, `--max-words` | 100, 5000 | Only speeches in this range of words. |
+| `--min-words`, `--max-words` | 99, 5000 | Only speeches in this range of words. |
 | `--seed` | 1 | The same seed gives the same sample. |
 | `--model` | `gemini-3.5-flash-lite` | The LLM that extracts. |
 | `--prompt` | the highest version | The prompt version, for example `v1`. |

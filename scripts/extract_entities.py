@@ -9,8 +9,8 @@ The prompts are in tags/extraction_v1/prompts/. --prompt v<N> picks a version. T
 
 Idempotent. The tables speech_extractions and speech_items
 (db/init/11-extractions.sql) hold at most one extraction per speech. A speech
-that has a row is never sent again, whatever model made the row. The model
-column is metadata for review and audit only. A row made with an older prompt
+that has a row is never sent again, whatever model made the row. The column model_id
+(table models) is metadata for review and audit only. A row made with an older prompt
 version is "stale". It is counted and skipped, unless
 --redo-stale. --force extracts every selected speech again, also the speeches
 done with the current version. An old row is deleted in the same transaction
@@ -232,11 +232,10 @@ def fetch_speeches(conn, ids: list[int]) -> list[dict]:
 
 
 def plan(ids: list[int], existing: dict[int, str], version: str, redo_stale: bool,
-         force: bool = False) -> tuple[list[int], list[int], list[int]]:
-    """Split the ids into (to extract, done with this prompt version, stale).
-    Stale ids are in `to extract` only with redo_stale. With force, every id is in `to extract`."""
-    done = [i for i in ids if existing.get(i) == version]
-    stale = [i for i in ids if i in existing and existing[i] != version]
+         force: bool = False, stubs: frozenset[int] = frozenset()) -> tuple[list[int], list[int], list[int]]:
+    """Returns (to extract, done, stale). A row of the model rule-stub counts as done, and only force extracts it again."""
+    done = [i for i in ids if existing.get(i) == version or (i in existing and i in stubs)]
+    stale = [i for i in ids if i in existing and existing[i] != version and i not in stubs]
     todo = [i for i in ids if i not in existing] + (stale if redo_stale or force else []) + (done if force else [])
     return todo, done, stale
 
@@ -245,12 +244,18 @@ def estimate(words: int, n: int) -> dict:
     return {"input": int(words * 1.5 + n * 1000), "output": n * 470}
 
 
+def model_id(conn, name: str) -> int:
+    """Adds the model name to the table models if it is new."""
+    conn.execute(text("INSERT INTO models (name) VALUES (:n) ON CONFLICT (name) DO NOTHING"), {"n": name})
+    return conn.execute(text("SELECT id FROM models WHERE name = :n"), {"n": name}).scalar()
+
+
 def store(conn, s: dict, model: str, version: str, clean: dict, warnings: list[str], answer: dict, tokens: dict) -> None:
     ext_id = conn.execute(text("""
-        INSERT INTO speech_extractions (speech_id, model, prompt_version, language, summary, warnings, raw, tokens)
+        INSERT INTO speech_extractions (speech_id, model_id, prompt_version, language, summary, warnings, raw, tokens)
         VALUES (:sid, :m, :ver, :lang, :summary, :warnings, CAST(:raw AS jsonb), CAST(:tokens AS jsonb))
         RETURNING id
-    """), {"sid": s["speech_id"], "m": model, "ver": version, "lang": clean["language"],
+    """), {"sid": s["speech_id"], "m": model_id(conn, model), "ver": version, "lang": clean["language"],
            "summary": clean["summary"], "warnings": warnings, "raw": json.dumps(answer, ensure_ascii=False),
            "tokens": json.dumps(tokens)}).scalar()
     rows = [{"ext": ext_id, "sid": s["speech_id"], "list": lst, "pos": pos, "name": e["name"], "type": e["type"],
@@ -268,8 +273,9 @@ def store(conn, s: dict, model: str, version: str, clean: dict, warnings: list[s
 def load_records(conn, ids: list[int]) -> list[dict]:
     speeches = {s["speech_id"]: s for s in fetch_speeches(conn, ids)}
     exts = conn.execute(text("""
-        SELECT id, speech_id, model, prompt_version, language, summary, warnings FROM speech_extractions
-        WHERE speech_id = ANY(:ids)
+        SELECT e.id, e.speech_id, m.name AS model, e.prompt_version, e.language, e.summary, e.warnings
+        FROM speech_extractions e JOIN models m ON m.id = e.model_id
+        WHERE e.speech_id = ANY(:ids)
     """), {"ids": ids}).all()
     items = conn.execute(text("""
         SELECT extraction_id, list, name, type, model_salience, mention, mention_found FROM speech_items
@@ -348,7 +354,7 @@ def main() -> None:
     ap.add_argument("--debates", type=int, default=10, help="sample mode: random debates (default 10)")
     ap.add_argument("--per-debate", type=int, default=3, help="sample mode: speeches per debate at most (default 3)")
     ap.add_argument("--seed", type=int, default=1)
-    ap.add_argument("--min-words", type=int, default=100)
+    ap.add_argument("--min-words", type=int, default=99)
     ap.add_argument("--max-words", type=int, default=5000)
     ap.add_argument("--model", default=DEFAULT_MODEL)
     ap.add_argument("--prompt", help="prompt version, for example v1 (default: the highest version in prompts/)")
@@ -370,10 +376,13 @@ def main() -> None:
     engine = get_engine()
     with engine.connect() as conn:
         ids, debates_in_scope = select_speech_ids(conn, where, params, args)
-        existing = dict(conn.execute(text(
-            "SELECT speech_id, prompt_version FROM speech_extractions WHERE speech_id = ANY(:ids)"),
-            {"ids": ids}).all())
-        todo, done, stale = plan(ids, existing, version, args.redo_stale, args.force)
+        rows = conn.execute(text("""
+            SELECT e.speech_id, e.prompt_version, m.name = 'rule-stub' AS is_stub
+            FROM speech_extractions e JOIN models m ON m.id = e.model_id
+            WHERE e.speech_id = ANY(:ids)"""), {"ids": ids}).all()
+        existing = {r.speech_id: r.prompt_version for r in rows}
+        stubs = frozenset(r.speech_id for r in rows if r.is_stub)
+        todo, done, stale = plan(ids, existing, version, args.redo_stale, args.force, stubs)
         words = conn.execute(text("SELECT coalesce(sum(word_count), 0) FROM speeches WHERE id = ANY(:ids)"),
                              {"ids": todo}).scalar()
         over = conn.execute(text(f"""

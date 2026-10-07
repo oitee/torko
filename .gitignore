@@ -24,3 +24,6 @@ fixtures/
 tags/*/results/chunks/
 tags/*/results/merge_in/
 tags/*/atlas/tags.json
+
+# one-off loader of the extraction folders, not part of the repo
+db_load/

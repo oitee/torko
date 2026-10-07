@@ -107,6 +107,15 @@ def test_force_extracts_again_every_speech_also_the_done_ones():
     assert plan([1, 2, 3], existing, "new", redo_stale=True, force=True) == ([3, 2, 1], [1], [2])
 
 
+def test_plan_never_counts_a_rule_stub_as_stale():
+    from scripts.extract_entities import plan
+    existing = {1: "new", 2: "old", 3: "old"}
+    stubs = frozenset({3})
+    assert plan([1, 2, 3, 4], existing, "new", redo_stale=True, stubs=stubs) == ([4, 2], [1, 3], [2])
+    assert plan([3], existing, "new", redo_stale=True, stubs=stubs) == ([], [3], [])
+    assert plan([3], existing, "new", redo_stale=True, force=True, stubs=stubs) == ([3], [3], [])
+
+
 def test_mention_found_ignores_spaces_zero_width_characters_and_case():
     from scripts.extract_entities import mention_found
     speech = "रेल मंत्री जी, चाणस्‍मा से राधनपुर तक NEW Railway line"
