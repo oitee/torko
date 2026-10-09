@@ -40,6 +40,8 @@ A manual review marked 150 tags as relevant, over 30 speeches and 600 tags (20 p
 
 Relevant tags occur at every rank. 16 of the 150 are at ranks 16 to 20. So the 20 nearest tags probably miss some relevant tags, and the first column is an upper limit. The decision model judges each candidate tag, so a larger N costs more questions but adds no wrong tag by itself.
 
+**Decided: N = 12 (2026-10-09).** With N = 12, the top N holds 122 of the 150 relevant tags (81%). The cost of the tag questions in the judging step was estimated for all 52,630 speeches of LS 16, 17, and 18, at about 130 input tokens per tag question and $0.042 per million input tokens: N = 5 about $1.44, N = 10 about $2.88, N = 12 about $3.46, N = 15 about $4.32, N = 20 about $5.76.
+
 ## How to run it
 
 Run from the repo root. `.env` must hold `GEMINI_API_KEY`.
