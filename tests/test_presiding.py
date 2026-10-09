@@ -57,8 +57,7 @@ class TestAnnotatePresiding:
         assert segs[0]["mpName"] == "MR. SPEAKER"
 
     def test_anchored_segment_is_never_downgraded(self):
-        # Owner's decision: role over person applies to UNANCHORED chair labels;
-        # an anchored segment keeps its anchor attribution untouched.
+        # An anchored segment keeps its anchor attribution.
         segs = [{"mpCode": "100", "speakerLabel": "MR. SPEAKER", "mpName": "Shri Kodikunnil Suresh"}]
         annotate_speakers(segs, ROSTER)
         assert segs[0]["nameSource"] == "anchor"

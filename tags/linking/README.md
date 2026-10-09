@@ -24,10 +24,10 @@ python3 scripts/link_entities.py --dry-run
 python3 scripts/link_entities.py
 ```
 
-`--test-pairs` runs steps 1 to 4 on the owner's 74 test pairs (`tags/embedding_v1/data/test_pairs_v1.tsv`) and writes nothing to the database. It counts four outcomes: correct link, wrong link, missed link (`NONE` where a tag fits), and correct `NONE`.
+`--test-pairs` runs steps 1 to 4 on the 74 hand-made test pairs (`tags/embedding_v1/data/test_pairs_v1.tsv`) and writes nothing to the database. It counts four outcomes: correct link, wrong link, missed link (`NONE` where a tag fits), and correct `NONE`.
 
 The script is idempotent. A link stays until the model or question version changes. A `NONE` is tried again when new tags arrive.
 
 ## Results
 
-A normal run writes a review file into `results/`: Markdown to read, and TSV with an empty `owner` column. Write `right`, `wrong`, or `missed` in that column.
+A normal run writes a review file into `results/`: Markdown to read, and TSV with an empty `review` column. Write `right`, `wrong`, or `missed` in that column.

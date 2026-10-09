@@ -1,6 +1,6 @@
 """Stage 4 must judge topics by centrality and named items by their role and their name, and never let the type decide."""
 from scripts.judge_items import (LEVELS, ROLES, TYPES, Thresholds, gate_rates, judged_by, keep, questions_for,
-                                 read_item, summary_state)
+                                 read_item, read_marks, summary_state)
 
 
 def named(point, refers, absent=0.0):
@@ -76,8 +76,15 @@ def test_summary_state_holds_the_summary_and_each_mention():
 
 def test_gate_rates_count_both_directions():
     r = gate_rates([(True, True), (True, False), (False, False), (False, True), (False, False)])
-    assert r == {"owner_keep": 2, "model_keeps_of_those": 1, "owner_drop": 3, "model_drops_of_those": 2}
+    assert r == {"manual_keep": 2, "model_keeps_of_those": 1, "manual_drop": 3, "model_drops_of_those": 2}
 
 
 def test_version_names_model_and_questions():
     assert judged_by("jev-1.13.0") == "jev-1.13.0 q3"
+
+
+def test_marks_are_read_from_a_review_column_and_from_an_old_owner_column(tmp_path):
+    for column in ("review", "owner"):
+        path = tmp_path / f"{column}.tsv"
+        path.write_text(f"item_id\tname\t{column}\n1\ta\tKeep\n2\tb\tdrop\n3\tc\t\n4\td\tmaybe\n", encoding="utf-8")
+        assert read_marks(path) == {1: True, 2: False}

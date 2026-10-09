@@ -1,5 +1,8 @@
-from scripts.link_entities import (MAX_OPTIONS, NONE, decide_link, link_question, link_state, merge_candidates,
-                                   needs_decision, norm_name, outcome)
+import json
+
+from scripts.link_entities import (EXACT_MATCH, EXACT_VERSION, MAX_OPTIONS, NONE, Tags, decide_link, exact_tag,
+                                   link_question, link_state, merge_candidates, needs_decision, norm_name, outcome,
+                                   rule_report, split_by_rule, write_exact_link)
 
 
 def test_norm_name_folds_case_spaces_and_outer_punctuation():
@@ -57,3 +60,114 @@ def test_the_four_gate_outcomes():
     assert outcome(None, ["Terrorism"]) == "missed link"
     assert outcome(None, [NONE, "Criminal Law"]) == "correct none"
     assert outcome("Criminal Law", [NONE, "Criminal Law"]) == "correct link"
+
+
+class Rows:
+    def __init__(self, rows=None, scalar=None):
+        self.rows, self.value = rows or [], scalar
+
+    def all(self):
+        return self.rows
+
+    def scalar(self):
+        return self.value
+
+
+class FakeConn:
+    def __init__(self, tag_rows):
+        self.tag_rows, self.calls = tag_rows, []
+
+    def execute(self, stmt, params=None):
+        sql = str(stmt)
+        if "FROM tags WHERE status" in sql:
+            return Rows(self.tag_rows)
+        if "max(id)" in sql:
+            return Rows(scalar=max(r.id for r in self.tag_rows))
+        self.calls.append((sql, params))
+        return Rows()
+
+
+class TagRow:
+    def __init__(self, id, tag, type="topic", aliases=()):
+        self.id, self.tag, self.type, self.description, self.aliases = id, tag, type, "d", list(aliases)
+
+
+def tags_with(*rows):
+    return Tags(FakeConn(list(rows)))
+
+
+def name_row(norm, type="topic"):
+    return {"id": 1, "norm_name": norm, "type": type, "name": norm}
+
+
+def test_one_exact_tag_links_without_the_model():
+    tags = tags_with(TagRow(1, "Water"), TagRow(2, "Rivers"))
+    by_rule, rest = split_by_rule([name_row("water"), name_row("dams")], tags.exact)
+    assert [r["norm_name"] for r in by_rule] == ["water"]
+    assert [r["norm_name"] for r in rest] == ["dams"]
+    assert exact_tag(tags.exact, "water") == 1
+
+
+def test_two_distinct_exact_tags_go_to_the_model():
+    tags = tags_with(TagRow(1, "Water"), TagRow(2, "Jal", aliases=["Water"]))
+    assert exact_tag(tags.exact, "water") is None
+    by_rule, rest = split_by_rule([name_row("water")], tags.exact)
+    assert by_rule == [] and len(rest) == 1
+
+
+def test_an_alias_match_counts_and_the_same_tag_twice_counts_once():
+    tags = tags_with(TagRow(1, "Illegal Activities", aliases=["Unlawful Activities", "illegal activities"]))
+    assert exact_tag(tags.exact, "unlawful activities") == 1
+    assert exact_tag(tags.exact, "illegal activities") == 1
+
+
+def test_a_rejected_tag_is_not_loaded_so_it_does_not_match():
+    tags = tags_with(TagRow(1, "Water"))
+    assert exact_tag(tags.exact, "rivers") is None
+
+
+def test_the_tag_of_another_linked_name_is_not_a_tag_match():
+    tags = tags_with(TagRow(1, "Water"))
+    linked = {"jal": 1}
+    assert exact_tag(tags.exact, "jal") is None
+    assert split_by_rule([name_row("jal")], tags.exact)[0] == [] and "jal" in linked
+
+
+def test_the_exact_link_is_written_with_the_reason_and_no_probability():
+    tags = tags_with(TagRow(7, "Water"))
+    conn = FakeConn([])
+    write_exact_link(conn, name_row("water"), tags)
+    sql, params = conn.calls[0]
+    assert "link_p = NULL" in sql and "link_status = 'linked'" in sql
+    assert params["tid"] == 7 and params["by"] == EXACT_VERSION and params["why"] == EXACT_MATCH
+    assert json.loads(params["c"])[0]["source"] == "exact"
+
+
+def linked_row(by, tag_id, status="linked", tsv=10):
+    return {"link_status": status, "linked_by": by, "tag_set_version": tsv, "tag_id": tag_id}
+
+
+def test_an_exact_link_stays_and_is_not_decided_again():
+    assert not needs_decision(linked_row(EXACT_VERSION, 1), "m q1", 99, exact=1)
+
+
+def test_an_exact_link_is_decided_again_when_the_exact_tag_changes_or_force_is_set():
+    assert needs_decision(linked_row(EXACT_VERSION, 1), "m q1", 10, exact=2)
+    assert needs_decision(linked_row(EXACT_VERSION, 1), "m q1", 10, force=True, exact=1)
+
+
+def test_a_name_that_had_the_rule_and_now_has_two_exact_tags_goes_to_the_model():
+    assert needs_decision(linked_row(EXACT_VERSION, 1), "m q1", 10, exact=None)
+
+
+def test_a_model_decided_name_with_one_exact_tag_gets_the_rule():
+    assert needs_decision(linked_row("m q1", 1), "m q1", 10, exact=1)
+    assert needs_decision(linked_row("m q1", None, status="none"), "m q1", 10, exact=1)
+
+
+def test_the_report_lists_exact_links_where_the_types_differ():
+    tags = tags_with(TagRow(1, "Illegal Activities", "topic", ["Unlawful Activities"]), TagRow(2, "Water", "topic"))
+    rows = [name_row("unlawful activities", "law"), name_row("water", "topic"), name_row("dams")]
+    rep = rule_report(rows, tags)
+    assert len(rep["one"]) == 2
+    assert rep["mismatches"] == [("unlawful activities", "law", "Illegal Activities", "topic")]

@@ -39,7 +39,7 @@ def test_presiding_interjection_does_not_break_a_speech():
 
 
 def test_short_heckle_by_another_mp_bridges():
-    # A -> B ("But Sir!", short) -> A  ==> one speech, per owner's call.
+    # A -> B ("But Sir!", short) -> A  ==> one speech, by decision.
     turns = [
         T(0, person_id=5, word_count=300),
         T(1, person_id=9, word_count=8),  # heckle

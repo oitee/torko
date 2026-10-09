@@ -35,8 +35,9 @@ is written in its own transaction as soon as its answer arrives.
 Which speeches: every speech with an extraction, or only those in one --year
 or one --term. In sample mode (no --all) a review file is written in
 tags/judging/results/: a Markdown file to read and a TSV file with an empty
-`owner` column. The owner writes keep or drop in that column, and --score FILE
-compares the owner's marks with the model's decisions.
+`review` column. You write keep or drop in that column, and --score FILE
+compares your marks with the model's decisions. --score also reads the old
+column name `owner`.
 
 Needs TYPESAFE_API_KEY. Run from the repo root:
 
@@ -245,32 +246,37 @@ def rethreshold(engine, where: str | None, params: dict, version: str, t: Thresh
 
 
 def gate_rates(pairs: list[tuple[bool, bool]]) -> dict:
-    """pairs = (owner keeps, model keeps). The two stage 4 gate numbers, with their counts."""
-    owner_keep = [m for o, m in pairs if o]
-    owner_drop = [m for o, m in pairs if not o]
-    return {"owner_keep": len(owner_keep), "model_keeps_of_those": sum(owner_keep),
-            "owner_drop": len(owner_drop), "model_drops_of_those": sum(1 for m in owner_drop if not m)}
+    """pairs holds (manual keep, model keep) for each item."""
+    manual_keep = [m for o, m in pairs if o]
+    manual_drop = [m for o, m in pairs if not o]
+    return {"manual_keep": len(manual_keep), "model_keeps_of_those": sum(manual_keep),
+            "manual_drop": len(manual_drop), "model_drops_of_those": sum(1 for m in manual_drop if not m)}
 
 
-def score(engine, path: Path, version: str, t: Thresholds) -> None:
-    """Compare the owner's keep or drop marks with the model's decisions, for topics and named items apart."""
+def read_marks(path: Path) -> dict[int, bool]:
     marks = {}
     with path.open(encoding="utf-8") as f:
         for row in csv.DictReader(f, delimiter="\t"):
-            mark = (row.get("owner") or "").strip().lower()
+            mark = (row.get("review") or row.get("owner") or "").strip().lower()
             if mark in ("keep", "drop"):
                 marks[int(row["item_id"])] = mark == "keep"
+    return marks
+
+
+def score(engine, path: Path, version: str, t: Thresholds) -> None:
+    """Compare the manual keep or drop marks with the model's decisions, for topics and named items apart."""
+    marks = read_marks(path)
     if not marks:
-        raise SystemExit(f"no row in {path} has keep or drop in the owner column")
+        raise SystemExit(f"no row in {path} has keep or drop in the review column")
     with engine.connect() as conn:
         rows = conn.execute(text(f"SELECT {JUDGED_COLUMNS}, i.type FROM speech_items i "
                                  "WHERE i.id = ANY(:ids) AND i.judged_by = :by"), {"ids": list(marks), "by": version}).all()
-    print(f"{len(marks)} items marked by the owner, {len(rows)} of them judged with {version}. {t}.")
+    print(f"{len(marks)} items marked by hand, {len(rows)} of them judged with {version}. {t}.")
     for label, sel in (("topics", [r for r in rows if r.type == "topic"]),
                        ("named items", [r for r in rows if r.type != "topic"]), ("all", rows)):
         r = gate_rates([(marks[x.id], keep(judgement(x), t)) for x in sel])
-        print(f"  {label:11}: the model keeps {r['model_keeps_of_those']} of the {r['owner_keep']} items that the owner "
-              f"keeps, and drops {r['model_drops_of_those']} of the {r['owner_drop']} items that the owner drops")
+        print(f"  {label:11}: the model keeps {r['model_keeps_of_those']} of the {r['manual_keep']} items that the manual review "
+              f"keeps, and drops {r['model_drops_of_those']} of the {r['manual_drop']} items that the manual review drops")
 
 
 def write_review(engine, speech_ids: list[int], label: str, model: str) -> Path:
@@ -292,11 +298,11 @@ def write_review(engine, speech_ids: list[int], label: str, model: str) -> Path:
           f"{len(speech_ids)} speeches. For a topic, `P(keep)` is P(central or supporting), kept at {t.level}. "
           f"For a named item, `P(keep)` is P(part of the member's point), kept at {t.point} together with "
           f"`P(refers)` at {t.refers}. `Model type` shows the model's type only when it differs from the extraction type. "
-          f"Write keep or drop in the `owner` column of `{stem}.tsv`.", ""]
+          f"Write keep or drop in the `review` column of `{stem}.tsv`.", ""]
     with (out_dir / f"{stem}.tsv").open("w", encoding="utf-8", newline="") as f:
         w = csv.writer(f, delimiter="\t")
         w.writerow(["item_id", "speech_id", "list", "type", "model_type", "name", "mention", "p_keep", "p_refers",
-                    "kept", "owner"])
+                    "kept", "review"])
         for sid in speech_ids:
             s = speeches.get(sid)
             mine = [i for i in items if i.speech_id == sid]
@@ -346,7 +352,7 @@ def main() -> None:
     ap.add_argument("--force", action="store_true", help="judge again the items done with this version")
     ap.add_argument("--dry-run", action="store_true", help="print the counts, call no model")
     ap.add_argument("--rethreshold", action="store_true", help="compute `kept` again from the stored probabilities")
-    ap.add_argument("--score", type=Path, help="a review TSV with the owner column filled in")
+    ap.add_argument("--score", type=Path, help="a review TSV with the review column filled in")
     args = ap.parse_args()
 
     engine = get_engine()

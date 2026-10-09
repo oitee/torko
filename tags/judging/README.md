@@ -27,4 +27,4 @@ The script is idempotent. It skips each item that the current model and question
 
 ## Results
 
-A sample run writes two files into `results/`: a Markdown file to read, and a TSV file with an empty `owner` column. Write `keep` or `drop` in that column for each item. Then `--score` compares your marks with the model's decisions at several thresholds.
+A sample run writes two files into `results/`: a Markdown file to read, and a TSV file with an empty `review` column. Write `keep` or `drop` in that column for each item. Then `--score` compares your marks with the model's decisions at several thresholds.
