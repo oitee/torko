@@ -5,6 +5,7 @@ Run from the repo root:
 
     set -a && source .env && set +a
     python3 scripts/embed_tags.py --task-type RETRIEVAL_DOCUMENT
+    python3 scripts/embed_tags.py --task-type RETRIEVAL_DOCUMENT --dry-run   # count only
 """
 from __future__ import annotations
 
@@ -33,6 +34,8 @@ def to_embed(tags: list[dict], stored: dict[int, str]) -> list[dict]:
 def main() -> None:
     ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     ap.add_argument("--task-type", required=True, choices=sorted(TASK_TYPES))
+    ap.add_argument("--dry-run", action="store_true",
+                    help="count the tags that need a vector and estimate the input tokens. No API call, no write.")
     args = ap.parse_args()
 
     engine = get_engine()
@@ -48,6 +51,11 @@ def main() -> None:
     todo = to_embed(tags, stored)
     print(f"{len(tags)} tags, {len(todo)} need a vector ({MODEL}, {args.task_type})", flush=True)
     if not todo:
+        return
+    if args.dry_run:
+        chars = sum(len(t["text"]) for t in todo)
+        print(f"dry run: {chars} characters, about {chars // 4} input tokens (4 characters per token). "
+              "Nothing sent, nothing written.", flush=True)
         return
     vectors = embed_texts([t["text"] for t in todo], args.task_type)
 
