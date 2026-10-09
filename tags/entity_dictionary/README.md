@@ -32,7 +32,7 @@ The rules count the uses of a mention over the items of the kept names only. An 
 
 The file `data/exclude.tsv` is tracked and has three columns: `kind` (`name` or `mention`), `value`, and `reason`. A `name` row drops every item whose name has the same spelling key as the value. A `mention` row drops every item that has this mention, whatever its name. The script prints the number of dropped mention uses for each reason.
 
-The file follows the "do not extract" rules of the extraction prompt. It holds the House and its bodies and procedure, titles and offices with no named person, and India itself. The prompt allows India only in a comparison with another country, and the lookup cannot see a comparison. The owner reviews the file. Change the file and build the dictionary again to change the result.
+The file follows the "do not extract" rules of the extraction prompt. It holds the House and its bodies and procedure, titles and offices with no named person, and India itself. The prompt allows India only in a comparison with another country, and the lookup cannot see a comparison. A manual review of the file on 2026-10-09 added six House names: Lok Sabha Secretariat, Parliament House, President's Address, Motion of Thanks on the President's Address, Privileges Committee, and Committee of Privileges. The file now holds 33 names. Change the file and build the dictionary again to change the result.
 
 ## Columns
 
@@ -72,18 +72,18 @@ python3 scripts/entity_lookup_gate.py           # writes results/gate_report.md,
 
 ## Build result (2026-10-09)
 
-Before the three fixes (2026-10-07), the build had these numbers. After the fixes, they are in the second column. Each count is a number of items (mention uses) out of 166,478 items read.
+Before the three fixes (2026-10-07), the build had these numbers. After the fixes and the six added exclusions, they are in the second column. Each count is a number of items (mention uses) out of 166,478 items read.
 
 | | Before | After |
 |---|---|---|
-| Names in 3 or more speeches | 6,630 | 6,586 |
-| Dropped by exclusion | 0 | 701 (India), 593 (body or procedure), 634 (title or office), 445 (person mention with an office word) |
+| Names in 3 or more speeches | 6,630 | 6,580 |
+| Dropped by exclusion | 0 | 701 (India), 619 (body or procedure), 634 (title or office), 445 (person mention with an office word) |
 | Dropped because the name has fewer than 3 speeches | 26,032 | 24,608 |
-| Dropped because the mention has fewer than 2 uses | 14,960 | 15,366 |
+| Dropped because the mention has fewer than 2 uses | 14,960 | 15,359 |
 | Dropped because the mention has 3 characters or fewer | 3,661 | 3,630 |
-| Dropped as ambiguous | 17,936 | 15,518 |
-| Kept | 103,889 | 104,983 |
-| Names in the dictionary | 5,003 | 5,045 |
+| Dropped as ambiguous | 17,936 | 15,516 |
+| Kept | 103,889 | 104,966 |
+| Names in the dictionary | 5,003 | 5,040 |
 
 The merge joined 1,648 groups that had more than one spelling. The source holds 42,264 distinct speeches.
 
@@ -91,10 +91,10 @@ The merge joined 1,648 groups that had more than one spelling. The source holds 
 
 `results/gate_report.md` has the full tables and every denominator. Before the fixes, the values are in brackets.
 
-- Precision and recall proxies. The test used the 3,764 speeches that `gemini-3.8-flash` extracted. The lookup ran with an empty "already has" set. With K = 8, 6,796 of 21,460 looked-up names (31.7%, before 25.6%) are names that the LLM also extracted. With no cap, 10,230 of 56,682 (18.0%, before 16.2%). Of 13,132 LLM names that are in the dictionary, the lookup found 6,796 with K = 8 (51.8%, before 44.9%) and 10,230 with no cap (77.9%, before 76.7%).
+- Precision and recall proxies. The test used the 3,764 speeches that `gemini-3.8-flash` extracted. The lookup ran with an empty "already has" set. With K = 8, 6,802 of 21,453 looked-up names (31.7%, before 25.6%) are names that the LLM also extracted. With no cap, 10,230 of 56,608 (18.1%, before 16.2%). Of 13,132 LLM names that are in the dictionary, the lookup found 6,802 with K = 8 (51.8%, before 44.9%) and 10,230 with no cap (77.9%, before 76.7%).
 - The precision proxy is a lower bound. The LLM extracts at most 8 other entities. A speech can name more entities that are real. The proxies are also optimistic, because the dictionary comes from the same speeches.
-- Added entities per speech. The test used 2,000 random speeches of the 45,687 that lite models extracted. The "already has" set was every item name of the speech. With K = 8, the mean is 4.35 (before 5.05), 163 speeches (8.2%) get no addition, and 577 speeches (28.9%, before 35.4%) reach the cap. With no cap, the mean is 6.31, the 90th percentile is 15, and the maximum is 53.
-- The owner sets K and accepts the gate.
+- Added entities per speech. The test used 2,000 random speeches of the 45,687 that lite models extracted. The "already has" set was every item name of the speech. With K = 8, the mean is 4.35 (before 5.05), 163 speeches (8.2%) get no addition, and 575 speeches (28.8%, before 35.4%) reach the cap. With no cap, the mean is 6.30, the 90th percentile is 15, and the maximum is 53.
+- You set K and accept the gate. A decision (2026-10-09) chose no common-word filter and no type guard on the merge: the judging step decides.
 
 ## Done, next, unknown
 
@@ -102,4 +102,4 @@ Done: the build script, the lookup module, the gate script, and the offline test
 
 Next: read the gate report and set K. The judging step then reads the added entities as candidates.
 
-Unknown: how many of the 56,682 looked-up names are real subjects of their speech. Only the judging step can tell. Also unknown: how often a common word is a mention of a rare name. The Hindi word `दिशा` (direction) is a mention of the scheme DISHA and ranks high because the scheme is rare.
+Unknown: how many of the 56,608 looked-up names are real subjects of their speech. Only the judging step can tell. Also unknown: how often a common word is a mention of a rare name. The Hindi word `दिशा` (direction) is a mention of the scheme DISHA and ranks high because the scheme is rare.
