@@ -8,9 +8,9 @@ Distinct place names: 8796. Place items: 73027 (kept by the judge: 31).
 
 | Group | Names | Items | Kept items |
 |---|---|---|---|
-| equals exactly one new tag | 882 | 21659 | 7 |
+| equals exactly one new tag | 880 | 21639 | 6 |
 | equals two or more new tags | 8 | 485 | 0 |
-| equals an existing tag | 144 | 33327 | 16 |
+| equals an existing tag | 146 | 33347 | 17 |
 | equals nothing | 7762 | 17556 | 8 |
 
 Of the names that equal exactly one new tag, 20 names (701 items) are on the MODEL_ONLY list of scripts/link_entities.py. The exact rule skips them and the decision model decides.
@@ -56,23 +56,23 @@ Of the names that equal exactly one new tag, 20 names (701 items) are on the MOD
 |---|---|---|---|
 | 13 | Hoshangabad | Narmadapuram | होशंगाबाद |
 | 16 | Buldhana | Buldhana | बूलढाणा |
-| 128 | Kanpur | Kanpur | कानपुर |
-| 11 | Raiganj | Raiganj | Raiganj |
+| 24 | Kanpur Dehat | Kanpur Dehat | कानपुर देहात |
+| 63 | Raipur | Raipur | रायपुर |
 | 11 | Aravalli | Aravalli | अरावली |
-| 2 | Ballari | Ballari | Ballary |
-| 7 | Uttara Kannada | Uttara Kannada | Uttara Kannada |
-| 5 | Mon | Mon | Mon |
+| 2 | Ballari | Ballari | Bellary |
+| 9 | Vadakara | Vatakara | Vadakara |
+| 8 | Morbi | Morbi | मोरबी |
 | 1 | Bardhaman-Durgapur | Bardhaman–Durgapur | Bardhaman-Durgapur |
 | 10 | Jind | Jind | जींद |
-| 20 | Nellore | Nellore | Nellore |
+| 8 | Nilgiris | Nilgiris | Nilgris |
 | 4 | Aurangabad, Bihar | Aurangabad (Bihar) | औरंगाबाद |
-| 7 | Maldaha Uttar | Maldaha Uttar | माल्दहा उत्तर |
+| 8 | Malkajgiri | Malkajgiri | मल्‍काजगिरी |
 | 27 | Dehradun | Dehradun | देहरादून |
-| 15 | Angul | Angul | अंगुल |
-| 54 | Banswara | Banswara | बांसवाड़ा |
-| 72 | Kishanganj | Kishanganj | Kishanganj |
-| 36 | Keonjhar | Keonjhar | Keonjhar |
-| 10 | Balangir | Balangir | Balangir district |
+| 15 | Angul | Angul | अंगुल जिले |
+| 54 | Banswara | Banswara | Banswara |
+| 2 | Kishtwar | Kishtwar | किश्तवाड़ जिले |
+| 2 | Khadoor Sahib | Khadoor Sahib | Khadoor Sahib |
+| 10 | Balangir | Balangir | Balangir |
 | 3 | Dum Dum | Dum Dum | Dum Dum |
 
 ## Names that equal two or more new tags (top 15)

@@ -90,7 +90,9 @@ These names are the same place under another name. They are not spelling variant
 | Ganga (181), Ganges (51), Yamuna (75), Brahmaputra (82), Cauvery (52), Godavari (50) | the seed river tags | The seed tag has the word River. The seed tag Mahanadi River already has the bare alias Mahanadi. |
 | Dadra and Nagar Haveli and Daman and Diu (18) | seed tag Daman & Diu, or a new tag | The union territory has a new joint name. |
 
-## Pairs of one place that are still two tags
+## Pairs of one place that were two tags
+
+Resolved on 2026-10-09: the 18 certain pairs are merged in `data/same_place.tsv`. The 3 possible pairs are rejected, because each pair holds two different places. `Bangalore South` is a Bengaluru city seat, and `Bengaluru South` is the 2025 new name of the Ramanagara district. `Garhwal` is also a large region. `Medinipur` is a town and a seat, and `Paschim Medinipur` is a district.
 
 The build merged only the 8 pairs of `data/same_place.tsv`. The list below shows more pairs in one state. Each pair has a district and a constituency with two spellings. A person must decide. The first group looks certain. The second group looks possible.
 

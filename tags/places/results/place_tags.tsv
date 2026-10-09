@@ -5,8 +5,7 @@ South Andaman	place	district	-	District in Andaman and Nicobar Islands, India.	-
 Alluri Sitharama Raju	place	district	-	District in Andhra Pradesh, India.	-	0
 Amalapuram	place	constituency	-	Lok Sabha constituency in Andhra Pradesh, India.	-	0
 Anakapalli	place	district_constituency	-	District and Lok Sabha constituency in Andhra Pradesh, India.	Anakapalle	0
-Anantapur	place	constituency	-	Lok Sabha constituency in Andhra Pradesh, India.	Ananthapur	0
-Ananthapuramu	place	district	-	District in Andhra Pradesh, India.	-	0
+Ananthapuramu	place	district_constituency	-	District and Lok Sabha constituency in Andhra Pradesh, India. The constituency is listed as Anantapur.	Anantapur|Ananthapur	0
 Annamayya	place	district	-	District in Andhra Pradesh, India.	-	0
 Araku	place	constituency	-	Lok Sabha constituency in Andhra Pradesh, India.	-	0
 Bapatla	place	district_constituency	-	District and Lok Sabha constituency in Andhra Pradesh, India.	-	0
@@ -16,7 +15,6 @@ East Godavari	place	district	-	District in Andhra Pradesh, India.	-	0
 Eluru	place	district_constituency	-	District and Lok Sabha constituency in Andhra Pradesh, India.	-	0
 Guntur	place	district_constituency	-	District and Lok Sabha constituency in Andhra Pradesh, India.	-	0
 Hindupur	place	constituency	-	Lok Sabha constituency in Andhra Pradesh, India.	-	0
-Kadapa	place	constituency	-	Lok Sabha constituency in Andhra Pradesh, India.	-	0
 Kakinada	place	district_constituency	-	District and Lok Sabha constituency in Andhra Pradesh, India.	-	0
 Krishna	place	district	-	District in Andhra Pradesh, India.	-	0
 Kurnool	place	district_constituency	-	District and Lok Sabha constituency in Andhra Pradesh, India.	-	0
@@ -41,7 +39,7 @@ Vijayawada	place	constituency	-	Lok Sabha constituency in Andhra Pradesh, India.
 Visakhapatnam	place	district_constituency	-	District and Lok Sabha constituency in Andhra Pradesh, India.	Vishakhapatnam	0
 Vizianagaram	place	district_constituency	-	District and Lok Sabha constituency in Andhra Pradesh, India.	-	0
 West Godavari	place	district	-	District in Andhra Pradesh, India.	-	0
-YSR Kadapa	place	district	-	District in Andhra Pradesh, India.	-	0
+YSR Kadapa	place	district_constituency	-	District and Lok Sabha constituency in Andhra Pradesh, India. The constituency is listed as Kadapa.	Kadapa	0
 Anjaw	place	district	-	District in Arunachal Pradesh, India.	-	0
 Arunachal East	place	constituency	-	Lok Sabha constituency in Arunachal Pradesh, India.	-	0
 Arunachal West	place	constituency	-	Lok Sabha constituency in Arunachal Pradesh, India.	-	0
@@ -125,13 +123,12 @@ Bhagalpur	place	district_constituency	-	District and Lok Sabha constituency in B
 Bhojpur	place	district	-	District in Bihar, India.	-	0
 Buxar	place	district_constituency	-	District and Lok Sabha constituency in Bihar, India.	-	0
 Darbhanga	place	district_constituency	-	District and Lok Sabha constituency in Bihar, India.	-	0
-East Champaran	place	district	-	District in Bihar, India.	-	0
+East Champaran	place	district_constituency	-	District and Lok Sabha constituency in Bihar, India. The constituency is listed as Purvi Champaran.	Purvi Champaran	0
 Gaya	place	district_constituency	-	District and Lok Sabha constituency in Bihar, India.	-	0
 Gopalganj	place	district_constituency	-	District and Lok Sabha constituency in Bihar, India.	-	0
 Hajipur	place	constituency	-	Lok Sabha constituency in Bihar, India.	-	0
-Jahanabad	place	constituency	-	Lok Sabha constituency in Bihar, India.	-	0
 Jamui	place	district_constituency	-	District and Lok Sabha constituency in Bihar, India.	-	0
-Jehanabad	place	district	-	District in Bihar, India.	-	0
+Jehanabad	place	district_constituency	-	District and Lok Sabha constituency in Bihar, India. The constituency is listed as Jahanabad.	Jahanabad	0
 Jhanjharpur	place	constituency	-	Lok Sabha constituency in Bihar, India.	-	0
 Kaimur	place	district	-	District in Bihar, India.	-	0
 Karakat	place	constituency	-	Lok Sabha constituency in Bihar, India.	-	0
@@ -146,12 +143,10 @@ Munger	place	district_constituency	-	District and Lok Sabha constituency in Biha
 Muzaffarpur	place	district_constituency	-	District and Lok Sabha constituency in Bihar, India.	-	0
 Nalanda	place	district_constituency	-	District and Lok Sabha constituency in Bihar, India.	-	0
 Nawada	place	district_constituency	-	District and Lok Sabha constituency in Bihar, India.	-	0
-Paschim Champaran	place	constituency	-	Lok Sabha constituency in Bihar, India.	-	0
 Pataliputra	place	constituency	-	Lok Sabha constituency in Bihar, India.	Patliputra	0
 Patna	place	district	-	District in Bihar, India.	-	0
 Patna Sahib	place	constituency	-	Lok Sabha constituency in Bihar, India.	-	0
 Purnia	place	district_constituency	-	District and Lok Sabha constituency in Bihar, India.	Purnea	0
-Purvi Champaran	place	constituency	-	Lok Sabha constituency in Bihar, India.	-	0
 Rohtas	place	district	-	District in Bihar, India.	-	0
 Saharsa	place	district	-	District in Bihar, India.	-	0
 Samastipur	place	district_constituency	-	District and Lok Sabha constituency in Bihar, India.	-	0
@@ -165,7 +160,7 @@ Supaul	place	district_constituency	-	District and Lok Sabha constituency in Biha
 Ujiarpur	place	constituency	-	Lok Sabha constituency in Bihar, India.	-	0
 Vaishali	place	district_constituency	-	District and Lok Sabha constituency in Bihar, India.	-	0
 Valmiki Nagar	place	constituency	-	Lok Sabha constituency in Bihar, India.	Valmikinagar	0
-West Champaran	place	district	-	District in Bihar, India.	-	0
+West Champaran	place	district_constituency	-	District and Lok Sabha constituency in Bihar, India. The constituency is listed as Paschim Champaran.	Paschim Champaran	0
 Balod	place	district	-	District in Chhattisgarh, India.	-	0
 Baloda Bazar	place	district	-	District in Chhattisgarh, India.	-	0
 Balrampur-Ramanujganj	place	district	-	District in Chhattisgarh, India.	Balrampur–Ramanujganj	0
@@ -196,10 +191,9 @@ Raipur	place	district_constituency	-	District and Lok Sabha constituency in Chha
 Rajnandgaon	place	district_constituency	-	District and Lok Sabha constituency in Chhattisgarh, India.	-	0
 Sakti	place	district	-	District in Chhattisgarh, India.	-	0
 Sarangarh-Bilaigarh	place	district	-	District in Chhattisgarh, India.	Sarangarh–Bilaigarh	0
-Sarguja	place	constituency	-	Lok Sabha constituency in Chhattisgarh, India.	-	0
 Sukma	place	district	-	District in Chhattisgarh, India.	-	0
 Surajpur	place	district	-	District in Chhattisgarh, India.	-	0
-Surguja	place	district	-	District in Chhattisgarh, India.	-	0
+Surguja	place	district_constituency	-	District and Lok Sabha constituency in Chhattisgarh, India. The constituency is listed as Sarguja.	Sarguja	0
 Dadra and Nagar Haveli	place	district_constituency	-	District and Lok Sabha constituency in Dadra and Nagar Haveli and Daman and Diu, India.	-	0
 Daman	place	district	-	District in Dadra and Nagar Haveli and Daman and Diu, India.	-	0
 Diu	place	district	-	District in Dadra and Nagar Haveli and Daman and Diu, India.	-	0
@@ -238,9 +232,8 @@ Gir Somnath	place	district	-	District in Gujarat, India.	-	0
 Jamnagar	place	district_constituency	-	District and Lok Sabha constituency in Gujarat, India.	-	0
 Junagadh	place	district_constituency	-	District and Lok Sabha constituency in Gujarat, India.	-	0
 Kheda	place	district_constituency	-	District and Lok Sabha constituency in Gujarat, India.	-	0
-Mahesana	place	constituency	-	Lok Sabha constituency in Gujarat, India.	-	0
 Mahisagar	place	district	-	District in Gujarat, India.	-	0
-Mehsana	place	district	-	District in Gujarat, India.	-	0
+Mehsana	place	district_constituency	-	District and Lok Sabha constituency in Gujarat, India. The constituency is listed as Mahesana.	Mahesana	0
 Morbi	place	district	-	District in Gujarat, India.	-	0
 Narmada	place	district	-	District in Gujarat, India.	-	0
 Navsari	place	district_constituency	-	District and Lok Sabha constituency in Gujarat, India.	-	0
@@ -322,8 +315,7 @@ Garhwa	place	district	-	District in Jharkhand, India.	-	0
 Giridih	place	district_constituency	-	District and Lok Sabha constituency in Jharkhand, India.	-	0
 Godda	place	district_constituency	-	District and Lok Sabha constituency in Jharkhand, India.	-	0
 Gumla	place	district	-	District in Jharkhand, India.	-	0
-Hazaribag	place	district	-	District in Jharkhand, India.	-	0
-Hazaribagh	place	constituency	-	Lok Sabha constituency in Jharkhand, India.	-	0
+Hazaribag	place	district_constituency	-	District and Lok Sabha constituency in Jharkhand, India. The constituency is listed as Hazaribagh.	Hazaribagh	0
 Jamshedpur	place	constituency	-	Lok Sabha constituency in Jharkhand, India.	-	0
 Jamtara	place	district	-	District in Jharkhand, India.	-	0
 Khunti	place	district_constituency	-	District and Lok Sabha constituency in Jharkhand, India.	-	0
@@ -574,13 +566,12 @@ Wokha	place	district	-	District in Nagaland, India.	-	0
 Zunheboto	place	district	-	District in Nagaland, India.	-	0
 Angul	place	district	-	District in Odisha, India.	-	0
 Aska	place	constituency	-	Lok Sabha constituency in Odisha, India.	-	0
-Balangir	place	district	-	District in Odisha, India.	-	0
+Balangir	place	district_constituency	-	District and Lok Sabha constituency in Odisha, India. The constituency is listed as Bolangir.	Bolangir	0
 Balasore	place	district_constituency	-	District and Lok Sabha constituency in Odisha, India.	-	0
 Bargarh	place	district_constituency	-	District and Lok Sabha constituency in Odisha, India.	-	0
 Berhampur	place	constituency	-	Lok Sabha constituency in Odisha, India.	-	0
 Bhadrak	place	district_constituency	-	District and Lok Sabha constituency in Odisha, India.	-	0
 Bhubaneswar	place	constituency	-	Lok Sabha constituency in Odisha, India.	Bhubaneshwar	0
-Bolangir	place	constituency	-	Lok Sabha constituency in Odisha, India.	-	0
 Boudh	place	district	-	District in Odisha, India.	-	0
 Cuttack	place	district_constituency	-	District and Lok Sabha constituency in Odisha, India.	-	0
 Debagarh	place	district	-	District in Odisha, India.	-	0
@@ -593,8 +584,7 @@ Jharsuguda	place	district	-	District in Odisha, India.	-	0
 Kalahandi	place	district_constituency	-	District and Lok Sabha constituency in Odisha, India.	-	0
 Kandhamal	place	district_constituency	-	District and Lok Sabha constituency in Odisha, India.	-	0
 Kendrapara	place	district_constituency	-	District and Lok Sabha constituency in Odisha, India.	-	0
-Kendujhar	place	district	-	District in Odisha, India.	-	0
-Keonjhar	place	constituency	-	Lok Sabha constituency in Odisha, India.	-	0
+Kendujhar	place	district_constituency	-	District and Lok Sabha constituency in Odisha, India. The constituency is listed as Keonjhar.	Keonjhar	0
 Khordha	place	district	-	District in Odisha, India.	Khurda	0
 Koraput	place	district_constituency	-	District and Lok Sabha constituency in Odisha, India.	-	0
 Malkangiri	place	district	-	District in Odisha, India.	-	0
@@ -653,7 +643,6 @@ Deeg	place	district	-	District in Rajasthan, India.	-	0
 Dholpur	place	district	-	District in Rajasthan, India.	-	0
 Didwana Kuchaman	place	district	-	District in Rajasthan, India.	-	0
 Dungarpur	place	district	-	District in Rajasthan, India.	-	0
-Ganganagar	place	constituency	-	Lok Sabha constituency in Rajasthan, India.	-	0
 Hanumangarh	place	district	-	District in Rajasthan, India.	-	0
 Jaipur	place	district_constituency	-	District and Lok Sabha constituency in Rajasthan, India.	-	0
 Jaipur Rural	place	constituency	-	Lok Sabha constituency in Rajasthan, India.	-	0
@@ -677,7 +666,7 @@ Salumbar	place	district	-	District in Rajasthan, India.	-	0
 Sawai Madhopur	place	district	-	District in Rajasthan, India.	-	0
 Sikar	place	district_constituency	-	District and Lok Sabha constituency in Rajasthan, India.	-	0
 Sirohi	place	district	-	District in Rajasthan, India.	-	0
-Sri Ganganagar	place	district	-	District in Rajasthan, India.	Sriganganagar	0
+Sri Ganganagar	place	district_constituency	-	District and Lok Sabha constituency in Rajasthan, India. The constituency is listed as Ganganagar.	Ganganagar|Sriganganagar	0
 Tonk	place	district	-	District in Rajasthan, India.	-	0
 Tonk–Sawai Madhopur	place	constituency	-	Lok Sabha constituency in Rajasthan, India.	Tonk-Sawai Madhopur	0
 Udaipur	place	district_constituency	-	District and Lok Sabha constituency in Rajasthan, India.	-	0
@@ -703,8 +692,7 @@ Dindigul	place	district_constituency	-	District and Lok Sabha constituency in Ta
 Erode	place	district_constituency	-	District and Lok Sabha constituency in Tamil Nadu, India.	-	0
 Kallakurichi	place	district_constituency	-	District and Lok Sabha constituency in Tamil Nadu, India.	-	0
 Kanchipuram	place	district_constituency	-	District and Lok Sabha constituency in Tamil Nadu, India. The constituency is listed as Kancheepuram.	Kancheepuram	0
-Kanniyakumari	place	constituency	-	Lok Sabha constituency in Tamil Nadu, India.	-	0
-Kanyakumari	place	district	-	District in Tamil Nadu, India.	-	0
+Kanyakumari	place	district_constituency	-	District and Lok Sabha constituency in Tamil Nadu, India. The constituency is listed as Kanniyakumari.	Kanniyakumari	0
 Karur	place	district_constituency	-	District and Lok Sabha constituency in Tamil Nadu, India.	-	0
 Krishnagiri	place	district_constituency	-	District and Lok Sabha constituency in Tamil Nadu, India.	-	0
 Madurai	place	district_constituency	-	District and Lok Sabha constituency in Tamil Nadu, India.	-	0
@@ -723,13 +711,12 @@ Sriperumbudur	place	constituency	-	Lok Sabha constituency in Tamil Nadu, India.	
 Tenkasi	place	district_constituency	-	District and Lok Sabha constituency in Tamil Nadu, India.	-	0
 Thanjavur	place	district_constituency	-	District and Lok Sabha constituency in Tamil Nadu, India.	-	0
 Theni	place	district_constituency	-	District and Lok Sabha constituency in Tamil Nadu, India.	-	0
-Thiruvallur	place	constituency	-	Lok Sabha constituency in Tamil Nadu, India.	-	0
 Thoothukudi	place	district_constituency	-	District and Lok Sabha constituency in Tamil Nadu, India. The constituency is listed as Thoothukkudi.	Thoothukkudi	0
 Tiruchirappalli	place	district_constituency	-	District and Lok Sabha constituency in Tamil Nadu, India.	Tiruchirapalli	0
 Tirunelveli	place	district_constituency	-	District and Lok Sabha constituency in Tamil Nadu, India.	-	0
 Tirupattur	place	district	-	District in Tamil Nadu, India.	Tirupathur	0
 Tiruppur	place	district_constituency	-	District and Lok Sabha constituency in Tamil Nadu, India.	Tirupur	0
-Tiruvallur	place	district	-	District in Tamil Nadu, India.	-	0
+Tiruvallur	place	district_constituency	-	District and Lok Sabha constituency in Tamil Nadu, India. The constituency is listed as Thiruvallur.	Thiruvallur	0
 Tiruvannamalai	place	district_constituency	-	District and Lok Sabha constituency in Tamil Nadu, India.	Thiruvannamalai	0
 Tiruvarur	place	district	-	District in Tamil Nadu, India.	Thiruvarur	0
 Vellore	place	district_constituency	-	District and Lok Sabha constituency in Tamil Nadu, India.	-	0
@@ -761,8 +748,7 @@ Nalgonda	place	district_constituency	-	District and Lok Sabha constituency in Te
 Narayanpet	place	district	-	District in Telangana, India.	-	0
 Nirmal	place	district	-	District in Telangana, India.	-	0
 Nizamabad	place	district_constituency	-	District and Lok Sabha constituency in Telangana, India.	-	0
-Peddapalle	place	constituency	-	Lok Sabha constituency in Telangana, India.	-	0
-Peddapalli	place	district	-	District in Telangana, India.	-	0
+Peddapalli	place	district_constituency	-	District and Lok Sabha constituency in Telangana, India. The constituency is listed as Peddapalle.	Peddapalle	0
 Rajanna Sircilla	place	district	-	District in Telangana, India.	-	0
 Ranga Reddy	place	district	-	District in Telangana, India.	-	0
 Sangareddy	place	district	-	District in Telangana, India.	-	0
@@ -794,9 +780,7 @@ Aonla	place	constituency	-	Lok Sabha constituency in Uttar Pradesh, India.	-	0
 Auraiya	place	district	-	District in Uttar Pradesh, India.	-	0
 Ayodhya	place	district_constituency	-	District and Lok Sabha constituency in Uttar Pradesh, India. The constituency is listed as Faizabad.	Faizabad	0
 Azamgarh	place	district_constituency	-	District and Lok Sabha constituency in Uttar Pradesh, India.	-	0
-Badaun	place	constituency	-	Lok Sabha constituency in Uttar Pradesh, India.	-	0
-Baghpat	place	constituency	-	Lok Sabha constituency in Uttar Pradesh, India.	-	0
-Bagpat	place	district	-	District in Uttar Pradesh, India.	-	0
+Bagpat	place	district_constituency	-	District and Lok Sabha constituency in Uttar Pradesh, India. The constituency is listed as Baghpat.	Baghpat	0
 Bahraich	place	district_constituency	-	District and Lok Sabha constituency in Uttar Pradesh, India.	-	0
 Ballia	place	district_constituency	-	District and Lok Sabha constituency in Uttar Pradesh, India.	Balia	0
 Balrampur	place	district	-	District in Uttar Pradesh, India.	-	0
@@ -807,7 +791,7 @@ Bareilly	place	district_constituency	-	District and Lok Sabha constituency in Ut
 Basti	place	district_constituency	-	District and Lok Sabha constituency in Uttar Pradesh, India.	-	0
 Bhadohi	place	district_constituency	-	District and Lok Sabha constituency in Uttar Pradesh, India.	-	0
 Bijnor	place	district_constituency	-	District and Lok Sabha constituency in Uttar Pradesh, India.	-	0
-Budaun	place	district	-	District in Uttar Pradesh, India.	-	0
+Budaun	place	district_constituency	-	District and Lok Sabha constituency in Uttar Pradesh, India. The constituency is listed as Badaun.	Badaun	0
 Bulandshahr	place	district_constituency	-	District and Lok Sabha constituency in Uttar Pradesh, India.	-	0
 Chandauli	place	district_constituency	-	District and Lok Sabha constituency in Uttar Pradesh, India.	-	0
 Chitrakoot	place	district	-	District in Uttar Pradesh, India.	-	0
@@ -841,9 +825,8 @@ Kanpur Dehat	place	district	-	District in Uttar Pradesh, India.	Ramabai Nagar	0
 Kanpur Nagar	place	district	-	District in Uttar Pradesh, India.	-	0
 Kasganj	place	district	-	District in Uttar Pradesh, India.	Kanshiram Nagar	0
 Kaushambi	place	district_constituency	-	District and Lok Sabha constituency in Uttar Pradesh, India.	-	0
-Kheri	place	constituency	-	Lok Sabha constituency in Uttar Pradesh, India.	-	0
 Kushinagar	place	district_constituency	-	District and Lok Sabha constituency in Uttar Pradesh, India. The constituency is listed as Kushi Nagar.	Kushi Nagar	0
-Lakhimpur Kheri	place	district	-	District in Uttar Pradesh, India.	-	0
+Lakhimpur Kheri	place	district_constituency	-	District and Lok Sabha constituency in Uttar Pradesh, India. The constituency is listed as Kheri.	Kheri	0
 Lalganj	place	constituency	-	Lok Sabha constituency in Uttar Pradesh, India.	-	0
 Lalitpur	place	district	-	District in Uttar Pradesh, India.	-	0
 Lucknow	place	district_constituency	-	District and Lok Sabha constituency in Uttar Pradesh, India.	-	0
@@ -895,8 +878,7 @@ Rudraprayag	place	district	-	District in Uttarakhand, India.	-	0
 Tehri Garhwal	place	district_constituency	-	District and Lok Sabha constituency in Uttarakhand, India.	-	0
 Udham Singh Nagar	place	district	-	District in Uttarakhand, India.	-	0
 Uttarkashi	place	district	-	District in Uttarakhand, India.	-	0
-Alipurduar	place	district	-	District in West Bengal, India.	-	0
-Alipurduars	place	constituency	-	Lok Sabha constituency in West Bengal, India.	-	0
+Alipurduar	place	district_constituency	-	District and Lok Sabha constituency in West Bengal, India. The constituency is listed as Alipurduars.	Alipurduars	0
 Arambagh	place	constituency	-	Lok Sabha constituency in West Bengal, India.	Arambag	0
 Asansol	place	constituency	-	Lok Sabha constituency in West Bengal, India.	-	0
 Baharampur	place	constituency	-	Lok Sabha constituency in West Bengal, India.	-	0

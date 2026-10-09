@@ -5,8 +5,7 @@ South Andaman	Andaman and Nicobar Islands	district	-	-	Andaman and Nicobar (AN) 
 Alluri Sitharama Raju	Andhra Pradesh	district	-	-	Andhra Pradesh (AP) #1
 Amalapuram	Andhra Pradesh	constituency	SC	-	Andhra Pradesh (25) #7
 Anakapalli	Andhra Pradesh	district_constituency	-	-	Andhra Pradesh (AP) #2|Andhra Pradesh (25) #5
-Anantapur	Andhra Pradesh	constituency	-	-	Andhra Pradesh (25) #19
-Ananthapuramu	Andhra Pradesh	district	-	-	Andhra Pradesh (AP) #3
+Ananthapuramu	Andhra Pradesh	district_constituency	-	-	Andhra Pradesh (AP) #3|Andhra Pradesh (25) #19
 Annamayya	Andhra Pradesh	district	-	-	Andhra Pradesh (AP) #4
 Araku	Andhra Pradesh	constituency	ST	-	Andhra Pradesh (25) #1
 Bapatla	Andhra Pradesh	district_constituency	SC	-	Andhra Pradesh (AP) #5|Andhra Pradesh (25) #15
@@ -16,7 +15,6 @@ East Godavari	Andhra Pradesh	district	-	-	Andhra Pradesh (AP) #8
 Eluru	Andhra Pradesh	district_constituency	-	-	Andhra Pradesh (AP) #9|Andhra Pradesh (25) #10
 Guntur	Andhra Pradesh	district_constituency	-	-	Andhra Pradesh (AP) #10|Andhra Pradesh (25) #13
 Hindupur	Andhra Pradesh	constituency	-	-	Andhra Pradesh (25) #20
-Kadapa	Andhra Pradesh	constituency	-	-	Andhra Pradesh (25) #21
 Kakinada	Andhra Pradesh	district_constituency	-	-	Andhra Pradesh (AP) #11|Andhra Pradesh (25) #6
 Krishna	Andhra Pradesh	district	-	-	Andhra Pradesh (AP) #12
 Kurnool	Andhra Pradesh	district_constituency	-	-	Andhra Pradesh (AP) #13|Andhra Pradesh (25) #18
@@ -41,7 +39,7 @@ Vijayawada	Andhra Pradesh	constituency	-	-	Andhra Pradesh (25) #12
 Visakhapatnam	Andhra Pradesh	district_constituency	-	-	Andhra Pradesh (AP) #23|Andhra Pradesh (25) #4
 Vizianagaram	Andhra Pradesh	district_constituency	-	-	Andhra Pradesh (AP) #24|Andhra Pradesh (25) #3
 West Godavari	Andhra Pradesh	district	-	-	Andhra Pradesh (AP) #25
-YSR Kadapa	Andhra Pradesh	district	-	-	Andhra Pradesh (AP) #26
+YSR Kadapa	Andhra Pradesh	district_constituency	-	-	Andhra Pradesh (AP) #26|Andhra Pradesh (25) #21
 Anjaw	Arunachal Pradesh	district	-	-	Arunachal Pradesh (AR) #1
 Arunachal East	Arunachal Pradesh	constituency	-	-	Arunachal Pradesh (2) #2
 Arunachal West	Arunachal Pradesh	constituency	-	-	Arunachal Pradesh (2) #1
@@ -125,13 +123,12 @@ Bhagalpur	Bihar	district_constituency	-	-	Bihar (BR) #6|Bihar (40) #26
 Bhojpur	Bihar	district	-	-	Bihar (BR) #7
 Buxar	Bihar	district_constituency	-	-	Bihar (BR) #8|Bihar (40) #33
 Darbhanga	Bihar	district_constituency	-	-	Bihar (BR) #9|Bihar (40) #14
-East Champaran	Bihar	district	-	-	Bihar (BR) #10
+East Champaran	Bihar	district_constituency	-	-	Bihar (BR) #10|Bihar (40) #3
 Gaya	Bihar	district_constituency	SC	-	Bihar (BR) #11|Bihar (40) #38
 Gopalganj	Bihar	district_constituency	SC	-	Bihar (BR) #12|Bihar (40) #17
 Hajipur	Bihar	constituency	SC	-	Bihar (40) #21
-Jahanabad	Bihar	constituency	-	-	Bihar (40) #36
 Jamui	Bihar	district_constituency	SC	-	Bihar (BR) #13|Bihar (40) #40
-Jehanabad	Bihar	district	-	-	Bihar (BR) #14
+Jehanabad	Bihar	district_constituency	-	-	Bihar (BR) #14|Bihar (40) #36
 Jhanjharpur	Bihar	constituency	-	-	Bihar (40) #7
 Kaimur	Bihar	district	-	-	Bihar (BR) #15
 Karakat	Bihar	constituency	-	-	Bihar (40) #35
@@ -146,12 +143,10 @@ Munger	Bihar	district_constituency	-	-	Bihar (BR) #22|Bihar (40) #28
 Muzaffarpur	Bihar	district_constituency	-	-	Bihar (BR) #23|Bihar (40) #15
 Nalanda	Bihar	district_constituency	-	-	Bihar (BR) #24|Bihar (40) #29
 Nawada	Bihar	district_constituency	-	-	Bihar (BR) #25|Bihar (40) #39
-Paschim Champaran	Bihar	constituency	-	-	Bihar (40) #2
 Pataliputra	Bihar	constituency	-	-	Bihar (40) #31
 Patna	Bihar	district	-	-	Bihar (BR) #26
 Patna Sahib	Bihar	constituency	-	-	Bihar (40) #30
 Purnia	Bihar	district_constituency	-	-	Bihar (BR) #27|Bihar (40) #12
-Purvi Champaran	Bihar	constituency	-	-	Bihar (40) #3
 Rohtas	Bihar	district	-	-	Bihar (BR) #28
 Saharsa	Bihar	district	-	-	Bihar (BR) #29
 Samastipur	Bihar	district_constituency	SC	-	Bihar (BR) #30|Bihar (40) #23
@@ -165,7 +160,7 @@ Supaul	Bihar	district_constituency	-	-	Bihar (BR) #36|Bihar (40) #8
 Ujiarpur	Bihar	constituency	-	-	Bihar (40) #22
 Vaishali	Bihar	district_constituency	-	-	Bihar (BR) #37|Bihar (40) #16
 Valmiki Nagar	Bihar	constituency	-	-	Bihar (40) #1
-West Champaran	Bihar	district	-	-	Bihar (BR) #38
+West Champaran	Bihar	district_constituency	-	-	Bihar (BR) #38|Bihar (40) #2
 Balod	Chhattisgarh	district	-	-	Chhattisgarh (CG) #1
 Baloda Bazar	Chhattisgarh	district	-	-	Chhattisgarh (CG) #2
 Balrampur-Ramanujganj	Chhattisgarh	district	-	-	Chhattisgarh (CG) #3
@@ -196,10 +191,9 @@ Raipur	Chhattisgarh	district_constituency	-	-	Chhattisgarh (CG) #27|Chhattisgarh
 Rajnandgaon	Chhattisgarh	district_constituency	-	-	Chhattisgarh (CG) #28|Chhattisgarh (11) #6
 Sakti	Chhattisgarh	district	-	-	Chhattisgarh (CG) #30
 Sarangarh-Bilaigarh	Chhattisgarh	district	-	-	Chhattisgarh (CG) #29
-Sarguja	Chhattisgarh	constituency	ST	-	Chhattisgarh (11) #1
 Sukma	Chhattisgarh	district	-	-	Chhattisgarh (CG) #31
 Surajpur	Chhattisgarh	district	-	-	Chhattisgarh (CG) #32
-Surguja	Chhattisgarh	district	-	-	Chhattisgarh (CG) #33
+Surguja	Chhattisgarh	district_constituency	ST	-	Chhattisgarh (CG) #33|Chhattisgarh (11) #1
 Dadra and Nagar Haveli	Dadra and Nagar Haveli and Daman and Diu	district_constituency	ST	-	Dadra and Nagar Haveli and Daman and Diu (DD) #1|Dadra and Nagar Haveli and Daman and Diu (2) #2
 Daman	Dadra and Nagar Haveli and Daman and Diu	district	-	-	Dadra and Nagar Haveli and Daman and Diu (DD) #2
 Diu	Dadra and Nagar Haveli and Daman and Diu	district	-	-	Dadra and Nagar Haveli and Daman and Diu (DD) #3
@@ -238,9 +232,8 @@ Gir Somnath	Gujarat	district	-	-	Gujarat (GJ) #14
 Jamnagar	Gujarat	district_constituency	-	-	Gujarat (GJ) #15|Gujarat (26) #12
 Junagadh	Gujarat	district_constituency	-	-	Gujarat (GJ) #16|Gujarat (26) #13
 Kheda	Gujarat	district_constituency	-	-	Gujarat (GJ) #17|Gujarat (26) #17
-Mahesana	Gujarat	constituency	-	-	Gujarat (26) #4
 Mahisagar	Gujarat	district	-	-	Gujarat (GJ) #19
-Mehsana	Gujarat	district	-	-	Gujarat (GJ) #20
+Mehsana	Gujarat	district_constituency	-	-	Gujarat (GJ) #20|Gujarat (26) #4
 Morbi	Gujarat	district	-	-	Gujarat (GJ) #21
 Narmada	Gujarat	district	-	-	Gujarat (GJ) #22
 Navsari	Gujarat	district_constituency	-	-	Gujarat (GJ) #23|Gujarat (26) #25
@@ -322,8 +315,7 @@ Garhwa	Jharkhand	district	-	-	Jharkhand (JH) #7
 Giridih	Jharkhand	district_constituency	-	-	Jharkhand (JH) #8|Jharkhand (14) #6
 Godda	Jharkhand	district_constituency	-	-	Jharkhand (JH) #9|Jharkhand (14) #3
 Gumla	Jharkhand	district	-	-	Jharkhand (JH) #10
-Hazaribag	Jharkhand	district	-	-	Jharkhand (JH) #11
-Hazaribagh	Jharkhand	constituency	-	-	Jharkhand (14) #14
+Hazaribag	Jharkhand	district_constituency	-	-	Jharkhand (JH) #11|Jharkhand (14) #14
 Jamshedpur	Jharkhand	constituency	-	-	Jharkhand (14) #9
 Jamtara	Jharkhand	district	-	-	Jharkhand (JH) #12
 Khunti	Jharkhand	district_constituency	ST	-	Jharkhand (JH) #13|Jharkhand (14) #11
@@ -574,13 +566,12 @@ Wokha	Nagaland	district	-	-	Nagaland (NL) #15
 Zunheboto	Nagaland	district	-	-	Nagaland (NL) #16
 Angul	Odisha	district	-	-	Odisha (OD) #1
 Aska	Odisha	constituency	-	-	Odisha (21) #19
-Balangir	Odisha	district	-	-	Odisha (OD) #4
+Balangir	Odisha	district_constituency	-	-	Odisha (OD) #4|Odisha (21) #10
 Balasore	Odisha	district_constituency	-	-	Odisha (OD) #6|Odisha (21) #6
 Bargarh	Odisha	district_constituency	-	-	Odisha (OD) #5|Odisha (21) #1
 Berhampur	Odisha	constituency	-	-	Odisha (21) #20
 Bhadrak	Odisha	district_constituency	SC	-	Odisha (OD) #3|Odisha (21) #7
 Bhubaneswar	Odisha	constituency	-	-	Odisha (21) #18
-Bolangir	Odisha	constituency	-	-	Odisha (21) #10
 Boudh	Odisha	district	-	-	Odisha (OD) #2
 Cuttack	Odisha	district_constituency	-	-	Odisha (OD) #7|Odisha (21) #14
 Debagarh	Odisha	district	-	-	Odisha (OD) #8
@@ -593,8 +584,7 @@ Jharsuguda	Odisha	district	-	-	Odisha (OD) #12
 Kalahandi	Odisha	district_constituency	-	-	Odisha (OD) #17|Odisha (21) #11
 Kandhamal	Odisha	district_constituency	-	-	Odisha (OD) #18|Odisha (21) #13
 Kendrapara	Odisha	district_constituency	-	-	Odisha (OD) #20|Odisha (21) #15
-Kendujhar	Odisha	district	-	-	Odisha (OD) #16
-Keonjhar	Odisha	constituency	ST	-	Odisha (21) #4
+Kendujhar	Odisha	district_constituency	ST	-	Odisha (OD) #16|Odisha (21) #4
 Khordha	Odisha	district	-	-	Odisha (OD) #15
 Koraput	Odisha	district_constituency	ST	-	Odisha (OD) #19|Odisha (21) #21
 Malkangiri	Odisha	district	-	-	Odisha (OD) #21
@@ -653,7 +643,6 @@ Deeg	Rajasthan	district	-	-	Rajasthan (RJ) #15
 Dholpur	Rajasthan	district	-	-	Rajasthan (RJ) #16
 Didwana Kuchaman	Rajasthan	district	-	-	Rajasthan (RJ) #17
 Dungarpur	Rajasthan	district	-	-	Rajasthan (RJ) #18
-Ganganagar	Rajasthan	constituency	SC	-	Rajasthan (25) #1
 Hanumangarh	Rajasthan	district	-	-	Rajasthan (RJ) #19
 Jaipur	Rajasthan	district_constituency	-	-	Rajasthan (RJ) #20|Rajasthan (25) #7
 Jaipur Rural	Rajasthan	constituency	-	-	Rajasthan (25) #6
@@ -677,7 +666,7 @@ Salumbar	Rajasthan	district	-	-	Rajasthan (RJ) #35
 Sawai Madhopur	Rajasthan	district	-	-	Rajasthan (RJ) #36
 Sikar	Rajasthan	district_constituency	-	-	Rajasthan (RJ) #37|Rajasthan (25) #5
 Sirohi	Rajasthan	district	-	-	Rajasthan (RJ) #38
-Sri Ganganagar	Rajasthan	district	-	-	Rajasthan (RJ) #39
+Sri Ganganagar	Rajasthan	district_constituency	SC	-	Rajasthan (RJ) #39|Rajasthan (25) #1
 Tonk	Rajasthan	district	-	-	Rajasthan (RJ) #40
 Tonk–Sawai Madhopur	Rajasthan	constituency	-	-	Rajasthan (25) #12
 Udaipur	Rajasthan	district_constituency	ST	-	Rajasthan (RJ) #41|Rajasthan (25) #19
@@ -703,8 +692,7 @@ Dindigul	Tamil Nadu	district_constituency	-	-	Tamil Nadu (TN) #7|Tamil Nadu (39)
 Erode	Tamil Nadu	district_constituency	-	-	Tamil Nadu (TN) #8|Tamil Nadu (39) #17
 Kallakurichi	Tamil Nadu	district_constituency	-	-	Tamil Nadu (TN) #9|Tamil Nadu (39) #14
 Kanchipuram	Tamil Nadu	district_constituency	SC	-	Tamil Nadu (TN) #10|Tamil Nadu (39) #6
-Kanniyakumari	Tamil Nadu	constituency	-	-	Tamil Nadu (39) #39
-Kanyakumari	Tamil Nadu	district	-	-	Tamil Nadu (TN) #11
+Kanyakumari	Tamil Nadu	district_constituency	-	-	Tamil Nadu (TN) #11|Tamil Nadu (39) #39
 Karur	Tamil Nadu	district_constituency	-	-	Tamil Nadu (TN) #12|Tamil Nadu (39) #23
 Krishnagiri	Tamil Nadu	district_constituency	-	-	Tamil Nadu (TN) #13|Tamil Nadu (39) #9
 Madurai	Tamil Nadu	district_constituency	-	-	Tamil Nadu (TN) #14|Tamil Nadu (39) #32
@@ -723,13 +711,12 @@ Sriperumbudur	Tamil Nadu	constituency	-	-	Tamil Nadu (39) #5
 Tenkasi	Tamil Nadu	district_constituency	SC	-	Tamil Nadu (TN) #25|Tamil Nadu (39) #37
 Thanjavur	Tamil Nadu	district_constituency	-	-	Tamil Nadu (TN) #30|Tamil Nadu (39) #30
 Theni	Tamil Nadu	district_constituency	-	-	Tamil Nadu (TN) #28|Tamil Nadu (39) #33
-Thiruvallur	Tamil Nadu	constituency	SC	-	Tamil Nadu (39) #1
 Thoothukudi	Tamil Nadu	district_constituency	-	-	Tamil Nadu (TN) #31|Tamil Nadu (39) #36
 Tiruchirappalli	Tamil Nadu	district_constituency	-	-	Tamil Nadu (TN) #27|Tamil Nadu (39) #24
 Tirunelveli	Tamil Nadu	district_constituency	-	-	Tamil Nadu (TN) #29|Tamil Nadu (39) #38
 Tirupattur	Tamil Nadu	district	-	-	Tamil Nadu (TN) #32
 Tiruppur	Tamil Nadu	district_constituency	-	-	Tamil Nadu (TN) #26|Tamil Nadu (39) #18
-Tiruvallur	Tamil Nadu	district	-	-	Tamil Nadu (TN) #33
+Tiruvallur	Tamil Nadu	district_constituency	SC	-	Tamil Nadu (TN) #33|Tamil Nadu (39) #1
 Tiruvannamalai	Tamil Nadu	district_constituency	-	-	Tamil Nadu (TN) #35|Tamil Nadu (39) #11
 Tiruvarur	Tamil Nadu	district	-	-	Tamil Nadu (TN) #34
 Vellore	Tamil Nadu	district_constituency	-	-	Tamil Nadu (TN) #36|Tamil Nadu (39) #8
@@ -761,8 +748,7 @@ Nalgonda	Telangana	district_constituency	-	-	Telangana (TG) #19|Telangana (17) #
 Narayanpet	Telangana	district	-	-	Telangana (TG) #21
 Nirmal	Telangana	district	-	-	Telangana (TG) #22
 Nizamabad	Telangana	district_constituency	-	-	Telangana (TG) #23|Telangana (17) #4
-Peddapalle	Telangana	constituency	SC	-	Telangana (17) #2
-Peddapalli	Telangana	district	-	-	Telangana (TG) #24
+Peddapalli	Telangana	district_constituency	SC	-	Telangana (TG) #24|Telangana (17) #2
 Rajanna Sircilla	Telangana	district	-	-	Telangana (TG) #25
 Ranga Reddy	Telangana	district	-	-	Telangana (TG) #26
 Sangareddy	Telangana	district	-	-	Telangana (TG) #27
@@ -794,9 +780,7 @@ Aonla	Uttar Pradesh	constituency	-	-	Uttar Pradesh (80) #24
 Auraiya	Uttar Pradesh	district	-	-	Uttar Pradesh (UP) #6
 Ayodhya	Uttar Pradesh	district_constituency	-	Faizabad	Uttar Pradesh (UP) #7|Uttar Pradesh (80) #54
 Azamgarh	Uttar Pradesh	district_constituency	-	-	Uttar Pradesh (UP) #8|Uttar Pradesh (80) #69
-Badaun	Uttar Pradesh	constituency	-	-	Uttar Pradesh (80) #23
-Baghpat	Uttar Pradesh	constituency	-	-	Uttar Pradesh (80) #11
-Bagpat	Uttar Pradesh	district	-	-	Uttar Pradesh (UP) #9
+Bagpat	Uttar Pradesh	district_constituency	-	-	Uttar Pradesh (UP) #9|Uttar Pradesh (80) #11
 Bahraich	Uttar Pradesh	district_constituency	SC	-	Uttar Pradesh (UP) #10|Uttar Pradesh (80) #56
 Ballia	Uttar Pradesh	district_constituency	-	-	Uttar Pradesh (UP) #11|Uttar Pradesh (80) #72
 Balrampur	Uttar Pradesh	district	-	-	Uttar Pradesh (UP) #12
@@ -807,7 +791,7 @@ Bareilly	Uttar Pradesh	district_constituency	-	-	Uttar Pradesh (UP) #15|Uttar Pr
 Basti	Uttar Pradesh	district_constituency	-	-	Uttar Pradesh (UP) #16|Uttar Pradesh (80) #61
 Bhadohi	Uttar Pradesh	district_constituency	-	-	Uttar Pradesh (UP) #17|Uttar Pradesh (80) #78
 Bijnor	Uttar Pradesh	district_constituency	-	-	Uttar Pradesh (UP) #18|Uttar Pradesh (80) #4
-Budaun	Uttar Pradesh	district	-	-	Uttar Pradesh (UP) #19
+Budaun	Uttar Pradesh	district_constituency	-	-	Uttar Pradesh (UP) #19|Uttar Pradesh (80) #23
 Bulandshahr	Uttar Pradesh	district_constituency	SC	-	Uttar Pradesh (UP) #20|Uttar Pradesh (80) #14
 Chandauli	Uttar Pradesh	district_constituency	-	-	Uttar Pradesh (UP) #21|Uttar Pradesh (80) #76
 Chitrakoot	Uttar Pradesh	district	-	-	Uttar Pradesh (UP) #22
@@ -841,9 +825,8 @@ Kanpur Dehat	Uttar Pradesh	district	-	Ramabai Nagar	Uttar Pradesh (UP) #42
 Kanpur Nagar	Uttar Pradesh	district	-	-	Uttar Pradesh (UP) #43
 Kasganj	Uttar Pradesh	district	-	Kanshiram Nagar	Uttar Pradesh (UP) #44
 Kaushambi	Uttar Pradesh	district_constituency	SC	-	Uttar Pradesh (UP) #45|Uttar Pradesh (80) #50
-Kheri	Uttar Pradesh	constituency	-	-	Uttar Pradesh (80) #28
 Kushinagar	Uttar Pradesh	district_constituency	-	-	Uttar Pradesh (UP) #46|Uttar Pradesh (80) #65
-Lakhimpur Kheri	Uttar Pradesh	district	-	-	Uttar Pradesh (UP) #47
+Lakhimpur Kheri	Uttar Pradesh	district_constituency	-	-	Uttar Pradesh (UP) #47|Uttar Pradesh (80) #28
 Lalganj	Uttar Pradesh	constituency	SC	-	Uttar Pradesh (80) #68
 Lalitpur	Uttar Pradesh	district	-	-	Uttar Pradesh (UP) #48
 Lucknow	Uttar Pradesh	district_constituency	-	-	Uttar Pradesh (UP) #49|Uttar Pradesh (80) #35
@@ -895,8 +878,7 @@ Rudraprayag	Uttarakhand	district	-	-	Uttarakhand (UK) #10
 Tehri Garhwal	Uttarakhand	district_constituency	-	-	Uttarakhand (UK) #11|Uttarakhand (5) #1
 Udham Singh Nagar	Uttarakhand	district	-	-	Uttarakhand (UK) #12
 Uttarkashi	Uttarakhand	district	-	-	Uttarakhand (UK) #13
-Alipurduar	West Bengal	district	-	-	West Bengal (WB) #1
-Alipurduars	West Bengal	constituency	ST	-	West Bengal (42) #2
+Alipurduar	West Bengal	district_constituency	ST	-	West Bengal (WB) #1|West Bengal (42) #2
 Arambagh	West Bengal	constituency	SC	-	West Bengal (42) #29
 Asansol	West Bengal	constituency	-	-	West Bengal (42) #40
 Baharampur	West Bengal	constituency	-	-	West Bengal (42) #10

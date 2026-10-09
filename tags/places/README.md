@@ -6,18 +6,18 @@ The linking step (`scripts/link_entities.py`) has an exact-match rule. When an e
 
 ## The result
 
-`results/place_tags.tsv` holds 951 new tags. It has the same columns as the seed file: `tag`, `type`, `subtype`, `domain`, `description`, `aliases`, `debate_count`. Every tag has the type `place`, the domain `-` (like the existing state tags), and `debate_count` 0.
+`results/place_tags.tsv` holds 933 new tags. It has the same columns as the seed file: `tag`, `type`, `subtype`, `domain`, `description`, `aliases`, `debate_count`. Every tag has the type `place`, the domain `-` (like the existing state tags), and `debate_count` 0.
 
 | Subtype | Tags | Meaning |
 |---|---|---|
-| `district` | 416 | A district that is not a constituency of the same name in the same state. |
-| `constituency` | 166 | A Lok Sabha constituency that is not a district of the same name in the same state. |
-| `district_constituency` | 366 | One district and one constituency with the same name in the same state. They share ONE tag. |
+| `district` | 398 | A district that is not a constituency of the same name in the same state. |
+| `constituency` | 148 | A Lok Sabha constituency that is not a district of the same name in the same state. |
+| `district_constituency` | 383 | One district and one constituency with the same name in the same state. They share ONE tag. |
 | `former_constituency` | 4 | An old Assam constituency that no longer exists. See rule 10. |
 
 The input has 788 district rows and 543 constituency rows. 13 places have no new tag, because an existing tag has their name or alias. The 13 places are listed in `results/review_pairs.tsv` (kind `existing_exact`). Examples are Chandigarh, Ranchi, Kargil, and Sikkim. Three of them (`Daman and Diu`, `Andaman and Nicobar Islands`, and `Puducherry`) lost their tag because the seed list got an alias for them. `Kutch` lost its tag for the same reason: the seed tag `Kachchh Region` is the same place, and it now has the aliases `Kutch` and `Kachchh`. See `results/alias_review.md`.
 
-15 tags have the state in the name, for example `Hamirpur (Uttar Pradesh)`. 28 old district names are in use as aliases. 139 aliases exist in total. The other aliases are the bare name of a shared name, the ASCII spelling of a name with a diacritic (`Mahé` and `Mahe`), the other dash character of a name with a dash (`Janjgir-Champa` and `Janjgir–Champa`), the second spelling of a merged place, and the 59 hand-checked aliases of `data/extra_aliases.tsv`.
+15 tags have the state in the name, for example `Hamirpur (Uttar Pradesh)`. 28 old district names are in use as aliases. 156 aliases exist in total. The other aliases are the bare name of a shared name, the ASCII spelling of a name with a diacritic (`Mahé` and `Mahe`), the other dash character of a name with a dash (`Janjgir-Champa` and `Janjgir–Champa`), the second spelling of a merged place (rule 8), and the 59 hand-checked aliases of `data/extra_aliases.tsv`.
 
 The file `results/build_report.md` shows the counts for each state and the result of each self check.
 
@@ -48,7 +48,7 @@ The hand-made file `data/renames.tsv` holds the district renames. Each row has a
 5. A place whose name equals the name or an alias of an existing tag gets no new tag. The comparison uses `norm_name` from `scripts/link_entities.py`. The script imports it. An alias of a new tag that equals an existing name or alias is dropped, and a review row says so.
 6. An old district name from `renames.tsv` is an alias of the tag with the new name. The Wikipedia lists still show some old names (for example Osmanabad). In that case the tag gets the new name and the old name is the alias.
 7. The script adds no Hindi alias and no invented spelling. It adds only two systematic spelling forms: the name without diacritics, and the name with the other dash character. Every other alias comes from a hand-made file (rules 8 to 10).
-8. A pair in `data/same_place.tsv` makes ONE tag. The columns are `name_a`, `name_b`, `state`, `keep`, and `note`. One name is a district and the other name is a constituency of the same place in the same state, with two spellings. The rule for `keep` is the district spelling. The other spelling is an alias, and the description says "The constituency is listed as X." The build stops with an error when a row names a missing place or two places of one kind. The file has 8 pairs: Kutch and Kachchh, Kanchipuram and Kancheepuram, Thoothukudi and Thoothukkudi, Viluppuram and Villupuram, Kushinagar and Kushi Nagar, Raebareli and Rae Bareli, Shravasti and Shrawasti, Chikkaballapur and Chikballapur.
+8. A pair in `data/same_place.tsv` makes ONE tag. The columns are `name_a`, `name_b`, `state`, `keep`, and `note`. One name is a district and the other name is a constituency of the same place in the same state, with two spellings. The rule for `keep` is the district spelling. The other spelling is an alias, and the description says "The constituency is listed as X." The build stops with an error when a row names a missing place or two places of one kind. The file has 26 pairs. The first 8 pairs came from the spelling key: Kutch and Kachchh, Kanchipuram and Kancheepuram, Thoothukudi and Thoothukkudi, Viluppuram and Villupuram, Kushinagar and Kushi Nagar, Raebareli and Rae Bareli, Shravasti and Shrawasti, Chikkaballapur and Chikballapur. A person checked the other 18 pairs in `results/alias_review.md`. Each of them has one district and one constituency in one state. The pairs are Jehanabad and Jahanabad, Surguja and Sarguja, Mehsana and Mahesana, Hazaribag and Hazaribagh, Balangir and Bolangir, Kendujhar and Keonjhar, Kanyakumari and Kanniyakumari, Tiruvallur and Thiruvallur, Peddapalli and Peddapalle, Budaun and Badaun, Bagpat and Baghpat, Sri Ganganagar and Ganganagar, Alipurduar and Alipurduars, West Champaran and Paschim Champaran, East Champaran and Purvi Champaran, Ananthapuramu and Anantapur, YSR Kadapa and Kadapa, and Lakhimpur Kheri and Kheri. The alias of the last pair is `Kheri`. The bare name `Lakhimpur` is not an alias, because `Lakhimpur` is an Assam constituency. The hand-made alias `Ananthapur` now belongs to `Ananthapuramu` in `data/extra_aliases.tsv`.
 9. A row in `data/extra_aliases.tsv` adds one alias to one new tag. The columns are `alias`, `tag`, `state`, `items`, `evidence`, and `reason`. A person must read example mentions before a row enters the file. The self checks reject an alias that equals the name or alias of any other tag.
 10. Each seat of the old Assam constituency table needs one row in `data/old_seats.tsv`. The decision is `same` (the old name is already a name or alias), `alias` (the old name becomes an alias of the tag in `target`), `former` (the seat gets its own tag), or `ignore` (no change, the note says why). The build stops with an error for a seat without a row.
 
@@ -69,12 +69,12 @@ Ahmednagar (Ahilyanagar), Osmanabad (Dharashiv), and Gurgaon (Gurugram) work in 
 
 | Kind | Rows | Meaning |
 |---|---|---|
-| `existing_exact` | 12 | A source place equals an existing tag name or alias. No new tag. |
-| `existing_near` | 3 | A source place has the spelling key of an existing tag, or the hand-made file `data/near_hints.tsv` links them. Review only. |
+| `existing_exact` | 13 | A source place equals an existing tag name or alias. No new tag. |
+| `existing_near` | 1 | A source place has the spelling key of an existing tag, or the hand-made file `data/near_hints.tsv` links them. Review only. |
 | `shared_name` | 14 | A bare name shared by new tags in different states. |
 | `common_word` | 31 | A place name that is also an ordinary word. |
 | `rename` | 28 | An alias from `renames.tsv`. |
-| `new_near` | 0 | Two new tags of one state with the same spelling key. The 8 pairs that this kind found are now merged (rule 8). `results/alias_review.md` lists more pairs that the spelling key cannot see. |
+| `new_near` | 0 | Two new tags of one state with the same spelling key. The pairs that this kind found are now merged (rule 8). |
 
 The spelling key is `spelling_key` from `entity_lookup.py`. It also merges different places (`Gond` and `Gonda` have the same key). So no row is a merge. For `existing_near`, the script removes a last generic word such as `Region` before it makes the key.
 
@@ -131,12 +131,12 @@ The tests are in `tests/test_build_place_tags.py`. The frozen inputs are `tests/
 
 | Group | Names | Items | Before the alias work |
 |---|---|---|---|
-| Equals exactly one new tag | 882 | 21,659 | 822 names, 21,399 items |
+| Equals exactly one new tag | 880 | 21,639 | 822 names, 21,399 items |
 | Equals two or more new tags | 8 | 485 | 8 names, 485 items |
-| Equals an existing tag | 144 | 33,327 | 124 names, 31,743 items |
+| Equals an existing tag | 146 | 33,347 | 124 names, 31,743 items |
 | Equals nothing | 7,762 | 17,556 | 7,842 names, 19,400 items |
 
-Of the 882 names with exactly one new tag, 20 names (701 items) are on the `MODEL_ONLY` list. The exact rule skips them. The decision model decides.
+Of the 880 names with exactly one new tag, 20 names (701 items) are on the `MODEL_ONLY` list. The exact rule skips them. The decision model decides.
 
 Only 131 of the 271,957 items in `speech_items` have a judge result, and only 31 of the 73,027 place items are kept. The linking step reads only kept items. So the table counts all extracted place items, not the items that the linking step will see.
 
@@ -179,13 +179,13 @@ A former tag has the description "Former Lok Sabha constituency in Assam, India 
 - The tags have no embedding. The vector search finds them only after `scripts/embed_tags.py` runs.
 - Cities (Mumbai, Bengaluru, Kochi), rivers, and regions are not in scope. They are the largest gap in the coverage check.
 - Spelling variants of names with fewer than 3 items stay unmatched. The alias work did not check them.
-- 18 more pairs of one place still have two tags (for example `Hazaribagh` and `Hazaribag`). `results/alias_review.md` lists them. Only the 8 pairs of `data/same_place.tsv` are merged.
+- Three pairs of `results/alias_review.md` stay as two tags, because each pair holds two different places. `Bangalore South` is a Bengaluru city seat, and `Bengaluru South` is the 2025 new name of the Ramanagara district. `Garhwal` is also a large region, and `Pauri Garhwal` is a district. `Medinipur` is a town and a seat, and `Paschim Medinipur` is a district. The other 18 pairs are merged (rule 8).
 - The linking step has a name-only rule. Two places in different states can have the same name, and only one of them has a tag. The tag `Chitrakoot` (Uttar Pradesh) catches the town Chitrakoot in Madhya Pradesh. 12 of its 146 items have a debate title with Madhya Pradesh. The same risk exists for `Balrampur`.
 
 ## Done, next, and unknown
 
-Done: the source files, the script, the 951 tags, the review file, the tests, the coverage check, the 8 merged pairs, the `MODEL_ONLY` list, the 59 extra aliases, the 20 seed aliases, and the old Assam seats.
+Done: the source files, the script, the 933 tags, the review file, the tests, the coverage check, the 26 merged pairs (18 merged and 3 rejected from the list of 21 likely pairs), the `MODEL_ONLY` list, the 59 extra aliases, the 20 seed aliases, and the old Assam seats.
 
-Next: a person fills the `review` column and decides on the 18 other pairs and the proposed aliases in `results/alias_review.md`. Then someone decides how to load the tags (source label, loader), embeds them, and runs the linking step in `--dry-run` mode to see the new exact links.
+Next: a person fills the `review` column and decides on the proposed aliases in `results/alias_review.md`. Then someone decides how to load the tags (source label, loader), embeds them, and runs the linking step in `--dry-run` mode to see the new exact links.
 
 Unknown: how many exact links are correct. The coverage check does not measure this. It is also unknown which other ordinary words can cause a wrong link in real speeches. The `MODEL_ONLY` list comes from reading the 31 flagged rows and the single-word tag names once. It is not complete. It is also unknown whether `Autonomous District` is the old name of `Diphu`.

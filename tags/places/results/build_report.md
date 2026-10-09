@@ -2,12 +2,12 @@
 
 Source rows: 788 districts, 543 constituencies.
 
-New tags: 951. By subtype: constituency 166, district 416, district_constituency 365, former_constituency 4.
+New tags: 933. By subtype: constituency 148, district 398, district_constituency 383, former_constituency 4.
 Skipped places (an existing tag has the name or an alias): 13.
 Tags with the state in the name (shared names): 14.
 Aliases from renames.tsv in use: 28.
 Unused rename rows (new name not in the source): 0.
-Pairs merged by same_place.tsv: 8.
+Pairs merged by same_place.tsv: 26.
 Aliases added by extra_aliases.tsv: 59.
 Former constituency tags (old_seats.tsv): 4.
 
@@ -35,6 +35,24 @@ Review rows by kind: common_word 31, existing_exact 13, existing_near 1, rename 
 - Uttar Pradesh: Raebareli (kept) and Rae Bareli are one place
 - Uttar Pradesh: Shravasti (kept) and Shrawasti are one place
 - Karnataka: Chikkaballapur (kept) and Chikballapur are one place
+- Bihar: Jehanabad (kept) and Jahanabad are one place
+- Chhattisgarh: Surguja (kept) and Sarguja are one place
+- Gujarat: Mehsana (kept) and Mahesana are one place
+- Jharkhand: Hazaribag (kept) and Hazaribagh are one place
+- Odisha: Balangir (kept) and Bolangir are one place
+- Odisha: Kendujhar (kept) and Keonjhar are one place
+- Tamil Nadu: Kanyakumari (kept) and Kanniyakumari are one place
+- Tamil Nadu: Tiruvallur (kept) and Thiruvallur are one place
+- Telangana: Peddapalli (kept) and Peddapalle are one place
+- Uttar Pradesh: Budaun (kept) and Badaun are one place
+- Uttar Pradesh: Bagpat (kept) and Baghpat are one place
+- Rajasthan: Sri Ganganagar (kept) and Ganganagar are one place
+- West Bengal: Alipurduar (kept) and Alipurduars are one place
+- Bihar: West Champaran (kept) and Paschim Champaran are one place
+- Bihar: East Champaran (kept) and Purvi Champaran are one place
+- Andhra Pradesh: Ananthapuramu (kept) and Anantapur are one place
+- Andhra Pradesh: YSR Kadapa (kept) and Kadapa are one place
+- Uttar Pradesh: Lakhimpur Kheri (kept) and Kheri are one place
 
 ## Seats of the old constituency table (old_seats.tsv)
 
@@ -58,19 +76,19 @@ Review rows by kind: common_word 31, existing_exact 13, existing_near 1, rename 
 | State | district | constituency | district_constituency |
 |---|---|---|---|
 | Andaman and Nicobar Islands | 3 | 0 | 0 |
-| Andhra Pradesh | 15 | 12 | 13 |
+| Andhra Pradesh | 13 | 10 | 15 |
 | Arunachal Pradesh | 27 | 2 | 0 |
 | Assam | 26 | 5 | 9 |
-| Bihar | 11 | 13 | 27 |
-| Chhattisgarh | 23 | 1 | 10 |
+| Bihar | 8 | 10 | 30 |
+| Chhattisgarh | 22 | 0 | 11 |
 | Dadra and Nagar Haveli and Daman and Diu | 2 | 0 | 1 |
 | Delhi | 5 | 1 | 6 |
 | Goa | 1 | 0 | 2 |
-| Gujarat | 12 | 4 | 21 |
+| Gujarat | 11 | 3 | 22 |
 | Haryana | 14 | 1 | 9 |
 | Himachal Pradesh | 8 | 0 | 4 |
 | Jammu and Kashmir | 16 | 1 | 4 |
-| Jharkhand | 14 | 4 | 9 |
+| Jharkhand | 13 | 3 | 10 |
 | Karnataka | 8 | 5 | 23 |
 | Kerala | 0 | 6 | 13 |
 | Ladakh | 6 | 0 | 0 |
@@ -80,17 +98,17 @@ Review rows by kind: common_word 31, existing_exact 13, existing_near 1, rename 
 | Meghalaya | 12 | 2 | 0 |
 | Mizoram | 11 | 0 | 0 |
 | Nagaland | 16 | 0 | 0 |
-| Odisha | 14 | 5 | 16 |
+| Odisha | 12 | 3 | 18 |
 | Puducherry | 3 | 0 | 0 |
 | Punjab | 12 | 2 | 11 |
-| Rajasthan | 21 | 5 | 20 |
+| Rajasthan | 20 | 4 | 21 |
 | Sikkim | 6 | 0 | 0 |
-| Tamil Nadu | 9 | 10 | 29 |
-| Telangana | 22 | 6 | 11 |
+| Tamil Nadu | 7 | 8 | 31 |
+| Telangana | 21 | 5 | 12 |
 | Tripura | 8 | 2 | 0 |
-| Uttar Pradesh | 16 | 21 | 59 |
+| Uttar Pradesh | 13 | 18 | 62 |
 | Uttarakhand | 10 | 2 | 3 |
-| West Bengal | 13 | 32 | 10 |
+| West Bengal | 12 | 31 | 11 |
 
 ## Sources
 
