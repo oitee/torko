@@ -154,7 +154,7 @@ Regional Languages	topic		Education	Languages spoken by people in a particular r
 Agricultural Loan	topic		Agriculture and Farmers	Loans given to farmers to pay for seeds, equipment, and other farming costs.	Agricultural Credit	165
 Legislation	topic		Law, Justice and Constitution	Process of creating and enacting laws.	-	165
 Liquified Petroleum Gas (LPG)	topic		Energy	A gas fuel, made from petroleum, used for cooking and heating.	LPG|Liquified Petrolium Gas	164
-North Eastern Region	place	region	-	The group of states in the northeastern part of India.	North Eastern India|North Eastern States|North-eastern States	163
+North Eastern Region	place	region	-	The group of states in the northeastern part of India.	North Eastern India|North Eastern States|North-eastern States|North-Eastern Region|North East Region|North-East Region|North-Eastern India	163
 Religious Places	place	area_type	-	Temples, mosques, churches, and other places of worship.	Religious Sites	163
 Water Management	topic		Water and Drinking Water	Planning how water is stored, shared, and used. (Spelling: Management)	Water Managment	163
 Welfare Schemes	topic		Social Justice and Reservation	General government programs that improve the well-being of citizens.	Welfare Fund	163
@@ -186,7 +186,7 @@ Tourism	topic		Culture, Tourism and Sports	Travel and recreational activities.	-
 Unorganised Sector	topic		Labour and Employment	Employment without formal contracts.	-	147
 Communal Riots	topic		Home Affairs and Law and Order	Violent conflict or tension between groups of different religions.	Communal Clashes|communal violence|Communal Tension	146
 Flood Relief	topic		Disasters and Relief	Government assistance to flooded areas.	-	146
-Jammu & Kashmir	place	state	-	State in the northern region of India.	-	146
+Jammu & Kashmir	place	state	-	State in the northern region of India.	Jammu and Kashmir	146
 Traffic Congestion	topic		Roads and Highways	Heavy traffic that blocks smooth movement and causes delay.	Traffic Jams	146
 Act Amendment	topic		Law, Justice and Constitution	A change made to an existing law.	Amendments	145
 Employees	topic		Labour and Employment	People employed by an organisation.	-	145
@@ -642,7 +642,7 @@ Rescue Operation	topic		Disasters and Relief	Emergency action taken to save live
 Shares	topic		Economy, Finance and Taxation	A unit of ownership in a company.	Stocks|Equity Share	48
 State Disaster Response Fund (SDRF)	scheme		Disasters and Relief	Government fund, run by each state, that pays for disaster relief. Formerly the Calamity Relief Fund.	Calamity Relief Fund|Calamity Relief Fund (CRF)	48
 TV Channels	topic		Media and Broadcasting	Television broadcast organisations and the networks that run them.	Television Networks|Telecasting Companies	48
-USA	place	country	External Affairs	The United States of America, a country in North America.	United States of America (USA)|United States of America	48
+USA	place	country	External Affairs	The United States of America, a country in North America.	United States of America (USA)|United States of America|United States	48
 Advertisements	topic		Media and Broadcasting	Paid messages that promote a product, service, or idea.	Advertising	47
 Air Transport	topic		Civil Aviation and Shipping	Moving passengers and goods by aircraft.	-	47
 Anti India	topic		Home Affairs and Law and Order	Activities or statements that the government views as hostile to India's interests or security.	-	47
@@ -2310,7 +2310,7 @@ Agricultural Investments	topic		Agriculture and Farmers	Capital expenditure in f
 Air Traffic Control (ATC)	topic		Civil Aviation and Shipping	The system that guides aircraft safely through the sky and on runways.	-	7
 Alcoholism	topic		Health and Family Welfare	Addiction to alcohol and resulting health issues	-	7
 Aluminium Industry	institution		Industry, Trade and Commerce	Production of aluminum and related products	-	7
-Andaman & N Islands	place	union_territory	-	Union territory comprising islands in Bay of Bengal	-	7
+Andaman & N Islands	place	union_territory	-	Union territory comprising islands in Bay of Bengal	Andaman and Nicobar Islands|Andaman & Nicobar Islands|Andaman and Nicobar	7
 Animal Slaughter	topic		Agriculture and Farmers	Killing of livestock for food production	-	7
 Autonomous Institutions	institution		Education	Educational bodies with independent governance	-	7
 Aviation Turbine Fuel (ATF)	topic		Civil Aviation and Shipping	The fuel used to power aircraft engines.	-	7
@@ -2920,7 +2920,7 @@ Traditional Culture	topic		Culture, Tourism and Sports	Customs and practices of 
 UNESCO World Heritage Site	place	area_type	Culture, Tourism and Sports	Culturally significant site recognized internationally	-	5
 UNICEF	institution		Women and Children	International organization for child welfare	-	5
 Unethical Conduct	topic		Elections and Governance	Improper behavior violating ethical standards	-	5
-United Kingdom (UK)	place	country	External Affairs	Island nation and trading partner of India	-	5
+United Kingdom (UK)	place	country	External Affairs	Island nation and trading partner of India	United Kingdom	5
 Vande Bharat Mission	scheme		External Affairs	Government program that brought Indian citizens home from abroad.	-	5
 Veterinary Research	topic		Agriculture and Farmers	Scientific study of animal diseases	-	5
 Vivad Se Vishwas Scheme	scheme		Economy, Finance and Taxation	Government scheme that settles tax disputes between taxpayers and the government.	-	5
@@ -3137,7 +3137,7 @@ Polio	topic		Health and Family Welfare	Infectious viral disease affecting the ne
 Political Agitations	topic		Elections and Governance	Organized public demonstrations and protests.	-	4
 Political Vengeance	topic		Elections and Governance	Government action taken against political opponents to punish them for political reasons.	-	4
 Political Workers	topic		Labour and Employment	People who take an active part in the work of a political party.	Political Worker	4
-Pondicherry	place	union_territory	-	Union territory on southern coast of India.	-	4
+Pondicherry	place	union_territory	-	Union territory on southern coast of India.	Puducherry	4
 Post And Telegraphs	institution		Science, Technology and Telecom	Government department for postal and telegraph services.	-	4
 Posting	topic		Labour and Employment	The assignment of a government employee to a specific job location or role.	-	4
 Power Demand	topic		Energy	The amount of electricity that consumers require.	-	4
@@ -3355,7 +3355,7 @@ Cultural Organization	institution		Culture, Tourism and Sports	Body promoting cu
 Curfew	topic		Home Affairs and Law and Order	Government order restricting movement during specific hours.	-	3
 Cyber Terrorism	topic		Defence	Attacks that use computers to damage systems or infrastructure.	-	3
 DNA Technology	topic		Science, Technology and Telecom	Scientific methods using genetic material for identification.	-	3
-Daman & Diu	place	union_territory	-	Union territory and former Portuguese colony.	-	3
+Daman & Diu	place	union_territory	-	Union territory and former Portuguese colony.	Daman and Diu	3
 Data Bank	institution		Science, Technology and Telecom	Repository storing and managing organized information.	-	3
 Delhi Master Plan	scheme		Urban Development and Housing	The official long-term plan that guides how Delhi city is built and used.	-	3
 Delhi Transport Corporation (DTC)	institution		Urban Development and Housing	The government company that runs public buses in Delhi.	-	3
@@ -3540,7 +3540,7 @@ Missiles	topic		Defence	Guided weapons that travel through the air to hit a targ
 Mobile App	topic		Science, Technology and Telecom	Software application running on mobile devices.	-	3
 Mobile Electric Magnetic Unit (MEMU)	institution		Railways	Suburban train service using electric power.	-	3
 Mortal Remains	topic		Culture, Tourism and Sports	Dead body after life ends.	-	3
-Mullapperiyar Dam	place	landmark	-	Dam on border between Tamil Nadu and Kerala.	-	3
+Mullapperiyar Dam	place	landmark	-	Dam on border between Tamil Nadu and Kerala.	Mullaperiyar Dam|Mullaiperiyar Dam|Mullai Periyar Dam	3
 Multi State Cooperative Societies	institution		Agriculture and Farmers	Organizations spanning multiple states for collective benefit.	-	3
 Multilateral Relations	topic		External Affairs	Diplomatic ties among three or more countries at once.	-	3
 NATO	institution		External Affairs	Military alliance of western nations.	-	3
@@ -3648,7 +3648,7 @@ Rubber Products	topic		Industry, Trade and Commerce	Items made from natural or s
 Safety Devices	topic		Labour and Employment	Equipment protecting workers from workplace injury.	-	3
 Sagarmala Project	scheme		Civil Aviation and Shipping	Government plan to develop coastal ports and facilities.	-	3
 Salt Industry	topic		Food and Public Distribution	Businesses that produce salt for food and industrial use.	-	3
-Satluj Yamuna Link Canal	place	landmark	-	Water channel connecting two major rivers.	-	3
+Satluj Yamuna Link Canal	place	landmark	-	Water channel connecting two major rivers.	Sutlej-Yamuna Link Canal|Sutlej Yamuna Link Canal	3
 Saving Accounts	topic		Economy, Finance and Taxation	Bank accounts for people to store money safely.	-	3
 School Systems	topic		Education	Structures and organization of educational institutions.	-	3
 Scs & Sts Atrocities	topic		Social Justice and Reservation	Crimes against scheduled castes and tribes.	-	3
@@ -4394,7 +4394,7 @@ Subsidiaries	topic		Industry, Trade and Commerce	Companies controlled by a paren
 Subsidised Air Services	topic		Civil Aviation and Shipping	Flights where the government lowers the ticket price for passengers.	-	2
 Suicide Squads	topic		Home Affairs and Law and Order	A tag with unclear meaning, possibly referring to militant groups linked to suicide attacks.	-	2
 Sukanya Samridhi Yojana	scheme		Economy, Finance and Taxation	Government savings scheme for the education and marriage costs of a girl child.	-	2
-Sunderbans	place	region	-	Forest and delta region in West Bengal and Bangladesh.	-	2
+Sunderbans	place	region	-	Forest and delta region in West Bengal and Bangladesh.	Sundarbans|Sundarban|Sunderban	2
 Super Bazars	topic		Industry, Trade and Commerce	Large retail stores selling variety of consumer goods and products.	-	2
 Surrender	topic		Defence	The act of giving up military forces or positions to an enemy.	-	2
 Swadeshi Jagran Manch	institution		Culture, Tourism and Sports	Organization promoting indigenous Indian economic and social development.	-	2

@@ -108,3 +108,23 @@ Locomotives	type	topic	manual review, 2026-10-02: clear type error
 Satellites	type	topic	manual review, 2026-10-02: clear type error
 Ambulance	type	topic	manual review, 2026-10-02: clear type error
 Laboratory Equipment	type	topic	manual review, 2026-10-02: clear type error
+Jammu & Kashmir	add_alias	Jammu and Kashmir	manual review, 2026-10-09: and versus & in the state name. 850 speech items use it
+Daman & Diu	add_alias	Daman and Diu	manual review, 2026-10-09: and versus & in the name of the union territory
+Andaman & N Islands	add_alias	Andaman and Nicobar Islands	manual review, 2026-10-09: the full name of the union territory. N stands for Nicobar
+Andaman & N Islands	add_alias	Andaman & Nicobar Islands	manual review, 2026-10-09: spelling variant of the name of the union territory
+Andaman & N Islands	add_alias	Andaman and Nicobar	manual review, 2026-10-09: spelling variant of the name of the union territory. 11 speech items use it
+Pondicherry	add_alias	Puducherry	manual review, 2026-10-09: official spelling since 2006 for the same union territory
+USA	add_alias	United States	manual review, 2026-10-09: the short name of the same country. 340 speech items use it
+United Kingdom (UK)	add_alias	United Kingdom	manual review, 2026-10-09: the name without the bracket. 72 speech items use it
+North Eastern Region	add_alias	North-Eastern Region	manual review, 2026-10-09: spelling variant with a hyphen. 16 speech items use it
+North Eastern Region	add_alias	North East Region	manual review, 2026-10-09: spelling variant without a hyphen
+North Eastern Region	add_alias	North-East Region	manual review, 2026-10-09: spelling variant with a hyphen
+North Eastern Region	add_alias	North-Eastern India	manual review, 2026-10-09: spelling variant of the existing alias North Eastern India
+Sunderbans	add_alias	Sundarbans	manual review, 2026-10-09: spelling variant with a. 24 speech items use it
+Sunderbans	add_alias	Sundarban	manual review, 2026-10-09: spelling variant without the final s
+Sunderbans	add_alias	Sunderban	manual review, 2026-10-09: spelling variant without the final s
+Mullapperiyar Dam	add_alias	Mullaperiyar Dam	manual review, 2026-10-09: spelling variant with one p. 19 speech items use it
+Mullapperiyar Dam	add_alias	Mullaiperiyar Dam	manual review, 2026-10-09: spelling variant of the same dam
+Mullapperiyar Dam	add_alias	Mullai Periyar Dam	manual review, 2026-10-09: spelling variant with a space. 8 speech items use it
+Satluj Yamuna Link Canal	add_alias	Sutlej-Yamuna Link Canal	manual review, 2026-10-09: spelling variant of Satluj with a hyphen. 3 speech items use it
+Satluj Yamuna Link Canal	add_alias	Sutlej Yamuna Link Canal	manual review, 2026-10-09: spelling variant of Satluj. 2 speech items use it
