@@ -1,6 +1,6 @@
 import json
 
-from scripts.link_entities import (EXACT_MATCH, EXACT_VERSION, MAX_OPTIONS, NONE, Tags, decide_link, exact_tag,
+from scripts.link_entities import (MODEL_ONLY, EXACT_MATCH, EXACT_VERSION, MAX_OPTIONS, NONE, Tags, decide_link, exact_tag,
                                    link_question, link_state, merge_candidates, needs_decision, norm_name, outcome,
                                    rule_report, split_by_rule, write_exact_link)
 
@@ -171,3 +171,29 @@ def test_the_report_lists_exact_links_where_the_types_differ():
     rep = rule_report(rows, tags)
     assert len(rep["one"]) == 2
     assert rep["mismatches"] == [("unlawful activities", "law", "Illegal Activities", "topic")]
+
+
+def test_a_model_only_name_with_one_exact_tag_goes_to_the_model():
+    tags = tags_with(TagRow(1, "Sagar", "place"), TagRow(2, "Water"))
+    assert "sagar" in MODEL_ONLY
+    assert exact_tag(tags.exact, "sagar") is None
+    by_rule, rest = split_by_rule([name_row("sagar", "place")], tags.exact)
+    assert by_rule == [] and len(rest) == 1
+    assert tags.exact["sagar"] == [1]
+
+
+def test_a_name_off_the_model_only_list_still_links_by_the_rule():
+    tags = tags_with(TagRow(1, "Meerut", "place"))
+    assert "meerut" not in MODEL_ONLY
+    assert exact_tag(tags.exact, "meerut") == 1
+
+
+def test_a_rule_link_on_a_model_only_name_is_decided_again_by_the_model():
+    assert needs_decision(linked_row(EXACT_VERSION, 1), "m q1", 10, exact=exact_tag({"mandi": [1]}, "mandi"))
+
+
+def test_the_report_counts_the_names_that_the_list_sent_to_the_model():
+    tags = tags_with(TagRow(1, "Mandi", "place"), TagRow(2, "Meerut", "place"))
+    rep = rule_report([name_row("mandi", "place"), name_row("meerut", "place")], tags)
+    assert [r["norm_name"] for r in rep["model_only"]] == ["mandi"]
+    assert [r["norm_name"] for r in rep["one"]] == ["meerut"]

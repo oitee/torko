@@ -7,49 +7,7 @@ A name is decided again only when its linked_by value or the tag set changed. --
 --test-pairs runs the steps on the hand-made test pairs and writes nothing to the database.
 --dry-run prints the counts and calls no model.
 
-Steps for each name:
-  0. Register. Each kept item (stage 4) gets a row in entity_names.
-  1. Exact match rule. If the full norm_name equals the norm_name of the name
-     or alias of exactly one tag, the name links to that tag at once. The
-     decision model is not called and no vector is made. The row gets
-     link_status 'linked', link_p NULL, link_reason 'exact_match' and
-     linked_by 'exact-match-v1'. Only tag names and aliases count (Tags.exact).
-     The tag of another linked entity name does not count. Two or more
-     distinct tag ids for the name cancel the rule, and the steps below run.
-     Known risk: the alias "Unlawful Activities" belongs to the topic tag
-     "Illegal Activities", not to the law of that name. The rule has no type
-     guard. The review file lists each exact link where the entity type
-     differs from the tag type, so a manual review can check them.
-  1b. Exact candidates: tags whose name or alias has the same norm_name, and
-     the tags of other entity names with the same norm_name that are linked.
-  2. Vector candidates: embed the name (gemini-embedding-001, RETRIEVAL_QUERY)
-     and take the 20 nearest tags (RETRIEVAL_DOCUMENT tag vectors).
-  3. The decision model gets one choice question. The state is the name, its
-     type, and up to 3 mentions and summaries from different speeches. The
-     options are the candidates (at most 21) and NONE. When two or more tags
-     match exactly, the exact candidates are options only.
-  4. Link when the top option is a tag with probability >= --link-p.
-     Otherwise link_status = 'none'. A wrong link is worse than no link.
-
-A link is never written into tags.aliases.
-
-Idempotent. The expected linked_by of a name is 'exact-match-v1' when the
-name has exactly one exact tag. Otherwise it is the model and question version.
-A name is decided again only when its linked_by differs from the expected
-value, or when an exact link points to another tag than the one exact tag now,
-or when it has no link and the tag set grew since its decision
-(tag_set_version = the largest tags.id). A name that had the rule and now has
-two exact tags goes to the model. --force decides every name again, but the
-rule still applies to it.
-
---test-pairs runs steps 1 to 4 on the hand-made test pairs
-(tags/embedding_v1/data/test_pairs_v1.tsv) and writes nothing to the
-database. A pair with exactly one exact tag links by the rule and makes no
-call. It counts four outcomes: correct link, wrong link, missed link
-(NONE where a tag fits), and correct NONE. It also counts the pairs that the
-rule linked, and says right or wrong for each.
-
-Needs TYPESAFE_API_KEY and GEMINI_API_KEY. Run from the repo root:
+It needs TYPESAFE_API_KEY and GEMINI_API_KEY. Run from the repo root:
 
     set -a && source .env && set +a
     python3 scripts/link_entities.py --test-pairs
@@ -90,6 +48,11 @@ N_EXAMPLES = 3
 LINK_P = 0.7
 NONE = "NONE"
 NONE_TEXT = "no option means the same thing as this name"
+# Place names that are also ordinary words. The exact match rule skips them, so the decision model decides.
+MODEL_ONLY = frozenset({
+    "basti", "mandi", "krishna", "daman", "guna", "banda", "sagar", "pali", "sham", "dhar", "mau", "mon",
+    "surat", "kota", "gaya", "agar", "anand", "dang", "samba", "korea", "patan", "panna",
+})
 PAIR_TYPES = {"group", "law", "person", "place", "role", "scheme"}
 
 
@@ -111,9 +74,10 @@ def norm_name(name: str) -> str:
 
 
 def exact_tag(exact: dict[str, list[int]], norm: str) -> int | None:
-    """The tag id when exactly one distinct tag has this norm_name as name or alias, else None."""
+    """Returns None when no tag or two or more tags match. A name in MODEL_ONLY always gives None."""
     ids = set(exact.get(norm, []))
-    return next(iter(ids)) if len(ids) == 1 else None
+    # No type guard: the law "Unlawful Activities" matches the alias of the topic tag "Illegal Activities".
+    return next(iter(ids)) if len(ids) == 1 and norm not in MODEL_ONLY else None
 
 
 def needs_decision(row: dict, version: str, tag_set: int, force: bool = False,
@@ -285,24 +249,27 @@ def write_exact_link(conn, row: dict, tags: Tags) -> None:
 
 
 def rule_report(rows: list[dict], tags: Tags) -> dict:
-    one, many, mismatches = [], [], []
+    one, many, mismatches, model_only = [], [], [], []
     for r in rows:
         ids = set(tags.exact.get(r["norm_name"], []))
-        if len(ids) == 1:
+        if len(ids) == 1 and r["norm_name"] in MODEL_ONLY:
+            model_only.append(r)
+        elif len(ids) == 1:
             one.append(r)
             t = tags.by_id[next(iter(ids))]
             if t["type"] != r["type"]:
                 mismatches.append((r["name"], r["type"], t["tag"], t["type"]))
         elif len(ids) > 1:
             many.append(r)
-    return {"names": len(rows), "one": one, "many": many, "mismatches": mismatches}
+    return {"names": len(rows), "one": one, "many": many, "mismatches": mismatches, "model_only": model_only}
 
 
 def print_rule_report(rows: list[dict], tags: Tags, todo: list[dict]) -> None:
     rep_ = rule_report(rows, tags)
     to_rule = sum(exact_tag(tags.exact, r["norm_name"]) is not None for r in todo)
     print(f"Exact match rule over {rep_['names']} names: {len(rep_['one'])} have exactly one exact tag (would link), "
-          f"{len(rep_['many'])} have 2 or more (go to the model). Of the names to decide now, "
+          f"{len(rep_['many'])} have 2 or more (go to the model). {len(rep_['model_only'])} have exactly one but "
+          f"are on the MODEL_ONLY list (go to the model). Of the names to decide now, "
           f"{to_rule} link by the rule and {len(todo) - to_rule} need a model call. "
           f"Exact links where the entity type differs from the tag type: {len(rep_['mismatches'])}.")
     for name, type_, tag, tag_type in rep_["mismatches"]:
