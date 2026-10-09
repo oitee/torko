@@ -2,6 +2,7 @@ kind	place	state	place_subtype	other_tag	other_type	other_subtype	detail	review
 existing_exact	Andaman and Nicobar Islands	Andaman and Nicobar Islands	constituency	Andaman & N Islands	place	union_territory	equals the alias of an existing tag. No new tag.	
 existing_exact	Chandigarh	Chandigarh	district_constituency	Chandigarh	place	union_territory	equals the name of an existing tag. No new tag.	
 existing_exact	Daman and Diu	Dadra and Nagar Haveli and Daman and Diu	constituency	Daman & Diu	place	union_territory	equals the alias of an existing tag. No new tag.	
+existing_exact	Kutch	Gujarat	district_constituency	Kachchh Region	place	region	equals the alias of an existing tag. No new tag.	
 existing_exact	Ranchi	Jharkhand	district_constituency	Ranchi	place	city	equals the name of an existing tag. No new tag.	
 existing_exact	Thiruvananthapuram	Kerala	district_constituency	Thiruvananthapuram	place	city	equals the name of an existing tag. No new tag.	
 existing_exact	Kargil	Ladakh	district	Kargil	place	region	equals the name of an existing tag. No new tag.	
@@ -11,8 +12,6 @@ existing_exact	Mizoram	Mizoram	constituency	Mizoram	place	state	equals the name 
 existing_exact	Nagaland	Nagaland	constituency	Nagaland	place	state	equals the name of an existing tag. No new tag.	
 existing_exact	Puducherry	Puducherry	district_constituency	Pondicherry	place	union_territory	equals the alias of an existing tag. No new tag.	
 existing_exact	Sikkim	Sikkim	constituency	Sikkim	place	state	equals the name of an existing tag. No new tag.	
-existing_near	Kutch	Gujarat	district_constituency	Kachchh Region	place	region	the spelling key of 'Kachchh' equals the key of 'Kachchh Region'	
-existing_near	Kutch	Gujarat	district_constituency	Kachchh Region	place	region	hand-made hint: The existing tag may describe the same area.	
 existing_near	Una	Himachal Pradesh	district	United Nations (UN)	institution		the spelling key of 'Una' equals the key of 'UN'	
 shared_name	Aurangabad (Bihar)	Bihar	district_constituency	Chhatrapati Sambhajinagar (Maharashtra, old name)	place		bare name 'Aurangabad' is an alias of every tag in the group. The decision model decides.	
 shared_name	Maharajganj (Bihar)	Bihar	constituency	Maharajganj (Uttar Pradesh)	place		bare name 'Maharajganj' is an alias of every tag in the group. The decision model decides.	

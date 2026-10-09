@@ -2,13 +2,14 @@
 
 Each row is a possible duplicate or risk. Fill the column `review` in `review_pairs.tsv`. This file is a short view. The first 15 rows of each kind are here.
 
-## existing_exact (12 rows)
+## existing_exact (13 rows)
 
 | place | state | other tag | other type | detail |
 |---|---|---|---|---|
 | Andaman and Nicobar Islands | Andaman and Nicobar Islands | Andaman & N Islands | place union_territory | equals the alias of an existing tag. No new tag. |
 | Chandigarh | Chandigarh | Chandigarh | place union_territory | equals the name of an existing tag. No new tag. |
 | Daman and Diu | Dadra and Nagar Haveli and Daman and Diu | Daman & Diu | place union_territory | equals the alias of an existing tag. No new tag. |
+| Kutch | Gujarat | Kachchh Region | place region | equals the alias of an existing tag. No new tag. |
 | Ranchi | Jharkhand | Ranchi | place city | equals the name of an existing tag. No new tag. |
 | Thiruvananthapuram | Kerala | Thiruvananthapuram | place city | equals the name of an existing tag. No new tag. |
 | Kargil | Ladakh | Kargil | place region | equals the name of an existing tag. No new tag. |
@@ -19,12 +20,10 @@ Each row is a possible duplicate or risk. Fill the column `review` in `review_pa
 | Puducherry | Puducherry | Pondicherry | place union_territory | equals the alias of an existing tag. No new tag. |
 | Sikkim | Sikkim | Sikkim | place state | equals the name of an existing tag. No new tag. |
 
-## existing_near (3 rows)
+## existing_near (1 rows)
 
 | place | state | other tag | other type | detail |
 |---|---|---|---|---|
-| Kutch | Gujarat | Kachchh Region | place region | the spelling key of 'Kachchh' equals the key of 'Kachchh Region' |
-| Kutch | Gujarat | Kachchh Region | place region | hand-made hint: The existing tag may describe the same area. |
 | Una | Himachal Pradesh | United Nations (UN) | institution  | the spelling key of 'Una' equals the key of 'UN' |
 
 ## shared_name (14 rows)

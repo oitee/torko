@@ -2,8 +2,8 @@
 
 Source rows: 788 districts, 543 constituencies.
 
-New tags: 952. By subtype: constituency 166, district 416, district_constituency 366, former_constituency 4.
-Skipped places (an existing tag has the name or an alias): 12.
+New tags: 951. By subtype: constituency 166, district 416, district_constituency 365, former_constituency 4.
+Skipped places (an existing tag has the name or an alias): 13.
 Tags with the state in the name (shared names): 14.
 Aliases from renames.tsv in use: 28.
 Unused rename rows (new name not in the source): 0.
@@ -11,7 +11,7 @@ Pairs merged by same_place.tsv: 8.
 Aliases added by extra_aliases.tsv: 59.
 Former constituency tags (old_seats.tsv): 4.
 
-Review rows by kind: common_word 31, existing_exact 12, existing_near 3, rename 28, shared_name 14.
+Review rows by kind: common_word 31, existing_exact 13, existing_near 1, rename 28, shared_name 14.
 
 ## Self checks
 
@@ -66,7 +66,7 @@ Review rows by kind: common_word 31, existing_exact 12, existing_near 3, rename 
 | Dadra and Nagar Haveli and Daman and Diu | 2 | 0 | 1 |
 | Delhi | 5 | 1 | 6 |
 | Goa | 1 | 0 | 2 |
-| Gujarat | 12 | 4 | 22 |
+| Gujarat | 12 | 4 | 21 |
 | Haryana | 14 | 1 | 9 |
 | Himachal Pradesh | 8 | 0 | 4 |
 | Jammu and Kashmir | 16 | 1 | 4 |

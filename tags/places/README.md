@@ -6,7 +6,7 @@ The linking step (`scripts/link_entities.py`) has an exact-match rule. When an e
 
 ## The result
 
-`results/place_tags.tsv` holds 952 new tags. It has the same columns as the seed file: `tag`, `type`, `subtype`, `domain`, `description`, `aliases`, `debate_count`. Every tag has the type `place`, the domain `-` (like the existing state tags), and `debate_count` 0.
+`results/place_tags.tsv` holds 951 new tags. It has the same columns as the seed file: `tag`, `type`, `subtype`, `domain`, `description`, `aliases`, `debate_count`. Every tag has the type `place`, the domain `-` (like the existing state tags), and `debate_count` 0.
 
 | Subtype | Tags | Meaning |
 |---|---|---|
@@ -15,7 +15,7 @@ The linking step (`scripts/link_entities.py`) has an exact-match rule. When an e
 | `district_constituency` | 366 | One district and one constituency with the same name in the same state. They share ONE tag. |
 | `former_constituency` | 4 | An old Assam constituency that no longer exists. See rule 10. |
 
-The input has 788 district rows and 543 constituency rows. 12 places have no new tag, because an existing tag has their name or alias. The 12 places are listed in `results/review_pairs.tsv` (kind `existing_exact`). Examples are Chandigarh, Ranchi, Kargil, and Sikkim. Three of them (`Daman and Diu`, `Andaman and Nicobar Islands`, and `Puducherry`) lost their tag because the seed list got an alias for them. See `results/alias_review.md`.
+The input has 788 district rows and 543 constituency rows. 13 places have no new tag, because an existing tag has their name or alias. The 13 places are listed in `results/review_pairs.tsv` (kind `existing_exact`). Examples are Chandigarh, Ranchi, Kargil, and Sikkim. Three of them (`Daman and Diu`, `Andaman and Nicobar Islands`, and `Puducherry`) lost their tag because the seed list got an alias for them. `Kutch` lost its tag for the same reason: the seed tag `Kachchh Region` is the same place, and it now has the aliases `Kutch` and `Kachchh`. See `results/alias_review.md`.
 
 15 tags have the state in the name, for example `Hamirpur (Uttar Pradesh)`. 28 old district names are in use as aliases. 139 aliases exist in total. The other aliases are the bare name of a shared name, the ASCII spelling of a name with a diacritic (`Mahé` and `Mahe`), the other dash character of a name with a dash (`Janjgir-Champa` and `Janjgir–Champa`), the second spelling of a merged place, and the 59 hand-checked aliases of `data/extra_aliases.tsv`.
 
@@ -184,7 +184,7 @@ A former tag has the description "Former Lok Sabha constituency in Assam, India 
 
 ## Done, next, and unknown
 
-Done: the source files, the script, the 952 tags, the review file, the tests, the coverage check, the 8 merged pairs, the `MODEL_ONLY` list, the 59 extra aliases, the 20 seed aliases, and the old Assam seats.
+Done: the source files, the script, the 951 tags, the review file, the tests, the coverage check, the 8 merged pairs, the `MODEL_ONLY` list, the 59 extra aliases, the 20 seed aliases, and the old Assam seats.
 
 Next: a person fills the `review` column and decides on the 18 other pairs and the proposed aliases in `results/alias_review.md`. Then someone decides how to load the tags (source label, loader), embeds them, and runs the linking step in `--dry-run` mode to see the new exact links.
 
