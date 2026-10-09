@@ -1,0 +1,89 @@
+kind	place	state	place_subtype	other_tag	other_type	other_subtype	detail	review
+existing_exact	Andaman and Nicobar Islands	Andaman and Nicobar Islands	constituency	Andaman & N Islands	place	union_territory	equals the alias of an existing tag. No new tag.	
+existing_exact	Chandigarh	Chandigarh	district_constituency	Chandigarh	place	union_territory	equals the name of an existing tag. No new tag.	
+existing_exact	Daman and Diu	Dadra and Nagar Haveli and Daman and Diu	constituency	Daman & Diu	place	union_territory	equals the alias of an existing tag. No new tag.	
+existing_exact	Ranchi	Jharkhand	district_constituency	Ranchi	place	city	equals the name of an existing tag. No new tag.	
+existing_exact	Thiruvananthapuram	Kerala	district_constituency	Thiruvananthapuram	place	city	equals the name of an existing tag. No new tag.	
+existing_exact	Kargil	Ladakh	district	Kargil	place	region	equals the name of an existing tag. No new tag.	
+existing_exact	Ladakh	Ladakh	constituency	Ladakh	place	union_territory	equals the name of an existing tag. No new tag.	
+existing_exact	Lakshadweep	Lakshadweep	district_constituency	Lakshadweep	place	union_territory	equals the name of an existing tag. No new tag.	
+existing_exact	Mizoram	Mizoram	constituency	Mizoram	place	state	equals the name of an existing tag. No new tag.	
+existing_exact	Nagaland	Nagaland	constituency	Nagaland	place	state	equals the name of an existing tag. No new tag.	
+existing_exact	Puducherry	Puducherry	district_constituency	Pondicherry	place	union_territory	equals the alias of an existing tag. No new tag.	
+existing_exact	Sikkim	Sikkim	constituency	Sikkim	place	state	equals the name of an existing tag. No new tag.	
+existing_near	Kutch	Gujarat	district_constituency	Kachchh Region	place	region	the spelling key of 'Kachchh' equals the key of 'Kachchh Region'	
+existing_near	Kutch	Gujarat	district_constituency	Kachchh Region	place	region	hand-made hint: The existing tag may describe the same area.	
+existing_near	Una	Himachal Pradesh	district	United Nations (UN)	institution		the spelling key of 'Una' equals the key of 'UN'	
+shared_name	Aurangabad (Bihar)	Bihar	district_constituency	Chhatrapati Sambhajinagar (Maharashtra, old name)	place		bare name 'Aurangabad' is an alias of every tag in the group. The decision model decides.	
+shared_name	Maharajganj (Bihar)	Bihar	constituency	Maharajganj (Uttar Pradesh)	place		bare name 'Maharajganj' is an alias of every tag in the group. The decision model decides.	
+shared_name	Bijapur (Chhattisgarh)	Chhattisgarh	district	Vijayapura (Karnataka, old name)	place		bare name 'Bijapur' is an alias of every tag in the group. The decision model decides.	
+shared_name	Bilaspur (Chhattisgarh)	Chhattisgarh	district_constituency	Bilaspur (Himachal Pradesh)	place		bare name 'Bilaspur' is an alias of every tag in the group. The decision model decides.	
+shared_name	Bilaspur (Himachal Pradesh)	Himachal Pradesh	district	Bilaspur (Chhattisgarh)	place		bare name 'Bilaspur' is an alias of every tag in the group. The decision model decides.	
+shared_name	Hamirpur (Himachal Pradesh)	Himachal Pradesh	district_constituency	Hamirpur (Uttar Pradesh)	place		bare name 'Hamirpur' is an alias of every tag in the group. The decision model decides.	
+shared_name	Dindori (Madhya Pradesh)	Madhya Pradesh	district	Dindori (Maharashtra)	place		bare name 'Dindori' is an alias of every tag in the group. The decision model decides.	
+shared_name	Dindori (Maharashtra)	Maharashtra	constituency	Dindori (Madhya Pradesh)	place		bare name 'Dindori' is an alias of every tag in the group. The decision model decides.	
+shared_name	Bishnupur (Manipur)	Manipur	district	Bishnupur (West Bengal)	place		bare name 'Bishnupur' is an alias of every tag in the group. The decision model decides.	
+shared_name	Pratapgarh (Rajasthan)	Rajasthan	district	Pratapgarh (Uttar Pradesh)	place		bare name 'Pratapgarh' is an alias of every tag in the group. The decision model decides.	
+shared_name	Hamirpur (Uttar Pradesh)	Uttar Pradesh	district_constituency	Hamirpur (Himachal Pradesh)	place		bare name 'Hamirpur' is an alias of every tag in the group. The decision model decides.	
+shared_name	Maharajganj (Uttar Pradesh)	Uttar Pradesh	district_constituency	Maharajganj (Bihar)	place		bare name 'Maharajganj' is an alias of every tag in the group. The decision model decides.	
+shared_name	Pratapgarh (Uttar Pradesh)	Uttar Pradesh	district_constituency	Pratapgarh (Rajasthan)	place		bare name 'Pratapgarh' is an alias of every tag in the group. The decision model decides.	
+shared_name	Bishnupur (West Bengal)	West Bengal	constituency	Bishnupur (Manipur)	place		bare name 'Bishnupur' is an alias of every tag in the group. The decision model decides.	
+common_word	Krishna	Andhra Pradesh	district		person		method entity_name: 1 speech items use this name with type person	
+common_word	Polavaram	Andhra Pradesh	district		scheme		method entity_name: 1 speech items use this name with type scheme	
+common_word	Arrah	Bihar	constituency				method english_word: the name is an English word in the system word list	
+common_word	Daman	Dadra and Nagar Haveli and Daman and Diu	district				method english_word: the name is an English word in the system word list	
+common_word	Dang	Gujarat	district				method english_word: the name is an English word in the system word list	
+common_word	Surat	Gujarat	district_constituency				method english_word: the name is an English word in the system word list	
+common_word	Panipat	Haryana	district		law		method entity_name: 1 speech items use this name with type law	
+common_word	Mandi	Himachal Pradesh	district_constituency				method hand_list: Hindi and Urdu: a market	
+common_word	Solan	Himachal Pradesh	district				method english_word: the name is an English word in the system word list	
+common_word	Samba	Jammu and Kashmir	district				method english_word: the name is an English word in the system word list	
+common_word	Bidar	Karnataka	district_constituency				method english_word: the name is an English word in the system word list	
+common_word	Sham	Ladakh	district				method english_word: the name is an English word in the system word list	
+common_word	Balaghat	Madhya Pradesh	district_constituency				method english_word: the name is an English word in the system word list	
+common_word	Dhar	Madhya Pradesh	district_constituency				method hand_list: Hindi: a flow or a ridge	
+common_word	Guna	Madhya Pradesh	district_constituency				method english_word: the name is an English word in the system word list	
+common_word	Sagar	Madhya Pradesh	district_constituency				method hand_list: Hindi: the sea, and a common personal name	
+common_word	Raver	Maharashtra	constituency				method english_word: the name is an English word in the system word list	
+common_word	Satara	Maharashtra	district_constituency				method english_word: the name is an English word in the system word list	
+common_word	Thane	Maharashtra	district_constituency				method english_word: the name is an English word in the system word list	
+common_word	Mon	Nagaland	district				method english_word: the name is an English word in the system word list	
+common_word	Pali	Rajasthan	district_constituency				method english_word: the name is an English word in the system word list	
+common_word	Pali	Rajasthan	district_constituency				method hand_list: A language, and a Buddhist text language	
+common_word	Pali	Rajasthan	district_constituency		group		method entity_name: 1 speech items use this name with type group	
+common_word	Sikar	Rajasthan	district_constituency				method english_word: the name is an English word in the system word list	
+common_word	Tonk	Rajasthan	district				method english_word: the name is an English word in the system word list	
+common_word	Erode	Tamil Nadu	district_constituency				method english_word: the name is an English word in the system word list	
+common_word	Banda	Uttar Pradesh	district_constituency				method english_word: the name is an English word in the system word list	
+common_word	Banda	Uttar Pradesh	district_constituency				method hand_list: Hindi and Urdu: also a person or a servant. Meaning not checked.	
+common_word	Basti	Uttar Pradesh	district_constituency				method hand_list: Hindi and Urdu: a slum or a small settlement	
+common_word	Mau	Uttar Pradesh	district				method english_word: the name is an English word in the system word list	
+common_word	Mau	Uttar Pradesh	district				method hand_list: Named as a risk in the task. Meaning not checked.	
+rename	Sribhumi	Assam	district_constituency	Karimganj			alias 'Karimganj' is the old name of this place	
+rename	Gurugram	Haryana	district_constituency	Gurgaon			alias 'Gurgaon' is the old name of this place	
+rename	Nuh	Haryana	district	Mewat			alias 'Mewat' is the old name of this place	
+rename	Ballari	Karnataka	district_constituency	Bellary			alias 'Bellary' is the old name of this place	
+rename	Belagavi	Karnataka	district_constituency	Belgaum			alias 'Belgaum' is the old name of this place	
+rename	Bengaluru Rural	Karnataka	district_constituency	Bangalore Rural			alias 'Bangalore Rural' is the old name of this place	
+rename	Bengaluru Urban	Karnataka	district	Bangalore Urban			alias 'Bangalore Urban' is the old name of this place	
+rename	Chikkamagaluru	Karnataka	district	Chikmagalur			alias 'Chikmagalur' is the old name of this place	
+rename	Kalaburagi	Karnataka	district_constituency	Gulbarga			alias 'Gulbarga' is the old name of this place	
+rename	Mysuru	Karnataka	district_constituency	Mysore			alias 'Mysore' is the old name of this place	
+rename	Shivamogga	Karnataka	district_constituency	Shimoga			alias 'Shimoga' is the old name of this place	
+rename	Tumakuru	Karnataka	district_constituency	Tumkur			alias 'Tumkur' is the old name of this place	
+rename	Vijayapura	Karnataka	district_constituency	Bijapur			alias 'Bijapur' is the old name of this place	
+rename	Narmadapuram	Madhya Pradesh	district_constituency	Hoshangabad			alias 'Hoshangabad' is the old name of this place	
+rename	Ahilyanagar	Maharashtra	district_constituency	Ahmednagar			alias 'Ahmednagar' is the old name of this place	
+rename	Chhatrapati Sambhajinagar	Maharashtra	district_constituency	Aurangabad			alias 'Aurangabad' is the old name of this place	
+rename	Dharashiv	Maharashtra	district_constituency	Osmanabad			alias 'Osmanabad' is the old name of this place	
+rename	Amethi	Uttar Pradesh	district_constituency	Chhatrapati Shahuji Maharaj Nagar			alias 'Chhatrapati Shahuji Maharaj Nagar' is the old name of this place	
+rename	Amroha	Uttar Pradesh	district_constituency	Jyotiba Phule Nagar			alias 'Jyotiba Phule Nagar' is the old name of this place	
+rename	Ayodhya	Uttar Pradesh	district_constituency	Faizabad			alias 'Faizabad' is the old name of this place	
+rename	Hapur	Uttar Pradesh	district	Panchsheel Nagar			alias 'Panchsheel Nagar' is the old name of this place	
+rename	Hathras	Uttar Pradesh	district_constituency	Mahamaya Nagar			alias 'Mahamaya Nagar' is the old name of this place	
+rename	Kanpur Dehat	Uttar Pradesh	district	Ramabai Nagar			alias 'Ramabai Nagar' is the old name of this place	
+rename	Kasganj	Uttar Pradesh	district	Kanshiram Nagar			alias 'Kanshiram Nagar' is the old name of this place	
+rename	Prayagraj	Uttar Pradesh	district_constituency	Allahabad			alias 'Allahabad' is the old name of this place	
+rename	Sambhal	Uttar Pradesh	district_constituency	Bhim Nagar			alias 'Bhim Nagar' is the old name of this place	
+rename	Shamli	Uttar Pradesh	district	Prabuddh Nagar			alias 'Prabuddh Nagar' is the old name of this place	
+rename	Shamli	Uttar Pradesh	district	Prabudh Nagar			alias 'Prabudh Nagar' is the old name of this place	

@@ -1,0 +1,60 @@
+alias	tag	state	items	evidence	reason
+Malda	Maldah	West Bengal	45	2 of 3 mentions read: Malda in West Bengal debates (GST office in Balurghat, local trains of Eastern Zone)	Wikipedia ending -ah is dropped
+Maldaha	Maldah	West Bengal	3	3 mentions read: erosion by the Ganges, West Bengal labourers, airport for Maldaha constituency	Maldaha is the spelling of the constituency names. The district tag takes it
+Malda Uttar	Maldaha Uttar	West Bengal	5	3 mentions read: Malda Uttar in Parliamentary debates (budget, health, curriculum)	the source spells Maldaha
+Maldah Uttar	Maldaha Uttar	West Bengal	4	3 mentions read: Maldah Uttar Parliamentary Constituency, West Bengal	the source spells Maldaha
+Malda North	Maldaha Uttar	West Bengal	6	Uttar means North in Hindi. The seat Malda Uttar is the only North seat of Malda	English word for Uttar
+Sriganganagar	Sri Ganganagar	Rajasthan	15	3 mentions read: Sriganganagar and Hanumangarh districts, Rajasthan	a space inside the name
+Tirupur	Tiruppur	Tamil Nadu	15	3 mentions read: Palladam, Coimbatore and Tirupur districts of Tamil Nadu	double letter
+Thiruvarur	Tiruvarur	Tamil Nadu	14	3 mentions read: Thiruvarur to Karaikudi train, crop insurance	Thiru and Tiru are one prefix
+Thiruvannamalai	Tiruvannamalai	Tamil Nadu	6	3 mentions read: NH 66, airport, Tindivanam rail line, Tamil Nadu	Thiru and Tiru are one prefix
+Tirupathur	Tirupattur	Tamil Nadu	3	3 mentions read: Chennai and Tirupathur trains, Tiruvannamalai constituency, Tamil Nadu	th for tt
+Sivagangai	Sivaganga	Tamil Nadu	9	3 mentions read: Sivagangai district, Keezhadi museum, Vaigai river, Tamil Nadu	ending -ai
+Pudukottai	Pudukkottai	Tamil Nadu	10	3 mentions read: Pudukottai district, fishermen and Sri Lankan Navy, Tamil Nadu	double letter
+Nagappattinam	Nagapattinam	Tamil Nadu	5	3 mentions read: Nagappattinam district, crop loss, Tamil Nadu	double letter
+Tiruchirapalli	Tiruchirappalli	Tamil Nadu	4	3 mentions read: Srirangam, Tiruchirapalli constituency, Tamil Nadu	double letter
+Gadag	Gadaga	Karnataka	13	3 mentions read: Gadag in Karnataka railway debates	the source spells Gadaga
+Mavelikkara	Mavelikara	Kerala	12	3 mentions read: Mavelikkara constituency, Kerala post offices	double letter
+Kasargod	Kasaragod	Kerala	16	3 mentions read: Kasargod medical college, endosulfan victims, Kerala	a letter is dropped
+Vadakara	Vatakara	Kerala	9	3 mentions read: NH 66 in Vadakara, IGNOU centre, Kerala	d for t
+Valmikinagar	Valmiki Nagar	Bihar	11	3 mentions read: Valmikinagar Parliamentary Constituency, Bihar	a space inside the name
+Siddharth Nagar	Siddharthnagar	Uttar Pradesh	9	3 mentions read: Siddarth Nagar, Uttar Pradesh	a space inside the name
+Siddharthanagar	Siddharthnagar	Uttar Pradesh	3	3 mentions read: Kapilvastu in Siddharthanagar district, Uttar Pradesh	an extra a
+Ambedkarnagar	Ambedkar Nagar	Uttar Pradesh	4	3 mentions read: Purvanchal Express, NTPC project, Ambedkarnagar district, Uttar Pradesh	a space inside the name
+Sravasti	Shravasti	Uttar Pradesh	5	3 mentions read: Sravasti in tourism and railway demands (one is an off-topic Nepal quake item)	Sh for S
+Mishrikh	Misrikh	Uttar Pradesh	15	2 mentions read: Mishrikh Parliamentary Constituency, Balamau, Uttar Pradesh	sh for s
+Machhlishahar	Machhlishahr	Uttar Pradesh	4	2 mentions read: drought-hit districts of Uttar Pradesh	an extra a
+Hardwar	Haridwar	Uttarakhand	3	2 mentions read: Hardwar tourism and sugarcane centre. Haridwar is in Uttarakhand	old spelling
+Balia	Ballia	Uttar Pradesh	5	2 mentions read: Balia parliamentary constituency drinking water	double letter
+Itawah	Etawah	Uttar Pradesh	3	2 mentions read: Chambal Express-way, Uttar Pradesh	old spelling
+Sonepat	Sonipat	Haryana	8	2 mentions read: NH 352-A Sonepat-Gohana-Jind, Sonepat Junction, Haryana	old spelling
+Hissar	Hisar	Haryana	6	2 mentions read: Hissar in Haryana debates	double letter
+Yamuna Nagar	Yamunanagar	Haryana	7	2 mentions read: Yamuna Nagar district, Haryana	a space inside the name
+Bhatinda	Bathinda	Punjab	4	2 mentions read: cancer patients in Punjab, IIPE	old spelling
+Ferozepur	Firozpur	Punjab	21	5 mentions read: all in Punjab debates (border farmers, cancer centre, Shatabdi, drugs)	old spelling
+Zaheerabad	Zahirabad	Telangana	7	2 mentions read: Zaheerabad Parliamentary Constituency, Kamareddy, Telangana	ee for i
+Mahabubnagar	Mahbubnagar	Telangana	25	2 mentions read: Mahabubnagar and Kurnool districts, drought in Telangana	an extra a
+Anakapalle	Anakapalli	Andhra Pradesh	17	2 mentions read: Anakapalle Parliamentary Constituency, Parvada, Andhra Pradesh	e for i
+Ananthapur	Anantapur	Andhra Pradesh	4	2 mentions read: Anantapuram district, seven districts of Andhra Pradesh	an extra h
+Vishakhapatnam	Visakhapatnam	Andhra Pradesh	4	2 mentions read: Polavaram project, Motion of Thanks	an extra h
+Ahmadabad	Ahmedabad	Gujarat	4	2 mentions read: Ahmadabad in pollution and railway debates	a for e
+Nasik	Nashik	Maharashtra	9	2 mentions read: Nasik in budget debate, passport offices	old spelling
+Bhubaneshwar	Bhubaneswar	Odisha	5	2 mentions read: AIIMS election, supplementary demands	sh for s
+Davangere	Davanagere	Karnataka	5	2 mentions read: Harpanahalli in Davangere, Karnataka	a letter is dropped
+Chamarajnagar	Chamarajanagar	Karnataka	3	2 mentions read: Chamarajnagar in Karnataka debates	a letter is dropped
+Kodarma	Koderma	Jharkhand	6	2 mentions read: Hazaribagh Road station, Bagodar-Giridih, Jharkhand	a for e
+Coochbehar	Cooch Behar	West Bengal	5	2 mentions read: Coochbehar jute cluster, West Bengal	a space inside the name
+Joynagar	Jaynagar	West Bengal	7	2 mentions read: Joynagar-Moipith rail link, West Bengal	oy for ay
+Arambag	Arambagh	West Bengal	3	2 mentions read: Arambag in debates on houses and cut motions	final h
+Shekhpura	Sheikhpura	Bihar	3	2 mentions read: drought and water in Bihar	old spelling
+Ashok Nagar	Ashoknagar	Madhya Pradesh	5	2 mentions read: trauma centre in Ashok Nagar district, Guna constituency, Madhya Pradesh	a space inside the name
+Chhattarpur	Chhatarpur	Madhya Pradesh	3	2 mentions read: temples of Achatt village in Chhatarpur, Madhya Pradesh	double letter
+Nabarangapur	Nabarangpur	Odisha	3	2 mentions read: Kendriya Vidyalaya in Nabarangapur constituency, Odisha	an extra a
+Khurda	Khordha	Odisha	3	2 mentions read: Khurda in lightning and scavenging debates (Odisha)	old spelling
+Purnea	Purnia	Bihar	3	2 mentions read: Purnea in railway and agriculture budget debates	old spelling
+Patliputra	Pataliputra	Bihar	21	2 mentions read: erosion of river banks, trauma centre in Bikram, Patliputra, Bihar	a letter is dropped
+Mangaldai	Mangaldoi	Assam	6	2 mentions read: Mangaldai Parliamentary Constituency bye-pass, Assam	ai for oi
+Gadchiroli - Chimur	Gadchiroli–Chimur	Maharashtra	3	2 mentions read: Gadchiroli - Chimur Parliamentary Constituency, Tadoba	spaces around the dash
+North-West Delhi	North West Delhi	Delhi	3	2 mentions read: North-West Delhi Parliamentary Constituency	a dash for a space
+Aurangabad, Bihar	Aurangabad (Bihar)	Bihar	4	2 mentions read: the extraction added the state to the name. Mentions are Aurangabad (Bihar) debates	comma for brackets
+Villuppuram	Viluppuram	Tamil Nadu	3	2 mentions read: Villupuram Parliamentary Constituency, Tamil Nadu	double letter

@@ -1,0 +1,29 @@
+old_name	new_name	state	year	source_url	checked
+Gurgaon	Gurugram	Haryana	2016	https://en.wikipedia.org/wiki/Gurugram_district	yes
+Mewat	Nuh	Haryana	2016	https://en.wikipedia.org/wiki/Nuh_district	yes
+Allahabad	Prayagraj	Uttar Pradesh	2018	https://en.wikipedia.org/wiki/Prayagraj_district	yes
+Faizabad	Ayodhya	Uttar Pradesh	2018	https://en.wikipedia.org/wiki/Ayodhya_district	no
+Jyotiba Phule Nagar	Amroha	Uttar Pradesh	2012	https://en.wikipedia.org/wiki/Amroha_district	yes
+Prabuddh Nagar	Shamli	Uttar Pradesh	2012	https://en.wikipedia.org/wiki/Shamli_district	yes
+Prabudh Nagar	Shamli	Uttar Pradesh	2012	https://en.wikipedia.org/wiki/Shamli_district	yes
+Kanshiram Nagar	Kasganj	Uttar Pradesh	2012	https://en.wikipedia.org/wiki/Kasganj_district	no
+Panchsheel Nagar	Hapur	Uttar Pradesh	2012	https://en.wikipedia.org/wiki/Hapur_district	no
+Mahamaya Nagar	Hathras	Uttar Pradesh	2012	https://en.wikipedia.org/wiki/Hathras_district	no
+Bhim Nagar	Sambhal	Uttar Pradesh	2012	https://en.wikipedia.org/wiki/Sambhal_district	no
+Ramabai Nagar	Kanpur Dehat	Uttar Pradesh	2012	https://en.wikipedia.org/wiki/Kanpur_Dehat_district	no
+Chhatrapati Shahuji Maharaj Nagar	Amethi	Uttar Pradesh	2012	https://en.wikipedia.org/wiki/Amethi_district	no
+Hoshangabad	Narmadapuram	Madhya Pradesh	2022	https://en.wikipedia.org/wiki/Narmadapuram_district	yes
+Osmanabad	Dharashiv	Maharashtra	2023	https://en.wikipedia.org/wiki/Dharashiv_district	yes
+Aurangabad	Chhatrapati Sambhajinagar	Maharashtra	2023	https://en.wikipedia.org/wiki/Chhatrapati_Sambhajinagar_district	yes
+Ahmednagar	Ahilyanagar	Maharashtra	2024	https://en.wikipedia.org/wiki/Ahilyanagar_district	yes
+Bangalore Urban	Bengaluru Urban	Karnataka	2014	https://en.wikipedia.org/wiki/Bengaluru_Urban_district	no
+Bangalore Rural	Bengaluru Rural	Karnataka	2014	https://en.wikipedia.org/wiki/Bengaluru_Rural_district	no
+Belgaum	Belagavi	Karnataka	2014	https://en.wikipedia.org/wiki/Belagavi_district	no
+Bellary	Ballari	Karnataka	2014	https://en.wikipedia.org/wiki/Ballari_district	no
+Bijapur	Vijayapura	Karnataka	2014	https://en.wikipedia.org/wiki/Vijayapura_district	no
+Chikmagalur	Chikkamagaluru	Karnataka	2014	https://en.wikipedia.org/wiki/Chikkamagaluru_district	no
+Gulbarga	Kalaburagi	Karnataka	2014	https://en.wikipedia.org/wiki/Kalaburagi_district	no
+Mysore	Mysuru	Karnataka	2014	https://en.wikipedia.org/wiki/Mysuru_district	no
+Shimoga	Shivamogga	Karnataka	2014	https://en.wikipedia.org/wiki/Shivamogga_district	no
+Tumkur	Tumakuru	Karnataka	2014	https://en.wikipedia.org/wiki/Tumakuru_district	no
+Karimganj	Sribhumi	Assam	2024	https://en.wikipedia.org/wiki/Sribhumi_district	yes
