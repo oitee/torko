@@ -2,19 +2,8 @@ from __future__ import annotations
 
 
 def load_db_roster(term: int) -> list[dict]:
-    """
-    Return every known speaker who served in Lok Sabha `term` or later, in
-    `mpPartDetailList` shape.
-
-    Scoped by `lok_sabha_term >= term`, not `==`. `db/init/04-speakers.sql`
-    loads exactly one row per person, attached to that person's LAST term, so
-    someone who served in term T is recorded under their last term, which is
-    always >= T. Scoping by equality would wrongly exclude anyone whose career
-    continued past `term`.
-
-    Returns [] on any connection or query failure -- callers rely on this to
-    make the DB tier a silent no-op when Postgres is unavailable.
-    """
+    """Speakers of `term` or later, from each person's last-term row, in `mpPartDetailList` shape. Returns [] on any failure."""
+    # Imported here so that importing this module never needs SQLAlchemy or a database.
     try:
         from sqlalchemy import text
 
@@ -30,6 +19,7 @@ def load_db_roster(term: int) -> list[dict]:
                     FROM speakers
                     JOIN persons ON persons.id = speakers.person_id
                     WHERE speakers.lok_sabha_term >= :term
+                      AND speakers.source = 'sansad-last-term'
                     """
                 ),
                 {"term": term},

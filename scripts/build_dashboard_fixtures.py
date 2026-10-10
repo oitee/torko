@@ -29,7 +29,7 @@ def party_lookup(engine) -> dict[str, dict]:
             text(
                 "SELECT p.sansad_id, s.party, s.constituency "
                 "FROM speakers s JOIN persons p ON p.id = s.person_id "
-                "WHERE p.sansad_id IS NOT NULL"
+                "WHERE p.sansad_id IS NOT NULL AND s.source = 'sansad-last-term'"
             )
         ).fetchall()
     return {str(r.sansad_id): {"party": r.party, "constituency": r.constituency} for r in rows}

@@ -164,7 +164,7 @@ Torko links all three spellings of Adhir Ranjan Chowdhury's name from the earlie
 ## Known limits
 
 1. Torko finds no speaker name for 111,286 turns. The dashboard marks these turns as unattributed.
-2. The party shown for a member reflects only their final term. A member who changed party shows one party for their whole history.
+2. The party shown for a speech is the member's party in the Lok Sabha term of the debate. It comes from the Wikipedia list of members of that term, and from sansad.in for the member's last term. It is the party at the election. A change of party inside a term is not shown. For 3.4% of the (member, term) pairs that speak in the debates, Torko has no party, and these turns hold 2.4% of the words with a known speaker. About half of these words belong to ministers from the Rajya Sabha, who have no Lok Sabha term.
 3. Torko does not read about 13.6% of the source text. The loss is 32.5% in the 13th Lok Sabha and about 3% in recent terms. Charts over time will therefore show too little activity in the early years.
 
    <details>
@@ -202,11 +202,11 @@ The plan has these steps:
 
 - **Topics over time.** Charts that show how often parliament discussed a topic in each session, and which members led the discussion.
 
-- **Better source data.** Read the text that Torko misses today, add each member's party for each term, and record who chaired each sitting.
+- **Better source data.** Read the text that Torko misses today, show a change of party inside a term, and record who chaired each sitting.
 
 ## Tests
 
-Torko ships 561 tests. The tests run with no network access. 4 tests read the local database, so load `.env` first. The full run takes about 1 second.
+Torko ships 748 tests. The tests run with no network access. 4 tests read the local database, so load `.env` first. The full run takes about 1 second.
 
 ```bash
 set -a && source .env && set +a && python3 -m pytest

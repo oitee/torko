@@ -224,8 +224,9 @@
   <div class="nav"><a href="index.html">Single-debate lookup</a> &nbsp;·&nbsp; <a href="dashboard.html">Debate list</a></div>
 
   <div class="caveat">
-    Party shown is each MP's <strong>last recorded term's party</strong>, not necessarily their
-    party when they gave a particular speech. Debate counts reflect only debates where we
+    The party is the MP's party in each Lok Sabha term. It comes from the Wikipedia list of members
+    of that term, and from sansad.in for the MP's last term. A change of party inside a term is not
+    shown. For some terms the party is not known. Debate counts reflect only debates where we
     attributed a turn to this MP — a coverage figure, not a verified activity total.
   </div>
 
@@ -313,12 +314,21 @@ async function loadSpeaker(sansadId, opts = {}) {
 
 let currentDebates = [];
 
+// One entry for each Lok Sabha term: the party and the seat in that term.
+function termsLine(terms) {
+  if (!terms || terms.length === 0) return '';
+  const parts = terms.map(t =>
+    `LS${t.loksabha}: ${escapeHtml(t.party || 'party unknown')}${t.constituency ? ' (' + escapeHtml(t.constituency) + ')' : ''}`);
+  return `<p class="speaker-meta">${parts.join(' · ')}</p>`;
+}
+
 function renderSpeaker(data) {
   const header = document.createElement('div');
   header.className = 'speaker-header';
   header.innerHTML = `
     <p class="speaker-name">${escapeHtml(data.speaker.name)}</p>
     <p class="speaker-meta">${escapeHtml(data.speaker.party || 'Party unknown')} · ${escapeHtml(data.speaker.constituency || 'Constituency unknown')} · sansadId ${escapeHtml(data.speaker.sansadId)}</p>
+    ${termsLine(data.terms)}
     ${speakerStats(data.debates)}
   `;
   contentEl.appendChild(header);

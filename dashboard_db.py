@@ -25,14 +25,15 @@ def _speakers_present(conn, debate_id: int) -> list[dict]:
     rows = conn.execute(
         text(
             """
-            SELECT p.sansad_id AS sansad_id, sp.name AS name, sp.party AS party,
+            SELECT p.sansad_id AS sansad_id, p.name AS name, sp.party AS party,
                    sp.constituency AS constituency
             FROM turns t
+            JOIN debates d ON d.id = t.debate_id
             JOIN persons p ON p.id = t.person_id
-            LEFT JOIN speakers sp ON sp.person_id = p.id
+            LEFT JOIN speakers sp ON sp.person_id = p.id AND sp.lok_sabha_term = d.loksabha
             WHERE t.debate_id = :debate_id
-            GROUP BY p.sansad_id, sp.name, sp.party, sp.constituency
-            ORDER BY sp.name
+            GROUP BY p.sansad_id, p.name, sp.party, sp.constituency
+            ORDER BY p.name
             """
         ),
         {"debate_id": debate_id},
@@ -109,8 +110,11 @@ def list_debates(
         params["text_query"] = text_query
     if parties:
         clauses.append(
-            "EXISTS (SELECT 1 FROM turns t JOIN speakers sp ON sp.person_id = t.person_id "
-            "WHERE t.debate_id = d.id AND sp.party = ANY(:parties))"
+            # The party of the debate's term. The term test sits in WHERE, not in the JOIN:
+            # in the JOIN, the planner picks a plan that is about 30 times slower.
+            "EXISTS (SELECT 1 FROM speakers sp JOIN turns t ON t.person_id = sp.person_id "
+            "WHERE t.debate_id = d.id AND sp.lok_sabha_term = d.loksabha "
+            "AND sp.party = ANY(:parties))"
         )
         params["parties"] = parties
     if speaker_codes:
@@ -188,17 +192,17 @@ def get_debate_detail(loksabha: int, session: int, dbslno: int) -> dict | None:
             text(
                 """
                 SELECT t.seq, t.speaker_label, t.text, t.name_source, t.role_kind,
-                       p.sansad_id AS sansad_id, sp.name AS person_name, sp.party AS party,
+                       p.sansad_id AS sansad_id, p.name AS person_name, sp.party AS party,
                        sr.display_name AS role_display_name
                 FROM turns t
                 LEFT JOIN persons p ON p.id = t.person_id
-                LEFT JOIN speakers sp ON sp.person_id = p.id
+                LEFT JOIN speakers sp ON sp.person_id = p.id AND sp.lok_sabha_term = :ls
                 LEFT JOIN speaker_roles sr ON sr.id = t.role_id
                 WHERE t.debate_id = :debate_id
                 ORDER BY t.seq
                 """
             ),
-            {"debate_id": debate.id},
+            {"debate_id": debate.id, "ls": debate.loksabha},
         ).fetchall()
 
         turns = []
@@ -326,10 +330,9 @@ def get_mp_diff(loksabha: int, session: int, dbslno: int) -> dict | None:
         attributed_rows = conn.execute(
             text(
                 """
-                SELECT DISTINCT p.sansad_id AS sansad_id, sp.name AS name
+                SELECT DISTINCT p.sansad_id AS sansad_id, p.name AS name
                 FROM turns t
                 JOIN persons p ON p.id = t.person_id
-                LEFT JOIN speakers sp ON sp.person_id = p.id
                 WHERE t.debate_id = :debate_id
                 """
             ),
@@ -357,19 +360,19 @@ def get_mp_diff(loksabha: int, session: int, dbslno: int) -> dict | None:
 
 def list_speakers(q: str) -> list[dict]:
     engine = get_engine()
-    clause = "WHERE sp.name ILIKE :q" if q else ""
+    clause = "WHERE p.name ILIKE :q" if q else ""
     with engine.connect() as conn:
         rows = conn.execute(
             text(
                 f"""
-                SELECT p.sansad_id AS sansad_id, sp.name AS name, sp.party AS party,
+                SELECT p.sansad_id AS sansad_id, p.name AS name, sp.party AS party,
                        sp.constituency AS constituency, count(DISTINCT t.debate_id) AS debate_count
                 FROM turns t
                 JOIN persons p ON p.id = t.person_id
-                LEFT JOIN speakers sp ON sp.person_id = p.id
+                LEFT JOIN speakers sp ON sp.person_id = p.id AND sp.source = 'sansad-last-term'
                 {clause}
-                GROUP BY p.sansad_id, sp.name, sp.party, sp.constituency
-                ORDER BY sp.name
+                GROUP BY p.sansad_id, p.name, sp.party, sp.constituency
+                ORDER BY p.name
                 """
             ),
             {"q": f"%{q}%"} if q else {},
@@ -394,10 +397,10 @@ def get_speaker_detail(sansad_id: str) -> dict | None:
         speaker = conn.execute(
             text(
                 """
-                SELECT p.sansad_id AS sansad_id, sp.name AS name, sp.party AS party,
+                SELECT p.id AS person_id, p.sansad_id AS sansad_id, p.name AS name, sp.party AS party,
                        sp.constituency AS constituency
                 FROM persons p
-                LEFT JOIN speakers sp ON sp.person_id = p.id
+                LEFT JOIN speakers sp ON sp.person_id = p.id AND sp.source = 'sansad-last-term'
                 WHERE p.sansad_id = :sansad_id
                 """
             ),
@@ -406,17 +409,27 @@ def get_speaker_detail(sansad_id: str) -> dict | None:
         if speaker is None:
             return None
 
+        term_rows = conn.execute(
+            text(
+                "SELECT lok_sabha_term, party, constituency FROM speakers "
+                "WHERE person_id = :pid ORDER BY lok_sabha_term"
+            ),
+            {"pid": speaker.person_id},
+        ).fetchall()
+
         debate_rows = conn.execute(
             text(
                 """
                 SELECT d.loksabha, d.session, d.dbslno, d.title, d.debate_type, d.debate_date,
-                       d.source_url,
+                       d.source_url, sp.party AS party,
                        count(*) AS interventions, sum(t.word_count) AS words
                 FROM turns t
                 JOIN persons p ON p.id = t.person_id
                 JOIN debates d ON d.id = t.debate_id
+                LEFT JOIN speakers sp ON sp.person_id = p.id AND sp.lok_sabha_term = d.loksabha
                 WHERE p.sansad_id = :sansad_id
-                GROUP BY d.id, d.loksabha, d.session, d.dbslno, d.title, d.debate_type, d.debate_date
+                GROUP BY d.id, d.loksabha, d.session, d.dbslno, d.title, d.debate_type, d.debate_date,
+                         sp.party
                 ORDER BY d.debate_date
                 """
             ),
@@ -433,6 +446,7 @@ def get_speaker_detail(sansad_id: str) -> dict | None:
             "debateType": r.debate_type,
             "debateDate": r.debate_date.isoformat() if r.debate_date else None,
             "sourceUrl": r.source_url,
+            "party": r.party,
             "interventions": r.interventions,
             "words": int(r.words) if r.words is not None else 0,
         }
@@ -446,6 +460,10 @@ def get_speaker_detail(sansad_id: str) -> dict | None:
             "party": speaker.party,
             "constituency": speaker.constituency,
         },
+        "terms": [
+            {"loksabha": r.lok_sabha_term, "party": r.party, "constituency": r.constituency}
+            for r in term_rows
+        ],
         "totalDebates": len(debates),
         "debates": debates,
     }
@@ -458,9 +476,11 @@ def get_facets() -> dict:
             r[0]
             for r in conn.execute(
                 text(
-                    "SELECT DISTINCT sp.party FROM turns t "
-                    "JOIN speakers sp ON sp.person_id = t.person_id "
-                    "WHERE sp.party IS NOT NULL ORDER BY sp.party"
+                    "SELECT DISTINCT sp.party FROM speakers sp "
+                    "WHERE sp.party IS NOT NULL "
+                    "AND EXISTS (SELECT 1 FROM turns t JOIN debates d ON d.id = t.debate_id "
+                    "WHERE t.person_id = sp.person_id AND d.loksabha = sp.lok_sabha_term) "
+                    "ORDER BY sp.party"
                 )
             ).fetchall()
         ]

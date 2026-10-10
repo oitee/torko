@@ -1,28 +1,3 @@
-"""
-Load the full Lok Sabha member roster from the sansad.in API into our DB.
-
-    persons  -- one row per real human (our own id; mpCode kept as sansad_id)
-    speakers -- one row per (person, Lok Sabha term)
-
-Design decisions:
-
-* Source is a single call: GET /api_ls/member?size=5427 -> everyone, one row
-  per person, with `lastLoksabha`, `partySname`, `constName`.
-* We attach each speaker to that person's OWN last term (`lastLoksabha`). The
-  member snapshot's party/constituency is the *latest-term* value, so pinning it
-  to the person's last LS makes the snapshot correct rather than fictional.
-  Per-term affiliation for earlier terms is a future feature.
-* The member directory spans ALL Lok Sabhas (1st-18th). Our debate corpus starts
-  at LS13, and a person who never served in LS13-18 can never appear in it, so we
-  skip anyone whose last term is < 13 (their `lastLoksabha` has no lok_sabhas row
-  anyway). Skipped count is reported.
-* Idempotent: safe to re-run. persons upsert on sansad_id; speakers on
-  (lok_sabha_term, person_id).
-
-Run from the repo root (with the DB up and db/init/*.sql applied):
-
-    python -m scripts.load_roster
-"""
 from __future__ import annotations
 
 import sys
@@ -83,9 +58,9 @@ def load(members: list[dict]) -> None:
                 text(
                     """
                     INSERT INTO speakers
-                        (person_id, lok_sabha_term, name, party, constituency)
+                        (person_id, lok_sabha_term, name, party, constituency, source)
                     VALUES
-                        (:person_id, :lok_sabha_term, :name, :party, :constituency)
+                        (:person_id, :lok_sabha_term, :name, :party, :constituency, 'sansad-last-term')
                     ON CONFLICT (lok_sabha_term, person_id) DO NOTHING
                     """
                 ),
