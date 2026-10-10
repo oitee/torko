@@ -1,15 +1,15 @@
-old_name	state	decision	target	note
-Karimganj	Assam	same		The old name is the old name of the district Sribhumi. It is already an alias of that tag.
-Silchar	Assam	same		The current tag Silchar has this name.
-Autonomous District	Assam	former	Autonomous District (Assam)	The seat is now Diphu, but the 2023 delimitation changed its area and nothing in this repository confirms the rename. The name is also an ordinary phrase, so the tag name has the state and no bare alias.
-Dhubri	Assam	same		The current tag Dhubri has this name.
-Kokrajhar	Assam	same		The current tag Kokrajhar has this name.
-Barpeta	Assam	same		The current tag Barpeta has this name.
-Gauhati	Assam	alias	Guwahati	Gauhati is the older English spelling of Guwahati. The seat has the same centre.
-Mangaldoi	Assam	former		Darrang-Udalguri replaced this seat in 2023. It also covers Udalguri, so it is not clearly the same seat. 6 speech items use the name.
-Tezpur	Assam	former		Sonitpur replaced this seat in 2023. The boundaries changed, so it is not clearly the same seat. 10 speech items use the name. Most of them mean the town.
-Nowgong	Assam	ignore		Nowgong is the old spelling of Nagaon. A town in Madhya Pradesh has the same name. No speech item uses the name. No alias, to avoid a wrong link.
-Kaliabor	Assam	former		Kaziranga replaced this seat in 2023. The boundaries changed, so it is not clearly the same seat. 2 speech items use the name.
-Jorhat	Assam	same		The current tag Jorhat has this name.
-Dilbrugarh	Assam	ignore		The old table spells Dibrugarh with a typo. The current tag Dibrugarh exists. No speech item uses the typo.
-Lakhimpur	Assam	same		The current tag Lakhimpur has this name.
+old_name	state	decision	target	note	description
+Karimganj	Assam	same		The old name is the old name of the district Sribhumi. It is already an alias of that tag.	
+Silchar	Assam	same		The current tag Silchar has this name.	
+Autonomous District	Assam	former	Autonomous District (Assam)	The seat is now Diphu, but the 2023 delimitation changed its area and nothing in this repository confirms the rename. The name is also an ordinary phrase, so the tag name has the state and no bare alias.	
+Dhubri	Assam	same		The current tag Dhubri has this name.	
+Kokrajhar	Assam	same		The current tag Kokrajhar has this name.	
+Barpeta	Assam	same		The current tag Barpeta has this name.	
+Gauhati	Assam	alias	Guwahati	Gauhati is the older English spelling of Guwahati. The seat has the same centre.	
+Mangaldoi	Assam	former		Darrang-Udalguri replaced this seat in 2023. It also covers Udalguri, so it is not clearly the same seat. 6 speech items use the name.	
+Tezpur	Assam	former		Sonitpur replaced this seat in 2023. The boundaries changed, so it is not clearly the same seat. 10 speech items use the name. Most of them mean the town.	Town in the Sonitpur district of Assam, India. A Lok Sabha constituency until 2024.
+Nowgong	Assam	ignore		Nowgong is the old spelling of Nagaon. A town in Madhya Pradesh has the same name. No speech item uses the name. No alias, to avoid a wrong link.	
+Kaliabor	Assam	former		Kaziranga replaced this seat in 2023. The boundaries changed, so it is not clearly the same seat. 2 speech items use the name.	
+Jorhat	Assam	same		The current tag Jorhat has this name.	
+Dilbrugarh	Assam	ignore		The old table spells Dibrugarh with a typo. The current tag Dibrugarh exists. No speech item uses the typo.	
+Lakhimpur	Assam	same		The current tag Lakhimpur has this name.	

@@ -296,7 +296,8 @@ def apply_old_seats(groups: dict, old_seats: list[dict], decisions: list[dict]) 
             if key in groups:
                 raise ValueError(f"old_seats.tsv: {s['name']!r} is marked `former` but a current place has this name")
             g = {"name": name, "state": s["state"], "kinds": {"former_constituency"}, "reserved": s["reserved"],
-                 "sources": [s["source_row"]], "old_names": [], "alt_names": [], "notes": []}
+                 "sources": [s["source_row"]], "old_names": [], "alt_names": [], "notes": [],
+                 "description": (d.get("description") or "").strip()}
             groups[key] = g
         else:
             raise ValueError(f"old_seats.tsv: unknown decision {d['decision']!r}")
@@ -309,6 +310,9 @@ def subtype_of(kinds: set[str]) -> str:
 
 
 def description_of(g: dict) -> str:
+    # A hand-made description in old_seats.tsv replaces the made one.
+    if g.get("description"):
+        return g["description"]
     what = {"district": "District", "constituency": "Lok Sabha constituency",
             "district_constituency": "District and Lok Sabha constituency",
             "former_constituency": "Former Lok Sabha constituency"}[subtype_of(g["kinds"])]

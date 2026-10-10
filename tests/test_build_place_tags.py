@@ -235,6 +235,13 @@ def test_a_former_tag_can_get_another_name_than_the_old_name():
     assert "Mangaldoi (Assam)" in tags and "Mangaldoi" not in tags
 
 
+def test_a_former_tag_takes_the_hand_made_description_when_one_is_given():
+    text = "Town in the Darrang district of Assam, India. A Lok Sabha constituency until 2024."
+    decisions = [{**OLD_DECISIONS[1], "description": text}] + OLD_DECISIONS[:1] + OLD_DECISIONS[2:]
+    tags = tags_by_name(build([], CURRENT, [], [], old_seats=OLD, old_decisions=decisions))
+    assert tags["Mangaldoi"]["description"] == text
+
+
 def test_an_old_seat_without_a_decision_or_a_wrong_decision_is_an_error():
     with pytest.raises(ValueError):
         build([], CURRENT, [], [], old_seats=OLD, old_decisions=OLD_DECISIONS[:3])
