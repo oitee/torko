@@ -226,7 +226,8 @@
   <div class="caveat">
     The party is the MP's party in each Lok Sabha term. It comes from the Wikipedia list of members
     of that term, and from sansad.in for the MP's last term. A change of party inside a term is not
-    shown. For some terms the party is not known. Debate counts reflect only debates where we
+    shown. For some terms the party is not known. A minister who spoke in a term without a Lok Sabha
+    seat shows the party of their last Lok Sabha term. Debate counts reflect only debates where we
     attributed a turn to this MP — a coverage figure, not a verified activity total.
   </div>
 
@@ -318,7 +319,8 @@ let currentDebates = [];
 function termsLine(terms) {
   if (!terms || terms.length === 0) return '';
   const parts = terms.map(t =>
-    `LS${t.loksabha}: ${escapeHtml(t.party || 'party unknown')}${t.constituency ? ' (' + escapeHtml(t.constituency) + ')' : ''}`);
+    `LS${t.loksabha}: ${escapeHtml(t.party || 'party unknown')}${t.constituency ? ' (' + escapeHtml(t.constituency) + ')' : ''}` +
+    (t.member === false ? ' (not a Lok Sabha member in this term)' : ''));
   return `<p class="speaker-meta">${parts.join(' · ')}</p>`;
 }
 

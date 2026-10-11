@@ -27,8 +27,9 @@ def party_lookup(engine) -> dict[str, dict]:
     with engine.connect() as conn:
         rows = conn.execute(
             text(
-                "SELECT p.sansad_id, s.party, s.constituency "
+                "SELECT p.sansad_id, pa.code AS party, s.constituency "
                 "FROM speakers s JOIN persons p ON p.id = s.person_id "
+                "LEFT JOIN parties pa ON pa.id = s.party_id "
                 "WHERE p.sansad_id IS NOT NULL AND s.source = 'sansad-last-term'"
             )
         ).fetchall()

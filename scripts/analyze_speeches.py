@@ -120,17 +120,19 @@ def main():
         # person). Shown as context,
         # NOT as party-at-time-of-speech.
         out["speakers"]["top_by_speeches"] = rows(c, """
-            select p.name, sp2.party, count(*) speeches, sum(sp.word_count) words,
+            select p.name, pa.code as party, count(*) speeches, sum(sp.word_count) words,
               percentile_cont(0.5) within group (order by sp.word_count) median_len
             from speeches sp join persons p on p.id=sp.person_id
             left join speakers sp2 on sp2.person_id=p.id and sp2.source='sansad-last-term'
-            group by p.id, p.name, sp2.party order by speeches desc limit 25""")
+            left join parties pa on pa.id=sp2.party_id
+            group by p.id, p.name, pa.code order by speeches desc limit 25""")
         out["speakers"]["top_by_words"] = rows(c, """
-            select p.name, sp2.party, count(*) speeches, sum(sp.word_count) words,
+            select p.name, pa.code as party, count(*) speeches, sum(sp.word_count) words,
               avg(sp.word_count) mean_len
             from speeches sp join persons p on p.id=sp.person_id
             left join speakers sp2 on sp2.person_id=p.id and sp2.source='sansad-last-term'
-            group by p.id, p.name, sp2.party order by words desc limit 25""")
+            left join parties pa on pa.id=sp2.party_id
+            group by p.id, p.name, pa.code order by words desc limit 25""")
         for grp in ("top_by_speeches", "top_by_words"):
             for s in out["speakers"][grp]:
                 for k in ("words", "median_len", "mean_len"):

@@ -18,6 +18,22 @@ def fetch_all_members() -> list[dict]:
     return resp.json().get("membersDtoList", [])
 
 
+def party_id(conn, code: str | None, name: str | None) -> int | None:
+    code = (code or "").strip()
+    if not code or code == "Not Available":
+        return None
+    return conn.execute(
+        text(
+            """
+            INSERT INTO parties (code, name) VALUES (:code, :name)
+            ON CONFLICT (code) DO UPDATE SET name = parties.name
+            RETURNING id
+            """
+        ),
+        {"code": code, "name": " ".join((name or code).split())},
+    ).scalar_one()
+
+
 def load(members: list[dict]) -> None:
     engine = get_engine()
 
@@ -58,9 +74,9 @@ def load(members: list[dict]) -> None:
                 text(
                     """
                     INSERT INTO speakers
-                        (person_id, lok_sabha_term, name, party, constituency, source)
+                        (person_id, lok_sabha_term, name, party_id, constituency, source)
                     VALUES
-                        (:person_id, :lok_sabha_term, :name, :party, :constituency, 'sansad-last-term')
+                        (:person_id, :lok_sabha_term, :name, :party_id, :constituency, 'sansad-last-term')
                     ON CONFLICT (lok_sabha_term, person_id) DO NOTHING
                     """
                 ),
@@ -68,7 +84,7 @@ def load(members: list[dict]) -> None:
                     "person_id": person_id.id,
                     "lok_sabha_term": last_ls,
                     "name": name,
-                    "party": (m.get("partySname") or "").strip() or None,
+                    "party_id": party_id(conn, m.get("partySname"), m.get("partyFname")),
                     "constituency": (m.get("constName") or "").strip() or None,
                 },
             )
