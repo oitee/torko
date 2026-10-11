@@ -86,7 +86,7 @@ term	mpsno	sansad_name	last_term	method	score	wiki_name	wiki_title	state	constit
 13	86	Ramesh Chennithala	13	name+seat	2	Ramesh Chennithala	Ramesh Chennithala	Kerala	Mavelikara	Indian National Congress	INC	
 13	87	Bhavna Devraj Chikhalia	13	name+seat	2	Chilhaliya Bhavnaben Devrajbhai	Bhavna Chikhalia	Gujarat	Junagadh	Bharatiya Janata Party	BJP	
 13	88	M. Chinnasamy	13	name+seat	1	M. Chinnasamy	M. Chinnasamy	Tamil Nadu	Karur	All India Anna Dravida Munnetra Kazhagam	AIADMK	
-13	89	VSM (Retd.) Col. Choudhary	16	none								
+13	89	VSM (Retd.) Col. Choudhary	16	article	0	Sona Ram	Sona Ram Choudhary	Rajasthan	Barmer	Indian National Congress	INC	
 13	90	Nikhil Kumar Choudhary	15	name	3	Nikhil Kumar Choudhary	Nikhil Kumar Choudhary	Bihar	Katihar	Bharatiya Janata Party	BJP	
 13	91	Reena Choudhary	13	name+seat	2	Reena Chowdhary		Uttar Pradesh	Mohanlalganj	Samajwadi Party	SP	
 13	92	Padamsen Chaudhary	13	name+seat	2	Padamsen Chaudhary	Padamsen Chaudhary	Uttar Pradesh	Bahraich	Bharatiya Janata Party	BJP	
@@ -104,7 +104,7 @@ term	mpsno	sansad_name	last_term	method	score	wiki_name	wiki_title	state	constit
 13	104	Priya Ranjan Dasmunsi	14	name	3	Priya Ranjan Dasmunsi	Priya Ranjan Dasmunsi	West Bengal	Raiganj	Indian National Congress	INC	
 13	105	Bandaru Dattatreya	16	name	2	Bandaru Dattatraya	Bandaru Dattatreya	Andhra Pradesh	Secunderabad	Bharatiya Janata Party	BJP	
 13	106	Deepak Kumar	13	name+seat	2	Deepak Kumar	Deepak Kumar (politician)	Uttar Pradesh	Unnao	Samajwadi Party	SP	
-13	107	Delkar, Shri Mohan S.	17	none								
+13	107	Delkar, Shri Mohan S.	17	article	0	Delkar Mohanbhai Sanjibhai	Mohanbhai Sanjibhai Delkar	Dadra and Nagar Haveli	Dadra and Nagar Haveli	Independent politician	Ind.	
 13	108	Bikram Keshari Deo	14	name	3	Bikram Keshari Deo	Bikram Keshari Deo	Orissa	Kalahandi	Bharatiya Janata Party	BJP	
 13	109	Sontosh Mohan Dev	14	name	3	Sontosh Mohan Dev	Santosh Mohan Dev	Assam	Silchar	Indian National Congress	INC	
 13	110	Kailasho Devi	13	name+seat	2	Prof. Kailasho Devi	Kailasho Devi	Haryana	Kurukshetra	Indian National Lok Dal	INLD	
@@ -125,7 +125,7 @@ term	mpsno	sansad_name	last_term	method	score	wiki_name	wiki_title	state	constit
 13	125	Gurcharan Singh Galib	13	name+seat	3	Gurcharan Singh Galib	Gurcharan Singh Galib	Punjab	Ludhiana	Indian National Congress	INC	
 13	126	Hema Gamang	13	name+seat	2	Hema Gamang	Hema Gamang	Orissa	Koraput	Indian National Congress	INC	
 13	127	Jarbom Gamlin	13	name+seat	2	Jarbom Gamlin	Jarbom Gamlin	Arunachal Pradesh	Arunachal West	Indian National Congress	INC	
-13	128	Dilip Kumar Mansukhlal Gandhi	16	none								
+13	128	Dilip Kumar Mansukhlal Gandhi	16	article	0	Dilipkumar Mansukhlal Gandhi	Dilipkumar Gandhi	Maharashtra	Ahmednagar	Bharatiya Janata Party	BJP	
 13	129	Maneka Sanjay Gandhi	17	name	2	Maneka Gandhi	Maneka Gandhi	Uttar Pradesh	Pilibhit	Independent politician	Ind.	
 13	130	Sonia Gandhi	17	name	2	Sonia Gandhi	Sonia Gandhi	Karnataka	Bellary	Indian National Congress	INC	
 13	131	Santosh Kumar Gangwar	17	name	2	Santosh Gangwar	Santosh Gangwar	Uttar Pradesh	Bareilly	Bharatiya Janata Party	BJP	
@@ -143,7 +143,7 @@ term	mpsno	sansad_name	last_term	method	score	wiki_name	wiki_title	state	constit
 13	143	Rajen Gohain	16	name	2	Rajen Gohain	Rajen Gohain	Assam	Nowgong	Bharatiya Janata Party	BJP	
 13	144	T. Govindan	13	name+seat	1	T. Govindan	T. Govindan	Kerala	Kasaragod	Communist Party of India (Marxist)	CPI(M)	
 13	145	Puttaswamy Gowda	13	name+seat	2	G. Putta Swamy Gowda	G. Puttaswamy Gowda	Karnataka	Hassan	Indian National Congress	INC	
-13	146	Anantrao Gudhe	14	none								
+13	146	Anantrao Gudhe	14	article	0	Anant Gudhe	Anant Gudhe	Maharashtra	Amravati	Shiv Sena	SS	
 13	147	Chaman Lal Gupta	13	name+seat	3	Chaman Lal Gupta	Chaman Lal Gupta	Jammu & Kashmir	Udhampur	Bharatiya Janata Party	BJP	
 13	148	Indrajit Gupta	13	name+seat	2	Indrajit Gupta	Indrajit Gupta	West Bengal	Midnapore	Communist Party of India	CPI	
 13	149	Bijoy Krishna Handique	15	name	3	Bijoy Krishna Handique	Bijoy Krishna Handique	Assam	Jorhat	Indian National Congress	INC	
@@ -184,7 +184,7 @@ term	mpsno	sansad_name	last_term	method	score	wiki_name	wiki_title	state	constit
 13	184	Vallabhbhai Kathiria	14	name	2	Dr. Vallabhbhai Kathiria	Vallabhbhai Kathiria	Gujarat	Rajkot	Bharatiya Janata Party	BJP	
 13	185	Vinaya Katiyar	13	name+seat	2	Vinay Katiyar	Vinay Katiyar	Uttar Pradesh	Faizabad	Bharatiya Janata Party	BJP	
 13	186	Preneet Kaur	17	name	2	Preneet Kaur	Preneet Kaur	Punjab	Patiala	Indian National Congress	INC	
-13	187	Raghuvir Singh Kaushal	14	none								
+13	187	Raghuvir Singh Kaushal	14	article	0	Raghuveer Singh Koshal	Raghuveer Singh Koshal	Rajasthan	Kota	Bharatiya Janata Party	BJP	
 13	188	Brijlal Khabri	13	seat	0	Brij Lal Khabri		Uttar Pradesh	Jalaun	Bahujan Samaj Party	BSP	
 13	189	Chandrakant Bhaurao Khaire	16	name	2	Chandrakant Khaire	Chandrakant Khaire	Maharashtra	Aurangabad	Shiv Sena	SS	
 13	190	Abul Hasnat Khan	13	name+seat	3	Abul Hasnat Khan	Abul Hasnat Khan	West Bengal	Jangipur	Communist Party of India (Marxist)	CPI(M)	
@@ -221,7 +221,7 @@ term	mpsno	sansad_name	last_term	method	score	wiki_name	wiki_title	state	constit
 13	221	Haribhau Mahale	13	name+seat	2	Haribahu Shankar Mahale	Haribahu Shankar Mahale	Maharashtra	Malegaon	Janata Dal (Secular)	JD(S)	
 13	222	Charan Das Mahant	15	name	3	Charan Das Mahant	Charan Das Mahant	Madhya Pradesh	Janjgir	Indian National Congress	INC	
 13	223	Subhash Maharia	14	name	2	Subhash Maharia	Subhash Maharia	Rajasthan	Sikar	Bharatiya Janata Party	BJP	
-13	224	Bir Sing Mahato	14	none								
+13	224	Bir Sing Mahato	14	article	0	Bir Singh Mahato	Bir Singh Mahato	West Bengal	Purulia	All India Forward Bloc	AIFB	
 13	225	Bhartruhari Mahtab	18	name	2	Bhartruhari Mahtab	Bhartruhari Mahtab	Orissa	Cuttack	Biju Janata Dal	BJD	
 13	226	Abha Mahato	13	name+seat	2	Abha Mahato	Abha Mahato	Bihar	Jamshedpur	Bharatiya Janata Party	BJP	
 13	227	Parsuram Majhi	14	name	2	Parsuram Majhi	Parsuram Majhi	Orissa	Nowrangpur	Bharatiya Janata Party	BJP	
@@ -239,9 +239,9 @@ term	mpsno	sansad_name	last_term	method	score	wiki_name	wiki_title	state	constit
 13	239	Manjay Lal	13	name+seat	2	Manjay Lal	Manjay Lal	Bihar	Samastipur	Janata Dal (United)	JD(U)	
 13	240	Ramji Manjhi	13	name+seat	2	Ramji Manjhi	Ramji Manjhi	Bihar	Gaya	Bharatiya Janata Party	BJP	
 13	241	Simranjit Singh Mann	17	name	3	Simranjit Singh Mann	Simranjit Singh Mann	Punjab	Sangrur	Shiromani Akali Dal (Amritsar)	SAD(M)	
-13	242	Zora Singh Mann	14	none								
+13	242	Zora Singh Mann	14	article	0	Zora Singh Maan	Zora Singh Maan	Punjab	Ferozpur	Shiromani Akali Dal	SAD	
 13	243	Murasoli Maran	13	name+seat	2	Murasoli Maran	Murasoli Maran	Tamil Nadu	Chennai Central	Dravida Munnetra Kazhagam	DMK	
-13	244	Babu Lal Marandi	15	none								
+13	244	Babu Lal Marandi	15	article	0	Babulal Marandi	Babulal Marandi	Bihar	Dumka	Bharatiya Janata Party	BJP	
 13	245	. Mayawati	14	name	1	Mayawati	Mayawati	Uttar Pradesh	Akbarpur	Bahujan Samaj Party	BSP	
 13	246	Bheru Lal Meena	13	name+seat	3	Bheru Lal Meena	Bheru Lal Meena	Rajasthan	Salumber	Indian National Congress	INC	
 13	247	Jaskaur Meena	17	name	2	Jaskaur Meena	Jaskaur Meena	Rajasthan	Sawai Madhopur	Bharatiya Janata Party	BJP	
@@ -305,18 +305,18 @@ term	mpsno	sansad_name	last_term	method	score	wiki_name	wiki_title	state	constit
 13	305	Mansinh Patel	13	name+seat	2	Mansinh Patel	Mansinh Patel	Gujarat	Mandvi	Bharatiya Janata Party	BJP	
 13	306	Prahlad Singh Patel	17	name	3	Prahlad Singh Patel	Prahlad Singh Patel	Madhya Pradesh	Balaghat	Bharatiya Janata Party	BJP	
 13	307	Tarachand Patel	13	name+seat	2	Tarachand Patel	Tarachand Patel	Madhya Pradesh	Khargone	Indian National Congress	INC	
-13	308	Dahya Bhai V. Patel	14	none								
+13	308	Dahya Bhai V. Patel	14	article	0	Patel Dahyabhai Vallabhbhai	Dahyabhai Vallabhbhai Patel	Daman and Diu	Daman and Diu	Indian National Congress	INC	
 13	309	Dinsha J. Patel	15	name	2	Dinsha Patel	Dinsha Patel	Gujarat	Kaira	Indian National Congress	INC	
 13	310	Harin Pathak	15	name	2	Harin Pathak	Harin Pathak	Gujarat	Ahmedabad	Bharatiya Janata Party	BJP	
 13	311	Amarsinh Vasantrao Patil	13	name+seat	3	Amarsinh Vasantarao Patil	Amarsinh Vasantrao Patil	Karnataka	Belgaum	Indian National Congress	INC	
-13	312	Anna Saheb M.K. Patil	14	none								
+13	312	Anna Saheb M.K. Patil	14	article	0	Annasaheb M. K. Patil	Annasaheb M. K. Patil	Maharashtra	Erandol	Bharatiya Janata Party	BJP	
 13	313	Balasaheb Vikhe Patil	14	name	3	E. V. alias Balasaheb Vikhe Patil	Balasaheb Vikhe Patil	Maharashtra	Kopargaon	Shiv Sena	SS	
 13	314	Basangouda Patil	14	name	2	Basanagouda R Patil (Yatnal)	Basangouda Patil Yatnal	Karnataka	Bijapur	Bharatiya Janata Party	BJP	
 13	315	Bhaskar Rao Patil	13	seat	0	Bhaskarrao Bapurao Khatgaonkar	Bhaskarrao Bapurao Khatgaonkar Patil	Maharashtra	Nanded	Indian National Congress	INC	
 13	316	Raosaheb Dadarao Danve	17	name	3	Danve Raosaheb Dadarao Patil	Raosaheb Danve	Maharashtra	Jalna	Bharatiya Janata Party	BJP	
 13	317	Jaisingrao Gaikwad Patil	14	name	3	Jaisingrao Gaikwad Patil	Jaisingrao Gaikwad Patil	Maharashtra	Beed	Bharatiya Janata Party	BJP	
-13	318	Laxman Rao Pandurang Patil	14	none								
-13	319	Prakash V. Patil	14	none								
+13	318	Laxman Rao Pandurang Patil	14	article	0	Laxmanrao Pandurang Jadhav (Patil)	Laxmanrao Pandurang Patil	Maharashtra	Satara	Nationalist Congress Party	NCP	
+13	319	Prakash V. Patil	14	article	0	Patil Prakashbapu Vasantdada	Prakashbapu Vasantdada Patil	Maharashtra	Sangli	Indian National Congress	INC	
 13	320	Rudragouda Patil	13	name+seat	1	R S Patil		Karnataka	Bagalkot	Indian National Congress	INC	
 13	321	Shivraj V. Patil	13	name+seat	2	Shivraj Vishwanath Patil	Shivraj Patil	Maharashtra	Latur	Indian National Congress	INC	
 13	322	Shriniwas Dadasaheb Patil	17	name	3	Patil Shriniwas Dadasaheb	Shriniwas Patil	Maharashtra	Karad	Nationalist Congress Party	NCP	
@@ -354,7 +354,7 @@ term	mpsno	sansad_name	last_term	method	score	wiki_name	wiki_title	state	constit
 13	354	Gingee N Ramachandran	14	name	2	N. Gingee Ramachandran		Tamil Nadu	Tindivanam	Marumalarchi Dravida Munnetra Kazhagam	MDMK	
 13	355	Ram Shakal	13	name+seat	2	Ram Shakal	Ram Shakal	Uttar Pradesh	Robertsganj	Bharatiya Janata Party	BJP	
 13	356	H.G. Ramulu	13	name+seat	1	H G Ramulu	H. G. Ramulu	Karnataka	Koppal	Indian National Congress	INC	
-13	357	Kashi Ram Rana	14	none								
+13	357	Kashi Ram Rana	14	article	0	Kashiram Rana	Kashiram Rana	Gujarat	Surat	Bharatiya Janata Party	BJP	
 13	358	Rajendrasinh (Raju Rana) Rana	15	name	2	Rajendrasinh Ghanshyamsinh Rana	Rajendrasinh Ghanshyamsinh Rana	Gujarat	Bhavnagar	Bharatiya Janata Party	BJP	
 13	359	Dadichiluka Veera Gouri Sankara Rao	13	name+seat	5	Dadichiluka Veera Gouri Sankara Rao	D. V. G. Sankara Rao	Andhra Pradesh	Parvathipuram	Telugu Desam Party	TDP	
 13	360	Ganta Srinivasa Rao	13	name+seat	3	Ganta Srinivasa Rao	Ganta Srinivasa Rao	Andhra Pradesh	Anakapalli	Telugu Desam Party	TDP	
@@ -419,7 +419,7 @@ term	mpsno	sansad_name	last_term	method	score	wiki_name	wiki_title	state	constit
 13	420	Vishnu Datt	13	name+seat	2	Vishno Datt Sharma	Vishno Datt Sharma	Jammu & Kashmir	Jammu	Bharatiya Janata Party	BJP	
 13	421	Shashi Kumar	13	name+seat	2	Shashi Kumar	Shashi Kumar	Karnataka	Chitradurga	Janata Dal (United)	JD(U)	
 13	422	Saleem Iqbal Shervani	14	name	3	Saleem Iqbal Shervani	Saleem Iqbal Shervani	Uttar Pradesh	Budaun	Samajwadi Party	SP	
-13	423	Sushil Kumar Sambhajirao Shinde	15	none								
+13	423	Sushil Kumar Sambhajirao Shinde	15	article	0	Sushilkumar Shinde	Sushilkumar Shinde	Maharashtra	Solapur	Indian National Congress	INC	
 13	424	Shyama Charan Shukla	13	name+seat	3	Shyama Charan Shukla	Shyama Charan Shukla	Madhya Pradesh	Mahasamund	Indian National Congress	INC	
 13	425	Tapan Sikdar	13	name+seat	2	Tapan Sikdar	Tapan Sikdar	West Bengal	Dum Dum	Bharatiya Janata Party	BJP	
 13	426	Sangeeta Kumari Singh Deo	18	name	3	Sangeeta Kumari Singh Deo	Sangeeta Kumari Singh Deo	Orissa	Bolangir	Bharatiya Janata Party	BJP	
@@ -434,10 +434,10 @@ term	mpsno	sansad_name	last_term	method	score	wiki_name	wiki_title	state	constit
 13	435	Buta Singh	13	name+seat	2	Sardar Buta Singh	Buta Singh	Rajasthan	Jalore	Indian National Congress	INC	
 13	436	Bahadur Singh Koli	16	name	3	Bahadur Singh Koli	Bahadur Singh Koli	Rajasthan	Bayana	Bharatiya Janata Party	BJP	
 13	437	Balbir Singh	13	name+seat	2	Balbir Singh		Punjab	Jullundur	Indian National Congress	INC	
-13	438	Brijbhushan Sharan Singh	17	none								
+13	438	Brijbhushan Sharan Singh	17	article	0	Brij Bhushan Sharan Singh	Brij Bhushan Sharan Singh	Uttar Pradesh	Gonda	Bharatiya Janata Party	BJP	
 13	439	Chandra Nath Singh	13	seat	0	Chandranath Singh		Uttar Pradesh	Machlishahr	Samajwadi Party	SP	
 13	440	Chandra Bhushan Singh	14	name	3	Chandra Bhushan Singh (Munnoo Babu)	Chandra Bhushan Singh	Uttar Pradesh	Farrukhabad	Samajwadi Party	SP	
-13	441	Chandra Pratap Singh	14	none								
+13	441	Chandra Pratap Singh	14	article	0	Chandrapratap Singh	Chandrapratap Singh	Madhya Pradesh	Sidhi	Bharatiya Janata Party	BJP	
 13	442	Chandra Vijay Singh	13	name+seat	3	Chandra Vijay Singh	Chandra Vijay Singh	Uttar Pradesh	Moradabad	Akhil Bhartiya Lok Tantrik Congress	ABLTC	
 13	443	Charanjit Singh	13	name+seat	2	Charanjit Singh		Punjab	Hoshiarpur	Indian National Congress	INC	
 13	444	Chhatrapal Singh	13	name+seat	2	Chhatrapal Singh Lodha	Chhatrapal Singh Lodha	Uttar Pradesh	Bulandshahr	Bharatiya Janata Party	BJP	
@@ -615,7 +615,7 @@ term	mpsno	sansad_name	last_term	method	score	wiki_name	wiki_title	state	constit
 14	99	Bikash Chowdhury	14	name+seat	2	Bikash Chowdhury	Bikash Chowdhury	West Bengal	Asansol	Communist Party of India (Marxist)	CPI(M)	
 14	100	Renuka Chowdhury	14	name+seat	2	Renuka Chowdhury	Renuka Chowdhury	Andhra Pradesh	Khammam	Indian National Congress	INC	
 14	104	Priya Ranjan Dasmunsi	14	name+seat	3	Priya Ranjan Dasmunsi	Priya Ranjan Dasmunsi	West Bengal	Raiganj	Indian National Congress	INC	
-14	107	Delkar, Shri Mohan S.	17	none								
+14	107	Delkar, Shri Mohan S.	17	article	0	Delkar Mohanbhai Sanjibhai	Mohanbhai Sanjibhai Delkar	Dadra and Nagar Haveli	Dadra and Nagar Haveli	Bharatiya Navshakti Party	BNP	
 14	108	Bikram Keshari Deo	14	name+seat	3	Bikram Keshari Deo	Bikram Keshari Deo	Orissa	Kalahandi	Bharatiya Janata Party	BJP	
 14	109	Sontosh Mohan Dev	14	name+seat	3	Sontosh Mohan Dev	Santosh Mohan Dev	Assam	Silchar	Indian National Congress	INC	
 14	113	Kishan Lal Diler	14	name+seat	3	Kishan Lal Diler	Kishan Lal Diler	Uttar Pradesh	Hathras	Bharatiya Janata Party	BJP	
@@ -749,7 +749,7 @@ term	mpsno	sansad_name	last_term	method	score	wiki_name	wiki_title	state	constit
 14	430	Raghuvansh Prasad Singh	15	name	3	Raghubansh Prasad Singh	Raghuvansh Prasad Singh	Bihar	Vaishali	Rashtriya Janata Dal	RJD	
 14	431	Ram Lakhan Singh	14	name+seat	2	Dr. Ramlakhan Singh	Ramlakhan Singh	Madhya Pradesh	Bhind	Bharatiya Janata Party	BJP	
 14	433	Kunwar Sarvraj Singh	14	name+seat	2	Kunwar Sarvraj Singh	Sarvraj Singh	Uttar Pradesh	Aonla	Janata Dal (United)	JD(U)	
-14	438	Brijbhushan Sharan Singh	17	none								
+14	438	Brijbhushan Sharan Singh	17	article	0	Brij Bhushan Sharan Singh	Brij Bhushan Sharan Singh	Uttar Pradesh	Balrampur	Bharatiya Janata Party	BJP	
 14	440	Chandra Bhushan Singh	14	name+seat	3	Chandra Bhushan Singh (Munnoo Babu)	Chandra Bhushan Singh	Uttar Pradesh	Farrukhabad	Samajwadi Party	SP	
 14	441	Chandra Pratap Singh	14	seat	0	Chandrapratap Singh	Chandrapratap Singh	Madhya Pradesh	Sidhi	Bharatiya Janata Party	BJP	
 14	448	Lakshman Singh	14	name+seat	2	Lakshman Singh	Lakshman Singh (politician)	Madhya Pradesh	Rajgarh	Bharatiya Janata Party	BJP	
@@ -827,7 +827,7 @@ term	mpsno	sansad_name	last_term	method	score	wiki_name	wiki_title	state	constit
 14	3400	Subodh Kant Sahai	15	name	3	Subodh Kant Sahay	Subodh Kant Sahay	Jharkhand	Ranchi	Indian National Congress	INC	
 14	3401	Nand Kumar Sai	14	name+seat	3	Nand Kumar Sai	Nand Kumar Sai	Chhattisgarh	Surguja	Bharatiya Janata Party	BJP	
 14	3418	Maha Deo Rao Shiwankar	14	seat	0	Mahadeorao Sukaji Shivankar	Mahadeo Shivankar	Maharashtra	Chimur	Bharatiya Janata Party	BJP	
-14	3439	Taslim Uddin	16	none								
+14	3439	Taslim Uddin	16	article	0	Md.Taslimuddin	Mohammed Taslimuddin	Bihar	Kishanganj	Rashtriya Janata Dal	RJD	
 14	3455	Mitrasen Yadav	14	name+seat	2	Mitrasen	Mitrasen Yadav	Uttar Pradesh	Faizabad	Bahujan Samaj Party	BSP	
 14	3478	Kirip Chaliha	14	name+seat	2	Kirip Chaliha	Kirip Chaliha	Assam	Gauhati	Indian National Congress	INC	
 14	3479	Pankaj Choudhary	18	name	2	Pankaj Choudhary	Pankaj Chaudhary	Uttar Pradesh	Maharajganj	Bharatiya Janata Party	BJP	
@@ -840,7 +840,7 @@ term	mpsno	sansad_name	last_term	method	score	wiki_name	wiki_title	state	constit
 14	3555	Harilal Madhavjibhai Patel	14	name+seat	3	Harilal Madhavjibhai Patel	Harilal Madhavjibhai Patel	Gujarat	Porbandar	Bharatiya Janata Party	BJP	
 14	3561	Suryakanta Patil	14	name+seat	2	Suryakanta Patil	Suryakanta Patil	Maharashtra	Hingoli	Nationalist Congress Party	NCP	
 14	3581	Allola Indrakaran Reddy	14	name+seat	3	Allola Indrakaran Reddy	Allola Indrakaran Reddy	Andhra Pradesh	Adilabad	Indian National Congress	INC	
-14	3583	Kotla Jaya Surya Prakash Reddy	15	none								
+14	3583	Kotla Jaya Surya Prakash Reddy	15	article	0	Kotla Jayasurya Prakasha Reddy	Kotla Jayasurya Prakasha Reddy	Andhra Pradesh	Kurnool	Indian National Congress	INC	
 14	3589	Kumari Selja	18	name	1	Selja Kumari	Selja Kumari	Haryana	Ambala	Indian National Congress	INC	
 14	3604	Mohan Singh	14	name+seat	2	Mohan Singh	Mohan Singh	Uttar Pradesh	Deoria	Samajwadi Party	SP	
 14	3617	K.V. Thangka Balu	14	seat	0	K. V. Thangkabalu	K. V. Thangkabalu	Tamil Nadu	Salem	Indian National Congress	INC	
@@ -1126,7 +1126,7 @@ term	mpsno	sansad_name	last_term	method	score	wiki_name	wiki_title	state	constit
 14	4214	Narahari Mahato	15	name	2	Narahari Mahato	Narahari Mahato	West Bengal	Purulia	All India Forward Bloc	AIFB	
 14	4216	Rampal Singh	14	name+seat	2	Rampal Singh	Rampal Singh (Madhya Pradesh politician)	Madhya Pradesh	Vidisha	Bharatiya Janata Party	BJP	
 14	4217	Ramswaroop Prasad	14	name+seat	2	Ram Swaroop Prasad		Bihar	Nalanda	Janata Dal (United)	JD(U)	
-14	4218	Jhansi Lakshmi Botcha	15	none								
+14	4218	Jhansi Lakshmi Botcha	15	article	0	Botsa Jhansi Lakshmi	Botsa Jhansi Lakshmi	Andhra Pradesh	Bobbili	Indian National Congress	INC	
 14	4219	Vijay Bahuguna	15	name	2	Vijay Bahuguna	Vijay Bahuguna	Uttarakhand	Tehri Garhwal	Indian National Congress	INC	
 14	4220	Manik Singh	14	name+seat	2	Manik Singh	Manik Singh	Madhya Pradesh	Sidhi	Indian National Congress	INC	
 14	4221	Yashodhara Raje Scindia	15	name	3	Yashodhara Raje Scindia	Yashodhara Raje Scindia	Madhya Pradesh	Gwalior	Bharatiya Janata Party	BJP	
@@ -1145,7 +1145,7 @@ term	mpsno	sansad_name	last_term	method	score	wiki_name	wiki_title	state	constit
 14	4234	Meena Singh	15	none								
 14	4245	(Retd.), TPS Rawat, PVSM, VSM	14	none								
 14	4246	Hemant Khandelwal	14	name+seat	2	Hemant Khandelwal	Hemant Khandelwal	Madhya Pradesh	Betul	Bharatiya Janata Party	BJP	
-14	4247	Bhismshankar Alias Kushal Tiwari	15	none								
+14	4247	Bhismshankar Alias Kushal Tiwari	15	article	0	Bhishma Shankar Tiwari	Bhishma Shankar Tiwari	Uttar Pradesh	Khalilabad	Bahujan Samaj Party	BSP	
 14	4248	Akbar Ahmad Dumpy	14	name+seat	3	Akbar Ahmad	Akbar Ahmad Dumpy	Uttar Pradesh	Azamgarh	Bahujan Samaj Party	BSP	
 14	4249	Anurag Singh Thakur	18	name	2	Anurag Thakur	Anurag Thakur	Himachal Pradesh	Hamirpur	Bharatiya Janata Party	BJP	
 14	4250	Anand Prakash Paranjpe	15	article	0	Anand Paranjpe	Anand Paranjpe	Maharashtra	Thane	Shiv Sena	SS	
@@ -1179,7 +1179,7 @@ term	mpsno	sansad_name	last_term	method	score	wiki_name	wiki_title	state	constit
 15	97	Adhir Ranjan Chowdhury	17	name	3	Adhir Ranjan Chowdhury	Adhir Ranjan Chowdhury	West Bengal	Baharampur	Indian National Congress	INC	
 15	98	Santosh Chowdhary	15	name+seat	2	Santosh Chowdhary	Santosh Chowdhary	Punjab	Hoshiarpur	Indian National Congress	INC	
 15	115	Ram Chandra Dome	15	name+seat	3	Ram Chandra Dome	Ram Chandra Dome	West Bengal	Bolpur	Communist Party of India (Marxist)	CPI(M)	
-15	128	Dilip Kumar Mansukhlal Gandhi	16	none								
+15	128	Dilip Kumar Mansukhlal Gandhi	16	article	0	Dilipkumar Gandhi	Dilipkumar Gandhi	Maharashtra	Ahmednagar	Bharatiya Janata Party	BJP	
 15	129	Maneka Sanjay Gandhi	17	name	2	Maneka Gandhi	Maneka Gandhi	Uttar Pradesh	Aonla	Bharatiya Janata Party	BJP	
 15	130	Sonia Gandhi	17	name	2	Sonia Gandhi	Sonia Gandhi	Uttar Pradesh	Rae Bareli	Indian National Congress	INC	
 15	133	Manikrao Hodlya Gavit	15	name+seat	3	Manikrao Hodlya Gavit	Manikrao Hodlya Gavit	Maharashtra	Nandurbar	Indian National Congress	INC	
@@ -1235,7 +1235,7 @@ term	mpsno	sansad_name	last_term	method	score	wiki_name	wiki_title	state	constit
 15	423	Sushil Kumar Sambhajirao Shinde	15	seat	0	Sushilkumar Shinde	Sushilkumar Shinde	Maharashtra	Solapur	Indian National Congress	INC	
 15	430	Raghuvansh Prasad Singh	15	name+seat	3	Raghuvansh Prasad Singh	Raghuvansh Prasad Singh	Bihar	Vaishali	Rashtriya Janata Dal	RJD	
 15	434	Ratna Singh	15	name+seat	2	Ratna Singh	Ratna Singh	Uttar Pradesh	Pratapgarh	Indian National Congress	INC	
-15	438	Brijbhushan Sharan Singh	17	none								
+15	438	Brijbhushan Sharan Singh	17	article	0	Brij Bhushan Sharan Singh	Brij Bhushan Sharan Singh	Uttar Pradesh	Kaiserganj	Samajwadi Party	SP	
 15	445	Digvijay Singh	15	name+seat	2	Digvijay Singh	Digvijay Singh (Bihar politician)	Bihar	Banka	Independent politician	Ind.	
 15	450	Prabhunath Singh	15	name+seat	2	Prabhunath Singh	Prabhunath Singh	Bihar	Maharajganj	Rashtriya Janata Dal	RJD	
 15	451	Radha Mohan Singh	18	name	3	Radha Mohan Singh	Radha Mohan Singh	Bihar	Purvi Champaran	Bharatiya Janata Party	BJP	
@@ -1259,7 +1259,7 @@ term	mpsno	sansad_name	last_term	method	score	wiki_name	wiki_title	state	constit
 15	2084	Biren Singh Engti	16	name	3	Biren Singh Engti	Biren Sing Engti	Assam	Autonomous District	Indian National Congress	INC	
 15	2099	Chandre D.B. Gowda	15	name+seat	2	D. B. Chandre Gowda	D. B. Chandregowda	Karnataka	Bangalore North	Bharatiya Janata Party	BJP	
 15	2354	V. Kishore Chandra Deo	15	name+seat	3	Kishore Chandra Deo	Kishore Chandra Deo	Andhra Pradesh	Araku	Indian National Congress	INC	
-15	2554	Sougata Ray	18	none								
+15	2554	Sougata Ray	18	article	0	Saugata Roy	Saugata Roy	West Bengal	Dum Dum	Trinamool Congress	AITC	
 15	2654	Farooq Abdullah	17	name	2	Farooq Abdullah	Farooq Abdullah	Jammu & Kashmir	Srinagar	Jammu & Kashmir National Conference	J&KNC	
 15	2864	Harish Rawat	15	name+seat	2	Harish Rawat	Harish Rawat	Uttarakhand	Haridwar	Indian National Congress	INC	
 15	2917	Shibu Soren	16	name	2	Shibu Soren	Shibu Soren	Jharkhand	Dumka	Jharkhand Mukti Morcha	JMM	
@@ -1273,7 +1273,7 @@ term	mpsno	sansad_name	last_term	method	score	wiki_name	wiki_title	state	constit
 15	3066	Meira Kumar	15	name+seat	2	Meira Kumar	Meira Kumar	Bihar	Sasaram	Indian National Congress	INC	
 15	3085	Ramachandran Mullappally	16	name	2	Mullappally Ramachandran	Mullappally Ramachandran	Kerala	Vatakara	Indian National Congress	INC	
 15	3139	Kavuri Samba Siva Rao	15	name+seat	4	Kavuri Sambasiva Rao	Kavuri Samba Siva Rao	Andhra Pradesh	Eluru	Indian National Congress	INC	
-15	3205	M. Thambi Durai	16	none								
+15	3205	M. Thambi Durai	16	article	0	M. Thambidurai	M. Thambidurai	Tamil Nadu	Karur	All India Anna Dravida Munnetra Kazhagam	AIADMK	
 15	3209	Kuruppassery Varkey Thomas	16	name	1	K. V. Thomas	K. V. Thomas	Kerala	Ernakulam	Indian National Congress	INC	
 15	3225	Mukul Balkrishna Wasnik	15	name+seat	2	Mukul Wasnik	Mukul Wasnik	Maharashtra	Ramtek	Indian National Congress	INC	
 15	3235	Sai Prathap Annayyagari	15	name+seat	3	Sai Prathap Annayyagari	Annayyagari Sai Prathap	Andhra Pradesh	Rajampet	Indian National Congress	INC	
@@ -1672,7 +1672,7 @@ term	mpsno	sansad_name	last_term	method	score	wiki_name	wiki_title	state	constit
 15	4546	P. Kumar	16	name	1	P. Kumar	P. Kumar	Tamil Nadu	Tiruchirappalli	All India Anna Dravida Munnetra Kazhagam	AIADMK	
 15	4547	D. Napoleon	15	name+seat	1	D. Napoleon	Napoleon (actor)	Tamil Nadu	Perambalur	Dravida Munnetra Kazhagam	DMK	
 15	4548	Sambandam Keerapalayam Alagiri	15	name+seat	1	S. Alagiri	K. S. Alagiri	Tamil Nadu	Cuddalore	Indian National Congress	INC	
-15	4549	Thirumaavalavan Tholkappiyan	18	none								
+15	4549	Thirumaavalavan Tholkappiyan	18	article	0	Thol. Thirumavalavan	Thol. Thirumavalavan	Tamil Nadu	Chidambaram	Viduthalai Chiruthaigal Katchi	VCK	
 15	4550	O. S. Manian	15	name+seat	1	O. S. Manian	O. S. Manian	Tamil Nadu	Mayiladuthurai	All India Anna Dravida Munnetra Kazhagam	AIADMK	
 15	4551	M. K. Alagiri	15	name+seat	1	M. K. Alagiri	M. K. Alagiri	Tamil Nadu	Madurai	Dravida Munnetra Kazhagam	DMK	
 15	4552	Manickam Tagore B	18	name	2	Manickam Tagore	Manickam Tagore	Tamil Nadu	Virudhunagar	Indian National Congress	INC	
@@ -1766,7 +1766,7 @@ term	mpsno	sansad_name	last_term	method	score	wiki_name	wiki_title	state	constit
 16	411	Arjun Charan Sethi	16	name+seat	3	Arjun Charan Sethi	Arjun Charan Sethi	Odisha	Bhadrak	Biju Janata Dal	BJD	
 16	418	Shanta Kumar	16	article	0	Shanta Kumar	Shanta Kumar	Himachal Pradesh	Mandi	Bharatiya Janata Party	BJP	
 16	436	Bahadur Singh Koli	16	name+seat	3	Bahadur Singh Koli	Bahadur Singh Koli	Rajasthan	Bharatpur	Bharatiya Janata Party	BJP	
-16	438	Brijbhushan Sharan Singh	17	none								
+16	438	Brijbhushan Sharan Singh	17	article	0	Brij Bhushan Sharan Singh	Brij Bhushan Sharan Singh	Uttar Pradesh	Kaiserganj	Bharatiya Janata Party	BJP	
 16	451	Radha Mohan Singh	18	name	3	Radha Mohan Singh	Radha Mohan Singh	Bihar	Purvi Champaran	Bharatiya Janata Party	BJP	
 16	463	Manoj Kumar Sinha	16	name+seat	2	Manoj Sinha	Manoj Sinha	Uttar Pradesh	Ghazipur	Bharatiya Janata Party	BJP	
 16	467	Dr. Kirit Somaiya	16	name+seat	2	Kirit Somaiya	Kirit Somaiya	Maharashtra	Mumbai North East	Bharatiya Janata Party	BJP	
@@ -1780,7 +1780,7 @@ term	mpsno	sansad_name	last_term	method	score	wiki_name	wiki_title	state	constit
 16	530	Mulayam Singh Yadav	17	name	3	Mulayam Singh Yadav	Mulayam Singh Yadav	Uttar Pradesh	Mainpuri	Samajwadi Party	SP	
 16	554	Rajesh Ranjan	18	name	2	Rajesh Ranjan (Pappu Yadav)	Pappu Yadav	Bihar	Madhepura	Rashtriya Janata Dal	RJD	
 16	2084	Biren Singh Engti	16	name+seat	3	Biren Singh Engti	Biren Sing Engti	Assam	Autonomous District	Indian National Congress	INC	
-16	2554	Sougata Ray	18	none								
+16	2554	Sougata Ray	18	article	0	Saugata Roy	Saugata Roy	West Bengal	Dum Dum	Trinamool Congress	AITC	
 16	2649	Nandi Yellaiah	16	name+seat	2	Nandi Yellaiah	Nandi Yellaiah	Telangana	Nagarkurnool	Indian National Congress	INC	
 16	2654	Farooq Abdullah	17	name	2	Farooq Abdullah	Farooq Abdullah	Jammu & Kashmir	Srinagar	Jammu & Kashmir National Conference	J&KNC	
 16	2660	Amarinder Singh	16	name+seat	2	Amarinder Singh	Amarinder Singh	Punjab	Amritsar	Indian National Congress	INC	
@@ -1795,7 +1795,7 @@ term	mpsno	sansad_name	last_term	method	score	wiki_name	wiki_title	state	constit
 16	3394	Mekapati Rajamohan Reddy	16	name+seat	3	Mekapati Rajamohan Reddy	Mekapati Rajamohan Reddy	Andhra Pradesh	Nellore	YSR Congress Party	YSR Congress Party	
 16	3439	Taslim Uddin	16	seat	0	Mohammed Taslimuddin	Mohammed Taslimuddin	Bihar	Araria	Rashtriya Janata Dal	RJD	
 16	3479	Pankaj Choudhary	18	name	2	Pankaj Chaudhary	Pankaj Chaudhary	Uttar Pradesh	Maharajganj	Bharatiya Janata Party	BJP	
-16	3586	Swami Sachidanand Hari Sakshi	18	none								
+16	3586	Swami Sachidanand Hari Sakshi	18	article	0	Sakshi Maharaj	Sakshi Maharaj	Uttar Pradesh	Unnao	Bharatiya Janata Party	BJP	
 16	3608	Virendra Singh	17	name	2	Virendra Singh Mast	Virendra Singh Mast	Uttar Pradesh	Bhadohi	Bharatiya Janata Party	BJP	
 16	3640	Hansraj Gangaram Ahir	16	name+seat	3	Hansraj Gangaram Ahir	Hansraj Gangaram Ahir	Maharashtra	Chandrapur	Bharatiya Janata Party	BJP	
 16	3654	Subhash Chandra Baheria	17	name	3	Subhash Chandra Baheria	Subhash Chandra Baheria	Rajasthan	Bhilwara	Bharatiya Janata Party	BJP	
@@ -2041,8 +2041,8 @@ term	mpsno	sansad_name	last_term	method	score	wiki_name	wiki_title	state	constit
 16	4689	Lakhan Lal Sahu	16	name+seat	3	Lakhan Lal Sahu	Lakhan Lal Sahu	Chhattisgarh	Bilaspur	Bharatiya Janata Party	BJP	
 16	4690	Kamalbhan Singh Marabi	16	name+seat	3	Kamalbhan Singh Marabi	Kamalbhan Singh Marabi	Chhattisgarh	Sarguja	Bharatiya Janata Party	BJP	
 16	4691	Dipsinh Shankarsinh Rathod	17	name	3	Dipsinh Shankarsinh Rathod	Dipsinh Shankarsinh Rathod	Gujarat	Sabarkantha	Bharatiya Janata Party	BJP	
-16	4692	Mohanbhai Kalyanji Kundariya	17	none								
-16	4693	Bharatiben Dhirubhai Shiyal	17	none								
+16	4692	Mohanbhai Kalyanji Kundariya	17	article	0	Mohan Kundariya	Mohan Kundariya	Gujarat	Rajkot	Bharatiya Janata Party	BJP	
+16	4693	Bharatiben Dhirubhai Shiyal	17	article	0	Bharti Shiyal	Bharti Shiyal	Gujarat	Bhavnagar	Bharatiya Janata Party	BJP	
 16	4694	Krishna Raj	16	name+seat	2	Krishna Raj	Krishna Raj	Uttar Pradesh	Shahjahanpur	Bharatiya Janata Party	BJP	
 16	4695	Bharat Singh	16	name+seat	2	Bharat Singh	Bharat Singh	Uttar Pradesh	Ballia	Bharatiya Janata Party	BJP	
 16	4696	Ajay (Teni) Misra	17	name	2	Ajay Kumar Mishra	Ajay Mishra Teni	Uttar Pradesh	Kheri	Bharatiya Janata Party	BJP	
@@ -2084,7 +2084,7 @@ term	mpsno	sansad_name	last_term	method	score	wiki_name	wiki_title	state	constit
 16	4738	Nagendra Singh	16	name+seat	2	Nagendra Singh	Nagendra Singh (politician, born 1943)	Madhya Pradesh	Khajuraho	Bharatiya Janata Party	BJP	
 16	4739	Kamakhya Prasad Tasa	18	name	3	Kamakhya Prasad Tasa	Kamakhya Prasad Tasa	Assam	Jorhat	Bharatiya Janata Party	BJP	
 16	4740	Muthamsetti Srinivasa Rao (Avanthi)	16	name+seat	3	Muttamsetti Srinivasa Rao	Avanthi Srinivas	Andhra Pradesh	Anakapalli	Telugu Desam Party	TDP	
-16	4741	Chavda Vinod Lakhamshi	18	none								
+16	4741	Chavda Vinod Lakhamshi	18	article	0	Vinodbhai Chavda	Vinodbhai Chavda	Gujarat	Kachchh	Bharatiya Janata Party	BJP	
 16	4742	Abhishek Singh	16	name+seat	2	Abhishek Singh	Abhishek Singh (politician)	Chhattisgarh	Rajnandgaon	Bharatiya Janata Party	BJP	
 16	4743	Hari Babu Kambhampati	16	name+seat	3	Kambhampati Hari Babu	Kambhampati Hari Babu	Andhra Pradesh	Visakhapatnam	Bharatiya Janata Party	BJP	
 16	4744	Sanganna Amarappa Karadi	17	name	3	Karadi Sanganna Amarappa	Karadi Sanganna Amarappa	Karnataka	Koppal	Bharatiya Janata Party	BJP	
@@ -2101,7 +2101,7 @@ term	mpsno	sansad_name	last_term	method	score	wiki_name	wiki_title	state	constit
 16	4755	Arjunlal Meena	17	name	2	Arjunlal Meena	Arjunlal Meena	Rajasthan	Udaipur	Bharatiya Janata Party	BJP	
 16	4756	Bheemrao Baswanthrao Patil	17	name	1	B. B. Patil	B. B. Patil	Telangana	Zahirabad	Bharat Rashtra Samithi	TRS	
 16	4757	Parbhubhai Nagarbhai Vasava	18	name	2	Parbhubhai Vasava	Parbhubhai Vasava	Gujarat	Bardoli	Bharatiya Janata Party	BJP	
-16	4758	Parvesh Sahib Singh	17	none								
+16	4758	Parvesh Sahib Singh	17	article	0	Parvesh Verma	Parvesh Verma	National Capital Territory of Delhi	West Delhi	Bharatiya Janata Party	BJP	
 16	4760	Ashok Gajapathi Raju Pusapati	16	name+seat	3	Ashok Gajapathi Raju	Ashok Gajapathi Raju	Andhra Pradesh	Vizianagaram	Telugu Desam Party	TDP	
 16	4761	Ramesh Pokhriyal Nishank	17	name	2	Ramesh Pokhriyal	Ramesh Pokhriyal	Uttarakhand	Haridwar	Bharatiya Janata Party	BJP	
 16	4762	B. Sreeramulu	16	name+seat	1	B. Sriramulu	B. Sriramulu	Karnataka	Bellary	Bharatiya Janata Party	BJP	
@@ -2324,12 +2324,12 @@ term	mpsno	sansad_name	last_term	method	score	wiki_name	wiki_title	state	constit
 17	527	Dinesh Chandra Yadav	18	name	3	Dinesh Chandra Yadav	Dinesh Chandra Yadav (Indian politician)	Bihar	Madhepura	Janata Dal (United)	JD(U)	
 17	530	Mulayam Singh Yadav	17	name+seat	3	Mulayam Singh Yadav	Mulayam Singh Yadav	Uttar Pradesh	Mainpuri	Samajwadi Party	SP	
 17	564	Akhilesh Yadav	18	name	2	Akhilesh Yadav	Akhilesh Yadav	Uttar Pradesh	Azamgarh	Samajwadi Party	SP	
-17	2554	Sougata Ray	18	none								
+17	2554	Sougata Ray	18	article	0	Saugata Roy	Saugata Roy	West Bengal	Dum Dum	Trinamool Congress	AITC	
 17	2654	Farooq Abdullah	17	name+seat	2	Farooq Abdullah	Farooq Abdullah	Jammu and Kashmir	Srinagar	Jammu & Kashmir National Conference	J&KNC	
 17	3361	Chhedi Paswan	17	name+seat	2	Chhedi Paswan	Chhedi Paswan	Bihar	Sasaram	Bharatiya Janata Party	BJP	
 17	3409	Muniyan Selvaraj	17	name+seat	1	M. Selvarasu	M. Selvarasu	Tamil Nadu	Nagapattinam	Communist Party of India	CPI	
 17	3479	Pankaj Choudhary	18	name	2	Pankaj Choudhary	Pankaj Chaudhary	Uttar Pradesh	Maharajganj	Bharatiya Janata Party	BJP	
-17	3586	Swami Sachidanand Hari Sakshi	18	none								
+17	3586	Swami Sachidanand Hari Sakshi	18	article	0	Sakshi Maharaj	Sakshi Maharaj	Uttar Pradesh	Unnao	Bharatiya Janata Party	BJP	
 17	3608	Virendra Singh	17	name+seat	2	Virendra Singh Mast	Virendra Singh Mast	Uttar Pradesh	Ballia	Bharatiya Janata Party	BJP	
 17	3652	Sukhbir Singh Badal	17	name+seat	3	Sukhbir Singh Badal	Sukhbir Singh Badal	Punjab	Firozpur	Shiromani Akali Dal	SAD	
 17	3654	Subhash Chandra Baheria	17	name+seat	3	Subhash Chandra Baheria	Subhash Chandra Baheria	Rajasthan	Bhilwara	Bharatiya Janata Party	BJP	
@@ -2419,7 +2419,7 @@ term	mpsno	sansad_name	last_term	method	score	wiki_name	wiki_title	state	constit
 17	4507	Narendra Singh Tomar	17	name+seat	3	Narendra Singh Tomar	Narendra Singh Tomar	Madhya Pradesh	Morena	Bharatiya Janata Party	BJP	
 17	4516	Uday Pratap Singh	17	name+seat	3	Uday Pratap Singh	Uday Pratap Singh (Madhya Pradesh politician)	Madhya Pradesh	Hoshangabad	Bharatiya Janata Party	BJP	
 17	4543	P.R. Natarajan	17	name+seat	1	P. R. Natarajan	P. R. Natarajan	Tamil Nadu	Coimbatore	Communist Party of India (Marxist)	CPI(M)	
-17	4549	Thirumaavalavan Tholkappiyan	18	none								
+17	4549	Thirumaavalavan Tholkappiyan	18	article	0	Thol. Thirumavalavan	Thol. Thirumavalavan	Tamil Nadu	Chidambaram	Viduthalai Chiruthaigal Katchi	VCK	
 17	4552	Manickam Tagore B	18	name	2	Manickam Tagore	Manickam Tagore	Tamil Nadu	Virudhunagar	Indian National Congress	INC	
 17	4558	K Sudhakaran	18	name	1	K. Sudhakaran	K. Sudhakaran	Kerala	Kannur	Indian National Congress	INC	
 17	4560	M K Raghavan	18	name	1	M. K. Raghavan	M. K. Raghavan	Kerala	Kozhikode	Indian National Congress	INC	
@@ -2502,7 +2502,7 @@ term	mpsno	sansad_name	last_term	method	score	wiki_name	wiki_title	state	constit
 17	4733	Sadashiv Kisan Lokhande	17	name+seat	2	Sadashiv Lokhande	Sadashiv Lokhande	Maharashtra	Shirdi	Shiv Sena	SS	
 17	4734	Krupal Balaji Tumane	17	name+seat	2	Krupal Tumane	Krupal Tumane	Maharashtra	Ramtek	Shiv Sena	SS	
 17	4735	Sanjay Haribhau Jadhav	18	name	3	Sanjay Haribhau Jadhav	Sanjay Haribhau Jadhav	Maharashtra	Parbhani	Shiv Sena (UBT)	SHSUBT	
-17	4741	Chavda Vinod Lakhamshi	18	none								
+17	4741	Chavda Vinod Lakhamshi	18	article	0	Vinodbhai Chavda	Vinodbhai Chavda	Gujarat	Kachchh	Bharatiya Janata Party	BJP	
 17	4744	Sanganna Amarappa Karadi	17	name+seat	3	Karadi Sanganna Amarappa	Karadi Sanganna Amarappa	Karnataka	Koppal	Bharatiya Janata Party	BJP	
 17	4745	Rameswar Teli	17	name+seat	2	Rameswar Teli	Rameswar Teli	Assam	Dibrugarh	Bharatiya Janata Party	BJP	
 17	4748	Ashok Mahadeorao Nete	17	name+seat	2	Ashok Nete	Ashok Nete	Maharashtra	Gadchiroli–Chimur	Bharatiya Janata Party	BJP	
@@ -2581,7 +2581,7 @@ term	mpsno	sansad_name	last_term	method	score	wiki_name	wiki_title	state	constit
 17	4969	C N Annadurai	18	name	1	C. N. Annadurai	Annadurai C. N.	Tamil Nadu	Tiruvannamalai	Dravida Munnetra Kazhagam	DMK	
 17	4970	T.R.V.S. Ramesh	17	name+seat	1	T. R. V. S. Ramesh	T. R. V. S. Ramesh	Tamil Nadu	Cuddalore	Dravida Munnetra Kazhagam	DMK	
 17	4971	M K Vishnu Prasad	18	name	2	M. K. Vishnu Prasad	M. K. Vishnu Prasad	Tamil Nadu	Arani	Indian National Congress	INC	
-17	4972	D Ravi Kumar	18	none								
+17	4972	D Ravi Kumar	18	article	0	D. Ravikumar	Ravikumar (writer)	Tamil Nadu	Viluppuram	Dravida Munnetra Kazhagam	DMK	
 17	4974	Sellaperumal Ramalingam	17	name+seat	1	S. Ramalingam	S. Ramalingam	Tamil Nadu	Mayiladuthurai	Dravida Munnetra Kazhagam	DMK	
 17	4975	Gautham Sigamani Pon	17	name+seat	2	Gautam Sigamani	Gautham Sigamani	Tamil Nadu	Kallakurichi	Dravida Munnetra Kazhagam	DMK	
 17	4976	S.R. Parthiban	17	name+seat	1	S. R. Parthiban	S. R. Parthiban	Tamil Nadu	Salem	Dravida Munnetra Kazhagam	DMK	
@@ -2625,8 +2625,8 @@ term	mpsno	sansad_name	last_term	method	score	wiki_name	wiki_title	state	constit
 17	5014	Sunil Kumar Soni	17	name+seat	3	Sunil Kumar Soni	Sunil Kumar Soni	Chhattisgarh	Raipur	Bharatiya Janata Party	BJP	
 17	5015	Santosh Pandey	18	name	2	Santosh Pandey	Santosh Pandey (Chhattisgarh politician)	Chhattisgarh	Rajnandgaon	Bharatiya Janata Party	BJP	
 17	5016	Renuka Singh	17	name+seat	2	Renuka Singh	Renuka Singh (politician)	Chhattisgarh	Sarguja	Bharatiya Janata Party	BJP	
-17	5017	Hasmukhbhai Somabhai Patel	18	none								
-17	5018	Miteshbhai Rameshbhai Patel	18	none								
+17	5017	Hasmukhbhai Somabhai Patel	18	article	0	Hasmukh Patel	Hasmukh Patel (politician)	Gujarat	Ahmedabad East	Bharatiya Janata Party	BJP	
+17	5018	Miteshbhai Rameshbhai Patel	18	article	0	Mitesh Rameshbhai Patel	Mitesh Rameshbhai Patel	Gujarat	Anand	Bharatiya Janata Party	BJP	
 17	5019	Parbatbhai Savabhai Patel	17	name+seat	2	Parbatbhai Patel	Parbatbhai Patel	Gujarat	Banaskantha	Bharatiya Janata Party	BJP	
 17	5020	Gitaben Vajesingbhai Rathva	17	name+seat	2	Gitaben Rathva	Gitaben Rathva	Gujarat	Chhota Udaipur	Bharatiya Janata Party	BJP	
 17	5021	Amit Shah	18	name	2	Amit Shah	Amit Shah	Gujarat	Gandhinagar	Bharatiya Janata Party	BJP	

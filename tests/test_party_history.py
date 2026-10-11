@@ -242,3 +242,40 @@ def test_real_14th_list_gives_a_raja_his_term_14_seat_and_party():
     raja = [m for m in matches if m.mpsno == 344]
     assert [(m.row.seat, m.row.party) for m in raja] == [("Perambalur", "Dravida Munnetra Kazhagam")]
     assert len(matches) >= 35
+
+
+def test_one_person_with_two_sansad_codes_keeps_both_seat_confirmed_matches():
+    # sansad.in gives Bhaskarrao Patil of Nanded code 315 (term 13) and code 4375 (term 15).
+    a = ph.Match(315, _wiki("Bhaskarrao Patil", "Nanded", term=13, title="Bhaskarrao Bapurao Khatgaonkar Patil"), "seat", 0)
+    b = ph.Match(4375, _wiki("Bhaskarrao Patil", "Nanded", term=15, title="Bhaskarrao Bapurao Khatgaonkar Patil"), "name+seat", 3)
+    kept, dropped, _ = ph.check_articles([a, b])
+    assert kept == [a, b]
+    assert dropped == []
+
+
+# --- the hand-filled file -----------------------------------------------------------------------
+
+def _terms_row(term, mpsno):
+    return {"term": term, "mpsno": mpsno, "method": "none", "score": "", "party": "", "constituency": ""}
+
+
+def test_manual_file_fills_a_row_with_no_party(tmp_path, monkeypatch):
+    from scripts import build_party_history as b
+    f = tmp_path / "manual.tsv"
+    f.write_text("term\tmpsno\tname\tparty\tconstituency\tnote\n"
+                 "13\t3960\tH.D. Devegowda\tJD(S)\tKanakapura\t\n"
+                 "13\t563\tPrabodh Panda\t\t\t\n", encoding="utf-8")
+    monkeypatch.setattr(b, "MANUAL", f)
+    rows = [_terms_row(13, 3960), _terms_row(13, 563)]
+    b.apply_manual(rows, {"janatadalsecular": "JD(S)"})
+    assert (rows[0]["method"], rows[0]["party"], rows[0]["constituency"]) == ("manual", "JD(S)", "Kanakapura")
+    assert rows[1]["method"] == "none"
+
+
+def test_manual_file_refuses_an_unknown_party_code(tmp_path, monkeypatch):
+    from scripts import build_party_history as b
+    f = tmp_path / "manual.tsv"
+    f.write_text("term\tmpsno\tparty\n13\t3960\tJanata Dal Secular\n", encoding="utf-8")
+    monkeypatch.setattr(b, "MANUAL", f)
+    with pytest.raises(SystemExit):
+        b.apply_manual([_terms_row(13, 3960)], {"janatadalsecular": "JD(S)"})

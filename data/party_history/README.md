@@ -12,6 +12,7 @@ sansad.in gives the party and the constituency for a member's last term only. Be
 | `raw/wiki_ls<N>.html` | Wikipedia, "List of members of the Nth Lok Sabha" | Seat, member name, and party for each seat in term N. The first line holds the page revision id. |
 | `raw/wiki_redirects.json` | Wikipedia API | Link title to article title. One person can have links under two titles. |
 | `party_codes.tsv` | Written by hand | Wikipedia party names that the sansad.in data cannot map to a party code. An empty code means that the party is not known. |
+| `manual.tsv` | Filled by hand | The (member, term) pairs with no party after all rules, sorted by words spoken. Fill the `party` column with a known party code. The build refuses an unknown code. |
 
 ## Steps
 
@@ -21,7 +22,9 @@ python3 -I scripts/build_party_history.py       # no network, no database: write
 python3 -m scripts.load_party_history           # database: one speakers row for each (member, term)
 ```
 
-`results/speaker_terms.tsv` has one row for each (member, term) pair on the sansad.in lists: 3,385 rows. `results/report.md` gives the counts. `results/rejects.tsv` lists the pairs that the matcher refused.
+`results/speaker_terms.tsv` has one row for each (member, term) pair on the sansad.in lists: 3,385 rows. `results/report.md` gives the counts. `results/rejects.tsv` lists the pairs that the matcher refused. `results/last_term_disagreements.tsv` lists the last terms in which sansad.in and Wikipedia give different parties, with an empty `review` column.
+
+The loader writes the party as an id into `speakers.party_id`. The table `parties` holds each code once, with its full name.
 
 ## How a member is matched to a Wikipedia row
 
@@ -31,19 +34,23 @@ python3 -m scripts.load_party_history           # database: one speakers row for
 4. One Wikipedia article is one person. If an article matches two member codes, only the matches with a confirmed seat stay.
 5. A member with one article in other terms takes the free row with that article.
 6. In the last term, a member takes the only free row in the sansad.in seat, if the two names share one word that is not a common name word, such as Singh or Kumar.
+7. The article fill runs again, with the articles that the seat fill found.
+8. A row in `manual.tsv` with a party replaces the result for that pair.
 
-The `method` column records the rule that made each match: `name+seat`, `name`, `article`, or `seat`.
+The `method` column records the rule that made each match: `name+seat`, `name`, `article`, `seat`, or `manual`.
 
 ## Rules for the data
 
-- **The party is the party at the election.** When Wikipedia shows two parties in one term, the first is the party, and `other_parties` holds the rest. A change of party inside a term is not shown anywhere else.
+- **One party for each term.** When Wikipedia shows two parties in one term, the first is the party, and `other_parties` holds the rest. A change of party inside a term is not shown anywhere else.
 - **The last term keeps the sansad.in party.** The loader does not change that row.
 - **The constituency is for matching and display only.** It is the Wikipedia spelling. Do not join on it, group by it, or compare it across terms. Spellings differ across sources, and seat boundaries changed with the delimitation orders of 1976 and 2008.
 - **A miss is acceptable. A wrong person is not.** A member with no match gets a row with no party (`sansad-term-list`).
+- **A speaker with no Lok Sabha seat in the term keeps the last-term party.** This is mostly a minister from the Rajya Sabha. The loader adds a row with source `last-term-fallback`, the party of the member's last-term row, and no constituency. TODO: a real party for speakers who are not Lok Sabha members.
 
 ## Known faults
 
 - Wikipedia does not list every by-election winner. The 13th list has about 25 members fewer than sansad.in.
+- A Wikipedia list does not always show the party at the election. The 17th list shows a later party for some members, for example BJP for Ravneet Singh Bittu, who won Ludhiana for INC in 2019.
+- sansad.in can give one person two member codes. Example: Bhaskarrao Patil of Nanded has code 315 in term 13 and code 4375 in term 15.
 - The Wikipedia list for the 18th term shows the party of today, not the party at the election. Torko does not use it, because the 18th term is the last term of all its members.
 - sansad.in itself can be wrong for the last term. Example: it gives K. H. Muniyappa the seat Koppal and the party BJP for the 16th term. Wikipedia gives Kolar and INC.
-- 56 (member, term) pairs speak in the debates but have no row: most are Rajya Sabha ministers, who are not Lok Sabha members. Their turns show no party for that term.

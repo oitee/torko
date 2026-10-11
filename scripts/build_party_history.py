@@ -1,34 +1,3 @@
-"""
-Build the party and the constituency of each member in each Lok Sabha term (LS 13 to 18).
-This script calls no network and writes nothing to the database.
-
-Input (read only, made by scripts/fetch_party_sources.py):
-  - data/party_history/raw/sansad_ls<N>.json   who sat in term N, with the sansad.in member code
-  - data/party_history/raw/wiki_ls<N>.html     the Wikipedia list of members of term N
-  - data/party_history/raw/wiki_redirects.json link title -> article title
-  - data/party_history/party_codes.tsv         hand map: Wikipedia party name -> party code
-
-Output (data/party_history/results/):
-  - speaker_terms.tsv  one row for each (member, term) on the sansad.in lists. A row with
-                       method 'none' has no Wikipedia match, so its party is not known.
-  - rejects.tsv        the candidate pairs that the matcher refused, with the reason
-  - report.md          counts for each term and each method
-
-Rules (see party_history.py):
-  - Names are compared only inside one term.
-  - A pair is kept only when each side is the other's single best candidate.
-  - In the member's last term, sansad.in knows the seat. A pair in another seat is never kept.
-  - A Wikipedia article that matches two member codes keeps only seat-confirmed matches.
-  - Two fill steps follow. A member with one article in other terms takes the free row with
-    that article. In the last term, a member takes the only free row in the sansad.in seat.
-  - The party is the first party on the row: the party at the general election or by-election.
-  - The constituency is the Wikipedia spelling. It is for matching only. No business logic may
-    use it, because spellings differ across sources and across delimitations.
-
-Run from the repo root:
-
-    python3 -I scripts/build_party_history.py
-"""
 from __future__ import annotations
 
 import csv
@@ -47,6 +16,8 @@ DATA = ROOT / "data" / "party_history"
 RAW = DATA / "raw"
 RESULTS = DATA / "results"
 TERMS = (13, 14, 15, 16, 17, 18)
+
+MANUAL = DATA / "manual.tsv"
 
 COLUMNS = ["term", "mpsno", "sansad_name", "last_term", "method", "score", "wiki_name",
            "wiki_title", "state", "constituency", "wiki_party", "party", "other_parties"]
@@ -85,6 +56,10 @@ def build() -> tuple[list[dict], list[dict]]:
     rejects += dropped
     matches += ph.fill_by_article(matches, members_by_term, rows_by_term, bad)
     matches += ph.fill_by_seat(matches, members_by_term, rows_by_term)
+    # The seat fill finds new articles. A second article fill uses them for the member's other terms.
+    matches += ph.fill_by_article(matches, members_by_term, rows_by_term, bad)
+    matches, late_dropped, _ = ph.check_articles(matches)
+    rejects += late_dropped
 
     codes = load_party_codes(members_by_term)
     unknown = sorted({m.row.party for m in matches if _key(m.row.party) not in codes})
@@ -110,7 +85,28 @@ def build() -> tuple[list[dict], list[dict]]:
                            wiki_party=m.row.party, party=party or "",
                            other_parties="; ".join(o for o in others if o and o != party))
             out.append(row)
+    apply_manual(out, codes)
     return out, rejects
+
+
+def apply_manual(rows: list[dict], codes: dict[str, str | None]) -> None:
+    if not MANUAL.exists():
+        return
+    known = {c for c in codes.values() if c}
+    by_pair = {(int(r["term"]), int(r["mpsno"])): r for r in rows}
+    with open(MANUAL, encoding="utf-8", newline="") as f:
+        for m in csv.DictReader(f, delimiter="\t"):
+            party = (m.get("party") or "").strip()
+            if not party:
+                continue
+            if party not in known:
+                raise SystemExit(f"manual.tsv: unknown party code {party!r} for member {m['mpsno']}, "
+                                 "use a code from speaker_terms.tsv or add it to party_codes.tsv")
+            row = by_pair.get((int(m["term"]), int(m["mpsno"])))
+            if row is None:
+                raise SystemExit(f"manual.tsv: member {m['mpsno']} did not sit in term {m['term']}")
+            row.update(method="manual", score="", party=party,
+                       constituency=(m.get("constituency") or "").strip() or row["constituency"])
 
 
 def write(rows: list[dict], rejects: list[dict]) -> None:
@@ -128,15 +124,15 @@ def write(rows: list[dict], rejects: list[dict]) -> None:
     lines = ["# Party history build report", "",
              "Counted over: every (member, term) pair on the sansad.in member lists for LS 13 to 18.",
              "A match is a pair of a sansad.in member and a Wikipedia row. It is not a checked fact.", "",
-             "| Term | Members | Matched | name+seat | name | article | seat | No match | Party not known |",
-             "|---|---|---|---|---|---|---|---|---|"]
+             "| Term | Members | Matched | name+seat | name | article | seat | manual | No match | Party not known |",
+             "|---|---|---|---|---|---|---|---|---|---|"]
     for term in TERMS:
         t = [r for r in rows if r["term"] == term]
         c = Counter(r["method"] for r in t)
         matched = len(t) - c["none"]
         noparty = sum(1 for r in t if r["method"] != "none" and not r["party"])
         lines.append(f"| {term} | {len(t)} | {matched} | {c['name+seat']} | {c['name']} | "
-                     f"{c['article']} | {c['seat']} | {c['none']} | {noparty} |")
+                     f"{c['article']} | {c['seat']} | {c['manual']} | {c['none']} | {noparty} |")
     total = len(rows)
     matched = sum(1 for r in rows if r["method"] != "none")
     lines += ["", f"Total: {matched} of {total} pairs matched ({matched / total:.1%}).",

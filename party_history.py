@@ -368,12 +368,8 @@ def _best(scores: dict[tuple[int, int], int]) -> dict[int, list[int]]:
 
 
 def check_articles(matches: list[Match]) -> tuple[list[Match], list[dict], set[str]]:
-    """Find a Wikipedia article that matched two or more member codes in any term.
-
-    One article is one person, so two codes on one article mean that a match is wrong or that
-    the page links the wrong article. Example: the 13th list links G. Mallikarjunappa to the
-    article of his son G. M. Siddeshwara. For such an article, only matches with a confirmed
-    seat (method name+seat) stay. Every other match to the article is dropped."""
+    # One article is one person, so two codes on one article mean a wrong match. Only seat-confirmed matches stay.
+    # Two seat-confirmed codes can be one person with two sansad.in codes (Bhaskarrao Patil of Nanded: 315 and 4375).
     codes: dict[str, set[int]] = {}
     for m in matches:
         if m.row.title:
@@ -382,7 +378,7 @@ def check_articles(matches: list[Match]) -> tuple[list[Match], list[dict], set[s
     kept, dropped = [], []
     for m in matches:
         t = m.row.title
-        if t in bad and m.method != "name+seat":
+        if t in bad and m.method not in ("name+seat", "seat"):
             dropped.append({"term": m.row.term, "mpsno": m.mpsno, "reason": "article matches two members",
                             "detail": t + " <- " + ", ".join(map(str, sorted(codes[t])))})
         else:
