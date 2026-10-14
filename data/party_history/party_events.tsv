@@ -1,0 +1,52 @@
+term	mpsno	name	effective_from	party	constituency	kind	source	note
+13	19	Amir Alam Khan		RLD		election	last_term_disagreements.tsv review	sansad.in gives LD(S)
+13	34	Mahendra Baitha		JD(U)		election	last_term_disagreements.tsv review	sansad.in gives Samata Party
+13	150	Md Anwarul Haque		RJD		election	last_term_disagreements.tsv review	sansad.in gives RJD(D)
+13	234	Brahmanand Mandal		JD(U)		election	last_term_disagreements.tsv review	sansad.in gives Samata Party
+13	239	Manjay Lal		JD(U)		election	last_term_disagreements.tsv review	sansad.in gives Samata Party
+13	269	Nagmani		RJD		election	last_term_disagreements.tsv review	sansad.in gives RJD(D)
+13	460	Th. Chaoba Singh		MSCP		election	last_term_disagreements.tsv review	sansad.in gives BJP
+13	537	Renu Kumari Singh		JD(U)		election	last_term_disagreements.tsv review	sansad.in gives Samata Party
+14	41	S. Bangarappa		BJP		election	last_term_disagreements.tsv review	sansad.in gives SP
+14	73	Somnath Chatterjee		CPI(M)		election	last_term_disagreements.tsv review	sansad.in gives Not Available
+14	486	P.C. Thomas		IFDP		election	last_term_disagreements.tsv review	sansad.in gives KEC
+15	180	Baliram Kashyap		BJP		election	last_term_disagreements.tsv review	sansad.in gives Ind.
+15	4530	Y. S. Jagan Mohan Reddy		INC		election	last_term_disagreements.tsv review	sansad.in gives YSR Congress Party
+16	261	K.H. Muniyappa		INC	Kolar	election	last_term_disagreements.tsv review	sansad.in gives BJP and Koppal
+16	4353	C. L. Ruala		INC		election	last_term_disagreements.tsv review	sansad.in gives MNF
+16	4846	B.N. Chandrappa		INC		election	last_term_disagreements.tsv review	sansad.in gives BJP
+17	4392	Supriya Sule		NCP		election	wikipedia, manual review	Wikipedia term 17 shows NCPSP, a party created after the 2019 election
+17	5185	Amol Ramsing Kolhe		NCP		election	wikipedia, manual review	Wikipedia term 17 shows NCPSP, a party created after the 2019 election
+17	4713	Arvind Ganpat Sawant		SS		election	wikipedia, manual review	Wikipedia term 17 shows SHSUBT, a party created after the 2019 election
+17	5189	Omprakash Bhupalsinh Alias Pavan Rajenimbalkar		SS		election	wikipedia, manual review	Wikipedia term 17 shows SHSUBT, a party created after the 2019 election
+17	4735	Sanjay Haribhau Jadhav		SS		election	wikipedia, manual review	Wikipedia term 17 shows SHSUBT, a party created after the 2019 election
+17	4777	Chirag Paswan		LJSP		election	wikipedia, manual review	Wikipedia term 17 shows LJSP(RV), a party created after the 2019 election
+14	244	Babu Lal Marandi		BJP	Kodarma	election	wikipedia, manual review	Wikipedia row Kodarma, BJP. The name matcher missed him.
+15	4446	Vitthalbhai Hansrajbhai Radadiya		INC	Porbandar	election	wikipedia, manual review	Wikipedia row Porbandar, INC. The name matcher missed him.
+13	150	Md Anwarul Haque	2001-05-01	RJD(D)		split	research document	RJD(D) formed in May 2001. The day is not known.
+13	269	Nagmani	2001-04-28	RJD(D)		expulsion	research document	Expelled by RJD, then formed RJD(D) in May 2001
+13	269	Nagmani	2004-01-05	BJP		merger	research document	RJD(D) merged into BJP
+13	460	Th. Chaoba Singh	2002-11-14	BJP		merger	research document, date chosen 2026-10-14	MSCP merged into BJP
+14	41	S. Bangarappa	2005-06-05	SP		by-election	research document	Resigned 2005-03-10, re-elected for SP. Declared 2005-06-05.
+14	73	Somnath Chatterjee	2008-07-23	Ind.		expulsion	research document	Expelled by CPI(M). Speaker until the end of the term.
+14	486	P.C. Thomas	2005-08-27	KEC		merger	research document	IFDP merged into Kerala Congress (Joseph)
+14	244	Babu Lal Marandi	2006-11-09	Ind.		by-election	wikipedia note	Resigned 2006-05-17, re-elected as an Independent
+14	394	P. A. Sangma	2006-02-19	NCP		by-election	wikipedia note	Resigned 2005-10-10, re-elected for NCP
+15	4530	Y. S. Jagan Mohan Reddy	2011-05-13	YSR Congress Party		by-election	research document	Resigned 2010-11-29. By-election declared 2011-05-13.
+15	3394	Mekapati Rajamohan Reddy	2012-06-15	YSR Congress Party		by-election	wikipedia note	Resigned 2012-02-28, re-elected for YSRCP
+15	4446	Vitthalbhai Hansrajbhai Radadiya	2013-06-05	BJP		by-election	wikipedia note	Resigned 2013-01-03, re-elected for BJP
+17	4663	Rajan Baburao Vichare	2022-07-20	SHSUBT		split	date chosen 2026-10-14	The House recognised the Shiv Sena split. Stayed with Uddhav Thackeray.
+17	4765	Vinayak Bhaurao Raut	2022-07-20	SHSUBT		split	date chosen 2026-10-14	The House recognised the Shiv Sena split. Stayed with Uddhav Thackeray.
+17	4713	Arvind Ganpat Sawant	2022-07-20	SHSUBT		split	date chosen 2026-10-14	The House recognised the Shiv Sena split. Stayed with Uddhav Thackeray.
+17	5189	Omprakash Bhupalsinh Alias Pavan Rajenimbalkar	2022-07-20	SHSUBT		split	date chosen 2026-10-14	The House recognised the Shiv Sena split. Stayed with Uddhav Thackeray.
+17	4735	Sanjay Haribhau Jadhav	2022-07-20	SHSUBT		split	date chosen 2026-10-14	The House recognised the Shiv Sena split. Stayed with Uddhav Thackeray.
+17	322	Shriniwas Dadasaheb Patil	2024-02-07	NCPSP		split	research document, ECI recognition date	NCP split on 2023-07-02. No House recognition date is known, so the ECI date is used. Check this date.
+17	4786	Faizal P.P. Mohammed	2024-02-07	NCPSP		split	research document, ECI recognition date	NCP split on 2023-07-02. No House recognition date is known, so the ECI date is used. Check this date.
+17	4392	Supriya Sule	2024-02-07	NCPSP		split	research document, ECI recognition date	NCP split on 2023-07-02. No House recognition date is known, so the ECI date is used. Check this date.
+17	5185	Amol Ramsing Kolhe	2024-02-07	NCPSP		split	research document, ECI recognition date	NCP split on 2023-07-02. No House recognition date is known, so the ECI date is used. Check this date.
+17	4612	Choudhary Mehboob Ali Kaiser	2021-06-14	RLJP		split	research document	The Speaker recognised the Paras group on 2021-06-14. ECI name RLJP on 2021-10-05.
+17	5212	Pashupati Kumar Paras	2021-06-14	RLJP		split	research document	The Speaker recognised the Paras group on 2021-06-14. ECI name RLJP on 2021-10-05.
+17	5218	Chandan Singh	2021-06-14	RLJP		split	research document	The Speaker recognised the Paras group on 2021-06-14. ECI name RLJP on 2021-10-05.
+17	5529	Prince Raj	2021-06-14	RLJP		split	research document	The Speaker recognised the Paras group on 2021-06-14. ECI name RLJP on 2021-10-05.
+17	4777	Chirag Paswan	2021-06-14	LJSP(RV)		split	assumption	Same date as the Paras group. ECI name LJP(RV) on 2021-10-05. Check this date.
+17	4964	P. Ravindhranath	2022-07-14	Ind.		expulsion	research document	Expelled by AIADMK (EPS group)
