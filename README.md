@@ -135,6 +135,8 @@ Two reader files turn HTML into speaking turns. `debate_fetch.py` reads the rece
 
 **Problem 1: the disguised Hindi font.** Old pages store Hindi text in a font that predates Unicode, the modern standard for text encoding. The stored bytes look like broken Latin characters, for example `gÉÉÒ`. A reader that ignores this stores meaningless text while it reports success. Torko builds a character map to convert the bytes into real Hindi text. Torko also builds a detector. The detector decides whether the conversion should run. The detector matters because one early version of the fix once converted correct Hindi text into damaged text.
 
+The character map does not fix all of the text. In 1,413 turns of the 13th Lok Sabha, most Hindi words stayed unreadable after the conversion. Torko stores a repaired text for each of these turns in [`data/turn_text_repairs.tsv`](data/turn_text_repairs.tsv). An LLM repaired 425 of them. A dictionary-and-rules program repaired the other 988. A rebuild applies the repairs again, and the database marks each repaired turn. A repair applies to a turn only if the turn still has the same garbled text.
+
 **Problem 2: one identity across 26 years.** The same person must carry one identity across all 6 parliament terms Torko covers. The source gives a stable identity number only on a speaker's first turn in each debate. Later turns carry just a printed name. Torko carries the identity number forward to later turns by comparing the printed names. Torko records no name when two different people could match the same printed name. A gap is safer than a wrong name.
 
 Torko links all three spellings of Adhir Ranjan Chowdhury's name from the earlier example to one person record. That single record holds 861 debates and 2,397 interventions. It holds 552,048 words in total. The record spans 5 parliament terms, from 1999 to 2024.
@@ -210,7 +212,7 @@ The plan has these steps:
 
 ## Tests
 
-Torko ships 758 tests. The tests run with no network access. 4 tests read the local database, so load `.env` first. The full run takes about 1 second.
+Torko ships 776 tests. The tests run with no network access. 4 tests read the local database, so load `.env` first. The full run takes about 1 second.
 
 ```bash
 set -a && source .env && set +a && python3 -m pytest

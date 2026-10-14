@@ -1,0 +1,24 @@
+[
+ {
+  "key": [
+   13,
+   2,
+   6790,
+   15
+  ],
+  "method": "repair-llm",
+  "garbled": "Now, the House stands adjourned to meet again at 3 p.m.\n\n13.19 hrs\n\nThe Lok Sabha then adjourned till Fifteen of the Clock.\n\n_________\n\n15.00 hrs.\n\n±ोEò स¦ाा 15.00 ¨ा.प. परú पुनः स¨ावेत ड़þुई।\n\n(¸ी¨ातÒ ¨ाार्गरúेटõ अ±वा, पÒ`öासÒन ड़þुईं)\n\n... (व्यवधान)\n\nस¦ाापÊत ¨ाड़þोदùय: +¦ी प्राइवेटõ ¨ौ¨बरú Êबजनैस Ê±ाया जाक्गा ।... (व्यवधान)\n\n... (व्यवधान)",
+  "repaired": "Now, the House stands adjourned to meet again at 3 p.m.\n\n13.19 hrs\n\nThe Lok Sabha then adjourned till Fifteen of the Clock.\n\n_________\n\n15.00 hrs.\n\nलोक सभा 15.00 म.प. पर पुनः समवेत हुई।\n\n(श्रीमती मार्गरेट आल्वा, पीठासीन हुईं)\n\n... (व्यवधान)\n\nसभापति महोदय: अभी प्राइवेट मैम्बर बिजनैस लिया जाएगा ।... (व्यवधान)\n\n... (व्यवधान)"
+ },
+ {
+  "key": [
+   13,
+   1,
+   6579,
+   1
+  ],
+  "method": "repair-dict",
+  "garbled": "Now I call upon Shri Atal Bihari Vajpayee to move the Motion standing in his name.\n\nप्रधान¨ांत्रÒ (¸ी +टõ±ा Êबड़þारúÒ वाजपेयÒ): ¨ााननÒय +ध्यIा जÒ, ¨ौं प्रस्ताव Eòरúता ड़þूं:\n\n\"ÊEò ¸ी जÒ.क्¨ा.सÒ. बा±ायोगÒ, जो इस स¦ाा Eòे सदùस्य ड़þैं, Eòो इस स¦ाा Eòे +ध्यIा Eòे रूüप ¨ों चुना जाये।\"",
+  "repaired": "Now I call upon Shri Atal Bihari Vajpayee to move the Motion standing in his name.\n\nप्रधानमंत्री (श्री अटल बिहारी वाजपेयी): माननीय अध्यक्ष जी, मैं प्रस्ताव करता हूँ:\n\n\"कि श्री जी.क्म.सी. बालयोगी, जो इस सभा के सदस्य हैं, को इस सभा के अध्यक्ष के रूप में चुना जाये।\""
+ }
+]
