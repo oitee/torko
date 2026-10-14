@@ -5,10 +5,10 @@
     "debates_with_speeches": 63675,
     "turns_total": 524822,
     "speeches_total": 172877,
-    "speeches_person": 133566,
-    "speeches_unresolved": 39311,
+    "speeches_person": 137513,
+    "speeches_unresolved": 35364,
     "words_total": 71806967,
-    "distinct_speakers": 2060
+    "distinct_speakers": 2063
   },
   "size": {
     "all": {
@@ -24,14 +24,14 @@
       "mx": 103632
     },
     "person_owned": {
-      "n": 133566,
-      "mean": 458.88,
-      "sd": 1108.01,
+      "n": 137513,
+      "mean": 457.33,
+      "sd": 1096.05,
       "p25": 88,
       "median": 199,
-      "p75": 505,
-      "p90": 1167,
-      "p99": 3317.45,
+      "p75": 504,
+      "p90": 1161,
+      "p99": 3299.88,
       "mn": 0,
       "mx": 103632
     },
@@ -154,9 +154,9 @@
   ],
   "speakers": {
     "per_speaker_dist": {
-      "mean": 64.84,
+      "mean": 66.66,
       "median": 28,
-      "p90": 150,
+      "p90": 152.8,
       "mx": 1734
     },
     "top_by_speeches": [
@@ -169,10 +169,24 @@
       },
       {
         "name": "Bhartruhari Mahtab",
+        "party": "BJD \u2192 BJP",
+        "speeches": 1667,
+        "words": 999980,
+        "median_len": 244
+      },
+      {
+        "name": "Adhir Ranjan Chowdhury",
+        "party": "INC",
+        "speeches": 1335,
+        "words": 562315,
+        "median_len": 154
+      },
+      {
+        "name": "Arjun Ram Meghwal",
         "party": "BJP",
-        "speeches": 1657,
-        "words": 997846,
-        "median_len": 247
+        "speeches": 1278,
+        "words": 537559,
+        "median_len": 142
       },
       {
         "name": "N K Premachandran",
@@ -182,25 +196,11 @@
         "median_len": 171
       },
       {
-        "name": "Adhir Ranjan Chowdhury",
-        "party": "INC",
-        "speeches": 1201,
-        "words": 547471,
-        "median_len": 169
-      },
-      {
         "name": "Basudeb Acharia",
         "party": "CPI(M)",
         "speeches": 1154,
         "words": 420491,
         "median_len": 99
-      },
-      {
-        "name": "Arjun Ram Meghwal",
-        "party": "BJP",
-        "speeches": 1138,
-        "words": 510553,
-        "median_len": 164.5
       },
       {
         "name": "Raghuvansh Prasad Singh",
@@ -217,11 +217,25 @@
         "median_len": 87
       },
       {
+        "name": "Sougata Ray",
+        "party": "AITC",
+        "speeches": 971,
+        "words": 329904,
+        "median_len": 165
+      },
+      {
         "name": "Vijay Kumar Malhotra",
         "party": "BJP",
         "speeches": 959,
         "words": 233172,
         "median_len": 62
+      },
+      {
+        "name": "Nishikant Dubey",
+        "party": "BJP",
+        "speeches": 953,
+        "words": 551748,
+        "median_len": 186
       },
       {
         "name": "Om Birla",
@@ -232,24 +246,10 @@
       },
       {
         "name": "Jagdambika Pal",
-        "party": "BJP",
-        "speeches": 832,
-        "words": 488016,
-        "median_len": 218
-      },
-      {
-        "name": "Sougata Ray",
-        "party": "AITC",
-        "speeches": 828,
-        "words": 305072,
-        "median_len": 187.5
-      },
-      {
-        "name": "Nishikant Dubey",
-        "party": "BJP",
-        "speeches": 814,
-        "words": 506574,
-        "median_len": 195.5
+        "party": "INC \u2192 BJP",
+        "speeches": 835,
+        "words": 488616,
+        "median_len": 217
       },
       {
         "name": "Mulayam Singh Yadav",
@@ -267,7 +267,7 @@
       },
       {
         "name": "Somnath Chatterjee",
-        "party": "Not Available",
+        "party": "CPI(M) \u2192 Ind.",
         "speeches": 658,
         "words": 249274,
         "median_len": 96
@@ -281,7 +281,7 @@
       },
       {
         "name": "Prabhunath Singh",
-        "party": "RJD",
+        "party": "JD(U) \u2192 RJD",
         "speeches": 601,
         "words": 229974,
         "median_len": 164
@@ -315,6 +315,13 @@
         "median_len": 160
       },
       {
+        "name": "Rajiv Pratap Rudy",
+        "party": "BJP",
+        "speeches": 566,
+        "words": 217235,
+        "median_len": 120
+      },
+      {
         "name": "Shailendra Kumar",
         "party": "SP",
         "speeches": 566,
@@ -327,22 +334,15 @@
         "speeches": 548,
         "words": 77909,
         "median_len": 37
-      },
-      {
-        "name": "Ganesh Singh",
-        "party": "BJP",
-        "speeches": 547,
-        "words": 269154,
-        "median_len": 220
       }
     ],
     "top_by_words": [
       {
         "name": "Bhartruhari Mahtab",
-        "party": "BJP",
-        "speeches": 1657,
-        "words": 997846,
-        "mean_len": 602.2
+        "party": "BJD \u2192 BJP",
+        "speeches": 1667,
+        "words": 999980,
+        "mean_len": 599.87
       },
       {
         "name": "Raghuvansh Prasad Singh",
@@ -354,9 +354,23 @@
       {
         "name": "Adhir Ranjan Chowdhury",
         "party": "INC",
-        "speeches": 1201,
-        "words": 547471,
-        "mean_len": 455.85
+        "speeches": 1335,
+        "words": 562315,
+        "mean_len": 421.21
+      },
+      {
+        "name": "Nishikant Dubey",
+        "party": "BJP",
+        "speeches": 953,
+        "words": 551748,
+        "mean_len": 578.96
+      },
+      {
+        "name": "Arjun Ram Meghwal",
+        "party": "BJP",
+        "speeches": 1278,
+        "words": 537559,
+        "mean_len": 420.63
       },
       {
         "name": "N K Premachandran",
@@ -373,25 +387,11 @@
         "mean_len": 295.48
       },
       {
-        "name": "Arjun Ram Meghwal",
-        "party": "BJP",
-        "speeches": 1138,
-        "words": 510553,
-        "mean_len": 448.64
-      },
-      {
-        "name": "Nishikant Dubey",
-        "party": "BJP",
-        "speeches": 814,
-        "words": 506574,
-        "mean_len": 622.33
-      },
-      {
         "name": "Jagdambika Pal",
-        "party": "BJP",
-        "speeches": 832,
-        "words": 488016,
-        "mean_len": 586.56
+        "party": "INC \u2192 BJP",
+        "speeches": 835,
+        "words": 488616,
+        "mean_len": 585.17
       },
       {
         "name": "Palaniappan Chidambaram",
@@ -409,10 +409,10 @@
       },
       {
         "name": "Supriya Sule",
-        "party": "NCPSP",
-        "speeches": 496,
-        "words": 374316,
-        "mean_len": 754.67
+        "party": "NCP \u2192 NCPSP",
+        "speeches": 521,
+        "words": 396508,
+        "mean_len": 761.05
       },
       {
         "name": "Shivraj V. Patil",
@@ -429,11 +429,18 @@
         "mean_len": 509.59
       },
       {
+        "name": "Sougata Ray",
+        "party": "AITC",
+        "speeches": 971,
+        "words": 329904,
+        "mean_len": 339.76
+      },
+      {
         "name": "Anurag Singh Thakur",
         "party": "BJP",
-        "speeches": 397,
-        "words": 317778,
-        "mean_len": 800.45
+        "speeches": 401,
+        "words": 318569,
+        "mean_len": 794.44
       },
       {
         "name": "Pranab Mukherjee",
@@ -448,13 +455,6 @@
         "speeches": 991,
         "words": 306927,
         "mean_len": 309.71
-      },
-      {
-        "name": "Sougata Ray",
-        "party": "AITC",
-        "speeches": 828,
-        "words": 305072,
-        "mean_len": 368.44
       },
       {
         "name": "Shailendra Kumar",
@@ -500,7 +500,7 @@
       },
       {
         "name": "Ram Kripal Yadav",
-        "party": "BJP",
+        "party": "RJD \u2192 BJP",
         "speeches": 468,
         "words": 257582,
         "mean_len": 550.39
@@ -519,40 +519,40 @@
       {
         "bucket": "0-1k",
         "debates": 59233,
-        "avg_speakers": 1.02,
-        "max_speakers": 12
+        "avg_speakers": 1.03,
+        "max_speakers": 16
       },
       {
         "bucket": "1-5k",
         "debates": 2222,
-        "avg_speakers": 4.91,
+        "avg_speakers": 5.0,
         "max_speakers": 26
       },
       {
         "bucket": "5-20k",
         "debates": 1348,
-        "avg_speakers": 9.95,
-        "max_speakers": 37
+        "avg_speakers": 10.17,
+        "max_speakers": 60
       },
       {
         "bucket": "20-50k",
         "debates": 630,
-        "avg_speakers": 23.73,
-        "max_speakers": 75
+        "avg_speakers": 24.39,
+        "max_speakers": 81
       },
       {
         "bucket": "50k+",
         "debates": 242,
-        "avg_speakers": 61.93,
-        "max_speakers": 139
+        "avg_speakers": 65.31,
+        "max_speakers": 159
       }
     ],
     "top_n": 500,
     "core_speakers": [
       {
         "name": "Bhartruhari Mahtab",
-        "in_debates": 244,
-        "words": 400477
+        "in_debates": 245,
+        "words": 400704
       },
       {
         "name": "N K Premachandran",
@@ -561,8 +561,13 @@
       },
       {
         "name": "Supriya Sule",
-        "in_debates": 143,
-        "words": 244742
+        "in_debates": 154,
+        "words": 263841
+      },
+      {
+        "name": "Nishikant Dubey",
+        "in_debates": 145,
+        "words": 229038
       },
       {
         "name": "Asaduddin Owaisi",
@@ -571,13 +576,13 @@
       },
       {
         "name": "Adhir Ranjan Chowdhury",
-        "in_debates": 137,
-        "words": 194891
+        "in_debates": 140,
+        "words": 199029
       },
       {
         "name": "Jagdambika Pal",
-        "in_debates": 124,
-        "words": 186919
+        "in_debates": 126,
+        "words": 187519
       },
       {
         "name": "Kaushalendra Kumar",
@@ -590,14 +595,19 @@
         "words": 94003
       },
       {
-        "name": "Nishikant Dubey",
-        "in_debates": 117,
-        "words": 193987
-      },
-      {
         "name": "Ganesh Singh",
         "in_debates": 116,
         "words": 146761
+      },
+      {
+        "name": "Arjun Ram Meghwal",
+        "in_debates": 116,
+        "words": 65851
+      },
+      {
+        "name": "Sougata Ray",
+        "in_debates": 104,
+        "words": 114602
       },
       {
         "name": "P. Karunakaran",
@@ -605,9 +615,14 @@
         "words": 131422
       },
       {
-        "name": "Sougata Ray",
-        "in_debates": 99,
-        "words": 102128
+        "name": "Kirit Premjibhai Solanki",
+        "in_debates": 97,
+        "words": 81901
+      },
+      {
+        "name": "Hanuman Beniwal",
+        "in_debates": 92,
+        "words": 118575
       },
       {
         "name": "Rajesh Ranjan",
@@ -615,34 +630,19 @@
         "words": 94796
       },
       {
-        "name": "Arjun Ram Meghwal",
+        "name": "Pralhad Joshi",
         "in_debates": 92,
-        "words": 59712
-      },
-      {
-        "name": "Kirit Premjibhai Solanki",
-        "in_debates": 91,
-        "words": 75875
-      },
-      {
-        "name": "Hanuman Beniwal",
-        "in_debates": 89,
-        "words": 115773
+        "words": 91839
       },
       {
         "name": "Virendra Kumar",
-        "in_debates": 88,
-        "words": 99808
+        "in_debates": 89,
+        "words": 101190
       },
       {
         "name": "Raghuvansh Prasad Singh",
         "in_debates": 88,
         "words": 135782
-      },
-      {
-        "name": "Pralhad Joshi",
-        "in_debates": 87,
-        "words": 91062
       },
       {
         "name": "M.A. Kharabela Swain",
@@ -652,12 +652,7 @@
       {
         "name": "Kalyan Banerjee",
         "in_debates": 86,
-        "words": 127188
-      },
-      {
-        "name": "Jayshreeben Patel",
-        "in_debates": 78,
-        "words": 97130
+        "words": 128111
       },
       {
         "name": "Prabodh Panda",
@@ -665,9 +660,14 @@
         "words": 74095
       },
       {
-        "name": "Rama Devi",
-        "in_debates": 76,
-        "words": 78114
+        "name": "Jayshreeben Patel",
+        "in_debates": 78,
+        "words": 97130
+      },
+      {
+        "name": "Thirumaavalavan Tholkappiyan",
+        "in_debates": 77,
+        "words": 49340
       },
       {
         "name": "Kodikunnil Suresh",
@@ -676,9 +676,9 @@
       }
     ],
     "concentration": {
-      "distinct_speakers": 1772,
-      "person_speeches": 29181,
-      "top20_share": 14.12
+      "distinct_speakers": 1799,
+      "person_speeches": 31037,
+      "top20_share": 14.03
     }
   },
   "keywords": {

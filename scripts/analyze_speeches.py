@@ -116,23 +116,33 @@ def main():
             with s as (select person_id, count(*) n from speeches where person_id is not null group by person_id)
             select avg(n) mean, percentile_cont(0.5) within group (order by n) median,
               percentile_cont(0.9) within group (order by n) p90, max(n) mx from s""")).fetchone()._mapping.items()}
-        # party/constituency are a LAST-TERM snapshot on speakers (one row per
-        # person). Shown as context,
-        # NOT as party-at-time-of-speech.
-        out["speakers"]["top_by_speeches"] = rows(c, """
-            select p.name, pa.code as party, count(*) speeches, sum(sp.word_count) words,
+        # Party is the member's party on the debate date (view speaker_periods).
+        # A member who changed party shows each party in order of use, for example "INC → BJP".
+        party_path = """
+            with by_speech as (
+              select s.person_id, pa.code, d.debate_date
+              from speeches s join debates d on d.id = s.debate_id
+              join speaker_periods sp on sp.person_id = s.person_id and sp.lok_sabha_term = d.loksabha
+                and sp.effective_from <= d.debate_date
+                and (sp.effective_to is null or d.debate_date < sp.effective_to)
+              join parties pa on pa.id = sp.party_id
+              where s.person_id is not null),
+            firsts as (select person_id, code, min(debate_date) first_used from by_speech group by 1, 2)
+            select person_id, string_agg(code, ' → ' order by first_used) party from firsts group by 1"""
+        out["speakers"]["top_by_speeches"] = rows(c, f"""
+            with pp as ({party_path})
+            select p.name, pp.party, count(*) speeches, sum(sp.word_count) words,
               percentile_cont(0.5) within group (order by sp.word_count) median_len
             from speeches sp join persons p on p.id=sp.person_id
-            left join speakers sp2 on sp2.person_id=p.id and sp2.source='sansad-last-term'
-            left join parties pa on pa.id=sp2.party_id
-            group by p.id, p.name, pa.code order by speeches desc limit 25""")
-        out["speakers"]["top_by_words"] = rows(c, """
-            select p.name, pa.code as party, count(*) speeches, sum(sp.word_count) words,
+            left join pp on pp.person_id = p.id
+            group by p.id, p.name, pp.party order by speeches desc limit 25""")
+        out["speakers"]["top_by_words"] = rows(c, f"""
+            with pp as ({party_path})
+            select p.name, pp.party, count(*) speeches, sum(sp.word_count) words,
               avg(sp.word_count) mean_len
             from speeches sp join persons p on p.id=sp.person_id
-            left join speakers sp2 on sp2.person_id=p.id and sp2.source='sansad-last-term'
-            left join parties pa on pa.id=sp2.party_id
-            group by p.id, p.name, pa.code order by words desc limit 25""")
+            left join pp on pp.person_id = p.id
+            group by p.id, p.name, pp.party order by words desc limit 25""")
         for grp in ("top_by_speeches", "top_by_words"):
             for s in out["speakers"][grp]:
                 for k in ("words", "median_len", "mean_len"):
