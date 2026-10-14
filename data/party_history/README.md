@@ -12,6 +12,7 @@ sansad.in gives the party and the constituency for a member's last term only. Be
 | `raw/wiki_ls<N>.html` | Wikipedia, "List of members of the Nth Lok Sabha" | Seat, member name, and party for each seat in term N. The first line holds the page revision id. |
 | `raw/wiki_redirects.json` | Wikipedia API | Link title to article title. One person can have links under two titles. |
 | `party_codes.tsv` | Written by hand | Wikipedia party names that the sansad.in data cannot map to a party code. An empty code means that the party is not known. |
+| `party_changes.tsv` | Wikipedia cell notes, then a manual review | Each change of party inside a term: member, from party, to party, and the date. 27 rows. A by-election row has the date from the Wikipedia note. A defection row has no date yet. Made once from the notes, then edited by hand. |
 | `manual.tsv` | Filled by hand | The (member, term) pairs with no party after all rules, sorted by words spoken. Fill the `party` column with a known party code. The build refuses an unknown code. |
 
 ## Steps
@@ -53,4 +54,5 @@ The `method` column records the rule that made each match: `name+seat`, `name`, 
 - A Wikipedia list does not always show the party at the election. The 17th list shows a later party for some members, for example BJP for Ravneet Singh Bittu, who won Ludhiana for INC in 2019.
 - sansad.in can give one person two member codes. Example: Bhaskarrao Patil of Nanded has code 315 in term 13 and code 4375 in term 15.
 - The Wikipedia list for the 18th term shows the party of today, not the party at the election. Torko does not use it, because the 18th term is the last term of all its members.
+- Many dates in the Wikipedia cell notes are copies. On the 16th list, 21 members "died on 30 April 2019" and 32 members "resigned on 20 June 2018". Use a Wikipedia date only when a manual review confirms it.
 - sansad.in itself can be wrong for the last term. Example: it gives K. H. Muniyappa the seat Koppal and the party BJP for the 16th term. Wikipedia gives Kolar and INC.
