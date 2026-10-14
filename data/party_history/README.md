@@ -13,6 +13,7 @@ sansad.in gives the party and the constituency for a member's last term only. Be
 | `raw/wiki_redirects.json` | Wikipedia API | Link title to article title. One person can have links under two titles. |
 | `party_codes.tsv` | Written by hand | Wikipedia party names that the sansad.in data cannot map to a party code. An empty code means that the party is not known. |
 | `party_changes.tsv` | Wikipedia cell notes, then a manual review | Each change of party inside a term: member, from party, to party, and the date. 27 rows. A by-election row has the date from the Wikipedia note. A defection row has no date yet. Made once from the notes, then edited by hand. |
+| `party_events.tsv` | Written by hand from the manual review | The party at the election where a source was wrong (`kind` = election, no date), and each formal change inside a term with its date: by-election, split, merger, expulsion. The loader reads it. |
 | `manual.tsv` | Filled by hand | The (member, term) pairs with no party after all rules, sorted by words spoken. Fill the `party` column with a known party code. The build refuses an unknown code. |
 
 ## Steps
@@ -42,8 +43,10 @@ The `method` column records the rule that made each match: `name+seat`, `name`, 
 
 ## Rules for the data
 
-- **One party for each term.** When Wikipedia shows two parties in one term, the first is the party, and `other_parties` holds the rest. A change of party inside a term is not shown anywhere else.
-- **The last term keeps the sansad.in party.** The loader does not change that row.
+- **The party follows the House record, with dates.** Each (member, term) has a first row from the first day of the term. A formal event in `party_events.tsv` adds a row from its date: a by-election, a split or merger that the House recognised, or an expulsion. A member who only works for another party keeps the party of the House record. A suspension changes nothing.
+- **A speech takes the row that is true on the date of its debate.** The view `speaker_periods` gives each row the date on which the next row starts.
+- **The last term starts from the sansad.in party.** A row of kind `election` in `party_events.tsv` replaces it where the manual review found it wrong. Each run of the loader first resets these rows to the sansad.in values, then applies the review.
+- **A change after the last sitting of a term affects no speech.** Example: the last sitting of term 17 is on 2024-02-10, so a member who joined BJP in March 2024 needs no dated row.
 - **The constituency is for matching and display only.** It is the Wikipedia spelling. Do not join on it, group by it, or compare it across terms. Spellings differ across sources, and seat boundaries changed with the delimitation orders of 1976 and 2008.
 - **A miss is acceptable. A wrong person is not.** A member with no match gets a row with no party (`sansad-term-list`).
 - **A speaker with no Lok Sabha seat in the term keeps the last-term party.** This is mostly a minister from the Rajya Sabha. The loader adds a row with source `last-term-fallback`, the party of the member's last-term row, and no constituency. TODO: a real party for speakers who are not Lok Sabha members.

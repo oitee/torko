@@ -24,13 +24,13 @@ def parse_composite_id(debate_id: str) -> tuple[int, int, int] | None:
 def _speakers_present(conn, debate_id: int) -> list[dict]:
     rows = conn.execute(
         text(
-            """
+            f"""
             SELECT p.sansad_id AS sansad_id, p.name AS name, pa.code AS party,
                    sp.constituency AS constituency
             FROM turns t
             JOIN debates d ON d.id = t.debate_id
             JOIN persons p ON p.id = t.person_id
-            LEFT JOIN speakers sp ON sp.person_id = p.id AND sp.lok_sabha_term = d.loksabha
+            LEFT JOIN speaker_periods sp ON sp.person_id = p.id AND {IN_FORCE}
             LEFT JOIN parties pa ON pa.id = sp.party_id
             WHERE t.debate_id = :debate_id
             GROUP BY p.sansad_id, p.name, pa.code, sp.constituency
@@ -64,6 +64,15 @@ def summarize_mp_diff(mp_list_raw, attributed) -> dict:
         "agreeSample": agree[:2],
         "missSample": miss[:2],
     }
+
+
+# The speaker_periods row that is true on the date of debate d. Use it with the alias sp.
+IN_FORCE = ("sp.lok_sabha_term = d.loksabha AND sp.effective_from <= d.debate_date "
+            "AND (sp.effective_to IS NULL OR d.debate_date < sp.effective_to)")
+
+# A member's latest row: the last term, and in it the latest date. Use it in a LATERAL join on p.
+LATEST_ROW = ("SELECT s.party_id, s.constituency FROM speakers s WHERE s.person_id = p.id "
+              "ORDER BY s.lok_sabha_term DESC, s.effective_from DESC LIMIT 1")
 
 
 def _party_ids(codes: list[str]) -> list[int]:
@@ -117,11 +126,11 @@ def list_debates(
         params["text_query"] = text_query
     if parties:
         clauses.append(
-            # The party of the debate's term. Two choices keep this query fast. The term test
+            # The party on the debate's date. Two choices keep this query fast. The period test
             # sits in WHERE, not in the JOIN. The party ids are known before the query, not
             # read from `parties` inside it. Each other choice made the query 10 to 30 times slower.
-            "EXISTS (SELECT 1 FROM speakers sp JOIN turns t ON t.person_id = sp.person_id "
-            "WHERE t.debate_id = d.id AND sp.lok_sabha_term = d.loksabha "
+            "EXISTS (SELECT 1 FROM speaker_periods sp JOIN turns t ON t.person_id = sp.person_id "
+            f"WHERE t.debate_id = d.id AND {IN_FORCE} "
             "AND sp.party_id = ANY(:party_ids))"
         )
         params["party_ids"] = _party_ids(parties)
@@ -204,14 +213,16 @@ def get_debate_detail(loksabha: int, session: int, dbslno: int) -> dict | None:
                        sr.display_name AS role_display_name
                 FROM turns t
                 LEFT JOIN persons p ON p.id = t.person_id
-                LEFT JOIN speakers sp ON sp.person_id = p.id AND sp.lok_sabha_term = :ls
+                LEFT JOIN speaker_periods sp ON sp.person_id = p.id AND sp.lok_sabha_term = :ls
+                    AND sp.effective_from <= :debate_date
+                    AND (sp.effective_to IS NULL OR :debate_date < sp.effective_to)
                 LEFT JOIN parties pa ON pa.id = sp.party_id
                 LEFT JOIN speaker_roles sr ON sr.id = t.role_id
                 WHERE t.debate_id = :debate_id
                 ORDER BY t.seq
                 """
             ),
-            {"debate_id": debate.id, "ls": debate.loksabha},
+            {"debate_id": debate.id, "ls": debate.loksabha, "debate_date": debate.debate_date},
         ).fetchall()
 
         turns = []
@@ -378,7 +389,7 @@ def list_speakers(q: str) -> list[dict]:
                        sp.constituency AS constituency, count(DISTINCT t.debate_id) AS debate_count
                 FROM turns t
                 JOIN persons p ON p.id = t.person_id
-                LEFT JOIN speakers sp ON sp.person_id = p.id AND sp.source = 'sansad-last-term'
+                LEFT JOIN LATERAL ({LATEST_ROW}) sp ON true
                 LEFT JOIN parties pa ON pa.id = sp.party_id
                 {clause}
                 GROUP BY p.sansad_id, p.name, pa.code, sp.constituency
@@ -406,11 +417,11 @@ def get_speaker_detail(sansad_id: str) -> dict | None:
     with engine.connect() as conn:
         speaker = conn.execute(
             text(
-                """
+                f"""
                 SELECT p.id AS person_id, p.sansad_id AS sansad_id, p.name AS name, pa.code AS party,
                        sp.constituency AS constituency
                 FROM persons p
-                LEFT JOIN speakers sp ON sp.person_id = p.id AND sp.source = 'sansad-last-term'
+                LEFT JOIN LATERAL ({LATEST_ROW}) sp ON true
                 LEFT JOIN parties pa ON pa.id = sp.party_id
                 WHERE p.sansad_id = :sansad_id
                 """
@@ -422,23 +433,23 @@ def get_speaker_detail(sansad_id: str) -> dict | None:
 
         term_rows = conn.execute(
             text(
-                "SELECT sp.lok_sabha_term, pa.code AS party, sp.constituency, sp.source FROM speakers sp "
-                "LEFT JOIN parties pa ON pa.id = sp.party_id "
-                "WHERE sp.person_id = :pid ORDER BY sp.lok_sabha_term"
+                "SELECT sp.lok_sabha_term, sp.effective_from, pa.code AS party, sp.constituency, sp.source "
+                "FROM speakers sp LEFT JOIN parties pa ON pa.id = sp.party_id "
+                "WHERE sp.person_id = :pid ORDER BY sp.lok_sabha_term, sp.effective_from"
             ),
             {"pid": speaker.person_id},
         ).fetchall()
 
         debate_rows = conn.execute(
             text(
-                """
+                f"""
                 SELECT d.loksabha, d.session, d.dbslno, d.title, d.debate_type, d.debate_date,
                        d.source_url, pa.code AS party,
                        count(*) AS interventions, sum(t.word_count) AS words
                 FROM turns t
                 JOIN persons p ON p.id = t.person_id
                 JOIN debates d ON d.id = t.debate_id
-                LEFT JOIN speakers sp ON sp.person_id = p.id AND sp.lok_sabha_term = d.loksabha
+                LEFT JOIN speaker_periods sp ON sp.person_id = p.id AND {IN_FORCE}
                 LEFT JOIN parties pa ON pa.id = sp.party_id
                 WHERE p.sansad_id = :sansad_id
                 GROUP BY d.id, d.loksabha, d.session, d.dbslno, d.title, d.debate_type, d.debate_date,
@@ -475,7 +486,8 @@ def get_speaker_detail(sansad_id: str) -> dict | None:
         },
         "terms": [
             {"loksabha": r.lok_sabha_term, "party": r.party, "constituency": r.constituency,
-             "member": r.source != "last-term-fallback"}
+             "member": r.source != "last-term-fallback",
+             "from": r.effective_from.isoformat() if r.source == "event" else None}
             for r in term_rows
         ],
         "totalDebates": len(debates),

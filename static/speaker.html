@@ -225,8 +225,9 @@
 
   <div class="caveat">
     The party is the MP's party in each Lok Sabha term. It comes from the Wikipedia list of members
-    of that term, and from sansad.in for the MP's last term. A change of party inside a term is not
-    shown. For some terms the party is not known. A minister who spoke in a term without a Lok Sabha
+    of that term, from sansad.in for the MP's last term, and from a manual review. A change of party
+    inside a term shows from its date, when the House record shows it: a by-election, a recognised
+    split or merger, or an expulsion. For some terms the party is not known. A minister who spoke in a term without a Lok Sabha
     seat shows the party of their last Lok Sabha term. Debate counts reflect only debates where we
     attributed a turn to this MP — a coverage figure, not a verified activity total.
   </div>
@@ -318,9 +319,11 @@ let currentDebates = [];
 // One entry for each Lok Sabha term: the party and the seat in that term.
 function termsLine(terms) {
   if (!terms || terms.length === 0) return '';
-  const parts = terms.map(t =>
-    `LS${t.loksabha}: ${escapeHtml(t.party || 'party unknown')}${t.constituency ? ' (' + escapeHtml(t.constituency) + ')' : ''}` +
-    (t.member === false ? ' (not a Lok Sabha member in this term)' : ''));
+  // A row with a date is a change of party inside the term, for example a split.
+  const parts = terms.map(t => t.from
+    ? `${escapeHtml(t.party || 'party unknown')} from ${escapeHtml(t.from)}`
+    : `LS${t.loksabha}: ${escapeHtml(t.party || 'party unknown')}${t.constituency ? ' (' + escapeHtml(t.constituency) + ')' : ''}` +
+      (t.member === false ? ' (not a Lok Sabha member in this term)' : ''));
   return `<p class="speaker-meta">${parts.join(' · ')}</p>`;
 }
 

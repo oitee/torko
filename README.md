@@ -164,7 +164,7 @@ Torko links all three spellings of Adhir Ranjan Chowdhury's name from the earlie
 ## Known limits
 
 1. Torko finds no speaker name for 111,286 turns. The dashboard marks these turns as unattributed.
-2. The party shown for a speech is the member's party in the Lok Sabha term of the debate. It comes from the Wikipedia list of members of that term, and from sansad.in for the member's last term. A change of party inside a term is not shown. For most terms the party is the party at the election, but a Wikipedia list sometimes shows a party that the member joined later in the term. A minister from the Rajya Sabha shows the party of their last Lok Sabha term. For 22 of the 3,254 (member, term) pairs that speak in the debates, Torko has no party. These pairs hold 0.3% of the words with a known speaker.
+2. The party shown for a speech is the member's party on the date of the debate, from the House record. It comes from the Wikipedia list of members of each term, from sansad.in for the member's last term, and from a manual review of 37 members. A change of party inside a term shows from its date only when it is a formal event: a by-election, a split or merger that the House recognised, or an expulsion. A member who only works for another party keeps the party of the House record. Torko knows 27 such dated changes, most of them in the 17th Lok Sabha. Changes in earlier terms that no source records are not shown. A minister from the Rajya Sabha shows the party of their last Lok Sabha term. For 22 of the 3,254 (member, term) pairs that speak in the debates, Torko has no party. These pairs hold 0.3% of the words with a known speaker.
 3. Torko does not read about 13.6% of the source text. The loss is 32.5% in the 13th Lok Sabha and about 3% in recent terms. Charts over time will therefore show too little activity in the early years.
 
    <details>
@@ -202,11 +202,11 @@ The plan has these steps:
 
 - **Topics over time.** Charts that show how often parliament discussed a topic in each session, and which members led the discussion.
 
-- **Better source data.** Read the text that Torko misses today, show a change of party inside a term, and record who chaired each sitting.
+- **Better source data.** Read the text that Torko misses today, find the changes of party in earlier terms that no source records, and record who chaired each sitting.
 
 ## Tests
 
-Torko ships 751 tests. The tests run with no network access. 4 tests read the local database, so load `.env` first. The full run takes about 1 second.
+Torko ships 756 tests. The tests run with no network access. 4 tests read the local database, so load `.env` first. The full run takes about 1 second.
 
 ```bash
 set -a && source .env && set +a && python3 -m pytest

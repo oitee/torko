@@ -74,10 +74,11 @@ def load(members: list[dict]) -> None:
                 text(
                     """
                     INSERT INTO speakers
-                        (person_id, lok_sabha_term, name, party_id, constituency, source)
-                    VALUES
-                        (:person_id, :lok_sabha_term, :name, :party_id, :constituency, 'sansad-last-term')
-                    ON CONFLICT (lok_sabha_term, person_id) DO NOTHING
+                        (person_id, lok_sabha_term, effective_from, name, party_id, constituency, source)
+                    SELECT :person_id, :lok_sabha_term, ls.start_date, :name, :party_id, :constituency,
+                           'sansad-last-term'
+                    FROM lok_sabhas ls WHERE ls.number = :lok_sabha_term
+                    ON CONFLICT (lok_sabha_term, person_id, effective_from) DO NOTHING
                     """
                 ),
                 {
