@@ -14,7 +14,7 @@ sansad.in gives the party and the constituency for a member's last term only. Be
 | `party_codes.tsv` | Written by hand | Wikipedia party names that the sansad.in data cannot map to a party code. An empty code means that the party is not known. |
 | `party_changes.tsv` | Wikipedia cell notes, then a manual review | Each change of party inside a term: member, from party, to party, and the date. 27 rows. A by-election row has the date from the Wikipedia note. A defection row has no date yet. Made once from the notes, then edited by hand. |
 | `party_events.tsv` | Written by hand from the manual review | The party at the election where a source was wrong (`kind` = election, no date), and each formal change inside a term with its date: by-election, split, merger, expulsion. The loader reads it. |
-| `manual.tsv` | Filled by hand | The (member, term) pairs with no party after all rules, sorted by words spoken. Fill the `party` column with a known party code. The build refuses an unknown code. |
+| `manual.tsv` | Filled by hand | The (member, term) pairs with no party after all rules, sorted by words spoken: 20 rows, all filled on 2026-10-14 from a manual review, with a source link for each. The `party` column holds a known party code. The build refuses an unknown code. |
 
 ## Steps
 

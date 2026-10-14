@@ -5,13 +5,13 @@ A match is a pair of a sansad.in member and a Wikipedia row. It is not a checked
 
 | Term | Members | Matched | name+seat | name | article | seat | manual | No match | Party not known |
 |---|---|---|---|---|---|---|---|---|---|
-| 13 | 568 | 536 | 248 | 252 | 23 | 13 | 0 | 32 | 1 |
-| 14 | 584 | 571 | 320 | 213 | 20 | 18 | 0 | 13 | 0 |
-| 15 | 557 | 552 | 320 | 204 | 14 | 14 | 0 | 5 | 0 |
-| 16 | 573 | 564 | 287 | 234 | 24 | 19 | 0 | 9 | 0 |
-| 17 | 559 | 555 | 318 | 203 | 13 | 21 | 0 | 4 | 0 |
+| 13 | 568 | 548 | 248 | 251 | 23 | 13 | 13 | 20 | 0 |
+| 14 | 584 | 574 | 320 | 213 | 20 | 18 | 3 | 10 | 0 |
+| 15 | 557 | 554 | 320 | 204 | 14 | 14 | 2 | 3 | 0 |
+| 16 | 573 | 565 | 287 | 234 | 24 | 19 | 1 | 8 | 0 |
+| 17 | 559 | 556 | 318 | 203 | 13 | 21 | 1 | 3 | 0 |
 | 18 | 544 | 543 | 519 | 0 | 2 | 22 | 0 | 1 | 0 |
 
-Total: 3321 of 3385 pairs matched (98.1%).
+Total: 3340 of 3385 pairs matched (98.7%).
 Rows with a second party on Wikipedia (a change inside the term): 13.
 Rejected candidate pairs: 40 (tie between wikipedia rows: 30, wikipedia row prefers another member: 6, article matches two members: 4).

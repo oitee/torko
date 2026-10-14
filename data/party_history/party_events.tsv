@@ -21,8 +21,6 @@ term	mpsno	name	effective_from	party	constituency	kind	source	note
 17	5189	Omprakash Bhupalsinh Alias Pavan Rajenimbalkar		SS		election	wikipedia, manual review	Wikipedia term 17 shows SHSUBT, a party created after the 2019 election
 17	4735	Sanjay Haribhau Jadhav		SS		election	wikipedia, manual review	Wikipedia term 17 shows SHSUBT, a party created after the 2019 election
 17	4777	Chirag Paswan		LJSP		election	wikipedia, manual review	Wikipedia term 17 shows LJSP(RV), a party created after the 2019 election
-14	244	Babu Lal Marandi		BJP	Kodarma	election	wikipedia, manual review	Wikipedia row Kodarma, BJP. The name matcher missed him.
-15	4446	Vitthalbhai Hansrajbhai Radadiya		INC	Porbandar	election	wikipedia, manual review	Wikipedia row Porbandar, INC. The name matcher missed him.
 13	150	Md Anwarul Haque	2001-05-01	RJD(D)		split	research document	RJD(D) formed in May 2001. The day is not known.
 13	269	Nagmani	2001-04-28	RJD(D)		expulsion	research document	Expelled by RJD, then formed RJD(D) in May 2001
 13	269	Nagmani	2004-01-05	BJP		merger	research document	RJD(D) merged into BJP
@@ -50,3 +48,4 @@ term	mpsno	name	effective_from	party	constituency	kind	source	note
 17	5529	Prince Raj	2021-06-14	RLJP		split	research document	The Speaker recognised the Paras group on 2021-06-14. ECI name RLJP on 2021-10-05.
 17	4777	Chirag Paswan	2021-06-14	LJSP(RV)		split	assumption	Same date as the Paras group. ECI name LJP(RV) on 2021-10-05. Check this date.
 17	4964	P. Ravindhranath	2022-07-14	Ind.		expulsion	research document	Expelled by AIADMK (EPS group)
+17	5223	Veena Devi	2021-06-14	RLJP		split	research document	One of the five LJP members in the Paras group. The Speaker recognised the group on 2021-06-14.
