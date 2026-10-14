@@ -62,3 +62,27 @@ def test_an_election_row_has_no_date_and_a_dated_row_falls_inside_its_term():
 def test_no_two_rows_for_one_member_on_one_date():
     keys = [(e["term"], e["mpsno"], e["kind"] == "election", e["effective_from"]) for e in _events()]
     assert len(keys) == len(set(keys))
+
+
+def _rows(path):
+    with open(path, encoding="utf-8", newline="") as f:
+        return list(csv.DictReader(f, delimiter="\t"))
+
+
+def test_a_reassignment_moves_turns_away_from_a_member_who_did_not_sit_in_the_term():
+    # Example: Arjun Singh of West Bengal (5038) first sat in term 17, so his term 14 turns
+    # belong to the Congress minister Arjun Singh (2973).
+    rows = _rows(DATA.parent / "turn_reassignments.tsv")
+    assert rows
+    for r in rows:
+        assert int(r["from_mpsno"]) not in _members(int(r["term"])), r
+        assert r["from_mpsno"] != r["to_mpsno"]
+
+
+def test_a_non_member_party_is_for_a_speaker_without_a_seat_in_that_term():
+    known = _known_codes()
+    rows = _rows(DATA / "non_member_parties.tsv")
+    assert rows
+    for r in rows:
+        assert int(r["mpsno"]) not in _members(int(r["term"])), r
+        assert r["party"] in known, r

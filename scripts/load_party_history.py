@@ -1,36 +1,3 @@
-"""
-Load the party and the constituency of each member for each term into `speakers`.
-
-Input: data/party_history/results/speaker_terms.tsv (made by scripts/build_party_history.py),
-       data/party_history/party_events.tsv (written by hand, from a manual review),
-       data/party_history/party_codes.tsv and the sansad.in lists, for the full party names.
-
-The steps, in order:
-
-1. The first row of each (member, term), with effective_from = the first day of the term.
-   For each row in speaker_terms.tsv, except the member's last term:
-     - a Wikipedia match gives a row with source 'wikipedia', the party, and the constituency.
-     - a row from manual.tsv gives a row with source 'manual'.
-     - no match gives a row with source 'sansad-term-list' and no party.
-   The member's last-term row comes from scripts/load_roster.py (source 'sansad-last-term').
-   This step resets its party and constituency to the sansad.in values in the raw files.
-2. The party at the election, from the rows of kind 'election' in party_events.tsv. They replace
-   the party (and the constituency, when given) of the first row. Example: sansad.in gives
-   K. H. Muniyappa BJP and Koppal for term 16. The review gives INC and Kolar.
-3. The dated events, from the other rows of party_events.tsv: a by-election, a split, a merger,
-   or an expulsion. Each one adds a row with source 'event' and its own effective_from.
-4. For each member who has turns in a term with no row (mostly a minister from the Rajya Sabha),
-   a row with source 'last-term-fallback'. It copies the party of the member's latest row, and
-   has no constituency. TODO: a real party for speakers who are not Lok Sabha members.
-
-The script also writes the full name of each party into `parties`.
-
-Safe to run again: it replaces the rows that it owns, and only those.
-
-Run from the repo root, with the database up and db/init/16, 17, and 18 applied:
-
-    python3 -m scripts.load_party_history
-"""
 from __future__ import annotations
 
 import csv
@@ -49,6 +16,7 @@ from db import get_engine  # noqa: E402
 DATA = ROOT / "data" / "party_history"
 TSV = DATA / "results" / "speaker_terms.tsv"
 EVENTS = DATA / "party_events.tsv"
+NON_MEMBERS = DATA / "non_member_parties.tsv"
 OWNED = ("wikipedia", "sansad-term-list", "manual", "last-term-fallback", "event")
 
 
@@ -195,6 +163,24 @@ def load(rows: list[dict], events: list[dict]) -> None:
             dated += n
 
         # Step 4: speakers with no Lok Sabha seat in the term.
+        with open(NON_MEMBERS, encoding="utf-8", newline="") as f:
+            non_members = list(csv.DictReader(f, delimiter="\t"))
+        hand = 0
+        for n in non_members:
+            pid = persons.get(int(n["mpsno"]))
+            if pid is None:
+                raise SystemExit(f"non_member_parties.tsv: no person with code {n['mpsno']}")
+            hand += conn.execute(
+                text(
+                    """
+                    INSERT INTO speakers (person_id, lok_sabha_term, effective_from, name, party_id, source)
+                    SELECT :pid, ls.number, ls.start_date, :name, :party_id, 'last-term-fallback'
+                    FROM lok_sabhas ls WHERE ls.number = :term
+                    AND NOT EXISTS (SELECT 1 FROM speakers s WHERE s.person_id = :pid AND s.lok_sabha_term = :term)
+                    """
+                ),
+                {"pid": pid, "term": int(n["term"]), "name": names[pid], "party_id": party_ids[n["party"]]},
+            ).rowcount
         fallback = conn.execute(
             text(
                 """
@@ -219,6 +205,7 @@ def load(rows: list[dict], events: list[dict]) -> None:
         print(f"first rows inserted   : {inserted} of {len(params)}", flush=True)
         print(f"election corrections  : {corrected}", flush=True)
         print(f"dated event rows      : {dated}", flush=True)
+        print(f"non-member parties    : {hand}", flush=True)
         print(f"last-term fallbacks   : {fallback}", flush=True)
         if inserted != len(params):
             print("some rows collided with a sansad-last-term row and were not inserted", flush=True)
