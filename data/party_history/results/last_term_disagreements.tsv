@@ -1,38 +1,38 @@
-term	mpsno	name	sansad_party	sansad_seat	wiki_party	wiki_seat	wiki_other_parties	match_method	review
-13	19	Amir Alam Khan	LD(S)	Kairana	RLD	Kairana		name+seat	
-13	34	Mahendra Baitha	Samata Party	Bagaha	JD(U)	Bagaha		name+seat	
-13	150	Md Anwarul Haque	RJD(D)	Sheohar	RJD	Sheohar		name+seat	
-13	234	Brahmanand Mandal	Samata Party	Monghyr	JD(U)	Monghyr		name+seat	
-13	239	Manjay Lal	Samata Party	Samastipur	JD(U)	Samastipur		name+seat	
-13	269	Nagmani	RJD(D)	Chatra	RJD	Chatra		name+seat	
-13	460	Th. Chaoba Singh	BJP	Inner Manipur	MSCP	Inner Maipur		name+seat	
-13	537	Renu Kumari Singh	Samata Party	Khagaria	JD(U)	Khagaria		name+seat	
-14	41	S. Bangarappa	SP	Shimoga	BJP	Shimoga	SP	name+seat	
-14	73	Somnath Chatterjee	Not Available	Bolpur	CPI(M)	Bolpur		name+seat	
-14	486	P.C. Thomas	KEC	Muvattupuzha	IFDP	Muvattapuzha		name+seat	
-15	180	Baliram Kashyap	Ind.	Bastar	BJP	Bastar		name+seat	
-15	4011	Kalyan Singh	Ind.	Etah	JKP	Etah		name+seat	
-15	4491	Tarun Mandal	Ind.	Jaynagar	SUCI(C)	Jaynagar		name+seat	
-15	4530	Y. S. Jagan Mohan Reddy	YSR Congress Party	Kadapa	INC	Kadapa	YSR Congress Party	name+seat	
-16	261	K.H. Muniyappa	BJP	Koppal	INC	Kolar		article	
-16	4353	C. L. Ruala	MNF	Mizoram	INC	Mizoram		name+seat	
-16	4846	B.N. Chandrappa	BJP	Chitradurga	INC	Chitradurga		name+seat	
-17	322	Shriniwas Dadasaheb Patil	NCP	Satara	NCPSP	Satara		name+seat	
-17	4429	Ravneet Singh	INC	Ludhiana	BJP	Ludhiana		name+seat	
-17	4502	Sisir Kumar Adhikari	AITC	Kanthi	BJP	Kanthi		name+seat	
-17	4612	Mehboob Ali Kaiser	LJSP	Khagaria	RJD	Khagaria		name+seat	
-17	4663	Rajan Baburao Vichare	SS	Thane	SHSUBT	Thane		name+seat	
-17	4765	Vinayak Bhaurao Raut	SS	Ratnagiri-Sindhudurg	SHSUBT	Ratnagiri–Sindhudurg		name+seat	
-17	4786	Faizal P.P. Mohammed	NCP	Lakshadweep	NCPSP	Lakshadweep		name+seat	
-17	4939	Dibyendu Adhikari	AITC	Tamluk	BJP	Tamluk		name+seat	
-17	4964	P. Ravindhranath	AIADMK	Theni	Ind.	Theni		name+seat	
-17	5047	Kunar Hembram	BJP	Jhargram	AITC	Jhargram		name+seat	
-17	5118	Geeta Kora	INC	Singhbhum	BJP	Singhbhum		seat	
-17	5132	Ritesh Pandey	BSP	Ambedkar Nagar	BJP	Ambedkar Nagar		name+seat	
-17	5134	Kunwar Danish Ali	BSP	Amroha	INC	Amroha		name+seat	
-17	5152	Sangeeta Azad	BSP	Lalganj	BJP	Lalganj		name+seat	
-17	5180	Sumalatha Ambareesh	Ind.	Mandya	BJP	Mandya		name+seat	
-17	5212	Pashupati Kumar Paras	LJSP	Hajipur	RLJP	Hajipur		name+seat	
-17	5218	Chandan Singh	LJSP	Nawada	RLJP	Nawada		name+seat	
-17	5529	Prince Raj	LJSP	Samastipur	RLJP	Samastipur		name+seat	
-17	5540	Sushil Kumar Rinku	AAP	Jalandhar	BJP	Jalandhar		name+seat	
+term	mpsno	name	sansad_party	sansad_seat	wiki_party	wiki_seat	wiki_other_parties	match_method	election_party	correct_source	changes_in_term	review
+13	19	Amir Alam Khan	LD(S)	Kairana	RLD	Kairana		name+seat	RLD	wikipedia		RLD for the full term. sansad.in LD(S) is not the party of this term.
+13	34	Mahendra Baitha	Samata Party	Bagaha	JD(U)	Bagaha		name+seat	JD(U)	both		Won on the JD(U) symbol. Sat in the House as the Samata Party bloc until the merger into JD(U) on 2003-10-30. Decision needed: show JD(U) or Samata Party before the merger.
+13	150	Md Anwarul Haque	RJD(D)	Sheohar	RJD	Sheohar		name+seat	RJD	wikipedia	2001-05: RJD -> RJD(D); 2004-03: RJD(D) -> BJP (after last sitting)	Joined the RJD(D) breakaway with Nagmani. The day in May 2001 is not known.
+13	234	Brahmanand Mandal	Samata Party	Monghyr	JD(U)	Monghyr		name+seat	JD(U)	both	2003-05-21: expelled from Samata Party; 2003-10-30: stays Samata Party, refuses the JD(U) merger	Won on the JD(U) symbol, Samata Party bloc in the House. Led the continuing Samata Party after the merger. sansad.in Samata Party fits the end of the term.
+13	239	Manjay Lal	Samata Party	Samastipur	JD(U)	Samastipur		name+seat	JD(U)	both		Same case as Mahendra Baitha: JD(U) symbol, Samata Party bloc, merger on 2003-10-30.
+13	269	Nagmani	RJD(D)	Chatra	RJD	Chatra		name+seat	RJD	wikipedia	2001-04-28: RJD -> RJD(D); 2004-01-05: RJD(D) -> BJP	Expelled by RJD on 2001-04-28, formed RJD(D) in May 2001.
+13	460	Th. Chaoba Singh	BJP	Inner Manipur	MSCP	Inner Maipur		name+seat	MSCP	wikipedia	2002-11-14: MSCP -> BJP	Source conflict: the transitions document says MSCP merged into BJP on 2002-11-14. The summary says he joined BJP in 2004. Check before use.
+13	537	Renu Kumari Singh	Samata Party	Khagaria	JD(U)	Khagaria		name+seat	JD(U)	both		Same case as Mahendra Baitha: JD(U) symbol, Samata Party bloc, merger on 2003-10-30.
+14	41	S. Bangarappa	SP	Shimoga	BJP	Shimoga	SP	name+seat	BJP	wikipedia	2005-03-10: resigned seat (BJP); 2005-06-05: re-elected for SP in a by-election; 2009-02-12: resigned seat to join INC	sansad.in SP is the party after the by-election. By-election: polled 2005-06-02, declared 2005-06-05. Wikipedia note says 2005-06-06. No speech as INC, because he resigned the seat.
+14	73	Somnath Chatterjee	Not Available	Bolpur	CPI(M)	Bolpur		name+seat	CPI(M)	wikipedia	2008-07-23: CPI(M) -> Ind. (expelled)	"Speaker for the full term. sansad.in gives ""Not Available""."
+14	486	P.C. Thomas	KEC	Muvattupuzha	IFDP	Muvattapuzha		name+seat	IFDP	wikipedia	2005-08-27: IFDP -> KEC (merged into Kerala Congress (Joseph))	sansad.in KEC is the party after the merger.
+15	180	Baliram Kashyap	Ind.	Bastar	BJP	Bastar		name+seat	BJP	wikipedia		BJP for the full term. Died in office on 2011-03-10. sansad.in Ind. is wrong.
+15	4011	Kalyan Singh	Ind.	Etah	JKP	Etah		name+seat	Ind.	sansad	2010-01-05: Ind. -> JKP; 2014-03-02: JKP -> BJP (after last sitting, seat resigned 2014-03-01)	Won as an Independent with SP support. Wikipedia JKP is a later party.
+15	4491	Tarun Mandal	Ind.	Jaynagar	SUCI(C)	Jaynagar		name+seat	Ind.	both		On the ballot as an Independent, member of SUCI(C) for the full term. Decision needed: show Ind. (ballot) or SUCI(C) (real party).
+15	4530	Y. S. Jagan Mohan Reddy	YSR Congress Party	Kadapa	INC	Kadapa	YSR Congress Party	name+seat	INC	wikipedia	2010-11-29: resigned seat (INC); 2011-05-13: re-elected for YSR Congress Party in a by-election	By-election polled 2011-05-08, declared 2011-05-13. sansad.in YSR Congress Party is the party after the by-election.
+16	261	K.H. Muniyappa	BJP	Koppal	INC	Kolar		article	INC	wikipedia		INC, Kolar, for the full term. sansad.in BJP and Koppal are wrong. Note: the research cites member code 255, but the sansad.in term list gives 261.
+16	4353	C. L. Ruala	MNF	Mizoram	INC	Mizoram		name+seat	INC	wikipedia		INC for the full term. sansad.in MNF is wrong for this term.
+16	4846	B.N. Chandrappa	BJP	Chitradurga	INC	Chitradurga		name+seat	INC	wikipedia		INC for the full term. sansad.in BJP is wrong for this term.
+17	322	Shriniwas Dadasaheb Patil	NCP	Satara	NCPSP	Satara		name+seat	NCP	sansad	2023-07-02: NCP -> NCPSP (ECI recognition 2024-02-07)	Won the 2019-10-21 by-election. Stayed with Sharad Pawar in the split.
+17	4429	Ravneet Singh	INC	Ludhiana	BJP	Ludhiana		name+seat	INC	sansad	2024-03-26: INC -> BJP (after last sitting)	No speech as BJP in this term.
+17	4502	Sisir Kumar Adhikari	AITC	Kanthi	BJP	Kanthi		name+seat	AITC	sansad	2021-03-21: AITC -> BJP (de facto, House record stays AITC)	Source conflict: one document says he joined BJP with Amit Shah, the other says with Narendra Modi. The date agrees.
+17	4612	Mehboob Ali Kaiser	LJSP	Khagaria	RJD	Khagaria		name+seat	LJSP	sansad	2021-06-14: LJSP -> RLJP; 2024-04-21: RLJP -> RJD (after last sitting)	LJP split: Speaker recognised the Paras group on 2021-06-14. ECI gave the name RLJP on 2021-10-05.
+17	4663	Rajan Baburao Vichare	SS	Thane	SHSUBT	Thane		name+seat	SS	sansad	2022-07: SS -> SHSUBT (ECI name 2022-10-10)	Stayed with Uddhav Thackeray. Decision needed: the date of the split (July 2022 in the House, or the ECI date 2022-10-10).
+17	4765	Vinayak Bhaurao Raut	SS	Ratnagiri-Sindhudurg	SHSUBT	Ratnagiri–Sindhudurg		name+seat	SS	sansad	2022-07: SS -> SHSUBT (ECI name 2022-10-10)	Same as Rajan Vichare.
+17	4786	Faizal P.P. Mohammed	NCP	Lakshadweep	NCPSP	Lakshadweep		name+seat	NCP	sansad	2023-07-02: NCP -> NCPSP (ECI recognition 2024-02-07)	Stayed with Sharad Pawar. Disqualified and reinstated twice in 2023, so some periods have no membership.
+17	4939	Dibyendu Adhikari	AITC	Tamluk	BJP	Tamluk		name+seat	AITC	sansad	2024-03-15: AITC -> BJP (after last sitting)	Estranged from AITC from December 2020, but joined BJP only after the last sitting.
+17	4964	P. Ravindhranath	AIADMK	Theni	Ind.	Theni		name+seat	AIADMK	sansad	2022-07-14: AIADMK -> Ind. (expelled, unattached)	Expelled by the EPS group.
+17	5047	Kunar Hembram	BJP	Jhargram	AITC	Jhargram		name+seat	BJP	sansad	2024-03-08: BJP -> Ind.; 2024-05-19: Ind. -> AITC (both after last sitting)	No speech after a change in this term.
+17	5118	Geeta Kora	INC	Singhbhum	BJP	Singhbhum		seat	INC	sansad	2024-02-26: INC -> BJP (after last sitting)	No speech as BJP in this term.
+17	5132	Ritesh Pandey	BSP	Ambedkar Nagar	BJP	Ambedkar Nagar		name+seat	BSP	sansad	2024-02-25: BSP -> BJP (after last sitting)	No speech as BJP in this term.
+17	5134	Kunwar Danish Ali	BSP	Amroha	INC	Amroha		name+seat	BSP	sansad	2023-12-09: BSP -> Ind. (suspended); 2024-03-20: Ind. -> INC (after last sitting)	Speeches from 2023-12-09 to 2024-02-10 are as a suspended BSP member.
+17	5152	Sangeeta Azad	BSP	Lalganj	BJP	Lalganj		name+seat	BSP	sansad	2024-03-18: BSP -> BJP (after last sitting)	No speech as BJP in this term.
+17	5180	Sumalatha Ambareesh	Ind.	Mandya	BJP	Mandya		name+seat	Ind.	sansad	2024-04-05: Ind. -> BJP (after last sitting)	Independent with BJP support for the full term.
+17	5212	Pashupati Kumar Paras	LJSP	Hajipur	RLJP	Hajipur		name+seat	LJSP	sansad	2021-06-14: LJSP -> RLJP	Led the LJP split. ECI name RLJP on 2021-10-05.
+17	5218	Chandan Singh	LJSP	Nawada	RLJP	Nawada		name+seat	LJSP	sansad	2021-06-14: LJSP -> RLJP	Joined the Paras group.
+17	5529	Prince Raj	LJSP	Samastipur	RLJP	Samastipur		name+seat	LJSP	sansad	2021-06-14: LJSP -> RLJP	Won the 2019-10-21 by-election. Joined the Paras group.
+17	5540	Sushil Kumar Rinku	AAP	Jalandhar	BJP	Jalandhar		name+seat	AAP	sansad	2024-03-27: AAP -> BJP (after last sitting)	Won the by-election polled 2023-05-10, declared 2023-05-13.
