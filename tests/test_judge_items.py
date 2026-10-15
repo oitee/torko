@@ -80,7 +80,7 @@ def test_gate_rates_count_both_directions():
 
 
 def test_version_names_model_and_questions():
-    assert judged_by("jev-1.13.0") == "jev-1.13.0 q3"
+    assert judged_by("jev-1.13.0") == "jev-1.13.0 q4"
 
 
 def test_marks_are_read_from_a_review_column_and_from_an_old_owner_column(tmp_path):
@@ -88,3 +88,31 @@ def test_marks_are_read_from_a_review_column_and_from_an_old_owner_column(tmp_pa
         path = tmp_path / f"{column}.tsv"
         path.write_text(f"item_id\tname\t{column}\n1\ta\tKeep\n2\tb\tdrop\n3\tc\t\n4\td\tmaybe\n", encoding="utf-8")
         assert read_marks(path) == {1: True, 2: False}
+
+
+def test_a_summary_tag_of_any_type_gets_the_level_question_with_its_description():
+    tag = {"id": 7, "name": "Bareilly", "type": "place", "mention": "", "source": "summary_tag",
+           "description": "District and Lok Sabha constituency in Uttar Pradesh, India."}
+    q = questions_for([tag])
+    assert list(q) == ["level_7"]
+    assert "a place: District and Lok Sabha constituency in Uttar Pradesh, India)" in q["level_7"]["instructions"]
+
+
+def test_a_dictionary_entity_gets_the_three_named_questions_with_its_matched_words():
+    item = {"id": 8, "name": "DISHA", "type": "scheme", "mention": "दिशा", "source": "dictionary"}
+    q = questions_for([item])
+    assert sorted(q) == ["refers_8", "role_8", "type_8"]
+    assert "«दिशा»" in q["refers_8"]["instructions"]
+
+
+def test_read_item_reads_a_summary_tag_by_level_even_when_its_type_is_not_topic():
+    tag = {"id": 7, "type": "place", "source": "summary_tag"}
+    j, warnings, _ = read_item({"level_7": {"probabilities": {"0": 0.9, "1": 0.1}}}, tag)
+    assert j["level_p"] == [0.9, 0.1, 0.0, 0.0] and j["role_p"] is None and not warnings
+    assert not keep(j)
+
+
+def test_summary_state_marks_an_item_without_quoted_words():
+    state = summary_state({"member": "M", "title": "T", "debate_date": "2019-07-01"}, "S.",
+                          [{"name": "Railway Projects", "type": "topic", "mention": ""}])
+    assert "- Railway Projects (topic): (no quoted words)" in state

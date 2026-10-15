@@ -1,0 +1,366 @@
+item_id	speech_id	source	list	type	model_type	name	mention	p_keep	p_refers	kept	review
+9	260741	llm	topic	topic		River Pollution	प्रदूषण	0.99	-	yes	keep
+10	260741	llm	topic	topic		River Cleaning	प्रदूषण मुक्त करने	0.99	-	yes	keep
+580072	260741	summary_tag	topic	scheme	?	Namami Ganga Mission	Government mission to clean and restore the Ganga river. Formerly the Ganga Action Plan.	0.98	-	yes	keep
+580073	260741	summary_tag	topic	topic		River Cleaning	Efforts to remove pollution and waste from rivers.	0.99	-	yes	keep
+580074	260741	summary_tag	topic	institution	?	National Ganga River Basin Authority	A government body set up to clean and manage the Ganga river.	0.04	-	no	drop
+580075	260741	summary_tag	topic	place	?	Bhagirathi River	River in Himalayas, source of Ganges River	0.00	-	no	drop
+580076	260741	summary_tag	topic	place	?	Ganga River	Major river in India	0.98	-	yes	keep
+580077	260741	summary_tag	topic	topic		River Conservation	General government effort to protect and restore rivers.	0.99	-	yes	keep
+580078	260741	summary_tag	topic	topic		River Pollution	Contamination of rivers with waste or harmful substances.	0.99	-	yes	keep
+580079	260741	summary_tag	topic	place	?	Haridwar	District and Lok Sabha constituency in Uttarakhand, India.	0.00	-	no	drop
+580080	260741	summary_tag	topic	place	?	Uttarkashi	District in Uttarakhand, India.	0.00	-	no	drop
+580081	260741	summary_tag	topic	place	?	Damodar River	River in eastern India used for irrigation and power	0.00	-	no	drop
+580082	260741	summary_tag	topic	scheme	?	Swachh Bharat Abhiyan	Government mission to improve sanitation and cleanliness across India.	0.01	-	no	drop
+580083	260741	summary_tag	topic	topic		Pollution Control	Government action to reduce and prevent pollution of air, water, or land.	0.99	-	yes	keep
+11	260741	llm	other	place		Kali River	काली नदी	1.00	0.61	yes	keep
+12	260741	llm	other	place		Ganga River	गंगा	1.00	0.89	yes	keep
+13	260741	llm	other	scheme		Namami Gange Programme	नमामि गंगे	1.00	0.89	yes	keep
+14	260741	llm	other	institution	scheme	National Mission for Clean Ganga	नेशनल मिशन फॉर क्लीन गंगा (NMCG)	0.97	0.90	yes	keep
+15	260741	llm	other	place		Uttar Pradesh	उत्तर प्रदेश	1.00	0.91	yes	keep
+16	260741	llm	other	place		Muzaffarnagar	मुजफफरनगर	0.98	0.87	yes	keep
+17	260741	llm	other	place		Meerut	मेरठ	0.80	0.82	yes	keep
+18	260741	llm	other	place		Kannauj	कन्नौज	0.93	0.83	yes	keep
+580315	260741	dictionary	other	place		Krishna River	कृष्णा	0.85	0.13	no	drop
+19	348672	llm	topic	topic		President's Rule	राष्ट्रपति शासन	1.00	-	yes	keep
+20	348672	llm	topic	topic		Reservation policy	आरक्षण	0.99	-	yes	keep
+21	348672	llm	topic	topic		Elections	चुनाव	0.98	-	yes	keep
+22	348672	llm	topic	topic		Border security and shelling	सीज़फायर	0.99	-	yes	keep
+23	348672	llm	topic	topic		Local governance	पंचायत	0.91	-	yes	keep
+580092	348672	summary_tag	topic	law	?	Article 370	Constitutional article on special status of Jammu and Kashmir	0.06	-	no	drop
+580093	348672	summary_tag	topic	law	?	Article 356	Constitutional provision for president's rule.	0.98	-	yes	keep
+580094	348672	summary_tag	topic	law	?	President's Rule	Constitutional rule that lets the central government run a state directly.	1.00	-	yes	keep
+580095	348672	summary_tag	topic	law	?	Reservation Policy	Constitutional rules that set aside seats and jobs for disadvantaged groups.	0.98	-	yes	keep
+580096	348672	summary_tag	topic	law	?	Reservation Bill	Legislation providing affirmative action quotas	0.97	-	yes	keep
+580097	348672	summary_tag	topic	law	?	Reservation Rules	Regulations for affirmative action in education and jobs	0.98	-	yes	keep
+580098	348672	summary_tag	topic	place	?	Jammu & Kashmir	State in the northern region of India.	0.99	-	yes	keep
+580099	348672	summary_tag	topic	law	?	Employment Reservation	Allocation of jobs by identity	0.94	-	yes	keep
+580100	348672	summary_tag	topic	law	?	Statutory Resolutions	Formal motions passed by parliament with legal effect.	0.91	-	yes	keep
+580101	348672	summary_tag	topic	law	?	The Government of National Capital Territory of Delhi(Amendment)Bill, 2023	Legislative amendment changing governance of Delhi territory.	0.00	-	no	drop
+580102	348672	summary_tag	topic	law	?	The Nari Shakti Vandan Adhiniyam	Law that reserves seats for women in Parliament and state assemblies.	0.00	-	no	drop
+580103	348672	summary_tag	topic	law	?	Women's Reservation	Constitutional provision for reserved seats for women	0.01	-	no	drop
+24	348672	llm	other	place		Jammu and Kashmir	जम्मू - कश्मीर	1.00	0.92	yes	keep
+25	348672	llm	other	law		Jammu and Kashmir Reservation Act, 2004	जम्मू - कश्मीर आरक्षण अधिनियम, 2004	1.00	0.88	yes	keep
+26	348672	llm	other	institution		Election Commission	चुनाव आयोग	0.98	0.90	yes	keep
+27	348672	llm	other	place		Ladakh	लद्दाख	0.72	0.89	yes	keep
+28	348672	llm	other	place		Pakistan	पाकिस्तान	1.00	0.91	yes	keep
+29	348672	llm	other	group		Gujjar Bakarwal	गुर्जर बकरवाल	0.67	0.87	yes	keep
+30	348672	llm	other	person		Rajnath Singh	श्रीमान् राजनाथ सिंह जी	0.64	0.90	yes	keep
+31	348672	llm	other	person		Narendra Modi	नरेन्द्र मोदी	0.42	0.91	no	keep
+580316	348672	dictionary	other	place		Jammu	जम्मू	1.00	0.88	yes	keep
+580317	348672	dictionary	other	role		President of India	राष्ट्रपति	1.00	0.87	yes	keep
+580318	348672	dictionary	other	role		Governor	राज्यपाल	1.00	0.83	yes	keep
+580319	348672	dictionary	other	group		Children	बच्चों	1.00	0.88	yes	keep
+580320	348672	dictionary	other	law		Constitution of India	संविधान	0.74	0.10	no	drop
+580321	348672	dictionary	other	institution		Ministry of Home Affairs	गृह मंत्री	0.17	0.45	no	drop
+580322	348672	dictionary	other	group	?	Opposition	विपक्ष	0.96	0.87	yes	keep
+580323	348672	dictionary	other	scheme	other	Amarnath Yatra	अमरनाथ यात्रा	0.89	0.89	yes	keep
+32	348687	llm	topic	topic		President's rule	धारा 356	0.67	-	yes	drop
+33	348687	llm	topic	topic		Assembly elections	विधान सभा का चुनाव	0.81	-	yes	keep
+34	348687	llm	topic	topic		Reservation	रिजर्वेशन में अमेंडमेंट	0.91	-	yes	keep
+35	348687	llm	topic	topic		Border security and welfare	इंटरनेशनल बार्डर	0.50	-	no	drop
+36	348687	llm	topic	topic		Peace and human touch	इंसानियत, कश्मीरियत	0.99	-	yes	keep
+580110	348687	summary_tag	topic	law	?	Article 370	Constitutional article on special status of Jammu and Kashmir	0.11	-	no	drop
+580111	348687	summary_tag	topic	place	?	Jammu & Kashmir	State in the northern region of India.	0.99	-	yes	keep
+580112	348687	summary_tag	topic	place	?	Jammu	District and Lok Sabha constituency in Jammu and Kashmir, India.	0.58	-	no	drop
+580113	348687	summary_tag	topic	institution	?	Hurriyat Conference	An alliance of separatist political groups based in Jammu and Kashmir.	0.00	-	no	drop
+580114	348687	summary_tag	topic	place	?	Udhampur	District and Lok Sabha constituency in Jammu and Kashmir, India.	0.00	-	no	drop
+580115	348687	summary_tag	topic	place	?	Baramulla	District and Lok Sabha constituency in Jammu and Kashmir, India.	0.00	-	no	drop
+580116	348687	summary_tag	topic	institution	?	National Conference	Political party in Kashmir and Jammu region	0.00	-	no	drop
+580117	348687	summary_tag	topic	place	?	Srinagar	District and Lok Sabha constituency in Jammu and Kashmir, India.	0.01	-	no	drop
+580118	348687	summary_tag	topic	place	?	Pakistan Occupied Kashmir (PoK)	Part of the former Jammu and Kashmir region under Pakistani control.	0.00	-	no	drop
+580119	348687	summary_tag	topic	place	?	Kathua	District in Jammu and Kashmir, India.	0.00	-	no	drop
+580120	348687	summary_tag	topic	place	?	Pulwama	District in Jammu and Kashmir, India.	0.00	-	no	drop
+580121	348687	summary_tag	topic	topic		Kashmiri Migrants	People who left the Kashmir region and now live elsewhere.	0.00	-	no	drop
+37	348687	llm	other	place		Jammu and Kashmir	जम्मू - कश्मीर	1.00	0.94	yes	keep
+38	348687	llm	other	person		Sheikh Abdullah	शेख अब्दुल्ला साहब	0.17	0.92	no	drop
+39	348687	llm	other	person		Indira Gandhi	श्रीमती इंदिरा गांधी जी	0.03	0.95	no	drop
+40	348687	llm	other	person		Rajiv Gandhi	श्री राजीव गांधी जी	0.02	0.94	no	drop
+41	348687	llm	other	person		Narendra Modi	आदरणीय प्रधान मंत्री नरेन्द्र मोदी जी	0.10	0.96	no	drop
+42	348687	llm	other	person		Atal Bihari Vajpayee	वाजपेयी जी	0.75	0.85	yes	keep
+43	348687	llm	other	person		H. D. Deve Gowda	श्री एच. डी. देवेगौड़ा जी	0.38	0.93	no	drop
+44	348687	llm	other	institution		Election Commission of India	चुनाव आयोग	0.95	0.87	yes	keep
+580324	348687	dictionary	other	place		Jammu	जम्मू	0.98	0.87	yes	drop
+580325	348687	dictionary	other	institution		Ministry of Home Affairs	गृह मंत्री	0.88	0.40	no	drop
+580326	348687	dictionary	other	place		Rajouri	राजौरी	0.21	0.86	no	drop
+580327	348687	dictionary	other	group	institution	Bahujan Samaj Party	बहुजन समाज पार्टी	0.82	0.93	yes	keep
+580328	348687	dictionary	other	law		Article 356	धारा 356	0.96	0.90	yes	keep
+1	348688	llm	topic	topic		Reservation	रिजर्वेशन	0.94	-	yes	keep
+2	348688	llm	topic	topic		Border safety and bunkers	बंकर्स	0.98	-	yes	keep
+3	348688	llm	topic	topic		Youth employment and industrial development	युवाओं के पास नौकरी नहीं थी	0.72	-	yes	keep
+4	348688	llm	topic	topic		Panchayat elections	पंचायत के चुनाव	0.73	-	yes	keep
+5	348688	llm	topic	topic		Tourism	टूरिज्म	0.07	-	no	drop
+580130	348688	summary_tag	topic	law	?	Employment Reservation	Allocation of jobs by identity	0.71	-	yes	keep
+580131	348688	summary_tag	topic	law	?	Reservation Bill	Legislation providing affirmative action quotas	0.92	-	yes	keep
+580132	348688	summary_tag	topic	topic		SCs and STs welfare	Support for scheduled communities	0.11	-	no	drop
+580133	348688	summary_tag	topic	law	?	Article 370	Constitutional article on special status of Jammu and Kashmir	0.09	-	no	drop
+580134	348688	summary_tag	topic	place	?	Jammu & Kashmir	State in the northern region of India.	0.99	-	yes	keep
+580135	348688	summary_tag	topic	law	?	Reservation Policy	Constitutional rules that set aside seats and jobs for disadvantaged groups.	0.90	-	yes	keep
+580136	348688	summary_tag	topic	scheme	?	The Viksit Bharat – Guarantee for Rozgar and Ajeevika Mission (Gramin) VB – G RAM G Bill	Government program aimed at rural employment and livelihoods.	0.00	-	no	drop
+580137	348688	summary_tag	topic	place	?	Jammu	District and Lok Sabha constituency in Jammu and Kashmir, India.	0.57	-	no	drop
+580138	348688	summary_tag	topic	law	?	Reservation Rules	Regulations for affirmative action in education and jobs	0.87	-	yes	keep
+580139	348688	summary_tag	topic	scheme	?	Deen Dayal Upadhyaya Antyodaya Yojana	Government scheme for poverty reduction through skills and self-employment.	0.00	-	no	drop
+580140	348688	summary_tag	topic	scheme	?	Pradhan Mantri Jan Vikas Karyakram (PMJVK)	Government program for the development of minority communities.	0.00	-	no	drop
+580141	348688	summary_tag	topic	place	?	Udhampur	District and Lok Sabha constituency in Jammu and Kashmir, India.	0.00	-	no	drop
+6	348688	llm	other	place		Jammu and Kashmir	जम्मू एण्ड कश्मीर	1.00	0.93	yes	keep
+7	348688	llm	other	law		Jammu and Kashmir Reservation (Amendment) Bill, 2019	रिजर्वेशन पर जो बिल आया है	0.92	0.76	yes	keep
+8	348688	llm	other	person		Kalvakuntla Chandrashekar Rao	के. सी. आर. जी	0.63	0.62	yes	drop
+580329	348688	dictionary	other	institution		Ministry of Home Affairs	गृह मंत्री	0.40	0.37	no	drop
+580330	348688	dictionary	other	group	institution	Opposition	विपक्ष	0.39	0.81	no	drop
+580331	348688	dictionary	other	group	institution	United Progressive Alliance	यू. पी. ए.	0.77	0.77	yes	drop
+580332	348688	dictionary	other	group		Children	बच्चों	0.97	0.64	yes	keep
+580333	348688	dictionary	other	group		Students	स्टूडेंट्स	0.90	0.81	yes	keep
+580334	348688	dictionary	other	group		Youth	युवाओं	0.95	0.86	yes	keep
+580335	348688	dictionary	other	group		Other Backward Classes	ओ.बी.सी.	0.29	0.81	no	drop
+580336	348688	dictionary	other	group		Scheduled Tribes	एस. टी.	0.23	0.82	no	drop
+45	347763	llm	topic	topic		State reorganization assurances	assurances given to the state of Telegana	0.99	-	yes	keep
+46	347763	llm	topic	topic		Railway coach factory	Railway Coach Factory was assured at Kazipet	0.03	-	no	drop
+47	347763	llm	topic	topic		Steel plant	Steel Plant was assured at Bayyaram	0.03	-	no	drop
+48	347763	llm	topic	topic		Tribal university	Tribal University was assured in the Act	0.98	-	yes	keep
+580147	347763	summary_tag	topic	place	?	Telangana	State in southern India, formed from the former Andhra Pradesh.	1.00	-	yes	keep
+580148	347763	summary_tag	topic	law	?	Article 371	Constitutional provisions for northeastern states' special status.	0.00	-	no	drop
+580149	347763	summary_tag	topic	topic		SCs and STs welfare	Support for scheduled communities	0.31	-	no	drop
+580150	347763	summary_tag	topic	topic		Tribal Sub Plan, Centre-State Relations	Government program for tribal development and governance.	0.15	-	no	drop
+580151	347763	summary_tag	topic	law	?	States Reorganisation	Restructuring or redrawing of state boundaries and administrative divisions.	0.97	-	yes	keep
+580152	347763	summary_tag	topic	law	?	SCs & STs lists	Lists of scheduled castes and scheduled tribes.	0.00	-	no	drop
+580153	347763	summary_tag	topic	topic		Telugu Language	Language spoken in Andhra Pradesh and Telangana regions of India.	0.00	-	no	drop
+580154	347763	summary_tag	topic	law	?	Reservation Bill	Legislation providing affirmative action quotas	0.00	-	no	drop
+580155	347763	summary_tag	topic	topic		Rehabilitation	Support programs to help people recover from disasters or other hardships.	0.00	-	no	drop
+580156	347763	summary_tag	topic	institution	?	Integral Coach Factory	State manufacturer of railway coaches	0.06	-	no	drop
+580157	347763	summary_tag	topic	law	?	Railway Budget	Annual government allocation for railway operations and development.	0.03	-	no	drop
+580158	347763	summary_tag	topic	law	?	Sabka Bima Sabki Raksha Bill	Insurance legislation for comprehensive coverage	0.00	-	no	drop
+49	347763	llm	other	place		Telangana	Telangana	1.00	0.91	yes	keep
+50	347763	llm	other	law		Andhra Pradesh Reorganisation Act	Andhra Pradesh Reorganisation Act	1.00	0.87	yes	keep
+51	347763	llm	other	place		Kazipet	Kazipet	0.79	0.77	yes	keep
+52	347763	llm	other	place		Bayyaram	Bayyaram	0.81	0.65	yes	keep
+580337	347763	dictionary	other	group		Scheduled Tribes	tribal	0.93	0.60	yes	drop
+580338	347763	dictionary	other	role		President of India	President of India	0.92	0.90	yes	keep
+580339	347763	dictionary	other	law	other	Union Budget	Budget	0.96	0.81	yes	keep
+580340	347763	dictionary	other	institution		Ministry of Home Affairs	Home Minister	1.00	0.58	no	drop
+60	346044	llm	topic	topic		Agricultural pricing	remunerative price for their agricultural produce	1.00	-	yes	keep
+61	346044	llm	topic	topic		Farmers' distress	plight of farmers of this country	0.99	-	yes	keep
+62	346044	llm	topic	topic		Farmers' suicide	forced to commit suicides	0.14	-	no	drop
+63	346044	llm	topic	topic		Agricultural subsidies	subsidy for fertilizers and raw material	0.47	-	no	drop
+580161	346044	summary_tag	topic	topic		Remunerative Prices	Fair prices for agricultural products that provide adequate farmer income.	1.00	-	yes	keep
+580162	346044	summary_tag	topic	scheme	?	Minimum Support  Prices (MSP)	Government guarantee of a minimum price paid to farmers for their crops.	0.81	-	yes	drop
+580163	346044	summary_tag	topic	law	?	Minimum Support Prices	Price floor for agricultural commodities	0.87	-	yes	drop
+580164	346044	summary_tag	topic	topic		Support Prices	Guaranteed minimum prices.	1.00	-	yes	keep
+580165	346044	summary_tag	topic	topic		Agricultural Prices	Price levels for agricultural produce	1.00	-	yes	keep
+580166	346044	summary_tag	topic	topic		Zero Budget Farming	Agricultural approach minimizing external input costs.	0.00	-	no	drop
+580167	346044	summary_tag	topic	topic		Farmers' Grievances	Complaints from agricultural workers	0.99	-	yes	keep
+580168	346044	summary_tag	topic	topic		Farmers' Agitation	Farm worker protests and demonstrations.	0.34	-	no	drop
+580169	346044	summary_tag	topic	institution	?	Swaminathan Commission Report	Report from a government commission that recommended higher crop support prices.	0.00	-	no	drop
+580170	346044	summary_tag	topic	institution	?	Commission for Agricultural Costs and Prices	Government body that recommends minimum support prices for farm crops.	0.01	-	no	drop
+580171	346044	summary_tag	topic	topic		Farmers' Welfare	Government support and welfare programs for farmers.	0.99	-	yes	keep
+580172	346044	summary_tag	topic	scheme	?	Pradhan Mantri Kisan Samman Nidhi Yojana	Government scheme that gives direct cash payments to farming families.	0.11	-	no	drop
+64	346044	llm	other	place		Tenkasi	Tenkasi parliamentary constituency	0.04	0.80	no	drop
+65	346044	llm	other	law	other	Thirukkural	Thirukkural	0.84	0.87	yes	keep
+66	346044	llm	other	group		Farmers	farmers	1.00	0.77	yes	keep
+67	346044	llm	other	person		M. K. Stalin	Thalapathi Thiru M.K Stalin	0.01	0.89	no	drop
+68	346044	llm	other	person		Udhayanidhi Stalin	Thiru Udhayanidhi Stalin	0.00	0.87	no	drop
+580341	346044	dictionary	other	group		Manufacturers	manufacturers	0.56	0.53	no	drop
+580342	346044	dictionary	other	group	institution	Youth	youth	0.00	0.50	no	drop
+53	345769	llm	topic	topic		Air connectivity	सुबह की फ्लाइट	1.00	-	yes	keep
+580173	345769	summary_tag	topic	place	?	Bhavnagar	District and Lok Sabha constituency in Gujarat, India.	1.00	-	yes	keep
+580174	345769	summary_tag	topic	scheme	?	Sagarmala Project	Government plan to develop coastal ports and facilities.	0.00	-	no	drop
+580175	345769	summary_tag	topic	topic		Air Connectivity	How well places are linked by air routes.	1.00	-	yes	keep
+580176	345769	summary_tag	topic	scheme	?	Vocal for Local	Promoting Indian-made goods and local businesses	0.00	-	no	drop
+580177	345769	summary_tag	topic	topic		Transport Development	Improvement of transportation infrastructure.	1.00	-	yes	keep
+580178	345769	summary_tag	topic	topic		Domestic airports	Airports that handle flights within India only.	0.85	-	yes	keep
+580179	345769	summary_tag	topic	place	?	Jamnagar	District and Lok Sabha constituency in Gujarat, India.	0.00	-	no	drop
+580180	345769	summary_tag	topic	institution	?	Vande Bharat Express	High-speed rail service connecting Indian cities	0.00	-	no	drop
+580181	345769	summary_tag	topic	topic		Domestic Flights	Air travel between airports within the same country.	1.00	-	yes	keep
+580182	345769	summary_tag	topic	topic		Air Links	Flight routes that connect two places.	1.00	-	yes	keep
+580183	345769	summary_tag	topic	scheme	?	UDAAN Scheme	Government scheme that supports small and medium businesses.	0.00	-	no	drop
+580184	345769	summary_tag	topic	institution	?	Pawan Hans Ltd	A government-owned company that runs helicopter services.	0.00	-	no	drop
+54	345769	llm	other	place		Bhavnagar	भावनगर	1.00	0.93	yes	keep
+55	345769	llm	other	place		Mumbai	मुंबई	1.00	0.95	yes	keep
+56	345769	llm	other	place		Alang Ship Breaking Yard	शिपब्रेकिंग यार्ड	0.38	0.82	no	drop
+57	345769	llm	other	place		Velavadar Blackbuck National Park	ब्लैक बग की नेशनल सेंन्चुरी	0.15	0.70	no	drop
+58	345769	llm	other	place		Pipavav Port	पीपावा पोर्ट	0.12	0.87	no	drop
+59	345769	llm	other	place		Palitana	पालीताना	0.14	0.86	no	drop
+69	345470	llm	topic	topic		Kashmir mediation claim	कश्मीर मुद्दे पर किसी तृतीय पक्ष का हस्तक्षेप नहीं होगा	0.99	-	yes	keep
+70	345470	llm	topic	topic		Bilateral relations	शिमला एग्रीमेंट के मुताबिक कश्मीर मुद्दा बाइलेटरल है	0.86	-	yes	keep
+580189	345470	summary_tag	topic	topic		Indo-US relations	Relations between India and the United States.	0.94	-	yes	keep
+580190	345470	summary_tag	topic	topic		Statement	A formal announcement made by a minister in parliament.	0.63	-	yes	drop
+580191	345470	summary_tag	topic	topic		Members	Participants or representatives in a group. Meaning here is unclear.	0.18	-	no	drop
+580192	345470	summary_tag	topic	law	?	Article 370	Constitutional article on special status of Jammu and Kashmir	0.01	-	no	drop
+580193	345470	summary_tag	topic	role	?	President	Constitutional de jure head of state of India, as distinct from the Prime Minister, the elected de facto head.	0.05	-	no	drop
+580194	345470	summary_tag	topic	institution	?	Parliament	The body that makes India's national laws.	0.71	-	yes	drop
+580195	345470	summary_tag	topic	topic		Indo-Pak Relation	Relations between India and Pakistan.	0.97	-	yes	keep
+580196	345470	summary_tag	topic	place	?	Srinagar	District and Lok Sabha constituency in Jammu and Kashmir, India.	0.00	-	no	drop
+580197	345470	summary_tag	topic	topic		Observation	A formal note made by parliament on a matter.	0.24	-	no	drop
+580198	345470	summary_tag	topic	role	?	Prime Minister	Elected de facto head of state of India, as distinct from the President, the de jure constitutional head.	1.00	-	yes	drop
+580199	345470	summary_tag	topic	place	?	Pakistan Occupied Kashmir (PoK)	Part of the former Jammu and Kashmir region under Pakistani control.	0.16	-	no	drop
+580200	345470	summary_tag	topic	law	?	Private Members Resolution	Parliamentary proposal from individual lawmakers	0.16	-	no	drop
+71	345470	llm	other	person		Narendra Modi	नरेन्द्र मोदी जी	1.00	0.94	yes	keep
+72	345470	llm	other	person		Donald Trump	ट्रंप साहब	1.00	0.93	yes	keep
+73	345470	llm	other	person		Indira Gandhi	इंदिरा गाँधी जी	0.84	0.94	yes	keep
+74	345470	llm	other	law	other	Simla Agreement	शिमला एग्रीमेंट	0.99	0.92	yes	keep
+75	345470	llm	other	place		United States	अमेरिका	0.99	0.93	yes	keep
+76	345470	llm	other	place		Pakistan	पाकिस्तान	0.89	0.92	yes	keep
+77	345470	llm	other	place	?	Kashmir	कश्मीर	1.00	0.90	yes	keep
+78	345470	llm	other	person		Zulfikar Ali Bhutto	भुट्टो	0.69	0.82	yes	drop
+580343	345470	dictionary	other	law	other	Shimla Agreement	शिमला एग्रीमेंट	1.00	0.92	yes	keep
+580344	345470	dictionary	other	role		President of India	राष्ट्रपति	0.09	0.03	no	drop
+85	345472	llm	topic	topic		Kashmir mediation claim	कश्मीर के सवाल पर किसी की मध्यस्थता	0.99	-	yes	keep
+86	345472	llm	topic	topic		India-Pakistan relations	पाकिस्तान के साथ	0.72	-	yes	keep
+87	345472	llm	topic	topic		National sovereignty and pride	राष्ट्रीय स्वाभिमान	0.91	-	yes	keep
+580207	345472	summary_tag	topic	place	?	Pakistan Occupied Kashmir (PoK)	Part of the former Jammu and Kashmir region under Pakistani control.	0.08	-	no	keep
+580208	345472	summary_tag	topic	law	?	Shimla Agreement	Agreement between India and Pakistan on the border after the 1971 war.	0.09	-	no	keep
+580209	345472	summary_tag	topic	place	?	Srinagar	District and Lok Sabha constituency in Jammu and Kashmir, India.	0.00	-	no	drop
+580210	345472	summary_tag	topic	topic		Indo-Pak Relation	Relations between India and Pakistan.	0.62	-	yes	keep
+580211	345472	summary_tag	topic	law	?	Article 370	Constitutional article on special status of Jammu and Kashmir	0.00	-	no	drop
+580212	345472	summary_tag	topic	place	?	Jammu & Kashmir	State in the northern region of India.	0.99	-	yes	keep
+580213	345472	summary_tag	topic	place	?	Indo-Pak Border	Border region between India and Pakistan	0.12	-	no	drop
+580214	345472	summary_tag	topic	topic		Negotiations	Formal talks between countries to reach an agreement.	0.89	-	yes	keep
+580215	345472	summary_tag	topic	topic		Kargil War	A military conflict fought between India and Pakistan in 1999.	0.00	-	no	drop
+580216	345472	summary_tag	topic	place	?	Udhampur	District and Lok Sabha constituency in Jammu and Kashmir, India.	0.00	-	no	drop
+580217	345472	summary_tag	topic	institution	?	Hurriyat Conference	An alliance of separatist political groups based in Jammu and Kashmir.	0.00	-	no	drop
+580218	345472	summary_tag	topic	place	?	Jammu	District and Lok Sabha constituency in Jammu and Kashmir, India.	0.07	-	no	drop
+88	345472	llm	other	place		United States	अमेरिका	0.98	0.93	yes	keep
+89	345472	llm	other	place		Pakistan	पाकिस्तान	0.99	0.92	yes	keep
+90	345472	llm	other	place		Jammu and Kashmir	कश्मीर	0.99	0.63	yes	keep
+91	345472	llm	other	person		Donald Trump	मिस्टर ट्रम्प	0.99	0.93	yes	keep
+92	345472	llm	other	person		Narendra Modi	प्रधान मंत्री मोदी जी	0.95	0.93	yes	keep
+93	345472	llm	other	person		S. Jaishankar	विदेश मंत्री श्री जयशंकर जी	1.00	0.92	yes	keep
+94	345472	llm	other	law	other	Shimla Agreement	शिमला समझौते	1.00	0.89	yes	keep
+95	345472	llm	other	place		Pakistan-administered Kashmir	पाक अधिकृत जम्मू - कश्मीर	0.98	0.91	yes	keep
+580345	345472	dictionary	other	role		President of India	राष्ट्रपति	0.12	0.05	no	drop
+580346	345472	dictionary	other	institution		Ministry of External Affairs	विदेश मंत्री	0.93	0.33	no	drop
+580347	345472	dictionary	other	scheme	other	Aadhaar	आधार	0.10	0.02	no	drop
+580348	345472	dictionary	other	place	?	Surat	सूरत	0.17	0.04	no	drop
+96	344219	llm	topic	topic		Arbitration	Indian arbitration system	0.99	-	yes	keep
+97	344219	llm	topic	topic		Arbitration Council	Arbitration Council	0.96	-	yes	keep
+98	344219	llm	topic	topic		Foreign Arbitrators	foreigners can also be arbitrators	0.98	-	yes	keep
+580224	344219	summary_tag	topic	institution	?	Arbitration Council of India	Body resolving disputes through arbitration.	0.94	-	yes	keep
+580225	344219	summary_tag	topic	law	?	Advocates(Amendment) Bill	Legislation modifying the Advocates Act and regulations.	0.00	-	no	drop
+580226	344219	summary_tag	topic	law	?	Law Amendment	Change to existing legislation	0.94	-	yes	keep
+580227	344219	summary_tag	topic	law	?	The Government of National Capital Territory of Delhi(Amendment)Bill, 2023	Legislative amendment changing governance of Delhi territory.	0.00	-	no	drop
+580228	344219	summary_tag	topic	law	?	Citizens Amendment Act (CAA)	Law amending citizenship provisions for religious minorities from neighboring countries.	0.00	-	no	drop
+580229	344219	summary_tag	topic	law	?	Arbitration Agreement	Legal contract for settling disputes without court	0.20	-	no	drop
+580230	344219	summary_tag	topic	topic		Arbitration	Dispute resolution through neutral mediators.	0.98	-	yes	keep
+580231	344219	summary_tag	topic	institution	?	Ficci	Federation of Indian Chambers of Commerce and Industry. A non-governmental trade association and advocacy group in India.	0.00	-	no	drop
+580232	344219	summary_tag	topic	institution	?	Lok Adalats	Alternative dispute resolution forums	0.00	-	no	drop
+580233	344219	summary_tag	topic	institution	?	National Company Law Appellate Tribunal (NCLAT)	Higher court for corporate and commercial law appeals	0.00	-	no	drop
+580234	344219	summary_tag	topic	law	?	The Nari Shakti Vandan Adhiniyam	Law that reserves seats for women in Parliament and state assemblies.	0.00	-	no	drop
+580235	344219	summary_tag	topic	law	?	Sabka Bima Sabki Raksha Bill	Insurance legislation for comprehensive coverage	0.00	-	no	drop
+99	344219	llm	other	law		Arbitration and Conciliation Act	Arbitration Act, 1996	0.76	0.76	yes	keep
+100	344219	llm	other	institution		High-Level Committee to Review Institutionalisation of Arbitration Mechanism in India	High-Level Committee	0.91	0.50	no	drop
+101	344219	llm	other	law		Companies Act	Companies Act	0.99	0.57	no	keep
+102	344219	llm	other	place		United Kingdom	U.K.	0.17	0.86	no	drop
+103	344219	llm	other	place		Hong Kong	Hong Kong	0.13	0.86	no	drop
+104	344219	llm	other	place		Singapore	Singapore	0.12	0.88	no	drop
+105	344219	llm	other	role		Law Minister of India	Law Minister	0.99	0.74	yes	keep
+106	344219	llm	other	group		Lawyers	lawyers	0.85	0.63	yes	keep
+580349	344219	dictionary	other	group		Judges	Judges	1.00	0.75	yes	keep
+580350	344219	dictionary	other	group	institution	Companies	companies	0.79	0.39	no	drop
+580351	344219	dictionary	other	law	?	National Exit Test	NEXT	0.00	0.02	no	drop
+580352	344219	dictionary	other	institution		High Court	High Court	0.79	0.76	yes	keep
+79	344220	llm	topic	topic		Arbitration	Arbitration Act	0.99	-	yes	keep
+80	344220	llm	topic	topic		Dispute resolution	Dispute is between two parties	0.99	-	yes	keep
+81	344220	llm	topic	topic		Judicial jurisdiction	High Court and the hon. Supreme Court	0.98	-	yes	keep
+580238	344220	summary_tag	topic	institution	?	Arbitration Council of India	Body resolving disputes through arbitration.	0.01	-	no	drop
+580239	344220	summary_tag	topic	law	?	The Government of National Capital Territory of Delhi(Amendment)Bill, 2023	Legislative amendment changing governance of Delhi territory.	0.00	-	no	drop
+580240	344220	summary_tag	topic	law	?	Arbitration Agreement	Legal contract for settling disputes without court	0.90	-	yes	keep
+580241	344220	summary_tag	topic	law	?	Law Amendment	Change to existing legislation	0.97	-	yes	keep
+580242	344220	summary_tag	topic	law	?	Advocates(Amendment) Bill	Legislation modifying the Advocates Act and regulations.	0.00	-	no	drop
+580243	344220	summary_tag	topic	law	?	Constitution (One Hundred And Thirtieth Amendment) Bill, 2025	Proposed amendment to India Constitution number 130	0.00	-	no	drop
+580244	344220	summary_tag	topic	topic		Arbitration	Dispute resolution through neutral mediators.	0.99	-	yes	keep
+580245	344220	summary_tag	topic	institution	?	Lok Adalats	Alternative dispute resolution forums	0.00	-	no	drop
+580246	344220	summary_tag	topic	law	?	Citizens Amendment Act (CAA)	Law amending citizenship provisions for religious minorities from neighboring countries.	0.00	-	no	drop
+580247	344220	summary_tag	topic	institution	?	Ficci	Federation of Indian Chambers of Commerce and Industry. A non-governmental trade association and advocacy group in India.	0.00	-	no	drop
+580248	344220	summary_tag	topic	law	?	National Anti-Doping (amendment) Bill 2025	Legislative amendment to anti-doping regulations	0.00	-	no	drop
+580249	344220	summary_tag	topic	law	?	Sabka Bima Sabki Raksha Bill	Insurance legislation for comprehensive coverage	0.00	-	no	drop
+82	344220	llm	other	institution		Supreme Court of India	Supreme Court	0.99	0.84	yes	keep
+83	344220	llm	other	institution		High Court	High Court	1.00	0.79	yes	keep
+84	344220	llm	other	institution		Ministry of Jal Shakti	जल शक्ति	0.24	0.72	no	drop
+580353	344220	dictionary	other	law		Arbitration Act	Arbitration Act	1.00	0.42	no	keep
+580354	344220	dictionary	other	institution		Supreme Court	कोर्ट	0.99	0.09	no	drop
+107	344225	llm	topic	topic		Arbitration	Arbitration Council of India	0.97	-	yes	keep
+108	344225	llm	topic	topic		Ease of Doing Business	Ease of Doing Business	0.37	-	no	drop
+109	344225	llm	topic	topic		Judiciary	appointment of Chief Justice	0.93	-	yes	keep
+580258	344225	summary_tag	topic	institution	?	Arbitration Council of India	Body resolving disputes through arbitration.	0.96	-	yes	keep
+580259	344225	summary_tag	topic	institution	?	Lok Adalats	Alternative dispute resolution forums	0.00	-	no	drop
+580260	344225	summary_tag	topic	law	?	Advocates(Amendment) Bill	Legislation modifying the Advocates Act and regulations.	0.00	-	no	drop
+580261	344225	summary_tag	topic	institution	?	Parliament	The body that makes India's national laws.	0.68	-	yes	drop
+580262	344225	summary_tag	topic	law	?	Law Amendment	Change to existing legislation	0.94	-	yes	keep
+580263	344225	summary_tag	topic	topic		Arbitration	Dispute resolution through neutral mediators.	0.97	-	yes	keep
+580264	344225	summary_tag	topic	institution	?	Bar Council of India	Regulatory body for lawyers and legal profession.	0.00	-	no	drop
+580265	344225	summary_tag	topic	law	?	Arbitration Agreement	Legal contract for settling disputes without court	0.28	-	no	drop
+580266	344225	summary_tag	topic	institution	?	Supreme Court	Highest judicial authority in India.	0.83	-	yes	keep
+580267	344225	summary_tag	topic	institution	?	National Company Law Appellate Tribunal (NCLAT)	Higher court for corporate and commercial law appeals	0.00	-	no	drop
+580268	344225	summary_tag	topic	law	?	The Government of National Capital Territory of Delhi(Amendment)Bill, 2023	Legislative amendment changing governance of Delhi territory.	0.00	-	no	drop
+580269	344225	summary_tag	topic	institution	?	Ficci	Federation of Indian Chambers of Commerce and Industry. A non-governmental trade association and advocacy group in India.	0.00	-	no	drop
+110	344225	llm	other	institution		Arbitration Council of India	Arbitration Council of India	1.00	0.82	yes	keep
+111	344225	llm	other	institution		Supreme Court of India	Supreme Court	0.98	0.87	yes	keep
+112	344225	llm	other	institution		High Court	High Court	0.99	0.77	yes	keep
+113	344225	llm	other	person		B.N. Srikrishna	Justice Srikrishna	0.39	0.62	no	drop
+580355	344225	dictionary	other	place	person	Kalyan	Kalyan	0.57	0.45	no	drop
+580356	344225	dictionary	other	group		Judges	Judges	0.98	0.69	yes	keep
+580357	344225	dictionary	other	person		A. Raja	Shri A. Raja	0.98	0.78	yes	keep
+580358	344225	dictionary	other	group	other	Hindi	Hindi	0.30	0.66	no	drop
+580359	344225	dictionary	other	group		Lawyers	lawyers	0.76	0.59	no	drop
+580360	344225	dictionary	other	institution		Srikrishna Committee	Srikrishna Committee	0.46	0.51	no	drop
+580361	344225	dictionary	other	person		Supriya Sule	Supriya Sule	0.91	0.82	yes	keep
+580362	344225	dictionary	other	place		London	London	0.55	0.78	no	drop
+120	342375	llm	topic	topic		Rail connectivity	रेल कनेक्टिविटी	0.99	-	yes	keep
+121	342375	llm	topic	topic		Railway line construction	नया रेलमार्ग	0.99	-	yes	keep
+580272	342375	summary_tag	topic	topic		New Railway Line	Construction of new railway routes and tracks.	0.99	-	yes	keep
+580273	342375	summary_tag	topic	topic		Railway Development	Expansion and improvement of railway infrastructure and services.	0.99	-	yes	keep
+580274	342375	summary_tag	topic	scheme	?	Diamond Quadrilateral Project	Government project linking four major Indian cities by high-speed rail.	0.00	-	no	drop
+580275	342375	summary_tag	topic	topic		Railway Projects	Development and implementation of railway infrastructure and services.	0.99	-	yes	keep
+580276	342375	summary_tag	topic	institution	?	Vande Bharat Express	High-speed rail service connecting Indian cities	0.00	-	no	drop
+580277	342375	summary_tag	topic	scheme	?	Pradhan Mantri Gati Shakti Yojana	Government program that plans transport infrastructure across the country.	0.00	-	no	drop
+580278	342375	summary_tag	topic	topic		Bullet Train	High-speed rail service connecting cities.	0.00	-	no	drop
+580279	342375	summary_tag	topic	topic		Transport Development	Improvement of transportation infrastructure.	0.99	-	yes	keep
+580280	342375	summary_tag	topic	scheme	?	Vande Bharat	Semi high-speed train service run by Indian Railways.	0.00	-	no	drop
+580281	342375	summary_tag	topic	institution	?	Rail Vikas Nigam Limited	Government company constructing railway infrastructure	0.00	-	no	drop
+580282	342375	summary_tag	topic	place	?	Banaskantha	District and Lok Sabha constituency in Gujarat, India.	0.05	-	no	drop
+580283	342375	summary_tag	topic	topic		Rail Budget	Annual financial allocation for railway services	0.01	-	no	drop
+122	342375	llm	other	place		Gujarat	गुजरात	1.00	0.92	yes	keep
+123	342375	llm	other	place		Chanasma	चाणस् ‍ मा	1.00	0.89	yes	keep
+124	342375	llm	other	place		Radhanpur	राधनपुर	1.00	0.89	yes	keep
+125	342375	llm	other	place		Kutch	कच्छ	1.00	0.86	yes	keep
+126	342375	llm	other	place		Kandla	कांडला	0.64	0.84	yes	keep
+127	342375	llm	other	place		Pakistan	पाकिस्तान	0.98	0.94	yes	keep
+580363	342375	dictionary	other	place		North Gujarat	उत्तर गुजरात	1.00	0.87	yes	keep
+580364	342375	dictionary	other	institution		Ministry of Railways	रेल मंत्री	1.00	0.35	no	drop
+114	340402	llm	topic	topic		Rail connectivity	पलिया, निघासन, बेलरायां और सिंघाई रेल मार्ग	1.00	-	yes	keep
+115	340402	llm	topic	topic		Railway gauge conversion	आमान परिवर्तन	0.18	-	no	drop
+116	340402	llm	topic	topic		Railway survey	सर्वे	0.98	-	yes	keep
+580290	340402	summary_tag	topic	topic		New Railway Line	Construction of new railway routes and tracks.	0.99	-	yes	keep
+580291	340402	summary_tag	topic	place	?	Bareilly	District and Lok Sabha constituency in Uttar Pradesh, India.	0.01	-	no	drop
+580292	340402	summary_tag	topic	topic		Railway Development	Expansion and improvement of railway infrastructure and services.	0.99	-	yes	keep
+580293	340402	summary_tag	topic	topic		Railway Projects	Development and implementation of railway infrastructure and services.	0.99	-	yes	keep
+580294	340402	summary_tag	topic	scheme	?	Diamond Quadrilateral Project	Government project linking four major Indian cities by high-speed rail.	0.00	-	no	drop
+580295	340402	summary_tag	topic	institution	?	Rail Vikas Nigam Limited	Government company constructing railway infrastructure	0.00	-	no	drop
+580296	340402	summary_tag	topic	place	?	Bulandshahr	District and Lok Sabha constituency in Uttar Pradesh, India.	0.00	-	no	drop
+580297	340402	summary_tag	topic	place	?	Raebareli	District and Lok Sabha constituency in Uttar Pradesh, India. The constituency is listed as Rae Bareli.	0.00	-	no	drop
+580298	340402	summary_tag	topic	scheme	?	Vande Bharat	Semi high-speed train service run by Indian Railways.	0.00	-	no	drop
+580299	340402	summary_tag	topic	place	?	Unnao	District and Lok Sabha constituency in Uttar Pradesh, India.	0.00	-	no	drop
+580300	340402	summary_tag	topic	place	?	Lucknow	District and Lok Sabha constituency in Uttar Pradesh, India.	0.00	-	no	drop
+580301	340402	summary_tag	topic	place	?	Uttar Pradesh	Northern Indian state.	0.48	-	no	drop
+117	340402	llm	other	place		Lakhimpur Kheri	लखीमपुर खीरी	0.98	0.90	yes	keep
+118	340402	llm	other	place		Uttar Pradesh	यू० पी०	0.64	0.81	yes	drop
+119	340402	llm	other	institution		Forest Department	वन विभाग	0.99	0.87	yes	keep
+580365	340402	dictionary	other	place		Mailani	मैलानी	0.99	0.68	yes	keep
+580366	340402	dictionary	other	place		Bahraich	बहराइच	0.95	0.87	yes	keep
+580367	340402	dictionary	other	institution		Ministry of Railways	रेल मंत्रालय	1.00	0.90	yes	keep
+134	340545	llm	topic	topic		Crop damage by stray animals	छुट्टा पशुओं	1.00	-	yes	keep
+135	340545	llm	topic	topic		Agricultural compensation	वाजिब मुआवजा	0.99	-	yes	keep
+580303	340545	summary_tag	topic	topic		agriculture compensation	Payment to farmers for crop loss or land acquisition	0.99	-	yes	keep
+580304	340545	summary_tag	topic	scheme	?	Pradhan Mantri Fasal Bima Yojana	Government crop insurance scheme that pays farmers for crop loss.	0.00	-	no	drop
+580305	340545	summary_tag	topic	scheme	?	Minimum Support  Prices (MSP)	Government guarantee of a minimum price paid to farmers for their crops.	0.00	-	no	drop
+580306	340545	summary_tag	topic	topic		Cow Protection	Policies protecting cattle and preventing cattle slaughter	0.07	-	no	drop
+580307	340545	summary_tag	topic	topic		Crop Damages	Loss or destruction of agricultural crops due to various causes.	1.00	-	yes	keep
+580308	340545	summary_tag	topic	scheme	?	National Agricultural Insurance Scheme	Government insurance scheme that protects farmers from crop loss.	0.00	-	no	drop
+580309	340545	summary_tag	topic	scheme	?	National Crop Insurance Programme (NCIP)	Government insurance scheme that pays farmers when crops fail.	0.00	-	no	drop
+580310	340545	summary_tag	topic	topic		Farmers' Welfare	Government support and welfare programs for farmers.	0.99	-	yes	keep
+580311	340545	summary_tag	topic	law	?	Minimum Support Prices	Price floor for agricultural commodities	0.00	-	no	drop
+580312	340545	summary_tag	topic	topic		Farmers' Grievances	Complaints from agricultural workers	0.99	-	yes	keep
+580313	340545	summary_tag	topic	topic		Insurance Claim	Request for insurance payment	0.08	-	no	drop
+580314	340545	summary_tag	topic	topic		Crop Insurance	General insurance that pays farmers when their crops are damaged or fail.	0.06	-	no	drop
+136	340545	llm	other	place		Jaunpur	जौनपुर	1.00	0.84	yes	keep
+137	340545	llm	other	group		Farmers	किसान	1.00	0.93	yes	keep
+580368	340545	dictionary	other	group		Government employees	सरकारी कर्मचारी	0.78	0.92	yes	keep

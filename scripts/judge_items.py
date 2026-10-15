@@ -3,10 +3,15 @@ The script stores the answers and the keep decision on each item in speech_items
 
 Stage 3 gives each speech at most 8 topics and 8 other entities (speech_items).
 Some are only background, or are the speaker, the Chair, or procedure. All
-items of one speech go in one call. Questions version q3:
+candidates of one speech go in one call. Each candidate has a source
+(speech_items.source): 'llm' (the extraction), 'dictionary' (the entity
+dictionary found the name in the text), or 'summary_tag' (a tag near the
+summary vector). scripts/add_candidates.py adds the last two. Questions
+version q4 (q3 with the two new sources):
 
-  Topics:
-    level   (score): how central the topic is to the speech, 0 to 3.
+  Topics and summary tags:
+    level   (score): how central the subject is to the speech, 0 to 3. The
+            question for a summary tag gives the tag's type and description.
   Named types (place, person, institution, law, scheme, group, role):
     role    (choice): absent / aside (an example, a precedent, a comparison,
             a courtesy, a side list) / point (part of the member's point; once
@@ -68,7 +73,7 @@ from decision_model import (MODEL, DecisionError, StateTooLong, api_key, choice_
 from scripts.extract_entities import cell, fetch_speeches, free_stem, scope_filter
 
 FOLDER = Path(__file__).resolve().parent.parent / "tags" / "judging"
-QUESTIONS_VERSION = "q3"
+QUESTIONS_VERSION = "q4"
 TYPE_P = 0.7
 
 LEVELS = [
@@ -110,11 +115,19 @@ def judged_by(model: str) -> str:
     return f"{model} {QUESTIONS_VERSION}"
 
 
+def is_level(item: dict) -> bool:
+    return item["type"] == "topic" or item.get("source") == "summary_tag"
+
+
 def questions_for(items: list[dict]) -> dict[str, dict]:
-    """All questions of one speech. Topics: level_<id>. Named items: role_<id>, refers_<id>, type_<id>."""
+    """All questions of one speech. Topics and summary tags: level_<id>. Named items: role_<id>, refers_<id>, type_<id>."""
     out = {}
     for it in items:
         i, name, type_ = it["id"], it["name"], it["type"]
+        if it.get("source") == "summary_tag":
+            about = f"a {type_}: {it['description']}" if it.get("description") else f"a {type_}"
+            out[f"level_{i}"] = score_q(f"How central is «{name}» ({about.rstrip('.')}) to this speech?", LEVELS)
+            continue
         if type_ == "topic":
             out[f"level_{i}"] = score_q(f"How central is «{name}» (a topic) to this speech?", LEVELS)
             continue
@@ -133,7 +146,8 @@ def speech_state(s: dict) -> str:
 
 
 def summary_state(s: dict, summary: str, items: list[dict]) -> str:
-    lines = [f"- {it['name']} ({it['type']}): \"{it['mention']}\"" for it in items]
+    lines = [f"- {it['name']} ({it['type']}): " + (f"\"{it['mention']}\"" if it["mention"] else "(no quoted words)")
+             for it in items]
     return (f"Member: {s['member']}\nDebate: {s['title'] or '(no title)'}\nDate: {s['debate_date']}\n\n"
             f"Summary of the speech: {summary}\n\nWords of the speech about each item:\n" + "\n".join(lines))
 
@@ -150,7 +164,7 @@ def read_item(answers: dict, item: dict) -> tuple[dict, list[str], dict]:
     """Check and read the answers of one item. Returns the judgement, the warnings, and the raw answers."""
     i, warnings, raw = item["id"], [], {}
     j = {"level_p": None, "role_p": None, "refers_p": None, "type_p": None, "type": None}
-    if item["type"] == "topic":
+    if is_level(item):
         raw["level"] = answers[f"level_{i}"]
         j["level_p"] = score_probabilities(raw["level"], LEVELS)
         if sum_is_off(j["level_p"]):
@@ -211,8 +225,10 @@ def judgement(row) -> dict:
 def select_items(conn, where: str | None, params: dict, version: str, force: bool) -> tuple[dict[int, list[dict]], int]:
     scope = f"AND {where}" if where else ""
     rows = conn.execute(text(f"""
-        SELECT i.id, i.speech_id, i.list, i.position, i.name, i.type, i.mention, i.judged_by
+        SELECT i.id, i.speech_id, i.list, i.position, i.name, i.type, i.mention, i.judged_by, i.source,
+               g.description
         FROM speech_items i JOIN speeches s ON s.id = i.speech_id JOIN debates d ON d.id = s.debate_id
+        LEFT JOIN tags g ON g.id = i.tag_id
         WHERE TRUE {scope}
         ORDER BY d.debate_date, i.speech_id, i.list DESC, i.position
     """), params).all()
@@ -263,31 +279,43 @@ def read_marks(path: Path) -> dict[int, bool]:
     return marks
 
 
+def score_groups(rows) -> list[tuple[str, list]]:
+    llm = [r for r in rows if r.source == "llm"]
+    return [("llm topics", [r for r in llm if r.type == "topic"]),
+            ("llm named", [r for r in llm if r.type != "topic"]),
+            ("dictionary", [r for r in rows if r.source == "dictionary"]),
+            ("recognised", [r for r in rows if r.source == "summary_tag"]),
+            ("all", list(rows))]
+
+
 def score(engine, path: Path, version: str, t: Thresholds) -> None:
-    """Compare the manual keep or drop marks with the model's decisions, for topics and named items apart."""
     marks = read_marks(path)
     if not marks:
         raise SystemExit(f"no row in {path} has keep or drop in the review column")
     with engine.connect() as conn:
-        rows = conn.execute(text(f"SELECT {JUDGED_COLUMNS}, i.type FROM speech_items i "
+        rows = conn.execute(text(f"SELECT {JUDGED_COLUMNS}, i.type, i.source FROM speech_items i "
                                  "WHERE i.id = ANY(:ids) AND i.judged_by = :by"), {"ids": list(marks), "by": version}).all()
     print(f"{len(marks)} items marked by hand, {len(rows)} of them judged with {version}. {t}.")
-    for label, sel in (("topics", [r for r in rows if r.type == "topic"]),
-                       ("named items", [r for r in rows if r.type != "topic"]), ("all", rows)):
+    for label, sel in score_groups(rows):
+        if not sel:
+            continue
         r = gate_rates([(marks[x.id], keep(judgement(x), t)) for x in sel])
-        print(f"  {label:11}: the model keeps {r['model_keeps_of_those']} of the {r['manual_keep']} items that the manual review "
+        print(f"  {label:12}: the model keeps {r['model_keeps_of_those']} of the {r['manual_keep']} items that the manual review "
               f"keeps, and drops {r['model_drops_of_those']} of the {r['manual_drop']} items that the manual review drops")
 
 
-def write_review(engine, speech_ids: list[int], label: str, model: str) -> Path:
+def write_review(engine, speech_ids: list[int], label: str, model: str, prefill: dict[int, bool] | None = None) -> Path:
+    prefill = prefill or {}
     with engine.connect() as conn:
         speeches = {s["speech_id"]: s for s in fetch_speeches(conn, speech_ids)}
         summaries = dict(conn.execute(text(
             "SELECT speech_id, summary FROM speech_extractions WHERE speech_id = ANY(:ids)"), {"ids": speech_ids}).all())
         items = conn.execute(text("""
-            SELECT id, speech_id, list, type, name, mention, mention_found, judge_level_p, judge_role_p,
-                   judge_refers_p, judge_type, kept, judge_state, judge_warnings
-            FROM speech_items WHERE speech_id = ANY(:ids) ORDER BY speech_id, list DESC, position
+            SELECT i.id, i.speech_id, i.list, i.type, i.name, i.mention, i.mention_found, i.judge_level_p, i.judge_role_p,
+                   i.judge_refers_p, i.judge_type, i.kept, i.judge_state, i.judge_warnings, i.source, i.evidence,
+                   g.description
+            FROM speech_items i LEFT JOIN tags g ON g.id = i.tag_id
+            WHERE i.speech_id = ANY(:ids) ORDER BY i.speech_id, i.list DESC, i.position
         """), {"ids": speech_ids}).all()
     out_dir = FOLDER / "results"
     out_dir.mkdir(parents=True, exist_ok=True)
@@ -298,11 +326,14 @@ def write_review(engine, speech_ids: list[int], label: str, model: str) -> Path:
           f"{len(speech_ids)} speeches. For a topic, `P(keep)` is P(central or supporting), kept at {t.level}. "
           f"For a named item, `P(keep)` is P(part of the member's point), kept at {t.point} together with "
           f"`P(refers)` at {t.refers}. `Model type` shows the model's type only when it differs from the extraction type. "
-          f"Write keep or drop in the `review` column of `{stem}.tsv`.", ""]
+          f"`Source`: `llm` = the extraction, `dict` = the entity dictionary found the words in the text, "
+          f"`recognised` = a recognised tag, near the summary in meaning (its rank and distance in brackets). "
+          f"Write keep or drop in the `review` column of `{stem}.tsv`. "
+          f"{len(prefill)} items carry an earlier manual mark already.", ""]
     with (out_dir / f"{stem}.tsv").open("w", encoding="utf-8", newline="") as f:
         w = csv.writer(f, delimiter="\t")
-        w.writerow(["item_id", "speech_id", "list", "type", "model_type", "name", "mention", "p_keep", "p_refers",
-                    "kept", "review"])
+        w.writerow(["item_id", "speech_id", "source", "list", "type", "model_type", "name", "mention", "p_keep",
+                    "p_refers", "kept", "review"])
         for sid in speech_ids:
             s = speeches.get(sid)
             mine = [i for i in items if i.speech_id == sid]
@@ -312,8 +343,8 @@ def write_review(engine, speech_ids: list[int], label: str, model: str) -> Path:
             md += [f"## {s['member']}: {' '.join((s['title'] or '(no title)').split())}", "",
                    f"{s['debate_date']}, {s['word_count']} words, state `{'/'.join(sorted(state)) or '-'}`. "
                    f"Speech id {sid}.", "", f"**Summary.** {summaries.get(sid, '')}", "",
-                   "| Kept | P(keep) | P(refers) | Type | Model type | Name | Mention |",
-                   "|---|---|---|---|---|---|---|"]
+                   "| Kept | P(keep) | P(refers) | Source | Type | Model type | Name | Mention |",
+                   "|---|---|---|---|---|---|---|---|"]
             for i in mine:
                 if i.judge_level_p:
                     pk = f"{i.judge_level_p[2] + i.judge_level_p[3]:.2f}"
@@ -324,9 +355,18 @@ def write_review(engine, speech_ids: list[int], label: str, model: str) -> Path:
                 pr = f"{i.judge_refers_p:.2f}" if i.judge_refers_p is not None else "-"
                 mt = i.judge_type if i.judge_type and i.judge_type != i.type else ("?" if i.type != "topic" and not i.judge_type else "")
                 kept = {True: "yes", False: "no", None: "-"}[i.kept]
-                note = "" if i.mention_found else " *(not in text)*"
-                md.append(f"| {kept} | {pk} | {pr} | {i.type} | {mt} | {cell(i.name)} | {cell(i.mention)}{note} |")
-                w.writerow([i.id, sid, i.list, i.type, mt, i.name, i.mention, pk, pr, kept, ""])
+                src = {"llm": "llm", "dictionary": "dict", "summary_tag": "recognised"}[i.source]
+                if i.source == "summary_tag":
+                    src += f" ({i.evidence['rank']}, {i.evidence['distance']:.2f})"
+                    mention = cell(i.description or "")
+                    note = ""
+                else:
+                    mention = cell(i.mention)
+                    note = "" if i.mention_found else " *(not in text)*"
+                mark = {True: "keep", False: "drop"}.get(prefill.get(i.id), "")
+                md.append(f"| {kept} | {pk} | {pr} | {src} | {i.type} | {mt} | {cell(i.name)} | {mention}{note} |")
+                w.writerow([i.id, sid, i.source, i.list, i.type, mt, i.name,
+                            i.description if i.source == "summary_tag" else i.mention, pk, pr, kept, mark])
             warns = [x for i in mine for x in i.judge_warnings]
             if warns:
                 md += ["", "Warnings: " + "; ".join(warns)]
@@ -340,6 +380,7 @@ def main() -> None:
     scope = ap.add_mutually_exclusive_group()
     scope.add_argument("--year", type=int)
     scope.add_argument("--term", type=int, help="Lok Sabha term, for example 17")
+    scope.add_argument("--speech-ids", help="comma-separated speech ids")
     ap.add_argument("--max-words", type=int, help="only speeches with at most this many words")
     ap.add_argument("--all", action="store_true", help="full mode: no review file")
     ap.add_argument("--model", default=MODEL)
@@ -353,12 +394,16 @@ def main() -> None:
     ap.add_argument("--dry-run", action="store_true", help="print the counts, call no model")
     ap.add_argument("--rethreshold", action="store_true", help="compute `kept` again from the stored probabilities")
     ap.add_argument("--score", type=Path, help="a review TSV with the review column filled in")
+    ap.add_argument("--prefill", type=Path, help="sample mode: a review TSV whose marks fill the new review file")
     args = ap.parse_args()
 
     engine = get_engine()
     t = Thresholds(args.keep_level, args.keep_point, args.keep_refers)
     version = judged_by(args.model)
-    where, params = (scope_filter(args.year, args.term) if args.year or args.term else (None, {}))
+    if args.speech_ids:
+        where, params = "s.id = ANY(:ids)", {"ids": [int(x) for x in args.speech_ids.split(",")]}
+    else:
+        where, params = (scope_filter(args.year, args.term) if args.year or args.term else (None, {}))
     if args.max_words:
         where = " AND ".join(x for x in (where, "s.word_count <= :max_words") if x)
         params = {**params, "max_words": args.max_words}
@@ -367,7 +412,8 @@ def main() -> None:
     if args.rethreshold:
         return rethreshold(engine, where, params, version, t)
 
-    label = f"LS{args.term}" if args.term else str(args.year) if args.year else "all"
+    label = (f"LS{args.term}" if args.term else str(args.year) if args.year else
+             "sample" if args.speech_ids else "all")
     with engine.connect() as conn:
         todo, done = select_items(conn, where, params, version, args.force)
     n_items = sum(len(v) for v in todo.values())
@@ -409,7 +455,7 @@ def main() -> None:
     print(f"judged {stored} speeches, failed {failed}. Kept {kept_total} of the items in the judged speeches. "
           f"State: speech {states['speech']}, summary {states['summary']}. Input tokens {tokens:,}.", flush=True)
     if not args.all:
-        path = write_review(engine, ids, label, args.model)
+        path = write_review(engine, ids, label, args.model, read_marks(args.prefill) if args.prefill else None)
         print(f"review files: {path}.md and {path}.tsv", flush=True)
 
 
