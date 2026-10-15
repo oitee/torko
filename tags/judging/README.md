@@ -69,4 +69,4 @@ The script is idempotent. It skips each item that the current model and question
 
 A sample run writes two files into `results/`: a Markdown file to read, and a TSV file with an empty `review` column. Write `keep` or `drop` in that column for each item. `--prefill FILE` copies the marks of an earlier review file into the new one, so you mark only the new items. Then `--score` compares your marks with the model's decisions, for each source apart.
 
-The current sample review is `results/sample_jev-1.13.0_q4_2026-10-16.tsv`: the 15 speeches of 2019, 365 candidates. Its marks come from the manual review of `results/sample_jev-1.13.0_q4_2026-10-15.tsv`, matched by speech, source, and name. 2 dictionary rows are new and need a mark.
+The current sample review is `results/sample_jev-1.13.0_q4_2026-10-16.tsv`: the 15 speeches of 2019, 365 candidates. Its marks come from the manual review of `results/sample_jev-1.13.0_q4_2026-10-15.tsv`, matched by speech, source, and name. 2 dictionary rows were new. They got a mark on 2026-10-16 that follows the same rules.
