@@ -33,7 +33,7 @@ def main() -> None:
         conn.execute(text("SET TRANSACTION READ ONLY"))
         rows = conn.execute(text("""
             SELECT name, count(*) AS n, count(*) FILTER (WHERE kept) AS n_kept
-            FROM speech_items WHERE type = 'place' AND list = 'other' GROUP BY name""")).all()
+            FROM speech_items WHERE type = 'place' AND list = 'other' AND source = 'llm' GROUP BY name""")).all()
         names: dict[str, dict] = defaultdict(lambda: {"n": 0, "kept": 0, "forms": defaultdict(int)})
         for r in rows:
             d = names[norm_name(r.name)]
@@ -42,7 +42,7 @@ def main() -> None:
             d["forms"][r.name] += r.n
         others = conn.execute(text("""
             SELECT name, type, count(*) AS n FROM speech_items
-            WHERE type <> 'place' AND list = 'other' GROUP BY name, type""")).all()
+            WHERE type <> 'place' AND list = 'other' AND source = 'llm' GROUP BY name, type""")).all()
         groups: dict[str, list[str]] = defaultdict(list)
         for n, d in names.items():
             k = "new1" if len(new_idx.get(n, ())) == 1 else "new2" if len(new_idx.get(n, ())) > 1 else \
@@ -53,7 +53,7 @@ def main() -> None:
         pick = rnd.sample(sorted(groups["new1"]), min(20, len(groups["new1"])))
         for n in pick:
             ex = conn.execute(text("""
-                SELECT mention FROM speech_items WHERE type = 'place' AND list = 'other' AND lower(name) = :n
+                SELECT mention FROM speech_items WHERE type = 'place' AND list = 'other' AND source = 'llm' AND lower(name) = :n
                 AND mention IS NOT NULL LIMIT 1"""), {"n": next(iter(names[n]["forms"])).lower()}).scalar()
             examples[n] = " ".join((ex or "").split())[:150]
 

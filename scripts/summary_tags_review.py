@@ -83,7 +83,7 @@ def load_speeches(conn, extraction_ids: list[int]) -> list[dict]:
     for i in extraction_ids:
         d = by_id[i]
         d["items"] = [dict(r._mapping) for r in conn.execute(text(
-            "SELECT list, position, name, type FROM speech_items WHERE extraction_id = :e ORDER BY list, position"),
+            "SELECT list, position, name, type FROM speech_items WHERE extraction_id = :e AND source = 'llm' ORDER BY list, position"),
             {"e": i})]
         out.append(d)
     return out

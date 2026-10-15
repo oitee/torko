@@ -41,7 +41,7 @@ ITEMS_SQL = """
     FROM speech_items i
     JOIN speech_extractions e ON e.id = i.extraction_id
     JOIN models m ON m.id = e.model_id
-    WHERE i.list = 'other' AND i.mention_found
+    WHERE i.list = 'other' AND i.mention_found AND i.source = 'llm'
 """
 
 

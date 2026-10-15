@@ -36,7 +36,7 @@ def speech_names(conn, model_filter: str) -> dict[int, dict]:
         FROM speech_items i
         JOIN speech_extractions e ON e.id = i.extraction_id
         JOIN models m ON m.id = e.model_id
-        WHERE {model_filter}
+        WHERE {model_filter} AND i.source = 'llm'
     """))
     out = defaultdict(lambda: {"other_found": set(), "all": set()})
     for speech_id, lst, name, found in rows:

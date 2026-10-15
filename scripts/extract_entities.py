@@ -279,7 +279,7 @@ def load_records(conn, ids: list[int]) -> list[dict]:
     """), {"ids": ids}).all()
     items = conn.execute(text("""
         SELECT extraction_id, list, name, type, model_salience, mention, mention_found FROM speech_items
-        WHERE extraction_id = ANY(:e) ORDER BY extraction_id, list, position
+        WHERE extraction_id = ANY(:e) AND source = 'llm' ORDER BY extraction_id, list, position
     """), {"e": [x.id for x in exts]}).all()
     records = []
     for x in exts:

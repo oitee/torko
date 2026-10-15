@@ -1,4 +1,4 @@
-from entity_lookup import EntityDictionary, normalise, parse_counted
+from entity_lookup import Entity, EntityDictionary, normalise, parse_counted
 from scripts.extract_entities import mention_key
 
 
@@ -182,3 +182,39 @@ def test_the_dictionary_loads_from_a_csv_file(tmp_path):
     path = tmp_path / "d.csv"
     path.write_text("name,type,speeches,mentions\nFarmers,group,10,farmers (3) | किसान (2)\n", encoding="utf-8-sig")
     assert names(EntityDictionary.load(path).lookup("किसान")) == ["Farmers"]
+
+
+def shimla_dictionary():
+    return EntityDictionary([Entity("Shimla", "place", 300, (("शिमला", 50),)),
+                             Entity("Shimla Agreement", "law", 40, (("शिमला एग्रीमेंट", 30),))], source_speeches=50_000)
+
+
+def test_a_name_inside_a_longer_dictionary_name_is_not_added():
+    assert names(shimla_dictionary().lookup("शिमला एग्रीमेंट को देखिए")) == ["Shimla Agreement"]
+
+
+def test_a_name_inside_a_longer_name_that_the_speech_has_already_is_not_added():
+    # The extraction holds the agreement, so the agreement is skipped. Its words still hide Shimla.
+    assert shimla_dictionary().lookup("शिमला एग्रीमेंट को देखिए", {"Shimla Agreement"}) == []
+
+
+def test_a_name_said_once_on_its_own_is_added_even_when_another_match_is_inside_a_longer_name():
+    assert names(shimla_dictionary().lookup("शिमला एग्रीमेंट शिमला में हुआ")) == ["Shimla", "Shimla Agreement"]
+
+
+def test_a_name_inside_the_words_of_an_extracted_name_is_not_added():
+    d = EntityDictionary([Entity("Kheri", "place", 30, (("खीरी", 20),))], source_speeches=50_000)
+    text = "मेरे क्षेत्र लखीमपुर खीरी में"
+    assert names(d.lookup(text)) == ["Kheri"]
+    assert d.lookup(text, longer_mentions=["लखीमपुर खीरी"]) == []
+
+
+def test_an_equal_match_is_not_a_longer_match():
+    d = EntityDictionary([Entity("Kheri", "place", 30, (("खीरी", 20),))], source_speeches=50_000)
+    assert names(d.lookup("खीरी जिला", longer_mentions=["खीरी"])) == ["Kheri"]
+
+
+def test_a_skipped_name_frees_its_place_under_the_cap():
+    d = shimla_dictionary()
+    d2 = EntityDictionary(d.entities + [Entity("Mandi", "place", 30_000, (("मंडी", 10),))], source_speeches=50_000)
+    assert names(d2.lookup("शिमला एग्रीमेंट और मंडी", {"Shimla Agreement"}, k=1)) == ["Mandi"]

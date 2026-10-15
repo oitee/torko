@@ -152,7 +152,7 @@ class EntityDictionary:
         best: dict[str, tuple[Entity, str, int, int]] = {}  # name -> entity, mention, mention matches, total matches
         for gram in grams & self._index.keys():
             for key, mention, uses, entity in self._index[gram]:
-                n = self._count_matches(norm, pos, text, key)
+                n = len(self._match_spans(norm, pos, text, key))
                 if not n:
                     continue
                 name = entity.name.casefold()
@@ -169,20 +169,42 @@ class EntityDictionary:
         return dict(entity.mentions).get(mention, 0)
 
     @staticmethod
-    def _count_matches(norm: str, pos: list[int], text: str, key: str) -> int:
-        count, start = 0, norm.find(key)
+    def _match_spans(norm: str, pos: list[int], text: str, key: str) -> list[tuple[int, int]]:
+        spans, start = [], norm.find(key)
         while start != -1:
             first, last = pos[start], pos[start + len(key) - 1]
             if is_boundary(_edge_char(text, first - 1, -1)) and is_boundary(_edge_char(text, last + 1, 1)):
-                count += 1
+                spans.append((first, last))
             start = norm.find(key, start + len(key))
-        return count
+        return spans
 
-    def lookup(self, text: str, already_has: set[str] | frozenset[str] = frozenset(), k: int = DEFAULT_K) -> list[tuple[str, str, str]]:
-        """The entities to add to a speech: (name, type, matched mention), at most `k`.
-        The order is the score, the highest first (see `score`), then the name.
-        An entity is skipped when the speech has its name, compared by spelling_key (case and spelling variants)."""
+    def spans_of(self, text: str, mentions) -> list[tuple[int, int]]:
+        norm, pos = normalise_with_positions(text)
+        out = []
+        for m in mentions:
+            key = normalise(m)
+            if key:
+                out += self._match_spans(norm, pos, text, key)
+        return out
+
+    def inside_longer(self, text: str, hits: dict, longer_mentions=()) -> set[str]:
+        """Names of the hits whose every match lies inside a longer match of another hit or of `longer_mentions`."""
+        own = {name: self.spans_of(text, [m for m, _ in e.mentions]) for name, (e, _, _) in hits.items()}
+        others = self.spans_of(text, longer_mentions)
+        out = set()
+        for name, spans in own.items():
+            longer = others + [sp for n, s in own.items() if n != name for sp in s]
+            if spans and all(any(a <= x and y <= b and b - a > y - x for a, b in longer) for x, y in spans):
+                out.add(name)
+        return out
+
+    def lookup(self, text: str, already_has: set[str] | frozenset[str] = frozenset(), k: int = DEFAULT_K,
+               longer_mentions=()) -> list[tuple[str, str, str]]:
+        """Return at most `k` (name, type, matched mention), best score first.
+        Skipping happens before the cap, so a skipped entity frees its place."""
         has = {spelling_key(n) for n in already_has}
-        hits = [h for h in self.find(text).values() if spelling_key(h[0].name) not in has]
+        found = self.find(text)
+        inside = self.inside_longer(text, found, longer_mentions)
+        hits = [h for name, h in found.items() if spelling_key(h[0].name) not in has and name not in inside]
         hits.sort(key=lambda h: (-self.score(h[0], h[2]), h[0].name.casefold()))
         return [(e.name, e.type, mention) for e, mention, _ in hits[:k]]

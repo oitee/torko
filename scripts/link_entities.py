@@ -184,7 +184,8 @@ def register(conn) -> int:
     if stale:
         conn.execute(text("UPDATE speech_items SET entity_name_id = NULL WHERE id = :id"), stale)
     items = conn.execute(text(
-        "SELECT id, name, coalesce(judge_type, type) AS type FROM speech_items WHERE kept AND entity_name_id IS NULL")).all()
+        "SELECT id, name, coalesce(judge_type, type) AS type FROM speech_items "
+        "WHERE kept AND entity_name_id IS NULL AND source <> 'summary_tag'")).all()
     for it in items:
         n = norm_name(it.name)
         if not n:
