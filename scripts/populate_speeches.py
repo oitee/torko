@@ -61,6 +61,12 @@ def main() -> None:
     ap = argparse.ArgumentParser()
     ap.add_argument("--limit", type=int, default=None, help="cap debates, for a dry run")
     ap.add_argument(
+        "--loksabha",
+        type=int,
+        default=None,
+        help="stitch only the debates of this term, for example 13 after apply_turn_text_repairs.py",
+    )
+    ap.add_argument(
         "--verify",
         action="store_true",
         help="check speeches against turns and exit non-zero on drift; write nothing",
@@ -73,7 +79,10 @@ def main() -> None:
         sys.exit(verify(engine))
 
     with engine.connect() as conn:
-        q = "SELECT DISTINCT debate_id FROM turns ORDER BY debate_id"
+        q = "SELECT DISTINCT t.debate_id FROM turns t JOIN debates d ON d.id = t.debate_id"
+        if args.loksabha:
+            q += f" WHERE d.loksabha = {int(args.loksabha)}"
+        q += " ORDER BY t.debate_id"
         if args.limit:
             q += f" LIMIT {int(args.limit)}"
         debate_ids = [r[0] for r in conn.execute(text(q)).fetchall()]
