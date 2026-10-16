@@ -67,5 +67,6 @@ def test_rounding_to_two_decimals_is_not_a_broken_sum_but_a_real_gap_is():
 def test_a_context_error_is_told_apart_from_other_errors():
     assert looks_too_long(400, '{"error": "input exceeds the maximum context length"}')
     assert looks_too_long(413, "")
+    assert looks_too_long(400, '{"detail":{"error_type":"max_tokens_exceeded"}}')
     assert not looks_too_long(400, '{"error": "unknown question type"}')
     assert not looks_too_long(401, "context")

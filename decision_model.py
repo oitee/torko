@@ -42,7 +42,7 @@ def looks_too_long(status: int, body: str) -> bool:
     if status == 413:
         return True
     low = body.lower()
-    return status == 400 and any(w in low for w in ("context", "too long", "too many tokens", "maximum"))
+    return status == 400 and any(w in low for w in ("context", "too long", "too many tokens", "maximum", "max_tokens_exceeded"))
 
 
 def decide(state: str, questions: dict[str, dict], key: str, model: str = MODEL, retries: int = 8) -> dict:
