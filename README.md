@@ -148,14 +148,14 @@ Torko links all three spellings of Adhir Ranjan Chowdhury's name from the earlie
 | Debates                                           | 64,921                                                                            |
 | Date range                                        | 20 October 1999 to 18 April 2026                                                  |
 | Parliament terms                                  | 6 (the 13th to the 18th Lok Sabha)                                                |
-| Speaking turns                                    | 524,822                                                                           |
-| Stitched speeches                                 | 172,877                                                                           |
-| Members in the loaded roster                      | 2,177                                                                             |
-| Members with at least one attributed turn         | 2,072                                                                             |
-| Total words                                       | 78,253,636                                                                        |
-| Words linked to a named person                    | 61,784,759 (79% of total words)                                                   |
-| Turns with no identified speaker (chair excluded) | 111,286                                                                           |
-| Speeches of 100 words or more with a named person | 97,043                                                                            |
+| Speaking turns                                    | 526,701                                                                           |
+| Stitched speeches                                 | 173,225                                                                           |
+| Members in the loaded roster                      | 2,178                                                                             |
+| Members with at least one attributed turn         | 2,076                                                                             |
+| Total words                                       | 76,543,432                                                                        |
+| Words linked to a named person                    | 61,737,420 (81% of total words)                                                   |
+| Turns with no identified speaker (chair excluded) | 106,168                                                                           |
+| Speeches of 100 words or more with a named person | 99,975                                                                            |
 | Debate categories                                 | 76                                                                                |
 | sansad.in keywords                                | 6,976 distinct keywords, on 70.5% of debates                                      |
 | Average speech length                             | 415 words                                                                         |
@@ -165,7 +165,7 @@ Torko links all three spellings of Adhir Ranjan Chowdhury's name from the earlie
 
 ## Known limits
 
-1. Torko finds no speaker name for 111,286 turns. The dashboard marks these turns as unattributed.
+1. Torko finds no speaker name for 106,168 turns. The dashboard marks these turns as unattributed.
 2. The party shown for a speech is the member's party on the date of the debate, from the House record. It comes from the Wikipedia list of members of each term, from sansad.in for the member's last term, and from a manual review of 37 members. A change of party inside a term shows from its date only when it is a formal event: a by-election, a split or merger that the House recognised, or an expulsion. A member who only works for another party keeps the party of the House record. Torko knows 28 such dated changes, most of them in the 17th Lok Sabha. Changes in earlier terms that no source records are not shown. Every member who speaks in the debates has a party for each term in which they speak. A minister from the Rajya Sabha shows the party of their last Lok Sabha term. For 22 of the 3,254 (member, term) pairs that speak in the debates, Torko has no party. These pairs hold 0.3% of the words with a known speaker.
 3. Torko does not read about 13.6% of the source text. The loss is 32.5% in the 13th Lok Sabha and about 3% in recent terms. Charts over time will therefore show too little activity in the early years.
 
