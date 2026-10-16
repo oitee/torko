@@ -57,3 +57,9 @@ python3 scripts/summary_tags_review.py
 ```
 
 The script is idempotent. A second run with no change makes no API call. The full run covers about 49,700 summaries and costs less than 1 US dollar.
+
+## General tags
+
+Some tags name the House, the government, or procedure, for example `Members`, `Parliament`, `Statement`, and `Government Of India`. They are near the summary of almost every speech, and the decision model kept many of them although they are not a subject. The file `data/general_tags.tsv` lists these tags, with a reason for each. `scripts/add_candidates.py` never makes them recognised tags of a speech. The next nearest tags take their places, so a speech still gets 12 recognised tags. The script stops when a name in the file is not in the tag list.
+
+Borderline tags stay out of the file for now: `Law Amendment`, `Demands For Grants` and its two variants, `President Address`, `Parliamentary Etiquette`, `MP(s) Conduct`, `Development Policy`, `Welfare Measures`, `Social Problems`, and `Ex-prime Minister`. Add a tag to the file with its reason, and it applies to every later run.

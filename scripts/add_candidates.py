@@ -4,19 +4,7 @@ Sources:
   dictionary   Entity names from the dictionary that the speech text contains, at most --k for each speech.
   summary_tag  The --n tags nearest to the summary vector of the speech.
 
-  dictionary   For each entity name of the entity dictionary, the script
-               searches the speech text for the exact words that speeches use
-               for the name (entity_lookup.py). It adds the entities that the
-               speech does not have yet, at most --k, the most specific first.
-               It skips an entity whose every match lies inside a longer
-               name: another dictionary name, or the words of a named item of
-               the extraction (not a topic, not a group). So "Shimla" inside
-               "Shimla Agreement" is not added.
-               A row has list 'other', the matched words as its mention, and
-               mention_found true.
-  summary_tag  The --n tags nearest to the summary vector of the speech
-               (scripts/embed_summaries.py). A row has list 'topic', the tag
-               name and type, tag_id set, and an empty mention.
+A speech that has rows of a source gets no new rows of it. --force deletes the rows and adds them again.
 
 Usage (from the repo root):
     python3 scripts/add_candidates.py --speech-ids 260741,340402 --dry-run
@@ -25,6 +13,7 @@ Usage (from the repo root):
 from __future__ import annotations
 
 import argparse
+import csv
 import json
 import sys
 from pathlib import Path
@@ -39,6 +28,7 @@ from scripts.embed_summaries import nearest_tags
 from scripts.extract_entities import fetch_speeches, scope_filter
 
 DEFAULT_N = 12
+GENERAL_TAGS_FILE = Path(__file__).resolve().parent.parent / "tags" / "summary_tags" / "data" / "general_tags.tsv"
 SOURCES = ("dictionary", "summary_tag")
 STUB_MODEL = "rule-stub"
 
@@ -67,6 +57,15 @@ def dictionary_rows(items: list[dict], speech_text: str, dictionary: EntityDicti
                     "mention": mention, "mention_found": True, "tag_id": None,
                     "evidence": {"matches": matches, "rank": rank}})
     return out
+
+
+def load_general_tags(path: Path = GENERAL_TAGS_FILE) -> frozenset[str]:
+    with path.open(encoding="utf-8") as f:
+        return frozenset(r["tag"].strip() for r in csv.DictReader(f, delimiter="\t") if r["tag"].strip())
+
+
+def without_general(near: list[dict], general: frozenset[str], n: int) -> list[dict]:
+    return [t for t in near if t["tag"] not in general][:n]
 
 
 def summary_tag_rows(items: list[dict], near: list[dict]) -> list[dict]:
@@ -134,6 +133,11 @@ def main() -> None:
 
     engine = get_engine()
     dictionary = EntityDictionary.load() if "dictionary" in sources else None
+    general = load_general_tags()
+    with engine.connect() as conn:
+        known = {r[0] for r in conn.execute(text("SELECT tag FROM tags WHERE tag = ANY(:t)"), {"t": list(general)})}
+    if general - known:
+        raise SystemExit(f"general tags not in the tag list: {sorted(general - known)}")
     with engine.connect() as conn:
         extraction_of = select_speeches(conn, where, params)
     ids = list(extraction_of)
@@ -150,7 +154,10 @@ def main() -> None:
                              {"ids": batch, "src": sources})
             items = items_by_speech(conn, batch)
             texts = {s["speech_id"]: s["text"] for s in fetch_speeches(conn, batch)} if dictionary else {}
-            near = nearest_tags(conn, batch, args.n) if "summary_tag" in sources else {}
+            near = {}
+            if "summary_tag" in sources:
+                found = nearest_tags(conn, batch, args.n + len(general))
+                near = {sid: without_general(tags, general, args.n) for sid, tags in found.items()}
             for sid in batch:
                 mine = items[sid]
                 llm = [i for i in mine if i["source"] == "llm"]

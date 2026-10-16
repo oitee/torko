@@ -1,5 +1,6 @@
 from entity_lookup import Entity, EntityDictionary
-from scripts.add_candidates import dictionary_rows, named_mentions, next_position, summary_tag_rows
+from scripts.add_candidates import (GENERAL_TAGS_FILE, dictionary_rows, load_general_tags, named_mentions, next_position,
+                                   summary_tag_rows, without_general)
 
 LLM = [{"list": "topic", "position": 1, "name": "Railways", "type": "topic", "mention": "railway", "mention_found": True},
        {"list": "topic", "position": 2, "name": "Safety", "type": "topic", "mention": "safety", "mention_found": True},
@@ -56,3 +57,16 @@ def test_a_topic_or_group_phrase_never_hides_a_dictionary_match():
              {"type": "place", "mention": "Jammu and Kashmir", "mention_found": True},
              {"type": "law", "mention": "an act the model guessed", "mention_found": False}]
     assert named_mentions(items) == ["Jammu and Kashmir"]
+
+
+def test_a_general_tag_is_never_a_recognised_tag_and_the_next_tag_takes_its_place():
+    near = [{"tag": "Members", "rank": 1}, {"tag": "New Railway Line", "rank": 2},
+            {"tag": "Parliament", "rank": 3}, {"tag": "Railway Projects", "rank": 4}, {"tag": "Bareilly", "rank": 5}]
+    kept = without_general(near, frozenset({"Members", "Parliament"}), 2)
+    assert [(t["tag"], t["rank"]) for t in kept] == [("New Railway Line", 2), ("Railway Projects", 4)]
+
+
+def test_the_general_tag_file_holds_the_house_words():
+    general = load_general_tags(GENERAL_TAGS_FILE)
+    assert {"Members", "Parliament", "Statement", "Government Of India"} <= general
+    assert "Law Amendment" not in general
