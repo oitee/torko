@@ -1,0 +1,660 @@
+item_id	speech_id	source	list	type	model_type	name	mention	p_keep	p_refers	kept	review
+232212	311914	llm	topic	topic		Impounded vehicles policy	जब्त किए गए वाहनों के संबंध में राष्ट्रीय नीति	0.99	-	yes	keep
+232213	311914	llm	topic	topic		Resource waste management	देश की बहुत बड़ी संपत्ति बर्बाद हो रही है	0.88	-	yes	keep
+1055680	311914	summary_tag	topic	law		Drug Policy	Laws on drugs.	0.02	-	no	drop
+1055681	311914	summary_tag	topic	topic		Goods Seized	Merchandise confiscated in law enforcement	0.89	-	yes	keep
+1055682	311914	summary_tag	topic	topic		Police reforms	Changes to law enforcement practices.	0.58	-	no	drop
+1055683	311914	summary_tag	topic	topic		Hoarding	Stockpiling goods unfairly	0.14	-	no	drop
+1055684	311914	summary_tag	topic	topic		Police Atrocities	Excessive or illegal use of force by police.	0.02	-	no	drop
+1055685	311914	summary_tag	topic	law		National Design Policy	Government framework for industrial design standards	0.56	-	no	drop
+1055686	311914	summary_tag	topic	topic		Police Custody	Detention of persons by police pending investigation or legal proceedings.	0.76	-	no	drop
+1055687	311914	summary_tag	topic	scheme		Voluntary Auto Scrapping Policy	Government incentive that encourages recycling old vehicles to cut emissions.	0.03	-	no	drop
+1055688	311914	summary_tag	topic	topic		Police Brutality	Excessive force by law enforcement.	0.02	-	no	drop
+1055689	311914	summary_tag	topic	topic		Obsolete Law	Laws no longer enforced or relevant.	0.12	-	no	drop
+1055690	311914	summary_tag	topic	law		Motor Vehicles Act	Law regulating vehicle operation, safety, and traffic rules.	0.28	-	no	drop
+1055691	311914	summary_tag	topic	institution		Police Stations	Local law enforcement outposts.	0.93	-	yes	keep
+236807	315393	llm	topic	topic		Infrastructural development claims	मेडिकल कॉलेज	0.96	-	yes	keep
+236808	315393	llm	topic	topic		Political alliances	गठबंधन	0.73	-	yes	keep
+1036402	315393	summary_tag	topic	institution		Hurriyat Conference	An alliance of separatist political groups based in Jammu and Kashmir.	0.03	-	no	drop
+1036403	315393	summary_tag	topic	place		Udhampur	District and Lok Sabha constituency in Jammu and Kashmir, India.	0.02	-	no	drop
+1036404	315393	summary_tag	topic	place		Jammu	District and Lok Sabha constituency in Jammu and Kashmir, India.	0.52	-	no	drop
+1036405	315393	summary_tag	topic	institution		National Conference	Political party in Kashmir and Jammu region	0.04	-	no	drop
+1036406	315393	summary_tag	topic	place		Srinagar	District and Lok Sabha constituency in Jammu and Kashmir, India.	0.05	-	no	drop
+1036407	315393	summary_tag	topic	place		Jammu & Kashmir	State in the northern region of India.	0.67	-	no	drop
+1036408	315393	summary_tag	topic	place		Anantnag–Rajouri	Lok Sabha constituency in Jammu and Kashmir, India.	0.03	-	no	drop
+1036409	315393	summary_tag	topic	place		Muzaffarpur	District and Lok Sabha constituency in Bihar, India.	0.02	-	no	drop
+1036410	315393	summary_tag	topic	place		Kathua	District in Jammu and Kashmir, India.	0.02	-	no	drop
+1036411	315393	summary_tag	topic	topic		Development Projects	Government initiatives for infrastructure.	0.94	-	yes	keep
+1036412	315393	summary_tag	topic	topic		Fake Encounters	Falsely reported violent confrontations causing death during law enforcement.	0.03	-	no	drop
+1036413	315393	summary_tag	topic	place		Hajipur	Lok Sabha constituency in Bihar, India.	0.02	-	no	drop
+236809	315393	llm	other	place		Jammu and Kashmir	जम्मू - कश्मीर	0.92	-	yes	drop
+236810	315393	llm	other	place		Bihar	बिहार	0.99	-	yes	keep
+236811	315393	llm	other	person		Mehbooba Mufti	महबूबा मुफ्ती	0.98	-	yes	keep
+1036394	315393	dictionary	other	place		Munger	मुंगेर	0.99	-	yes	keep
+1036395	315393	dictionary	other	person		Narendra Modi	मोदी जी	1.00	-	yes	keep
+1036396	315393	dictionary	other	institution		Ministry of Home Affairs	गृह मंत्री	0.95	-	yes	drop
+1036397	315393	dictionary	other	place		Lakhisarai	लखीसराय	0.98	-	yes	drop
+1036398	315393	dictionary	other	scheme		Jal Jeevan Mission	हर घर नल से जल	0.99	-	yes	keep
+1036399	315393	dictionary	other	place		Jammu	जम्मू	0.93	-	yes	drop
+1036400	315393	dictionary	other	place		Purnia	पूर्णिया	0.95	-	yes	keep
+1036401	315393	dictionary	other	person		Lalu Prasad Yadav	लालू जी	0.68	-	no	drop
+569652	320101	llm	topic	topic		Political corruption	घोटाला	0.88	-	yes	keep
+1011114	320101	summary_tag	topic	topic		CBI Inquiry	Investigation by Central Bureau of Investigation.	0.10	-	no	drop
+1011115	320101	summary_tag	topic	institution		CBI	India's federal agency that investigates serious and corruption-related crimes.	0.06	-	no	drop
+1011116	320101	summary_tag	topic	topic		2G Spectrum Scam	Corruption in wireless spectrum allocation.	0.07	-	no	drop
+1011117	320101	summary_tag	topic	topic		Criminalisation of Politics	Involvement of persons with criminal records in political activities.	0.55	-	no	drop
+1011118	320101	summary_tag	topic	topic		Corruption	Illegal and unethical conduct by government officials or public servants.	0.77	-	no	keep
+1011119	320101	summary_tag	topic	institution		Lokpal	Ombudsman investigating corruption.	0.03	-	no	drop
+1011120	320101	summary_tag	topic	topic		Cash-for-vote Scam	Corruption in voting.	0.16	-	no	drop
+1011121	320101	summary_tag	topic	topic		Parliamentary Questions	Questions that members ask the government about its work.	0.08	-	no	drop
+1011122	320101	summary_tag	topic	topic		Political Opposition	Parties and groups opposing government.	0.94	-	yes	drop
+1011123	320101	summary_tag	topic	topic		Operation Green Hunt	Counterinsurgency campaign against Maoist militants	0.03	-	no	drop
+1011124	320101	summary_tag	topic	institution		Liberhan Commission	Commission investigating riots in Ayodhya.	0.06	-	no	drop
+1011125	320101	summary_tag	topic	institution		Lokayuktas	Anti-corruption authority in states	0.03	-	no	drop
+569653	320101	llm	other	scheme		Bofors scandal	बोफोर्स का घोटाला	0.77	-	yes	keep
+1011112	320101	dictionary	other	institution		Supreme Court	कोर्ट	0.76	-	no	drop
+1011113	320101	dictionary	other	person		Mahatma Gandhi	गांधी	0.69	-	no	drop
+569947	321953	llm	topic	topic		Drug abuse	मादक द्रव्यों के सेवन	0.98	-	yes	keep
+569948	321953	llm	topic	topic		Law enforcement	स्वापक नियंत्रण ब्यूरो	0.94	-	yes	keep
+569949	321953	llm	topic	topic		De-addiction	नशामुक्त करने	0.80	-	yes	keep
+1006183	321953	summary_tag	topic	topic		Drug De-addiction	Treatment programs for persons dependent on addictive substances.	0.85	-	yes	keep
+1006184	321953	summary_tag	topic	law		Drug Policy	Laws on drugs.	0.71	-	no	keep
+1006185	321953	summary_tag	topic	topic		Drug Addiction	Harmful, repeated use of drugs and the resulting dependence.	0.97	-	yes	keep
+1006186	321953	summary_tag	topic	topic		Rehabilitation	Support programs to help people recover from disasters or other hardships.	0.71	-	no	keep
+1006187	321953	summary_tag	topic	topic		Narcotics	Illegal drugs and substance abuse control measures.	0.98	-	yes	keep
+1006188	321953	summary_tag	topic	topic		SCs and STs welfare	Support for scheduled communities	0.02	-	no	drop
+1006189	321953	summary_tag	topic	institution		Anti Narcotic Task Force	Organization combating illegal drug production and trafficking.	0.88	-	yes	keep
+1006190	321953	summary_tag	topic	institution		Narcotics Control Bureau	Agency enforcing drug control and prevention.	0.84	-	yes	keep
+1006191	321953	summary_tag	topic	topic		Decriminalisation	Removal of criminal penalties	0.30	-	no	drop
+1006192	321953	summary_tag	topic	topic		Drug Menace	Problem of illegal drug use and trafficking	0.97	-	yes	keep
+1006193	321953	summary_tag	topic	scheme		Nirbhaya Fund	Government fund that supports the safety and security of women.	0.02	-	no	drop
+1006194	321953	summary_tag	topic	topic		Narco Terrorism	Criminal drug trafficking and violence	0.44	-	no	drop
+569950	321953	llm	other	law		NDPS Act	एनडीपीएस अधिनियम 1985	0.89	-	yes	keep
+569951	321953	llm	other	institution		Narco Coordination Centre	नार्को समन्वय केंद्र	0.46	-	yes	keep
+569952	321953	llm	other	person		Amit Shah	अमित शाह जी	0.82	-	yes	drop
+569953	321953	llm	other	person		Narendra Modi	नरेन्द्र मोदी जी	0.21	-	no	drop
+569954	321953	llm	other	institution		Anti-Narcotics Task Force	एंटी - नारकोटिक्स टास्क फोर्स	0.77	-	yes	keep
+1006175	321953	dictionary	other	group		Police	पुलिस	0.61	-	no	drop
+1006176	321953	dictionary	other	institution		Ministry of Home Affairs	गृह मंत्री	0.93	-	yes	drop
+1006177	321953	dictionary	other	place		Chandigarh	चंडीगढ़	0.62	-	no	drop
+1006178	321953	dictionary	other	place		Gandhinagar	गांधीनगर	0.18	-	no	drop
+1006179	321953	dictionary	other	group		Bharatiya Janata Party	भारतीय जनता पार्टी	0.91	-	yes	drop
+1006180	321953	dictionary	other	place		Guwahati	गुवाहाटी	0.18	-	no	drop
+1006181	321953	dictionary	other	group		Youth	नौजवानों	1.00	-	yes	keep
+1006182	321953	dictionary	other	scheme		PRAGATI	प्रगति	0.01	-	no	drop
+246184	323072	llm	topic	topic		Public expenditure and excess grants	Excesses over Voted Grants and Charged Appropriations	0.98	-	yes	keep
+246185	323072	llm	topic	topic		Privatization	privatization of Railways	0.83	-	yes	keep
+246186	323072	llm	topic	topic		Economic relief and inflation	stimulus and relief package	0.96	-	yes	keep
+996099	323072	summary_tag	topic	topic		Supplementary Demands For Grants	A government request to parliament for extra money after it approved the yearly budget.	0.95	-	yes	keep
+996100	323072	summary_tag	topic	topic		Demands For Excess Grants	Parliamentary approval for spending beyond budgeted amount	0.94	-	yes	keep
+996101	323072	summary_tag	topic	topic		Demands For Grants	A parliamentary process for approving government spending plans.	0.96	-	yes	keep
+996102	323072	summary_tag	topic	topic		Demands For Grants On Account	Parliamentary approval for interim budget spending	0.41	-	no	drop
+996103	323072	summary_tag	topic	law		Money Bills	Financial legislation concerning revenue and government spending.	0.05	-	no	drop
+996104	323072	summary_tag	topic	topic		Budget	India's yearly financial plan, showing the government's planned income and spending.	0.95	-	yes	drop
+996105	323072	summary_tag	topic	topic		C&AG Reports	Reports that check how the government spent public money.	0.38	-	no	drop
+996106	323072	summary_tag	topic	topic		Deficit	Government spending exceeding income.	0.35	-	no	drop
+996107	323072	summary_tag	topic	topic		Health Budget	Financial allocation for healthcare	0.05	-	no	drop
+996108	323072	summary_tag	topic	topic		Non-plan Expenditure	Government spending outside the five-year plan schemes.	0.21	-	no	drop
+996109	323072	summary_tag	topic	topic		Non-Plan Allocation	Government spending outside five-year planning framework	0.09	-	no	drop
+996110	323072	summary_tag	topic	topic		Surpluses	Excess supply beyond demand.	0.05	-	no	drop
+246187	323072	llm	other	institution		Public Accounts Committee	Public Accounts Committee	0.99	-	yes	keep
+246188	323072	llm	other	institution		Ministry of Finance	Ministry of Finance	1.00	-	yes	keep
+246189	323072	llm	other	law		Mahatma Gandhi National Rural Employment Guarantee Act	MGNREGA scheme	0.97	-	yes	keep
+246190	323072	llm	other	institution		Air India	Air India	0.96	-	yes	keep
+246191	323072	llm	other	place		Kerala	Kerala	0.84	-	yes	keep
+996091	323072	dictionary	other	scheme		COVID-19	COVID-19	0.88	-	yes	drop
+996092	323072	dictionary	other	scheme		Atmanirbhar Bharat	Atmanirbhar Bharat	1.00	-	yes	keep
+996093	323072	dictionary	other	institution		Department of Revenue	Department of Revenue	0.96	-	yes	keep
+996094	323072	dictionary	other	institution		Central universities	Central Universities	0.90	-	yes	drop
+996095	323072	dictionary	other	group		Traders	traders	0.88	-	yes	drop
+996096	323072	dictionary	other	group		Minorities	minorities	0.90	-	yes	drop
+996097	323072	dictionary	other	group		Labourers	labourers	0.75	-	no	drop
+996098	323072	dictionary	other	group		Poor	poor	0.98	-	yes	drop
+246555	323153	llm	topic	topic		Inter-governmental relations	All the issues have been resolved now	0.52	-	yes	keep
+994271	323153	summary_tag	topic	place		West Bengal	State in eastern India	0.56	-	no	keep
+994272	323153	summary_tag	topic	topic		Operation Ganga	Government evacuation that brought Indian citizens home from Ukraine.	0.06	-	no	drop
+994273	323153	summary_tag	topic	topic		Inter-State Disputes	Disagreements between provinces	0.20	-	no	keep
+994274	323153	summary_tag	topic	law		Shimla Agreement	Agreement between India and Pakistan on the border after the 1971 war.	0.03	-	no	drop
+994275	323153	summary_tag	topic	place		North 24 Parganas	District in West Bengal, India.	0.09	-	no	drop
+994276	323153	summary_tag	topic	place		South 24 Parganas	District in West Bengal, India.	0.08	-	no	drop
+994277	323153	summary_tag	topic	place		Kolkata	District in West Bengal, India.	0.11	-	no	drop
+994278	323153	summary_tag	topic	scheme		One Nation One Ration Card Yojana	Government policy that lets a ration card be used anywhere in India.	0.08	-	no	drop
+994279	323153	summary_tag	topic	scheme		Vivad Se Vishwas Scheme	Government scheme that settles tax disputes between taxpayers and the government.	0.06	-	no	drop
+994280	323153	summary_tag	topic	place		Gorkhaland	Proposed state in Darjeeling region of West Bengal	0.10	-	no	drop
+994281	323153	summary_tag	topic	institution		Inter-State Council	Body facilitating cooperation and coordination between state governments.	0.05	-	no	drop
+994282	323153	summary_tag	topic	law		The Nari Shakti Vandan Adhiniyam	Law that reserves seats for women in Parliament and state assemblies.	0.04	-	no	drop
+246556	323153	llm	other	place		West Bengal	West Bengal	0.96	-	yes	keep
+248077	324686	llm	topic	topic		Electricity distribution privatisation	Electricity (Amendment) Bill, 2022	0.95	-	yes	keep
+988668	324686	summary_tag	topic	law		The Government of National Capital Territory of Delhi(Amendment)Bill, 2023	Legislative amendment changing governance of Delhi territory.	0.01	-	no	drop
+988669	324686	summary_tag	topic	law		Power Sector Reforms	Government policy changes modernizing electricity generation and distribution.	0.65	-	no	keep
+988670	324686	summary_tag	topic	law		Law Amendment	Change to existing legislation	0.97	-	yes	drop
+988671	324686	summary_tag	topic	law		The Nari Shakti Vandan Adhiniyam	Law that reserves seats for women in Parliament and state assemblies.	0.01	-	no	drop
+988672	324686	summary_tag	topic	law		Sabka Bima Sabki Raksha Bill	Insurance legislation for comprehensive coverage	0.01	-	no	drop
+988673	324686	summary_tag	topic	law		Union List	List of powers reserved for central government	0.36	-	no	drop
+988674	324686	summary_tag	topic	law		Constitution (One Hundred And Thirtieth Amendment) Bill, 2025	Proposed amendment to India Constitution number 130	0.01	-	no	drop
+988675	324686	summary_tag	topic	institution		Central Electricity Authority	Agency regulating electricity sector	0.04	-	no	drop
+988676	324686	summary_tag	topic	institution		State Legislatures	Elected assemblies that represent and govern individual Indian states.	0.61	-	no	drop
+988677	324686	summary_tag	topic	law		Ninth Schedule	A list in India's constitution that protects certain laws from being challenged in court.	0.03	-	no	drop
+988678	324686	summary_tag	topic	law		State List	Constitutional subjects under state jurisdiction.	0.64	-	no	drop
+988679	324686	summary_tag	topic	institution		Electricity Boards	Agencies responsible for power generation and distribution.	0.15	-	no	drop
+248078	324686	llm	other	law		Electricity (Amendment) Bill, 2022	Electricity (Amendment) Bill, 2022	1.00	-	yes	keep
+248079	324686	llm	other	law		Electricity Act, 2003	Electricity Act, 2003	1.00	-	yes	keep
+988664	324686	dictionary	other	group		Consumers	consumers	1.00	-	yes	keep
+988665	324686	dictionary	other	group		Companies	companies	0.90	-	yes	drop
+988666	324686	dictionary	other	group		Poor	poor	0.96	-	yes	drop
+988667	324686	dictionary	other	law		Constitution of India	Constitution	0.84	-	yes	keep
+570163	328034	llm	topic	topic		Foreign policy and international crises	यूक्रेन	0.79	-	yes	keep
+976264	328034	summary_tag	topic	topic		Parliamentary Questions	Questions that members ask the government about its work.	0.20	-	no	drop
+976265	328034	summary_tag	topic	topic		Rule 184	A specific rule that allows a parliamentary discussion with a vote.	0.12	-	no	drop
+976266	328034	summary_tag	topic	topic		Parliamentary Committees	A group of parliament members that studies a specific issue in depth.	0.02	-	no	drop
+976267	328034	summary_tag	topic	topic		Parliamentary Zero Hour	A period in a parliament session for raising urgent matters.	0.05	-	no	drop
+976268	328034	summary_tag	topic	topic		Speeches	Formal remarks made by a member of parliament.	0.34	-	no	drop
+976269	328034	summary_tag	topic	topic		Observation	A formal note made by parliament on a matter.	0.37	-	no	drop
+976270	328034	summary_tag	topic	topic		Parliamentary Proceedings	The official record and conduct of a parliament session.	0.73	-	no	drop
+976271	328034	summary_tag	topic	topic		Recommendation	Advice given by a parliamentary committee.	0.06	-	no	drop
+976272	328034	summary_tag	topic	topic		Short Duration Discussion	A brief parliamentary debate on one specific issue.	0.22	-	no	drop
+976273	328034	summary_tag	topic	topic		Parliamentary Delagation	A group of parliament members who travel together for talks. Correct spelling: Delegation.	0.04	-	no	drop
+976274	328034	summary_tag	topic	topic		Operation Ganga	Government evacuation that brought Indian citizens home from Ukraine.	0.04	-	no	drop
+976275	328034	summary_tag	topic	law		Rule 56	Parliamentary procedure rule	0.03	-	no	drop
+570164	328034	llm	other	place		Ukraine	यूक्रेन	0.89	-	yes	keep
+570165	328034	llm	other	person		Hardeep Singh Puri	माननीय हरदीप सिंह पुरी	0.80	-	yes	drop
+976263	328034	dictionary	other	institution		Ministry of External Affairs	विदेश मंत्री	0.85	-	yes	drop
+254096	328995	llm	topic	topic		Regional development	Andaman & Nicobar Islands	0.98	-	yes	keep
+254097	328995	llm	topic	topic		Tourism development	tourism	0.95	-	yes	keep
+254098	328995	llm	topic	topic		Employment generation	employment	0.97	-	yes	keep
+966982	328995	summary_tag	topic	place		Andaman & N Islands	Union territory comprising islands in Bay of Bengal	0.99	-	yes	keep
+966983	328995	summary_tag	topic	place		North and Middle Andaman	District in Andaman and Nicobar Islands, India.	0.09	-	no	drop
+966984	328995	summary_tag	topic	topic		Demands For Excess Grants	Parliamentary approval for spending beyond budgeted amount	0.23	-	no	drop
+966985	328995	summary_tag	topic	topic		SCs and STs welfare	Support for scheduled communities	0.11	-	no	drop
+966986	328995	summary_tag	topic	topic		Development Planning	Strategy for economic and social growth	0.93	-	yes	keep
+966987	328995	summary_tag	topic	law		The Government of National Capital Territory of Delhi(Amendment)Bill, 2023	Legislative amendment changing governance of Delhi territory.	0.03	-	no	drop
+966988	328995	summary_tag	topic	topic		Agitation	Organized protests and demonstrations by groups demanding change.	0.05	-	no	drop
+966989	328995	summary_tag	topic	topic		Tribal Development	Improvement for tribal communities.	0.19	-	no	drop
+966990	328995	summary_tag	topic	topic		Development Plans	Strategic initiatives for progress	0.93	-	yes	keep
+966991	328995	summary_tag	topic	law		Sabka Bima Sabki Raksha Bill	Insurance legislation for comprehensive coverage	0.02	-	no	drop
+966992	328995	summary_tag	topic	topic		Demands For Grants On Account	Parliamentary approval for interim budget spending	0.33	-	no	drop
+966993	328995	summary_tag	topic	topic		Supplementary Demands For Grants	A government request to parliament for extra money after it approved the yearly budget.	0.10	-	no	drop
+254099	328995	llm	other	place		Andaman and Nicobar Islands	Andaman & Nicobar Islands	1.00	-	yes	keep
+254100	328995	llm	other	place		Port Blair	Port Blair	0.99	-	yes	keep
+254101	328995	llm	other	place		Madurai	Madurai	0.97	-	yes	keep
+254102	328995	llm	other	place		Kochi	Kochi	0.98	-	yes	keep
+966974	328995	dictionary	other	law		Union Budget	Budget	0.76	-	no	keep
+966975	328995	dictionary	other	group		Women	women	0.98	-	yes	keep
+966976	328995	dictionary	other	place		Diglipur	Diglipur	0.99	-	yes	keep
+966977	328995	dictionary	other	institution		Andaman and Nicobar Administration	Andaman and Nicobar Administration	0.99	-	yes	keep
+966978	328995	dictionary	other	group		Tourists	tourists	0.98	-	yes	keep
+966979	328995	dictionary	other	group		ASHA	ASHA	0.98	-	yes	keep
+966980	328995	dictionary	other	group		Patients	patients	0.98	-	yes	keep
+966981	328995	dictionary	other	place		Puducherry	Puducherry	0.11	-	no	drop
+255900	329571	llm	topic	topic		Unemployment and economic crisis	employment crisis caused by the pandemic	0.99	-	yes	keep
+255901	329571	llm	topic	topic		Agricultural distress and MSP	farm crisis	0.98	-	yes	keep
+255902	329571	llm	topic	topic		Promotion of classical languages	classical languages	0.84	-	yes	keep
+959953	329571	summary_tag	topic	topic		Kannada Language	Official language of Karnataka state	0.92	-	yes	keep
+959954	329571	summary_tag	topic	scheme		The Viksit Bharat – Guarantee for Rozgar and Ajeevika Mission (Gramin) VB – G RAM G Bill	Government program aimed at rural employment and livelihoods.	0.03	-	no	drop
+959955	329571	summary_tag	topic	topic		Economic Crisis	Severe economic disruption or recession affecting the nation	0.98	-	yes	keep
+959956	329571	summary_tag	topic	topic		Economy	Economic conditions productivity and growth.	0.99	-	yes	keep
+959957	329571	summary_tag	topic	topic		Regional Disparity	Economic inequalities between different regions of India	0.81	-	yes	drop
+959958	329571	summary_tag	topic	topic		Agricultural Distress	Serious economic hardship faced by farmers and the farming sector.	0.97	-	yes	keep
+959959	329571	summary_tag	topic	place		Karnataka	Southern state of India	0.78	-	no	keep
+959960	329571	summary_tag	topic	topic		President Address	The speech the President gives when a parliament session opens.	0.95	-	yes	keep
+959961	329571	summary_tag	topic	topic		Poverty	State of living with insufficient income.	0.88	-	yes	keep
+959962	329571	summary_tag	topic	scheme		Minimum Support  Prices (MSP)	Government guarantee of a minimum price paid to farmers for their crops.	0.93	-	yes	keep
+959963	329571	summary_tag	topic	place		Mysuru	District and Lok Sabha constituency in Karnataka, India. The constituency is listed as Mysore.	0.02	-	no	drop
+959964	329571	summary_tag	topic	law		Development Policy	Government strategy for economic growth.	0.16	-	no	drop
+255903	329571	llm	other	scheme		Pradhan Mantri Fasal Bima Yojana	Pradhan Mantri Fasal Bima Yojana	0.90	-	yes	keep
+255904	329571	llm	other	scheme		Pradhan Mantri Bharatiya Janaushadhi Pariyojana	Pradhan Mantri Bhartiya Janaushadhi Pariyojana	0.97	-	yes	keep
+255905	329571	llm	other	scheme		PM SVANidhi	Prime Minister's Street Vendor's AatmaNirbhar Nidhi (PM SVANidhi) scheme	0.75	-	yes	keep
+255906	329571	llm	other	group		Kannada	Kannada	0.97	-	yes	keep
+959945	329571	dictionary	other	group		Farmers	farmers	1.00	-	yes	keep
+959946	329571	dictionary	other	group		Sanskrit	Sanskrit	0.58	-	no	drop
+959947	329571	dictionary	other	group		Poor	poor	1.00	-	yes	drop
+959948	329571	dictionary	other	person		Narendra Modi	Modi	0.99	-	yes	drop
+959949	329571	dictionary	other	group		Odia	Odia	0.05	-	no	drop
+959950	329571	dictionary	other	group		Malayalam	Malayalam	0.08	-	no	drop
+959951	329571	dictionary	other	group		Telugu	Telugu	0.02	-	no	drop
+959952	329571	dictionary	other	scheme		Minimum Support Price	Minimum Support Price	1.00	-	yes	keep
+260734	331396	llm	topic	topic		Stubble burning	burning of stubble	0.88	-	yes	keep
+260735	331396	llm	topic	topic		Stubble management	stubble management policy	0.91	-	yes	keep
+260736	331396	llm	topic	topic		Population control	stabilizing the population	0.61	-	yes	keep
+260737	331396	llm	topic	topic		Family planning	family planning	0.66	-	yes	keep
+260738	331396	llm	topic	topic		Climate change	climate change	0.72	-	yes	keep
+940901	331396	summary_tag	topic	topic		Private Members Bills	A bill introduced by a member who is not a minister.	0.53	-	no	keep
+940902	331396	summary_tag	topic	topic		Population Control	Government regulation and strategy to control population growth.	0.56	-	no	keep
+940903	331396	summary_tag	topic	law		Private Members Resolution	Parliamentary proposal from individual lawmakers	0.13	-	no	drop
+940904	331396	summary_tag	topic	topic		Stubble Burning	Burning of crop residue after harvest, a major cause of air pollution.	0.89	-	yes	keep
+940905	331396	summary_tag	topic	topic		Pollution Control	Government action to reduce and prevent pollution of air, water, or land.	0.82	-	yes	keep
+940906	331396	summary_tag	topic	topic		Population Explosion	Rapid population growth.	0.60	-	no	drop
+940907	331396	summary_tag	topic	law		Minimum Support Prices	Price floor for agricultural commodities	0.02	-	no	drop
+940908	331396	summary_tag	topic	law		Sabka Bima Sabki Raksha Bill	Insurance legislation for comprehensive coverage	0.02	-	no	drop
+940909	331396	summary_tag	topic	law		The Government of National Capital Territory of Delhi(Amendment)Bill, 2023	Legislative amendment changing governance of Delhi territory.	0.02	-	no	drop
+940910	331396	summary_tag	topic	topic		Sikhs	Sikh population and community issues	0.02	-	no	drop
+940911	331396	summary_tag	topic	law		National Population Register(NPR)	Government census of population with personal identification details.	0.04	-	no	drop
+940912	331396	summary_tag	topic	topic		Bills Introduction	The step where a new bill is presented to parliament.	0.93	-	yes	keep
+260739	331396	llm	other	law		Population (Control and Management) Bill, 2021	Population (Control and Management) Bill, 2021	0.35	-	no	keep
+260740	331396	llm	other	law		Climate Change (Net Zero Carbon) Bill, 2021	Climate Change (Net Zero Carbon) Bill, 2021	0.04	-	no	drop
+260741	331396	llm	other	institution		Population Planning Agency	Population Planning Agency	0.85	-	yes	keep
+260742	331396	llm	other	group		Girls	girl child	0.92	-	yes	keep
+261178	331565	llm	topic	topic		COVID-19 vaccination drive and healthcare	COVID-19 vaccine	0.99	-	yes	keep
+261179	331565	llm	topic	topic		Pandemic preparedness and new variants	new variant of Coronavirus named Omicron	0.98	-	yes	keep
+261180	331565	llm	topic	topic		Economic recovery post-pandemic	Our economy also has started growing	0.27	-	no	drop
+938755	331565	summary_tag	topic	topic		Novel Coronavirus (COVID -19)	The COVID-19 disease and the virus that causes it.	0.99	-	yes	keep
+938756	331565	summary_tag	topic	topic		Corona Warriors	Healthcare workers fighting pandemic	0.28	-	no	drop
+938757	331565	summary_tag	topic	topic		Vaccination Programme	General government effort that gives vaccines to prevent disease.	0.99	-	yes	keep
+938758	331565	summary_tag	topic	scheme		Vande Bharat Mission	Government program that brought Indian citizens home from abroad.	0.02	-	no	drop
+938759	331565	summary_tag	topic	topic		Pandemic Disease	A disease that spreads quickly across a large population.	0.99	-	yes	keep
+938760	331565	summary_tag	topic	topic		Free Medical Tests	Testing without cost.	0.05	-	no	drop
+938761	331565	summary_tag	topic	scheme		Pradhan Mantri Garib Kalyan Anna Yojana (PM-GKAY)	Government scheme that gave free food grains to poor families.	0.04	-	no	drop
+938762	331565	summary_tag	topic	scheme		National Health Protection Scheme (Ayushman Bharat)	Government scheme that pays hospital bills for poor and vulnerable families.	0.03	-	no	drop
+938763	331565	summary_tag	topic	topic		Sabka Sath Sabka Vikas	Government slogan for growth that includes and benefits everyone.	0.13	-	no	drop
+938764	331565	summary_tag	topic	scheme		Indradhanush Scheme	Named government health scheme.	0.01	-	no	drop
+938765	331565	summary_tag	topic	scheme		Universal Immunisation Programme	Government program that vaccinates children against preventable diseases.	0.13	-	no	drop
+938766	331565	summary_tag	topic	topic		Vaccination	Giving a substance to protect a person from a disease.	0.99	-	yes	keep
+261181	331565	llm	other	place		Karnataka	Karnataka	0.53	-	yes	drop
+938747	331565	dictionary	other	scheme		COVID-19	COVID-19	0.98	-	yes	keep
+938748	331565	dictionary	other	person		Narendra Modi	Modi	0.96	-	yes	drop
+938749	331565	dictionary	other	group		Citizens	citizens	1.00	-	yes	drop
+938750	331565	dictionary	other	group		Omicron	Omicron	0.94	-	yes	keep
+938751	331565	dictionary	other	group		Nurses	nurses	0.23	-	no	drop
+938752	331565	dictionary	other	group		Poor	poor	0.56	-	no	drop
+938753	331565	dictionary	other	group		Doctors	doctors	0.22	-	no	drop
+938754	331565	dictionary	other	group		Bharatiya Janata Party	Bhartiya Janata Party	0.62	-	no	drop
+264363	332818	llm	topic	topic		Archaeological site preservation	पुरातात्विक स्थान को संरक्षित	0.98	-	yes	keep
+924629	332818	summary_tag	topic	institution		Archaeological Survey of India (ASI)	Government body responsible for archaeological sites and heritage preservation	0.72	-	no	keep
+924630	332818	summary_tag	topic	place		Budaun	District and Lok Sabha constituency in Uttar Pradesh, India. The constituency is listed as Badaun.	0.23	-	no	drop
+924631	332818	summary_tag	topic	place		Ayodhya	District and Lok Sabha constituency in Uttar Pradesh, India. The constituency is listed as Faizabad.	0.01	-	no	drop
+924632	332818	summary_tag	topic	topic		Preservation of Cultural Heritage	Protecting and repairing historical sites, art, and traditions for future generations.	0.98	-	yes	keep
+924633	332818	summary_tag	topic	place		Prayagraj	District and Lok Sabha constituency in Uttar Pradesh, India. The constituency is listed as Allahabad.	0.02	-	no	drop
+924634	332818	summary_tag	topic	place		Kushinagar	District and Lok Sabha constituency in Uttar Pradesh, India. The constituency is listed as Kushi Nagar.	0.02	-	no	drop
+924635	332818	summary_tag	topic	place		Pataliputra	Lok Sabha constituency in Bihar, India.	0.02	-	no	drop
+924636	332818	summary_tag	topic	place		Heritage Sites	Historic monuments protected as cultural property	0.97	-	yes	keep
+924637	332818	summary_tag	topic	place		Agra	District and Lok Sabha constituency in Uttar Pradesh, India.	0.02	-	no	drop
+924638	332818	summary_tag	topic	place		Varanasi	District and Lok Sabha constituency in Uttar Pradesh, India.	0.01	-	no	drop
+924639	332818	summary_tag	topic	place		Protected Monuments	Heritage structures under government protection	0.90	-	yes	keep
+924640	332818	summary_tag	topic	place		Firozabad	District and Lok Sabha constituency in Uttar Pradesh, India.	0.02	-	no	drop
+264364	332818	llm	other	law		Ashoka Pillar	सम्राट अशोक महान के मूल स्तम्भ	0.81	-	yes	keep
+264365	332818	llm	other	place		Badaun	Badaun	0.24	-	no	drop
+924625	332818	dictionary	other	group		Tourists	पर्यटकों	1.00	-	yes	keep
+924626	332818	dictionary	other	person		Ashoka	सम्राट अशोक	1.00	-	yes	keep
+924627	332818	dictionary	other	place		Pali	पाली	0.31	-	no	keep
+924628	332818	dictionary	other	institution		Archaeological Survey of India	भारतीय पुरातत्व सर्वेक्षण	0.95	-	yes	keep
+265907	333286	llm	topic	topic		Government health dispensary services	केंद्रीय सरकार स्वास्थ्य योजना की डिस्पेंसरी	0.98	-	yes	keep
+918772	333286	summary_tag	topic	scheme		CGHS	Government health insurance for central government employees, pensioners, and families.	0.97	-	yes	keep
+918773	333286	summary_tag	topic	institution		Dispensaries	Facilities providing basic medical services.	0.97	-	yes	keep
+918774	333286	summary_tag	topic	scheme		Jan Aushadhi Scheme	Government-run stores that sell generic medicines at low prices.	0.02	-	no	drop
+918775	333286	summary_tag	topic	place		Koderma	District and Lok Sabha constituency in Jharkhand, India.	0.95	-	yes	keep
+918776	333286	summary_tag	topic	scheme		National Health Mission	Government programme that provides healthcare services across the country.	0.05	-	no	drop
+918777	333286	summary_tag	topic	institution		Primary Health Centres	Basic healthcare facilities	0.07	-	no	drop
+918778	333286	summary_tag	topic	institution		Health Centres	Facilities providing medical services	0.82	-	yes	drop
+918779	333286	summary_tag	topic	topic		Old Age Benefits	Support for elderly.	0.33	-	no	drop
+918780	333286	summary_tag	topic	institution		Community Health Centres	Basic healthcare facilities in communities	0.09	-	no	drop
+918781	333286	summary_tag	topic	institution		Government Hospitals	Public medical facilities providing healthcare	0.38	-	no	drop
+918782	333286	summary_tag	topic	scheme		Pradhan Mantri Swasthya Suraksha Bima Yojana	Government health insurance scheme for poor families.	0.02	-	no	drop
+918783	333286	summary_tag	topic	topic		Health For All Scheme	General government aim to give every citizen access to healthcare.	0.27	-	no	drop
+918769	333286	dictionary	other	place		Koderma	कोडरमा	1.00	-	yes	keep
+918770	333286	dictionary	other	place		Hazaribagh	हजारीबाग	0.99	-	yes	keep
+918771	333286	dictionary	other	institution		Ministry of Health and Family Welfare	स्वास्थ्य मंत्रालय	1.00	-	yes	keep
+183939	333847	llm	topic	topic		Railway infrastructure and projects	Demands of Grants related to Railways	0.99	-	yes	keep
+183940	333847	llm	topic	topic		Railway gauge conversion and tourism connectivity	conversion from NG to Board gauge	0.98	-	yes	keep
+183941	333847	llm	topic	topic		New train services and stoppages	operate a special train from Bhusawal to Mumbai	0.97	-	yes	keep
+183942	333847	llm	topic	topic		Railway asset monetisation	monetisation of the assets	0.67	-	yes	keep
+912520	333847	summary_tag	topic	topic		Rail Budget	Annual financial allocation for railway services	0.97	-	yes	keep
+912521	333847	summary_tag	topic	law		Railway Budget	Annual government allocation for railway operations and development.	0.95	-	yes	keep
+912522	333847	summary_tag	topic	place		Chhatrapati Sambhajinagar	District and Lok Sabha constituency in Maharashtra, India. The constituency is listed as Aurangabad.	0.16	-	no	keep
+912523	333847	summary_tag	topic	topic		Railway Development	Expansion and improvement of railway infrastructure and services.	0.99	-	yes	keep
+912524	333847	summary_tag	topic	scheme		Amrit Bharat Station Scheme	Government program that modernises railway stations.	0.03	-	no	drop
+912525	333847	summary_tag	topic	topic		New Railway Line	Construction of new railway routes and tracks.	0.91	-	yes	keep
+912526	333847	summary_tag	topic	topic		Gauge Conversion	Changing the distance between railway tracks to improve compatibility.	0.96	-	yes	keep
+912527	333847	summary_tag	topic	scheme		Diamond Quadrilateral Project	Government project linking four major Indian cities by high-speed rail.	0.03	-	no	drop
+912528	333847	summary_tag	topic	topic		SCs and STs welfare	Support for scheduled communities	0.03	-	no	drop
+912529	333847	summary_tag	topic	law		Railway Freight Exemptions	Relief from transport taxes for certain rail cargo.	0.02	-	no	drop
+912530	333847	summary_tag	topic	institution		Indian Railways	Government rail organization.	0.98	-	yes	keep
+912531	333847	summary_tag	topic	place		Railway Station	Facility where trains stop for passengers and cargo operations.	0.83	-	yes	drop
+183943	333847	llm	other	place		Bhusawal	Bhusawal	1.00	-	yes	keep
+183944	333847	llm	other	place		Ajanta Caves	Ajanta caves	1.00	-	yes	keep
+183945	333847	llm	other	scheme		Pachora-Jamner NG line	Pachora-Jamner NG line	1.00	-	yes	keep
+912512	333847	dictionary	other	person		Nirmala Sitharaman	Nirmala Sitharaman	0.04	-	no	drop
+912513	333847	dictionary	other	institution		Ministry of Railways	Railway Minister	0.81	-	yes	keep
+912514	333847	dictionary	other	place		Mumbai	Mumbai	1.00	-	yes	keep
+912515	333847	dictionary	other	institution		Central Railway	Central Railway	1.00	-	yes	keep
+912516	333847	dictionary	other	place		Pune	Pune	1.00	-	yes	keep
+912517	333847	dictionary	other	law		Union Budget	Budget	0.37	-	no	keep
+912518	333847	dictionary	other	person		Narendra Modi	Modi	0.15	-	no	drop
+912519	333847	dictionary	other	place		Aurangabad	Aurangabad	1.00	-	yes	keep
+269457	334457	llm	topic	topic		Democracy restoration	restoring democracy in Myanmar	0.98	-	yes	keep
+903141	334457	summary_tag	topic	topic		Indo-Myanmar Relations	Relations between India and Myanmar.	0.96	-	yes	keep
+903142	334457	summary_tag	topic	place		China	Neighboring country with bilateral relations with India	0.41	-	no	drop
+903143	334457	summary_tag	topic	place		Myanmar	Southeast Asian country.	0.98	-	yes	keep
+903144	334457	summary_tag	topic	topic		Bilateral Relations	Relations between India and one other country.	0.90	-	yes	drop
+903145	334457	summary_tag	topic	topic		Indo-China Relation	Relations between India and China.	0.39	-	no	drop
+903146	334457	summary_tag	topic	law		Bilateral Agreements	Treaties between India and other nations	0.07	-	no	drop
+903147	334457	summary_tag	topic	place		South Asia	Geographic region including India and neighbors	0.23	-	no	drop
+903148	334457	summary_tag	topic	topic		Indo-Bangladesh Relation	Relations between India and Bangladesh.	0.02	-	no	drop
+903149	334457	summary_tag	topic	institution		Ministry Of External Affairs	Indian government ministry that manages relations with other countries.	0.34	-	no	drop
+903150	334457	summary_tag	topic	institution		NSCN(IM)	Armed group operating in northeast India	0.07	-	no	drop
+903151	334457	summary_tag	topic	place		Neighbouring Countries	Nations sharing borders with India	0.57	-	no	drop
+903152	334457	summary_tag	topic	topic		Indo-Srilanka Relation	Relations between India and Sri Lanka.	0.02	-	no	drop
+269458	334457	llm	other	place		Myanmar	Myanmar	1.00	-	yes	keep
+269459	334457	llm	other	person		Aung San Suu Kyi	Aung San Suu Kyi	1.00	-	yes	keep
+269460	334457	llm	other	place		India	India	1.00	-	yes	drop
+269461	334457	llm	other	place		Arunachal Pradesh	Arunachal Pradesh	0.57	-	yes	drop
+269462	334457	llm	other	place		Nagaland	Nagaland	0.43	-	yes	drop
+269463	334457	llm	other	place		Manipur	Manipur	0.25	-	no	drop
+269464	334457	llm	other	place		Mizoram	Mizoram	0.34	-	no	drop
+903138	334457	dictionary	other	institution		Indian Army	Indian Army	0.65	-	no	keep
+903139	334457	dictionary	other	scheme		Act East Policy	Act East Policy	0.94	-	yes	keep
+903140	334457	dictionary	other	place		China	Chinese	0.90	-	yes	drop
+271074	335003	llm	topic	topic		Union Budget 2021-2022 support and evaluation	वर्ष 2021-22 के बजट पर बोलने का अवसर	0.99	-	yes	keep
+271075	335003	llm	topic	topic		Development and infrastructure in Nalanda	हमारे क्षेत्र नालंदा में	0.90	-	yes	keep
+898528	335003	summary_tag	topic	law		Railway Budget	Annual government allocation for railway operations and development.	0.12	-	no	drop
+898529	335003	summary_tag	topic	topic		Budget	India's yearly financial plan, showing the government's planned income and spending.	0.99	-	yes	keep
+898530	335003	summary_tag	topic	place		Nalanda	District and Lok Sabha constituency in Bihar, India.	0.92	-	yes	keep
+898531	335003	summary_tag	topic	topic		Health Budget	Financial allocation for healthcare	0.89	-	yes	keep
+898532	335003	summary_tag	topic	law		General Budget	Annual government financial plan detailing revenue and expenditure allocations.	0.92	-	yes	keep
+898533	335003	summary_tag	topic	institution		Nalanda University	Historic Buddhist university revived in modern India	0.56	-	no	keep
+898534	335003	summary_tag	topic	place		Darbhanga	District and Lok Sabha constituency in Bihar, India.	0.03	-	no	drop
+898535	335003	summary_tag	topic	topic		Sabka Sath Sabka Vikas	Government slogan for growth that includes and benefits everyone.	0.53	-	no	drop
+898536	335003	summary_tag	topic	topic		SCs and STs welfare	Support for scheduled communities	0.10	-	no	drop
+898537	335003	summary_tag	topic	scheme		Minimum Support  Prices (MSP)	Government guarantee of a minimum price paid to farmers for their crops.	0.04	-	no	drop
+898538	335003	summary_tag	topic	scheme		UDAAN Scheme	Government scheme that supports small and medium businesses.	0.03	-	no	drop
+898539	335003	summary_tag	topic	place		Nawada	District and Lok Sabha constituency in Bihar, India.	0.14	-	no	drop
+271076	335003	llm	other	place		Nalanda	नालंदा	1.00	-	yes	keep
+271077	335003	llm	other	person		Narendra Modi	माननीय प्रधानमंत्री जी	0.66	-	yes	drop
+271078	335003	llm	other	person		Atal Bihari Vajpayee	अटल बिहारी वाजपेयी	0.05	-	no	drop
+271079	335003	llm	other	person		Anurag Singh Thakur	श्री अनुराग ठाकुर जी	0.99	-	yes	keep
+898520	335003	dictionary	other	institution		Sainik School	सैनिक स्कूल	0.99	-	yes	keep
+898521	335003	dictionary	other	institution		Ministry of Finance	वित्त मंत्री	0.87	-	yes	keep
+898522	335003	dictionary	other	group		Farmers	किसानों	0.99	-	yes	keep
+898523	335003	dictionary	other	group		Traders	व्यापारियों	1.00	-	yes	keep
+898524	335003	dictionary	other	group		Poor	गरीब	0.97	-	yes	drop
+898525	335003	dictionary	other	place		Kalyan	कल्याण	0.09	-	no	drop
+898526	335003	dictionary	other	scheme		Atmanirbhar Bharat	आत्मनिर्भर भारत	0.74	-	no	drop
+898527	335003	dictionary	other	group		National Democratic Alliance	एनडीए	0.98	-	yes	drop
+275261	336464	llm	topic	topic		Traditional medicine	indigenous medicine system	0.97	-	yes	keep
+275262	336464	llm	topic	topic		Medical education reform	क्वालिटेटिव एजुकेशन	0.86	-	yes	drop
+881539	336464	summary_tag	topic	law		National Medical Commission Bill	Legislation regulating medical doctors and practice.	0.35	-	no	drop
+881540	336464	summary_tag	topic	topic		Ayurveda	Traditional Indian system of medicine and wellness	0.59	-	no	drop
+881541	336464	summary_tag	topic	institution		AYUSH	System for traditional medicine	0.31	-	no	drop
+881542	336464	summary_tag	topic	institution		National Ayurveda University	Higher education institution for traditional Indian medicine	0.03	-	no	drop
+881543	336464	summary_tag	topic	topic		Traditional Medicine	Medical practices based on indigenous knowledge systems	0.96	-	yes	keep
+881544	336464	summary_tag	topic	institution		Indian Council of Medical Research (ICMR)	Medical and health research organization.	0.03	-	no	drop
+881545	336464	summary_tag	topic	institution		National Institute of Medicinal Plants	Research organization for medicinal plant studies	0.03	-	no	drop
+881546	336464	summary_tag	topic	institution		Medical Council of India	Body regulating medical professionals	0.08	-	no	drop
+881547	336464	summary_tag	topic	topic		SCs and STs welfare	Support for scheduled communities	0.02	-	no	drop
+881548	336464	summary_tag	topic	topic		Siddha	Traditional medicine system practiced in India.	0.04	-	no	drop
+881549	336464	summary_tag	topic	scheme		Vocal for Local	Promoting Indian-made goods and local businesses	0.03	-	no	drop
+881550	336464	summary_tag	topic	law		Sabka Bima Sabki Raksha Bill	Insurance legislation for comprehensive coverage	0.02	-	no	drop
+275263	336464	llm	other	law		National Commission for the Indian System of Medicine Bill, 2020	Indian System of Medicine Bill, 2020	0.97	-	yes	keep
+275264	336464	llm	other	law		Indian Medicine Central Council Act	Indian Medicine Central Council Act	0.91	-	yes	keep
+881537	336464	dictionary	other	person		Narendra Modi	Narendra Modi	0.80	-	yes	drop
+881538	336464	dictionary	other	person		Harsh Vardhan	हर्ष वर्धन जी	0.41	-	no	drop
+277984	337288	llm	topic	topic		Agricultural market regulation	Essential Commodities (Amendment) Bill, 2020	0.96	-	yes	keep
+277985	337288	llm	topic	topic		Food storage and hoarding	store and hoard	0.98	-	yes	keep
+868447	337288	summary_tag	topic	law		Essential Commodities Act	Law regulating supply.	0.98	-	yes	keep
+868448	337288	summary_tag	topic	law		Minimum Support Prices	Price floor for agricultural commodities	0.04	-	no	drop
+868449	337288	summary_tag	topic	institution		Swaminathan Commission Report	Report from a government commission that recommended higher crop support prices.	0.02	-	no	drop
+868450	337288	summary_tag	topic	scheme		Minimum Support  Prices (MSP)	Government guarantee of a minimum price paid to farmers for their crops.	0.04	-	no	drop
+868451	337288	summary_tag	topic	institution		Food Corporation of India (FCI)	The government corporation that buys, stores, and distributes food grain in India.	0.02	-	no	drop
+868452	337288	summary_tag	topic	law		NATIONAL FOOD SECURITY ACT	Law guaranteeing subsidized food for poor households	0.05	-	no	drop
+868453	337288	summary_tag	topic	topic		Essential Commodities	Basic goods needed by people	0.99	-	yes	keep
+868454	337288	summary_tag	topic	law		Land Ceiling	Limits on maximum land holdings.	0.01	-	no	drop
+868455	337288	summary_tag	topic	law		Farm Laws	Laws that govern how farming and agricultural trade are carried out.	0.23	-	no	drop
+868456	337288	summary_tag	topic	topic		Farmers' Agitation	Farm worker protests and demonstrations.	0.25	-	no	drop
+868457	337288	summary_tag	topic	institution		KRIBHCO	Cooperative fertilizer producer owned by farmers.	0.01	-	no	drop
+868458	337288	summary_tag	topic	topic		Hoarding	Stockpiling goods unfairly	0.98	-	yes	keep
+277986	337288	llm	other	law		Essential Commodities (Amendment) Bill, 2020	Essential Commodities (Amendment) Bill, 2020	1.00	-	yes	keep
+277987	337288	llm	other	law		Essential Commodities Act	Essential Commodities Act	1.00	-	yes	keep
+277988	337288	llm	other	group		Adani Group	Adanis	0.93	-	yes	keep
+277989	337288	llm	other	institution		Adani Wilmar	Adani Wilmar	0.83	-	yes	keep
+277990	337288	llm	other	group		Reliance	Reliance	0.15	-	no	keep
+277991	337288	llm	other	group		Food Corporation of India	Food Producer Organisation	0.01	-	no	drop
+868441	337288	dictionary	other	group		Companies	companies	1.00	-	yes	keep
+868442	337288	dictionary	other	group		Farmers	farmers	1.00	-	yes	keep
+868443	337288	dictionary	other	place		Africa	Africa	0.49	-	no	drop
+868444	337288	dictionary	other	group		Citizens	citizens	0.97	-	yes	drop
+868445	337288	dictionary	other	group		Traders	traders	0.94	-	yes	keep
+868446	337288	dictionary	other	place		Bangladesh	Bangladesh	0.50	-	no	drop
+280454	338107	llm	topic	topic		Metro rail connectivity	Kochi Metro Rail	0.97	-	yes	keep
+856923	338107	summary_tag	topic	institution		Public Investment Board	Authority evaluating government investment proposals	0.92	-	yes	keep
+856924	338107	summary_tag	topic	topic		Metro Railway Development	Rapid transit system development in cities.	0.94	-	yes	keep
+856925	338107	summary_tag	topic	topic		Central Government Clearance	Approval by central government.	0.94	-	yes	keep
+856926	338107	summary_tag	topic	topic		Detailed Project Report (DPR)	A detailed document that plans and justifies a government infrastructure project before its approval.	0.80	-	yes	drop
+856927	338107	summary_tag	topic	place		Ernakulam	District and Lok Sabha constituency in Kerala, India.	0.12	-	no	drop
+856928	338107	summary_tag	topic	place		Thrissur	District and Lok Sabha constituency in Kerala, India.	0.02	-	no	drop
+856929	338107	summary_tag	topic	topic		Central Projects	Government infrastructure projects at national level	0.66	-	no	drop
+856930	338107	summary_tag	topic	topic		Environmental Clearance	Official approval required before a project can affect the environment.	0.03	-	no	drop
+856931	338107	summary_tag	topic	topic		Metro Corporation	A government company that builds and runs a city's metro rail system.	0.20	-	no	drop
+856932	338107	summary_tag	topic	law		Public Interest Litigation (PIL)	A court case filed by a citizen to protect the public interest.	0.02	-	no	drop
+856933	338107	summary_tag	topic	scheme		Atal Mission for Rejuvenation and Urban Transformation (AMRUT)	Government program that improves basic infrastructure in cities.	0.03	-	no	drop
+856934	338107	summary_tag	topic	institution		Metro Railways	Urban rapid rail transit systems.	0.54	-	no	drop
+280455	338107	llm	other	scheme		Kochi Metro Rail	Kochi Metro Rail	1.00	-	yes	keep
+280456	338107	llm	other	institution		Public Investment Board	Public Investment Board	1.00	-	yes	keep
+280457	338107	llm	other	institution		Ministry of Urban Development	Ministry of Urban Development	1.00	-	yes	keep
+280458	338107	llm	other	place		Jawaharlal Nehru Stadium	Jawaharlal Nehru Stadium	1.00	-	yes	keep
+280459	338107	llm	other	place		Infopark	Infopark	1.00	-	yes	keep
+856921	338107	dictionary	other	scheme		Kochi Metro	Kochi Metro	0.98	-	yes	keep
+856922	338107	dictionary	other	group		Employees	employees	0.89	-	yes	drop
+282111	338639	llm	topic	topic		Social justice	social justice	0.99	-	yes	keep
+282112	338639	llm	topic	topic		Minority rights	religious minorities	0.98	-	yes	keep
+852578	338639	summary_tag	topic	topic		Minority Groups	Religious and ethnic minorities requiring protection and welfare	0.98	-	yes	keep
+852579	338639	summary_tag	topic	topic		Harijan Atrocities	Violence and discrimination against scheduled castes.	0.43	-	no	drop
+852580	338639	summary_tag	topic	topic		Discrimination	Unfair treatment based on identity	0.97	-	yes	keep
+852581	338639	summary_tag	topic	topic		Social Inequality	Disparity in wealth, power, and opportunity.	0.98	-	yes	keep
+852582	338639	summary_tag	topic	topic		Religious Minorities	Non-Hindu religious communities	0.98	-	yes	keep
+852583	338639	summary_tag	topic	topic		Downtrodden	Marginalized and oppressed sections of society.	0.87	-	yes	drop
+852584	338639	summary_tag	topic	topic		Scs & Sts Atrocities	Crimes against scheduled castes and tribes.	0.56	-	no	drop
+852585	338639	summary_tag	topic	topic		Minorities	Communities that are religious, ethnic, or linguistic minorities.	0.98	-	yes	keep
+852586	338639	summary_tag	topic	topic		SCs and STs welfare	Support for scheduled communities	0.09	-	no	drop
+852587	338639	summary_tag	topic	topic		Inequality	Disparity in income, opportunity, or status among groups	0.97	-	yes	keep
+852588	338639	summary_tag	topic	topic		Weaker Sections	Economically disadvantaged population groups.	0.82	-	yes	drop
+852589	338639	summary_tag	topic	institution		Sachar Committee	A government committee that studied the condition of Muslim communities in India.	0.03	-	no	drop
+282113	338639	llm	other	institution		Supreme Court of India	Supreme Court of India	0.96	-	yes	drop
+282114	338639	llm	other	institution		Delhi Minority Commission	Minority Commission of Delhi	0.95	-	yes	keep
+282115	338639	llm	other	law		Citizenship Amendment Act	Citizenship Amendment Act	0.66	-	yes	drop
+282116	338639	llm	other	group		Muslims	Muslims	1.00	-	yes	keep
+852570	338639	dictionary	other	group		Minorities	minorities	1.00	-	yes	keep
+852571	338639	dictionary	other	place		Delhi	Delhi	0.89	-	yes	drop
+852572	338639	dictionary	other	group		Islam	Islam	0.37	-	no	drop
+852573	338639	dictionary	other	group		Religious minorities	religious minorities	1.00	-	yes	keep
+852574	338639	dictionary	other	law		Rule 193	Rule 193	0.42	-	no	drop
+852575	338639	dictionary	other	institution		United Nations Human Rights Council	UNHRC	0.24	-	no	drop
+852576	338639	dictionary	other	institution		Delhi Police	Delhi Police	1.00	-	yes	keep
+852577	338639	dictionary	other	place		Ganga	Ganga	0.14	-	no	drop
+574867	338869	llm	topic	topic		Rail connectivity	रेल अनुदान की मांगों	0.97	-	yes	keep
+574868	338869	llm	topic	topic		Railway station development	उच्चीकरण	0.97	-	yes	keep
+850240	338869	summary_tag	topic	place		Bareilly	District and Lok Sabha constituency in Uttar Pradesh, India.	0.92	-	yes	keep
+850241	338869	summary_tag	topic	law		Railway Budget	Annual government allocation for railway operations and development.	0.80	-	yes	drop
+850242	338869	summary_tag	topic	topic		Rail Budget	Annual financial allocation for railway services	0.89	-	yes	drop
+850243	338869	summary_tag	topic	topic		Demands For Grants On Account	Parliamentary approval for interim budget spending	0.61	-	no	drop
+850244	338869	summary_tag	topic	topic		Demands For Excess Grants	Parliamentary approval for spending beyond budgeted amount	0.04	-	no	drop
+850245	338869	summary_tag	topic	place		Aonla	Lok Sabha constituency in Uttar Pradesh, India.	0.95	-	yes	keep
+850246	338869	summary_tag	topic	topic		Railway Development	Expansion and improvement of railway infrastructure and services.	0.96	-	yes	keep
+850247	338869	summary_tag	topic	scheme		Amrit Bharat Station Scheme	Government program that modernises railway stations.	0.05	-	no	drop
+850248	338869	summary_tag	topic	law		Railway Freight Exemptions	Relief from transport taxes for certain rail cargo.	0.02	-	no	drop
+850249	338869	summary_tag	topic	topic		Demands For Grants	A parliamentary process for approving government spending plans.	0.93	-	yes	drop
+850250	338869	summary_tag	topic	topic		Railway Projects	Development and implementation of railway infrastructure and services.	0.95	-	yes	keep
+850251	338869	summary_tag	topic	topic		Railway Crossings	Intersections where railway lines cross roads or other tracks.	0.96	-	yes	keep
+574869	338869	llm	other	place		Aonla	आंवला	1.00	-	yes	keep
+574870	338869	llm	other	place		Bareilly	बरेली	1.00	-	yes	keep
+574871	338869	llm	other	institution		Ministry of Railways	रेल विभाग	1.00	-	yes	keep
+850234	338869	dictionary	other	place		Chandausi	चंदौसी	1.00	-	yes	keep
+850235	338869	dictionary	other	place		Lucknow	लखनऊ	1.00	-	yes	keep
+850236	338869	dictionary	other	place		Delhi	दिल्ली	1.00	-	yes	keep
+850237	338869	dictionary	other	institution		Ministry of Road Transport and Highways	विभाग	0.00	-	no	drop
+850238	338869	dictionary	other	place		Tilhar	तिलहर	1.00	-	yes	keep
+850239	338869	dictionary	other	group		Farmers	किसानों	1.00	-	yes	keep
+576418	342838	llm	topic	topic		Rail connectivity	सुपर एक्सप्रैस - वे	0.02	-	no	drop
+805704	342838	summary_tag	topic	place		Shirdi	Lok Sabha constituency in Maharashtra, India.	0.97	-	yes	keep
+805705	342838	summary_tag	topic	place		Chhatrapati Sambhajinagar	District and Lok Sabha constituency in Maharashtra, India. The constituency is listed as Aurangabad.	0.12	-	no	keep
+805706	342838	summary_tag	topic	scheme		Swadesh Darshan Scheme	Government program that develops tourism and pilgrimage infrastructure.	0.03	-	no	drop
+805707	342838	summary_tag	topic	scheme		Pradhan Mantri Gati Shakti Yojana	Government program that plans transport infrastructure across the country.	0.04	-	no	drop
+805708	342838	summary_tag	topic	scheme		PRASAD Scheme	Government scheme that develops pilgrimage and heritage sites for tourism.	0.03	-	no	drop
+805709	342838	summary_tag	topic	scheme		Golden Quadrilateral Project	Government highway project connecting four major Indian cities.	0.03	-	no	drop
+805710	342838	summary_tag	topic	scheme		Bharatmala Pariyojana	Government program that builds and connects national highways.	0.08	-	no	drop
+805711	342838	summary_tag	topic	scheme		Sagarmala Project	Government plan to develop coastal ports and facilities.	0.02	-	no	drop
+805712	342838	summary_tag	topic	institution		National Highways Authority of India (NHAI)	The government body that builds and manages India's national highways.	0.08	-	no	drop
+805713	342838	summary_tag	topic	scheme		Diamond Quadrilateral Project	Government project linking four major Indian cities by high-speed rail.	0.02	-	no	drop
+805714	342838	summary_tag	topic	topic		Detailed Project Report (DPR)	A detailed document that plans and justifies a government infrastructure project before its approval.	0.05	-	no	drop
+805715	342838	summary_tag	topic	place		Nashik	District and Lok Sabha constituency in Maharashtra, India.	0.02	-	no	drop
+576419	342838	llm	other	place		Aurangabad	औरंगाबाद	1.00	-	yes	keep
+576420	342838	llm	other	place		Shridi	शिरडी	1.00	-	yes	keep
+805702	342838	dictionary	other	place		Shirdi	शिरडी	1.00	-	yes	keep
+805703	342838	dictionary	other	group		Pilgrims	श्रद्धालुओं	1.00	-	yes	keep
+577080	343733	llm	topic	topic		Judicial backlog and reforms	लाखों की संख्या में मामले न्याय व्यवस्था के पास कई वर्षों से लंबित हैं	0.97	-	yes	keep
+577081	343733	llm	topic	topic		Judicial appointments and retirement age	सुप्रीम कोर्ट के न्यायाधीश की जो आयु सीमा है, उसे 65 वर्ष से बढ़ाकर 70 वर्ष किया जा सकता है	0.95	-	yes	keep
+577082	343733	llm	topic	topic		High Court bench establishment	कोल्हापुर हाई कोर्ट की डिमांड पिछले 15 साल से लंबित है	0.81	-	yes	keep
+796649	343733	summary_tag	topic	topic		Judicial Reforms	Changes made to improve the courts and legal process.	0.97	-	yes	keep
+796650	343733	summary_tag	topic	institution		Indian Judicial Service	Proposed civil service that would recruit judges through an all-India exam.	0.13	-	no	drop
+796651	343733	summary_tag	topic	institution		Supreme Court	Highest judicial authority in India.	0.92	-	yes	keep
+796652	343733	summary_tag	topic	law		Collegium System	Judge selection method.	0.09	-	no	drop
+796653	343733	summary_tag	topic	topic		Old Age Benefits	Support for elderly.	0.05	-	no	drop
+796654	343733	summary_tag	topic	institution		High Courts	Senior courts at the state level in the Indian court system.	0.91	-	yes	keep
+796655	343733	summary_tag	topic	institution		National Judicial Appointment Commission	Body selecting judges for higher courts.	0.03	-	no	drop
+796656	343733	summary_tag	topic	place		Kolhapur	District and Lok Sabha constituency in Maharashtra, India.	0.64	-	no	keep
+796657	343733	summary_tag	topic	topic		Judicial Activism	Proactive role of courts in addressing social issues	0.87	-	yes	keep
+796658	343733	summary_tag	topic	topic		SCs and STs welfare	Support for scheduled communities	0.03	-	no	drop
+796659	343733	summary_tag	topic	topic		Senior Citizens	Elderly people and their welfare needs.	0.02	-	no	drop
+796660	343733	summary_tag	topic	topic		Judicial Appointment	Selection and placement of judges in courts	0.77	-	no	keep
+577083	343733	llm	other	institution		Supreme Court	सुप्रीम कोर्ट	1.00	-	yes	keep
+577084	343733	llm	other	institution		Bombay High Court	बॉम्बे हाई कोर्ट	0.99	-	yes	keep
+577085	343733	llm	other	institution		Kolhapur High Court	कोल्हापुर हाई कोर्ट	1.00	-	yes	keep
+577086	343733	llm	other	person		B. R. Ambedkar	बाबा साहेब अम्बेडकर	0.30	-	no	drop
+577087	343733	llm	other	person		Bal Thackeray	बाला साहेब ठाकरे	0.12	-	no	drop
+577088	343733	llm	other	law		Transgender Persons (Protection of Rights) Bill, 2019	Transgender Persons (Protection of Rights) Bill, 2019	0.01	-	no	drop
+796641	343733	dictionary	other	institution		High Court	हाई कोर्ट	0.95	-	yes	keep
+796642	343733	dictionary	other	institution		Mumbai High Court	मुम्बई हाई कोर्ट	0.99	-	yes	keep
+796643	343733	dictionary	other	place		Kalyan	कल्याण	0.08	-	no	drop
+796644	343733	dictionary	other	place		Mumbai	मुम्बई	0.97	-	yes	drop
+796645	343733	dictionary	other	group		Judges	न्यायाधीश	1.00	-	yes	keep
+796646	343733	dictionary	other	group		Marathi	मराठी	0.06	-	no	drop
+796647	343733	dictionary	other	person		Balasaheb Thackeray	बाला साहेब ठाकरे जी	0.13	-	no	drop
+796648	343733	dictionary	other	place		Konkan	कोंकण	0.98	-	yes	drop
+297109	344188	llm	topic	topic		Aftercare for child victims under the POCSO Act	aftercare	0.96	-	yes	keep
+791644	344188	summary_tag	topic	topic		Rehabilitation	Support programs to help people recover from disasters or other hardships.	0.91	-	yes	keep
+791645	344188	summary_tag	topic	scheme		Nirbhaya Fund	Government fund that supports the safety and security of women.	0.02	-	no	drop
+791646	344188	summary_tag	topic	institution		Ministry of Social Justice and Empowerment	The government department that works for disadvantaged communities.	0.03	-	no	drop
+791647	344188	summary_tag	topic	law		The Nari Shakti Vandan Adhiniyam	Law that reserves seats for women in Parliament and state assemblies.	0.03	-	no	drop
+791648	344188	summary_tag	topic	topic		Child Care	Support for children	0.85	-	yes	keep
+791649	344188	summary_tag	topic	topic		Child Welfare	Programs for children.	0.95	-	yes	keep
+791650	344188	summary_tag	topic	topic		Child Abuse	Harm to children	0.97	-	yes	keep
+791651	344188	summary_tag	topic	topic		Drug De-addiction	Treatment programs for persons dependent on addictive substances.	0.01	-	no	drop
+791652	344188	summary_tag	topic	law		Child Adoption	Legal process for assuming guardianship and parenthood of a child.	0.02	-	no	drop
+791653	344188	summary_tag	topic	topic		SCs and STs welfare	Support for scheduled communities	0.02	-	no	drop
+791654	344188	summary_tag	topic	scheme		Integrated Child Development Services (ICDS)	Government program that gives nutrition, health, and early education to young children.	0.02	-	no	drop
+791655	344188	summary_tag	topic	topic		Child Protection	Safeguarding of minors from harm.	0.98	-	yes	keep
+297110	344188	llm	other	law		Protection of Children from Sexual Offences Act	POCSO Act	0.99	-	yes	keep
+297111	344188	llm	other	institution		Ministry of Women and Child Development	Ministry of Women and Child Development	0.97	-	yes	keep
+297112	344188	llm	other	institution		Parliamentary Standing Committee on Human Resource Development	Parliamentary Standing Committee on Human Resource Development	0.68	-	yes	drop
+791643	344188	dictionary	other	group		Children	children	1.00	-	yes	keep
+297894	344500	llm	topic	topic		Government residential accommodation	residential accommodation	0.97	-	yes	keep
+297895	344500	llm	topic	topic		Eviction procedures and rules	notice for eviction, order of eviction and payment of damages	0.98	-	yes	keep
+789277	344500	summary_tag	topic	law		The Government of National Capital Territory of Delhi(Amendment)Bill, 2023	Legislative amendment changing governance of Delhi territory.	0.01	-	no	drop
+789278	344500	summary_tag	topic	law		Lal Dora	Delhi law protecting agricultural land from urban spread.	0.03	-	no	drop
+789279	344500	summary_tag	topic	topic		Migrant Problems	Issues faced by migrant workers and displaced persons	0.03	-	no	drop
+789280	344500	summary_tag	topic	law		Housing Policy	Government decisions on residential provision	0.64	-	no	keep
+789281	344500	summary_tag	topic	topic		Homeless	People without housing or shelter.	0.24	-	no	drop
+789282	344500	summary_tag	topic	topic		Short Stay Homes	Facilities that give short-term shelter to people in distress.	0.02	-	no	drop
+789283	344500	summary_tag	topic	law		The Nari Shakti Vandan Adhiniyam	Law that reserves seats for women in Parliament and state assemblies.	0.01	-	no	drop
+789284	344500	summary_tag	topic	topic		Land Encroachment	Illegal occupation of land.	0.10	-	no	drop
+789285	344500	summary_tag	topic	topic		Encroachment	Illegal occupation of land	0.48	-	no	drop
+789286	344500	summary_tag	topic	scheme		The Viksit Bharat – Guarantee for Rozgar and Ajeevika Mission (Gramin) VB – G RAM G Bill	Government program aimed at rural employment and livelihoods.	0.01	-	no	drop
+789287	344500	summary_tag	topic	law		Reservation Bill	Legislation providing affirmative action quotas	0.02	-	no	drop
+789288	344500	summary_tag	topic	topic		Indian Citizens	Persons holding citizenship of India	0.07	-	no	drop
+297896	344500	llm	other	law		Public Premises (Eviction of Unauthorized Occupants) Amendment Bill, 2019	Public Premises (Eviction of Unauthorized Occupants) Amendment Bill, 2019	1.00	-	yes	keep
+297897	344500	llm	other	institution		Directorate of Estates	Directorate of Estates	0.99	-	yes	keep
+297898	344500	llm	other	institution		Central Public Works Department	CPWD	0.97	-	yes	keep
+789272	344500	dictionary	other	institution		Directorate General of Shipping	Director-General	0.00	-	no	drop
+789273	344500	dictionary	other	institution		Ministry of Urban Development	Ministry of Urban Development	0.69	-	no	keep
+789274	344500	dictionary	other	institution		Central Reserve Police Force	CRPF	0.76	-	no	drop
+789275	344500	dictionary	other	institution		High Court	High Court	0.84	-	yes	drop
+789276	344500	dictionary	other	place		Delhi	Delhi	0.78	-	no	drop
+297916	344510	llm	topic	topic		Government property management	सरकारी परिसम्पत्तियां	0.97	-	yes	keep
+297917	344510	llm	topic	topic		Eviction of unauthorized occupants	अप्राधिकृत अधिभोगियों की बेदखली	0.99	-	yes	keep
+297918	344510	llm	topic	topic		Housing allotment	आवास आबंटित	0.83	-	yes	keep
+789389	344510	summary_tag	topic	law		The Government of National Capital Territory of Delhi(Amendment)Bill, 2023	Legislative amendment changing governance of Delhi territory.	0.01	-	no	drop
+789390	344510	summary_tag	topic	law		Law Amendment	Change to existing legislation	0.98	-	yes	drop
+789391	344510	summary_tag	topic	law		Advocates(Amendment) Bill	Legislation modifying the Advocates Act and regulations.	0.52	-	no	drop
+789392	344510	summary_tag	topic	law		The Nari Shakti Vandan Adhiniyam	Law that reserves seats for women in Parliament and state assemblies.	0.01	-	no	drop
+789393	344510	summary_tag	topic	topic		SCs and STs welfare	Support for scheduled communities	0.04	-	no	drop
+789394	344510	summary_tag	topic	scheme		Pradhan Mantri Awaas Yojana	Government scheme that helps poor families build or buy a home.	0.03	-	no	drop
+789395	344510	summary_tag	topic	law		Sabka Bima Sabki Raksha Bill	Insurance legislation for comprehensive coverage	0.02	-	no	drop
+789396	344510	summary_tag	topic	law		The Repealing and Amending Bill	Legislation that removes or updates laws that are no longer needed.	0.05	-	no	drop
+789397	344510	summary_tag	topic	law		Housing Policy	Government decisions on residential provision	0.38	-	no	keep
+789398	344510	summary_tag	topic	law		Private Members Resolution	Parliamentary proposal from individual lawmakers	0.05	-	no	drop
+789399	344510	summary_tag	topic	law		Anti-Defection Law	Law that removes an elected member who switches political party.	0.02	-	no	drop
+789400	344510	summary_tag	topic	topic		MP(s) Conduct	Behavior and ethics of parliament members	0.76	-	no	drop
+297919	344510	llm	other	law		Public Premises (Eviction of Unauthorized Occupants) Amendment Bill, 2019	सरकारी स्थान ( अप्राधिकृत अधिभोगियों की बेदखली ) संशोधन विधेयक, 2019	1.00	-	yes	keep
+297920	344510	llm	other	place		Palghar	पालघर	0.82	-	yes	keep
+297921	344510	llm	other	place		Vasai-Virar-Nalasopara	वसई - विरार - नालासोपारा	0.94	-	yes	keep
+297922	344510	llm	other	place		Mumbai	मुंबई	0.56	-	yes	drop
+789381	344510	dictionary	other	place		Vasai-Virar	वसई-विरार	0.95	-	yes	keep
+789382	344510	dictionary	other	scheme		Pradhan Mantri Awas Yojana	आवास	0.03	-	no	drop
+789383	344510	dictionary	other	institution		Public Works Department	पीडब्ल्यूडी	0.03	-	no	drop
+789384	344510	dictionary	other	group		Government employees	सरकारी कर्मचारी	0.96	-	yes	keep
+789385	344510	dictionary	other	group		Police	पुलिस	0.94	-	yes	keep
+789386	344510	dictionary	other	group		Companies	कम्पनियों	0.42	-	no	drop
+789387	344510	dictionary	other	group		Doctors	डॉक्टर्स	0.30	-	no	drop
+789388	344510	dictionary	other	group		Scheduled Tribes	आदिवासी	0.15	-	no	drop
+299134	344955	llm	topic	topic		Freedom fighters commemoration	heroic sacrifices of all the unsung heroes of India	0.97	-	yes	keep
+783715	344955	summary_tag	topic	place		Sundargarh	District and Lok Sabha constituency in Odisha, India.	0.06	-	no	drop
+783716	344955	summary_tag	topic	place		Sambalpur	District and Lok Sabha constituency in Odisha, India.	0.07	-	no	drop
+783717	344955	summary_tag	topic	place		Kendujhar	District and Lok Sabha constituency in Odisha, India. The constituency is listed as Keonjhar.	0.05	-	no	drop
+783718	344955	summary_tag	topic	place		Kalahandi	District and Lok Sabha constituency in Odisha, India.	0.05	-	no	drop
+783719	344955	summary_tag	topic	place		Kandhamal	District and Lok Sabha constituency in Odisha, India.	0.05	-	no	drop
+783720	344955	summary_tag	topic	place		Mayurbhanj	District and Lok Sabha constituency in Odisha, India.	0.06	-	no	drop
+783721	344955	summary_tag	topic	place		Balangir	District and Lok Sabha constituency in Odisha, India. The constituency is listed as Bolangir.	0.06	-	no	drop
+783722	344955	summary_tag	topic	place		Balasore	District and Lok Sabha constituency in Odisha, India.	0.04	-	no	drop
+783723	344955	summary_tag	topic	place		Berhampur	Lok Sabha constituency in Odisha, India.	0.04	-	no	drop
+783724	344955	summary_tag	topic	place		Kendrapara	District and Lok Sabha constituency in Odisha, India.	0.04	-	no	drop
+783725	344955	summary_tag	topic	place		Puri	District and Lok Sabha constituency in Odisha, India.	0.03	-	no	drop
+783726	344955	summary_tag	topic	place		Cuttack	District and Lok Sabha constituency in Odisha, India.	0.05	-	no	drop
+299135	344955	llm	other	person		Mahatma Gandhi	Mahatma Gandhi	0.20	-	no	drop
+299136	344955	llm	other	person		Veer Surendra Sai	सुरेन्द्र साई	1.00	-	yes	keep
+783713	344955	dictionary	other	role		President of India	राष्ट्रपति	0.01	-	no	drop
+783714	344955	dictionary	other	group		British	अं ग्रेजों	0.77	-	no	drop
+300034	345373	llm	topic	topic		Unregulated deposit schemes	Banning of Unregulated Deposit Schemes Bill, 2019	0.99	-	yes	keep
+775975	345373	summary_tag	topic	topic		Unregulated Deposit	Unsecured deposits collected illegally without government oversight or insurance.	0.98	-	yes	keep
+775976	345373	summary_tag	topic	law		Sabka Bima Sabki Raksha Bill	Insurance legislation for comprehensive coverage	0.02	-	no	drop
+775977	345373	summary_tag	topic	topic		Bank Frauds	Fraudulent schemes in banking sector.	0.29	-	no	drop
+775978	345373	summary_tag	topic	topic		Scams	Fraudulent schemes to deceive and defraud people.	0.93	-	yes	keep
+775979	345373	summary_tag	topic	topic		Chit Fund Scheme	Informal savings and credit arrangement among groups	0.38	-	no	keep
+775980	345373	summary_tag	topic	topic		Beggars & Begging	Persons seeking financial assistance and regulation of solicitation practices.	0.02	-	no	drop
+775981	345373	summary_tag	topic	topic		Fraudulent Practice	Deliberate deception or dishonest schemes carried out to gain money or unfair advantage.	0.76	-	no	keep
+775982	345373	summary_tag	topic	institution		Chit Fund Companies	Organizations managing rotating savings schemes.	0.36	-	no	drop
+775983	345373	summary_tag	topic	topic		Bank Deposits	Money placed in bank accounts	0.58	-	no	drop
+775984	345373	summary_tag	topic	law		Securities Markets Code Bill, 2025	Financial market regulation legislation	0.01	-	no	drop
+775985	345373	summary_tag	topic	topic		SCs and STs welfare	Support for scheduled communities	0.02	-	no	drop
+775986	345373	summary_tag	topic	institution		Securities and Exchange Board of India (SEBI)	Regulatory body for stock market and securities regulation	0.06	-	no	drop
+300035	345373	llm	other	law		Banning of Unregulated Deposit Schemes Act	Banning of Unregulated Deposit Schemes Bill, 2019	0.46	-	yes	keep
+300036	345373	llm	other	institution		Standing Committee on Finance	Standing Committee for Finance	0.95	-	yes	drop
+300037	345373	llm	other	institution		Parliament	लोक सभा	0.92	-	yes	drop
+775970	345373	dictionary	other	institution		Standing Committee	स्टैंडिंग कमेटी	0.91	-	yes	drop
+775971	345373	dictionary	other	group		Poor	गरीब	1.00	-	yes	keep
+775972	345373	dictionary	other	role		President of India	राष्ट्रपति	0.89	-	yes	drop
+775973	345373	dictionary	other	person		Nirmala Sitharaman	Nirmala Sitharaman	0.07	-	no	drop
+775974	345373	dictionary	other	group		Depositors	depositors	1.00	-	yes	keep
+310987	348920	llm	topic	topic		Inclusion in OBC list	अन्य पिछड़ा वर्ग की सूची में शामिल हो	0.99	-	yes	keep
+732412	348920	summary_tag	topic	topic		Other Backward Classes (OBCs)	A group of communities that India officially recognises as socially disadvantaged.	0.98	-	yes	keep
+732413	348920	summary_tag	topic	topic		Backward Classes	Communities that are socially and economically disadvantaged.	0.98	-	yes	keep
+732414	348920	summary_tag	topic	law		O.B.C.	Law providing reservations for other backward classes.	0.96	-	yes	drop
+732415	348920	summary_tag	topic	topic		SCs and STs welfare	Support for scheduled communities	0.05	-	no	drop
+732416	348920	summary_tag	topic	law		SCs List	Official listing of scheduled castes.	0.05	-	no	drop
+732417	348920	summary_tag	topic	topic		Central List	An official government list, such as the list of backward classes eligible for reservation benefits.	0.79	-	no	keep
+732418	348920	summary_tag	topic	topic		Scheduled Castes	Communities of India officially recognised as a disadvantaged group.	0.04	-	no	drop
+732419	348920	summary_tag	topic	law		SCs & STs lists	Lists of scheduled castes and scheduled tribes.	0.08	-	no	drop
+732420	348920	summary_tag	topic	institution		National Commission for Backward Classes	A government body that works for social justice for backward communities.	0.09	-	no	drop
+732421	348920	summary_tag	topic	topic		Banjara Community	Historically nomadic community	0.01	-	no	drop
+732422	348920	summary_tag	topic	topic		Classification	The sorting of people or castes into official government categories, often for reservation benefits.	0.91	-	yes	drop
+732423	348920	summary_tag	topic	law		Mandal Commission Report	Document recommending reservation for backward castes.	0.08	-	no	drop
+310988	348920	llm	other	group		Kaurav	कौरव समाज	1.00	-	yes	keep
+310989	348920	llm	other	group		Anjana	अंजना समाज	0.21	-	no	keep
+310990	348920	llm	other	place		Narsinghpur	नरसिंहपुर	0.72	-	yes	keep
+310991	348920	llm	other	place		Hoshangabad	होशंगाबाद	0.72	-	yes	keep
+310992	348920	llm	other	place		Ujjain	उज्जैन	0.15	-	no	keep
+732404	348920	dictionary	other	group		Other Backward Classes	पिछड़ा वर्ग	1.00	-	yes	keep
+732405	348920	dictionary	other	place		Kalyan	कल्याण	0.01	-	no	drop
+732406	348920	dictionary	other	law		Mahabharata	महाभारत	0.40	-	no	drop
+732407	348920	dictionary	other	group		Children	बच्चों	1.00	-	yes	drop
+732408	348920	dictionary	other	scheme		PRAGATI	प्रगति	0.01	-	no	drop
+732409	348920	dictionary	other	place		Raisen	रायसेन	0.70	-	no	keep
+732410	348920	dictionary	other	place		Bhind	भिंड	0.77	-	no	keep
+732411	348920	dictionary	other	place		Rajasthan	राजस्थान	0.33	-	no	keep

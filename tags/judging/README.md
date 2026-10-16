@@ -52,6 +52,8 @@ Each item keeps its probabilities in `speech_items`: `judge_subject_p` and `judg
 
 The state is the member, the debate title, the date, and the speech text. When the speech does not fit in the model's context, the state is the stage 3 summary and the mention of each item. The column `judge_state` records which state was used.
 
+**Terms 16 and 17 used q5** (2026-10-17). All 22,063 term 16 speeches and all 21,399 term 17 speeches with candidates are judged. The review of 30 random term 17 speeches is `results/LS17_sample30_jev-1.13.0_q5_2026-10-17.tsv`. Its marks come from three LLM reviewers, not from a manual review.
+
 **Term 18 used the older version q4.** q4 gave a recognised tag its description, used four long levels for topics, asked three questions for each named item (`role`, `refers`, `type`), and kept every source at 0.6. The term 18 results stay as they are. `--questions q4` reads those rows for `--rethreshold` and `--score`.
 
 ## How to run it
