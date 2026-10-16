@@ -16,6 +16,7 @@ from debate_fetch import (
     _label_colon_pos,
     _leading_bold,
     annotate_speakers,
+    close_anchors,
     is_crowd_label,
     is_heading_label,
     load_debate,
@@ -42,7 +43,7 @@ def looks_legacy(html: str) -> bool:
 
 def _sanitize_legacy_html(html: str) -> str:
     # The source never closes <A>. An open anchor makes lxml nest every later paragraph inside it.
-    return re.sub(r'(?i)(<a\s+name="[^"]*")\s*>', r"\1/>", html)
+    return close_anchors(html)
 
 
 def _anchor_id(para_soup) -> str | None:

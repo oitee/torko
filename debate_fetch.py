@@ -10,7 +10,7 @@ import sys
 from difflib import SequenceMatcher
 
 import requests
-from bs4 import BeautifulSoup
+from bs4 import BeautifulSoup, NavigableString
 
 import translit
 from legacy_hindi import decode_legacy_hindi
@@ -430,6 +430,23 @@ def _anchor_id(para_soup) -> tuple[str | None, str | None]:
     return None, None
 
 
+def close_anchors(html: str) -> str:
+    return re.sub(r'(?i)(<a\s+name="[^"]*")\s*>', r"\1/>", html)
+
+
+def _anchor_is_trailing(para_soup) -> bool:
+    for a in para_soup.find_all("a"):
+        if not ANCHOR_NAME_RE.match(a.get("name", "") or ""):
+            continue
+        for el in a.next_elements:
+            if para_soup not in el.parents:
+                break
+            if isinstance(el, NavigableString) and el.strip():
+                return False
+        return True
+    return False
+
+
 # These lines look like speaker labels but nobody speaks: "Title: ...", "Motion Re: ..." and "17.00 hrs".
 _HEADING_LABELS = {"title", "motion re"}
 _HEADING_TIMESTAMP_RE = re.compile(r"^\d{1,2}[.:]\d{2}(½)?\s*hrs\.?$", re.IGNORECASE)
@@ -448,7 +465,7 @@ def split_by_speaker(
     html: str, mp_part_detail_list: list[dict], db_roster: list[dict] | None = None
 ) -> list[dict]:
     code_to_name = {str(m["mpCode"]): m["mpName"] for m in mp_part_detail_list}
-    soup = BeautifulSoup(html, "lxml")
+    soup = BeautifulSoup(close_anchors(html), "lxml")
 
     segments: list[dict] = []
     current: dict | None = None
@@ -464,12 +481,20 @@ def split_by_speaker(
                 pending_code, pending_part = anchor_code, anchor_part
             continue
 
+        # An anchor after all of the text belongs to the next paragraph.
+        trailing = None
+        if anchor_code and _anchor_is_trailing(p):
+            trailing = (anchor_code, anchor_part)
+            anchor_code = anchor_part = None
+
         mp_code, mp_part_code = anchor_code, anchor_part
         carried = mp_code is None and pending_code is not None
         if carried:
             mp_code, mp_part_code = pending_code, pending_part
         # A carried anchor applies to one paragraph only.
         pending_code = pending_part = None
+        if trailing:
+            pending_code, pending_part = trailing
 
         colon = _label_colon_pos(p, plain)
         # Some anchored labels are not bold, so the colon alone ends the label.
