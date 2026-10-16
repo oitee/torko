@@ -10,9 +10,9 @@ Every candidate is a row of `speech_items`. The column `source` tells where the 
 
 | Source | Added by | List | At most | Question |
 |---|---|---|---|---|
-| `llm` | stage 3, the extraction | `topic` and `other` | 8 + 8 | topic: `level`. Named item: `role`, `refers`, `type` |
-| `dictionary` | `scripts/add_candidates.py` | `other` | 8 (`--k`) | `role`, `refers`, `type` |
-| `summary_tag` (a recognised tag) | `scripts/add_candidates.py` | `topic` | 12 (`--n`) | `level`, with the tag type and description |
+| `llm` | stage 3, the extraction | `topic` and `other` | 8 + 8 | topic: `subject`. Named item: `use` |
+| `dictionary` | `scripts/add_candidates.py` | `other` | 8 (`--k`) | `use` |
+| `summary_tag` (a recognised tag) | `scripts/add_candidates.py` | `topic` | 12 (`--n`) | `subject`, with the tag type only |
 
 A `dictionary` row is a known entity name from `tags/entity_dictionary/` whose words are in the speech text, but which the extraction did not list. Its mention is the matched words. A name is not added when every match of its words lies inside a longer name: another dictionary name, or the words of a named item of the extraction (not a topic, not a group). For example, "शिमला" inside "शिमला एग्रीमेंट" does not add the place Shimla. A skipped name frees its place under the cap. A `summary_tag` row is a recognised tag: one of the 12 tags nearest in meaning to the one-sentence summary of the speech. It holds the tag in `tag_id`, so stage 5 does not link it. The column `evidence` keeps why each added row exists: the number of matches and the rank, or the distance and the rank. `db/init/20-candidate-sources.sql` adds these columns.
 
@@ -20,34 +20,39 @@ Run `scripts/add_candidates.py` before `scripts/judge_items.py`. It is idempoten
 
 ## The questions
 
-The current question version is `q4`. The script writes it into the column `judged_by` of each judged row, together with the model name, for example `jev-1.13.0 q4`. The question texts are in `scripts/judge_items.py`: the constant `QUESTIONS_VERSION`, the answer lists `LEVELS`, `ROLES`, and `TYPES`, and the function `questions_for`.
+The current question version is `q5`. The script writes it into the column `judged_by` of each judged row, together with the model name, for example `jev-1.13.0 q5`. The question texts are in `scripts/judge_items.py`: the constant `QUESTIONS_VERSION`, the answer list `USES`, and the function `questions_for`. Do not change a question text without a new version and a new gate.
 
 One call holds every question of one speech. A test on 2026-10-15 sent up to 300 questions in one call with no error. The longest speech of term 18 (10,332 words) fits in one call with 65 questions. So one call per speech is enough.
 
-**Topics and recognised tags** get one `score` question:
+**Topics and recognised tags** get one true-or-false statement (`noul`):
 
-> How central is «Railway Projects» (a topic) to this speech?
+> «Railway Projects» (a topic) is a main or supporting subject of this speech, not only a passing mention.
 
-For a recognised tag, the brackets hold the tag type and description, for example «Bareilly» (a place: District and Lok Sabha constituency in Uttar Pradesh, India). The answer is one of four levels:
+A recognised tag shows its type only, for example «Bareilly» (a place). It does not show the tag description.
 
-- 0, not a subject: it is not in the speech, or it is only the speaker, the Chair, an addressee, or procedure.
-- 1, passing: it is named once, as background, as an example, or as the source of a statement.
-- 2, supporting: the speech discusses it in more than one sentence, or the member's request depends on it.
-- 3, central: the speech is mainly about it.
+**Places, persons, institutions, laws, schemes, groups, and roles** get one `choice` question. The example uses the dictionary entity «Mailani», found in the words «मैलानी»:
 
-The item is kept when P(level 2 or 3) is 0.6 or more.
+> How does this speech use «Mailani» (a place, in the words «मैलानी»)?
 
-**Places, persons, institutions, laws, schemes, groups, and roles** get three questions. The examples use the dictionary entity «Mailani», found in the words «मैलानी».
+- `absent`: not mentioned, or only the speaker or the Chair.
+- `aside`: only an example, precedent, comparison, courtesy, or side list item.
+- `point`: part of the member's point: asked for, argued about, or says where or to whom it applies.
+- `other_meaning`: the words mean something else than this name.
 
-- `role` (`choice`): How does this speech use «Mailani» (a place, in the words «मैलानी»)? The answers are `absent` (the speech does not mention it, or it is only the speaker or the Chair), `aside` (only an example, a precedent, a comparison, a courtesy, or one item in a side list), and `point` (part of the member's point: the member asks for something about it, argues about it, or uses it to say where or to whom the point applies; one mention is enough).
-- `refers` (`noul`, the probability that a statement is true): In this speech, the words «मैलानी» refer to «Mailani». The speech, with common knowledge, is enough to tell that it is this one specific thing, without a guess.
-- `type` (`choice`): What kind of thing is «Mailani», as this speech uses it? The answers are place, person, institution, law, scheme, group, role, topic, and other.
+## The keep rule
 
-The item is kept when P(point) is 0.6 or more and P(refers) is 0.6 or more. The type never decides keep or drop.
+An item is kept when P(true), or P(point) for a named item, reaches the limit of its source. The two kinds of source have different limits, because they have opposite risks.
 
-All thresholds are start values. Each item keeps its probabilities in `speech_items` (`db/init/12-entity-links.sql`), so `--rethreshold` applies new thresholds without a new call.
+| Source | Limit | Why |
+|---|---|---|
+| `llm` | 0.4 (`--keep-llm`) | The extraction chose the item. Stage 4 is an extra check. The bad error is to drop a correct item. To keep a wrong item is acceptable. |
+| `dictionary` and `summary_tag` | 0.8 (`--keep-other`) | The item is an addition. The bad error is to keep a wrong item, because it adds noise to the tags. To drop a correct item is acceptable. |
+
+Each item keeps its probabilities in `speech_items`: `judge_subject_p` and `judge_use_p` (`db/init/21-judge-q5.sql`). So `--rethreshold` applies new limits without a new call. q5 asks no type question, so stage 5 uses the extraction type.
 
 The state is the member, the debate title, the date, and the speech text. When the speech does not fit in the model's context, the state is the stage 3 summary and the mention of each item. The column `judge_state` records which state was used.
+
+**Term 18 used the older version q4.** q4 gave a recognised tag its description, used four long levels for topics, asked three questions for each named item (`role`, `refers`, `type`), and kept every source at 0.6. The term 18 results stay as they are. `--questions q4` reads those rows for `--rethreshold` and `--score`.
 
 ## How to run it
 
@@ -59,8 +64,8 @@ python3 scripts/add_candidates.py --speech-ids 260741,340402 --dry-run
 python3 scripts/add_candidates.py --speech-ids 260741,340402
 python3 scripts/judge_items.py --speech-ids 260741,340402 --dry-run
 python3 scripts/judge_items.py --speech-ids 260741,340402 --prefill tags/judging/results/<old marks>.tsv
-python3 scripts/judge_items.py --rethreshold --keep-point 0.5
-python3 scripts/judge_items.py --score tags/judging/results/<file>.tsv
+python3 scripts/judge_items.py --rethreshold --term 18 --questions q4
+python3 scripts/judge_items.py --score tags/judging/results/<file>.tsv --questions q4
 ```
 
 The script is idempotent. It skips each item that the current model and question version judged before. `--force` judges again.

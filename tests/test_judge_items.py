@@ -1,71 +1,101 @@
-"""Stage 4 must judge topics by centrality and named items by their role and their name, and never let the type decide."""
-from scripts.judge_items import (LEVELS, ROLES, TYPES, Thresholds, gate_rates, judged_by, keep, questions_for,
-                                 read_item, read_marks, summary_state)
+from types import SimpleNamespace
+
+from scripts.judge_items import (ROLES, USES, Thresholds, gate_rates, judged_by, judgement, keep, p_keep,
+                                 questions_for, read_item, read_marks, summary_state)
 
 
-def named(point, refers, absent=0.0):
-    return {"level_p": None, "role_p": {"absent": absent, "aside": 1 - point - absent, "point": point},
-            "refers_p": refers}
+def subject(p, source="llm"):
+    return {"subject_p": p, "use_p": None, "source": source}
 
 
-def test_a_topic_is_kept_when_central_enough():
-    assert keep({"level_p": [0.1, 0.2, 0.3, 0.4]})              # P(2+3) = 0.7
-    assert not keep({"level_p": [0.2, 0.3, 0.3, 0.2]})          # P(2+3) = 0.5
-    assert keep({"level_p": [0.2, 0.3, 0.3, 0.2]}, Thresholds(level=0.5))
+def use(point, source="llm"):
+    return {"subject_p": None, "use_p": {"absent": 0.0, "aside": 1 - point, "point": point, "other_meaning": 0.0},
+            "source": source}
 
 
-def test_a_named_item_named_once_as_part_of_the_point_is_kept():
-    assert keep(named(point=0.9, refers=0.9))
+def test_an_llm_item_is_kept_at_a_low_limit():
+    assert keep(subject(0.45)) and keep(use(0.45))
+    assert not keep(subject(0.35)) and not keep(use(0.35))
 
 
-def test_an_example_or_a_courtesy_is_dropped_even_when_the_name_is_right():
-    assert not keep(named(point=0.1, refers=0.95))
+def test_a_dictionary_entity_or_a_recognised_tag_is_kept_only_at_a_high_limit():
+    for source in ("dictionary", "summary_tag"):
+        assert not keep(use(0.75, source)) and not keep(subject(0.75, source))
+        assert keep(use(0.85, source)) and keep(subject(0.85, source))
 
 
-def test_a_guessed_full_name_is_dropped_even_when_part_of_the_point():
-    assert not keep(named(point=0.9, refers=0.53))
-    assert keep(named(point=0.9, refers=0.53), Thresholds(refers=0.5))
+def test_the_limits_can_change():
+    assert keep(subject(0.75, "summary_tag"), Thresholds(other=0.7))
+    assert not keep(subject(0.45), Thresholds(llm=0.5))
 
 
-def test_topics_get_one_question_and_named_items_get_three():
+def test_topics_and_recognised_tags_get_one_statement_and_named_items_get_one_use_question():
     q = questions_for([{"id": 7, "name": "Arbitration and Conciliation Act", "type": "law",
-                        "mention": "Arbitration Act, 1996"},
-                       {"id": 9, "name": "Floods", "type": "topic", "mention": "बाढ़"}])
-    assert set(q) == {"role_7", "refers_7", "type_7", "level_9"}
-    assert q["level_9"]["criteria"] == LEVELS
-    assert set(q["role_7"]["criteria"]) == set(ROLES) and set(q["type_7"]["criteria"]) == set(TYPES)
-    assert "«Arbitration Act, 1996»" in q["refers_7"]["instructions"]
-    assert "«Arbitration Act, 1996»" in q["role_7"]["instructions"]
+                        "mention": "Arbitration Act, 1996", "source": "llm"},
+                       {"id": 9, "name": "Floods", "type": "topic", "mention": "बाढ़", "source": "llm"}])
+    assert set(q) == {"use_7", "level_9"}
+    assert q["level_9"] == {"type": "noul", "instructions":
+                            "«Floods» (a topic) is a main or supporting subject of this speech, not only a passing mention."}
+    assert q["use_7"]["type"] == "choice" and list(q["use_7"]["criteria"]) == list(USES)
+    assert "«Arbitration Act, 1996»" in q["use_7"]["instructions"]
+
+
+def test_a_recognised_tag_shows_its_type_and_no_description():
+    tag = {"id": 7, "name": "Bareilly", "type": "place", "mention": "", "source": "summary_tag",
+           "description": "District and Lok Sabha constituency in Uttar Pradesh, India."}
+    q = questions_for([tag])
+    assert list(q) == ["level_7"]
+    assert "«Bareilly» (a place) is a main" in q["level_7"]["instructions"]
+    assert "Uttar Pradesh" not in q["level_7"]["instructions"]
+
+
+def test_a_dictionary_entity_gets_the_use_question_with_its_matched_words():
+    q = questions_for([{"id": 8, "name": "DISHA", "type": "scheme", "mention": "दिशा", "source": "dictionary"}])
+    assert list(q) == ["use_8"] and "«दिशा»" in q["use_8"]["instructions"]
 
 
 def choice(probs):
     return {"type": "choice", "choice": max(probs, key=probs.get), "probabilities": probs}
 
 
-def test_read_item_takes_its_own_answers_and_sets_the_type_only_when_sure():
-    types = {t: 0.0 for t in TYPES}
-    answers = {"role_7": choice({"absent": 0.0, "aside": 0.1, "point": 0.9}),
-               "refers_7": {"type": "noul", "noul": 0.93},
-               "type_7": choice({**types, "other": 0.8, "law": 0.2}),
-               "role_8": choice({"absent": 0.0, "aside": 0.5, "point": 0.5}),
-               "refers_8": {"type": "noul", "noul": 0.5},
-               "type_8": choice({**types, "place": 0.6, "institution": 0.4})}
-    j, warnings, raw = read_item(answers, {"id": 7, "type": "law"})
-    assert j["role_p"]["point"] == 0.9 and j["refers_p"] == 0.93 and j["type"] == "other"
-    assert warnings == [] and set(raw) == {"role", "refers", "type"}
-    j, _, _ = read_item(answers, {"id": 8, "type": "place"})
-    assert j["type"] is None                                   # 0.6 is below TYPE_P
+def test_read_item_reads_a_named_item_by_its_use_and_keeps_the_source():
+    answers = {"use_7": choice({"absent": 0.0, "aside": 0.1, "point": 0.85, "other_meaning": 0.05})}
+    j, warnings, raw = read_item(answers, {"id": 7, "type": "law", "source": "dictionary"})
+    assert j["use_p"]["point"] == 0.85 and j["source"] == "dictionary" and warnings == [] and set(raw) == {"use"}
+    assert keep(j) and p_keep(j) == 0.85
 
 
-def test_read_item_reads_a_topic_by_level_only():
-    j, warnings, _ = read_item({"level_9": {"probabilities": {"0": 0.0, "1": 0.1, "2": 0.2, "3": 0.7}}},
-                               {"id": 9, "type": "topic"})
-    assert j["level_p"] == [0.0, 0.1, 0.2, 0.7] and j["role_p"] is None and warnings == []
+def test_read_item_reads_a_topic_or_a_recognised_tag_by_one_probability():
+    j, warnings, _ = read_item({"level_9": {"type": "noul", "noul": 0.7}}, {"id": 9, "type": "place",
+                                                                           "source": "summary_tag"})
+    assert j["subject_p"] == 0.7 and j["use_p"] is None and not warnings
+    assert not keep(j)                                          # 0.7 is below the limit for additions
 
 
 def test_read_item_warns_about_a_broken_sum():
-    _, warnings, _ = read_item({"level_1": {"probabilities": {"3": 0.5}}}, {"id": 1, "type": "topic"})
+    _, warnings, _ = read_item({"use_1": {"probabilities": {"point": 0.5}}}, {"id": 1, "type": "place"})
     assert warnings and "sum" in warnings[0]
+
+
+def q4_row(source, level=None, role=None, refers=None):
+    return SimpleNamespace(source=source, judge_subject_p=None, judge_use_p=None, judge_level_p=level,
+                           judge_role_p=role, judge_refers_p=refers)
+
+
+def test_a_row_that_q4_judged_is_read_with_the_limit_of_its_source():
+    topic = judgement(q4_row("llm", level=[0.2, 0.35, 0.25, 0.2]))           # P(2+3) = 0.45
+    assert keep(topic) and not keep({**topic, "source": "summary_tag"})
+    assert ROLES == ("absent", "aside", "point")
+    named = judgement(q4_row("dictionary", role=[0.0, 0.1, 0.9], refers=0.9))
+    assert keep(named)
+    assert not keep(judgement(q4_row("dictionary", role=[0.0, 0.1, 0.9], refers=0.5)))   # a guessed name
+
+
+def test_a_row_that_q5_judged_is_read_from_its_own_columns():
+    row = SimpleNamespace(source="llm", judge_subject_p=None, judge_use_p=[0.1, 0.2, 0.6, 0.1],
+                          judge_level_p=None, judge_role_p=None, judge_refers_p=None)
+    j = judgement(row)
+    assert j["use_p"] == {"absent": 0.1, "aside": 0.2, "point": 0.6, "other_meaning": 0.1} and keep(j)
 
 
 def test_summary_state_holds_the_summary_and_each_mention():
@@ -74,13 +104,20 @@ def test_summary_state_holds_the_summary_and_each_mention():
     assert "Asks for flood relief." in st and '"असम में बाढ़"' in st
 
 
+def test_summary_state_marks_an_item_without_quoted_words():
+    state = summary_state({"member": "M", "title": "T", "debate_date": "2019-07-01"}, "S.",
+                          [{"name": "Railway Projects", "type": "topic", "mention": ""}])
+    assert "- Railway Projects (topic): (no quoted words)" in state
+
+
 def test_gate_rates_count_both_directions():
     r = gate_rates([(True, True), (True, False), (False, False), (False, True), (False, False)])
     assert r == {"manual_keep": 2, "model_keeps_of_those": 1, "manual_drop": 3, "model_drops_of_those": 2}
 
 
 def test_version_names_model_and_questions():
-    assert judged_by("jev-1.13.0") == "jev-1.13.0 q4"
+    assert judged_by("jev-1.13.0") == "jev-1.13.0 q5"
+    assert judged_by("jev-1.13.0", "q4") == "jev-1.13.0 q4"
 
 
 def test_marks_are_read_from_a_review_column_and_from_an_old_owner_column(tmp_path):
@@ -88,31 +125,3 @@ def test_marks_are_read_from_a_review_column_and_from_an_old_owner_column(tmp_pa
         path = tmp_path / f"{column}.tsv"
         path.write_text(f"item_id\tname\t{column}\n1\ta\tKeep\n2\tb\tdrop\n3\tc\t\n4\td\tmaybe\n", encoding="utf-8")
         assert read_marks(path) == {1: True, 2: False}
-
-
-def test_a_summary_tag_of_any_type_gets_the_level_question_with_its_description():
-    tag = {"id": 7, "name": "Bareilly", "type": "place", "mention": "", "source": "summary_tag",
-           "description": "District and Lok Sabha constituency in Uttar Pradesh, India."}
-    q = questions_for([tag])
-    assert list(q) == ["level_7"]
-    assert "a place: District and Lok Sabha constituency in Uttar Pradesh, India)" in q["level_7"]["instructions"]
-
-
-def test_a_dictionary_entity_gets_the_three_named_questions_with_its_matched_words():
-    item = {"id": 8, "name": "DISHA", "type": "scheme", "mention": "दिशा", "source": "dictionary"}
-    q = questions_for([item])
-    assert sorted(q) == ["refers_8", "role_8", "type_8"]
-    assert "«दिशा»" in q["refers_8"]["instructions"]
-
-
-def test_read_item_reads_a_summary_tag_by_level_even_when_its_type_is_not_topic():
-    tag = {"id": 7, "type": "place", "source": "summary_tag"}
-    j, warnings, _ = read_item({"level_7": {"probabilities": {"0": 0.9, "1": 0.1}}}, tag)
-    assert j["level_p"] == [0.9, 0.1, 0.0, 0.0] and j["role_p"] is None and not warnings
-    assert not keep(j)
-
-
-def test_summary_state_marks_an_item_without_quoted_words():
-    state = summary_state({"member": "M", "title": "T", "debate_date": "2019-07-01"}, "S.",
-                          [{"name": "Railway Projects", "type": "topic", "mention": ""}])
-    assert "- Railway Projects (topic): (no quoted words)" in state

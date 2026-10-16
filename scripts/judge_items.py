@@ -1,32 +1,35 @@
 """Stage 4 of the tag pipeline: ask the decision model which items of each speech are real subjects of the speech.
 The script stores the answers and the keep decision on each item in speech_items.
 
-Stage 3 gives each speech at most 8 topics and 8 other entities (speech_items).
-Some are only background, or are the speaker, the Chair, or procedure. All
-candidates of one speech go in one call. Each candidate has a source
-(speech_items.source): 'llm' (the extraction), 'dictionary' (the entity
-dictionary found the name in the text), or 'summary_tag' (a tag near the
-summary vector). scripts/add_candidates.py adds the last two. Questions
-version q4 (q3 with the two new sources):
+Scope: --year, --term or --speech-ids. Sample mode (no --all) writes a review file with an empty `review` column.
+An item is kept when its probability reaches the limit of its source: --keep-llm for the llm items and
+--keep-other for the dictionary and summary tag items.
+An item that the current model and question version judged is skipped. --force judges it again.
+--rethreshold computes `kept` again from the stored probabilities and calls no model.
+--score FILE compares the marks of a review file with the decisions of the model.
+A run stops after --max-failures failed calls in a row, or when the input tokens reach --max-tokens.
 
   Topics and summary tags:
-    level   (score): how central the subject is to the speech, 0 to 3. The
-            question for a summary tag gives the tag's type and description.
+    subject (noul): "X (a <type>) is a main or supporting subject of this
+            speech, not only a passing mention." No tag description.
   Named types (place, person, institution, law, scheme, group, role):
-    role    (choice): absent / aside (an example, a precedent, a comparison,
-            a courtesy, a side list) / point (part of the member's point; once
-            is enough). The question shows the words of the speech, because
-            the name can be a full name that the speech does not say.
-    refers  (noul): the words of the speech refer to the item's name, and the
-            speech with common knowledge tells which one, without a guess.
-            This catches a full name that the extraction model guessed.
-    type    (choice): what kind of thing the item is. It never decides keep or
-            drop. When the model picks a type with p >= TYPE_P, judge_type
-            holds it, and later stages use it.
+    use     (choice): absent / aside (an example, a precedent, a comparison,
+            a courtesy, a side list) / point (part of the member's point) /
+            other_meaning (the words mean something else than this name). The
+            question shows the words of the speech, because the name can be a
+            full name that the speech does not say.
 
-A topic is kept when P(level 2 or 3) >= --keep-level. A named item is kept
-when P(point) >= --keep-point and P(refers) >= --keep-refers. Every item keeps
-its probabilities, so --rethreshold computes `kept` again and calls no model.
+An item is kept when P(true) or P(point) reaches the limit of its source. The
+two kinds of source have opposite risks. An llm item is the extraction's own
+choice, so the bad error is to drop a correct item: --keep-llm is low (0.4).
+A dictionary entity or a summary tag is an addition, so the bad error is to
+keep a wrong item: --keep-other is high (0.8). Every item keeps its
+probabilities, so --rethreshold computes `kept` again and calls no model.
+
+Rows judged with question version q4 keep their q4 probabilities (level,
+role, refers). keep() reads both versions, and --questions q4 selects the q4
+rows for --rethreshold and --score. A q4 named item also needs
+P(refers) >= --keep-refers. Only q5 can judge new rows.
 
 State: the member, the debate title, the date, and the speech text. When the
 speech does not fit in the model's context, the state is the stage 3 summary
@@ -49,7 +52,7 @@ Needs TYPESAFE_API_KEY. Run from the repo root:
     set -a && source .env && set +a
     python3 scripts/judge_items.py --year 2019 --max-words 5000 --dry-run
     python3 scripts/judge_items.py --year 2019 --max-words 5000
-    python3 scripts/judge_items.py --rethreshold --keep-point 0.5
+    python3 scripts/judge_items.py --rethreshold --term 18 --questions q4
     python3 scripts/judge_items.py --score tags/judging/results/2019_....tsv
 """
 from __future__ import annotations
@@ -69,50 +72,31 @@ from sqlalchemy import text
 
 from db import get_engine
 from decision_model import (MODEL, DecisionError, StateTooLong, api_key, choice_probabilities, choice_q, decide,
-                            noul_probability, noul_q, score_probabilities, score_q, sum_is_off)
+                            noul_probability, noul_q, sum_is_off)
 from scripts.extract_entities import cell, fetch_speeches, free_stem, scope_filter
 
 FOLDER = Path(__file__).resolve().parent.parent / "tags" / "judging"
-QUESTIONS_VERSION = "q4"
-TYPE_P = 0.7
-
-LEVELS = [
-    "0, not a subject: it is not in the speech, or it is only the speaker, the Chair, an addressee, or procedure.",
-    "1, passing: it is named once, as background, as an example, or as the source of a statement.",
-    "2, supporting: the speech discusses it in more than one sentence, or the member's request depends on it.",
-    "3, central: the speech is mainly about it.",
-]
-
-ROLES = {
-    "absent": "The speech does not mention it, or it is only the speaker or the Chair.",
-    "aside": "The speech mentions it only as an example, a precedent, a comparison, a courtesy (thanks, praise, "
-             "a greeting), or one item in a side list. The member's point does not depend on it.",
-    "point": "The speech mentions it as part of the member's point. The member asks for something about it, "
-             "argues about it, or uses it to say where or to whom the point applies. One mention is enough.",
+QUESTIONS_VERSION = "q5"
+USES = {
+    "absent": "Not mentioned, or only the speaker or the Chair.",
+    "aside": "Only an example, precedent, comparison, courtesy, or side list item.",
+    "point": "Part of the member's point: asked for, argued about, or says where or to whom it applies.",
+    "other_meaning": "The words mean something else than this name.",
 }
 
-TYPES = {
-    "place": "A specific place: a country, state, district, city, village, river, port, or region.",
-    "person": "One specific person.",
-    "institution": "An organisation or a body: a ministry, court, commission, company, party, or department.",
-    "law": "An Act, a bill, an ordinance, an article of the Constitution, or a code.",
-    "scheme": "A government programme, mission, or scheme.",
-    "group": "A class of people, for example farmers or Dalits.",
-    "role": "An office that one person holds at a time, for example Prime Minister.",
-    "topic": "A subject or an issue, not a named thing.",
-    "other": "A named thing of none of these kinds, for example a treaty, a book, or an event.",
-}
+# The q4 answer order of judge_role_p, needed to read the rows that q4 judged.
+ROLES = ("absent", "aside", "point")
 
 
 @dataclass(frozen=True)
 class Thresholds:
-    level: float = 0.6
-    point: float = 0.6
+    llm: float = 0.4
+    other: float = 0.8
     refers: float = 0.6
 
 
-def judged_by(model: str) -> str:
-    return f"{model} {QUESTIONS_VERSION}"
+def judged_by(model: str, questions: str = QUESTIONS_VERSION) -> str:
+    return f"{model} {questions}"
 
 
 def is_level(item: dict) -> bool:
@@ -120,23 +104,15 @@ def is_level(item: dict) -> bool:
 
 
 def questions_for(items: list[dict]) -> dict[str, dict]:
-    """All questions of one speech. Topics and summary tags: level_<id>. Named items: role_<id>, refers_<id>, type_<id>."""
     out = {}
     for it in items:
         i, name, type_ = it["id"], it["name"], it["type"]
-        if it.get("source") == "summary_tag":
-            about = f"a {type_}: {it['description']}" if it.get("description") else f"a {type_}"
-            out[f"level_{i}"] = score_q(f"How central is «{name}» ({about.rstrip('.')}) to this speech?", LEVELS)
+        if is_level(it):
+            out[f"level_{i}"] = noul_q(
+                f"«{name}» (a {type_}) is a main or supporting subject of this speech, not only a passing mention.")
             continue
-        if type_ == "topic":
-            out[f"level_{i}"] = score_q(f"How central is «{name}» (a topic) to this speech?", LEVELS)
-            continue
-        out[f"role_{i}"] = choice_q(
-            f"How does this speech use «{name}» (a {type_}, in the words «{it['mention']}»)?", ROLES)
-        out[f"refers_{i}"] = noul_q(
-            f"In this speech, the words «{it['mention']}» refer to «{name}». The speech, with common knowledge, "
-            f"is enough to tell that it is this one specific thing, without a guess.")
-        out[f"type_{i}"] = choice_q(f"What kind of thing is «{name}», as this speech uses it?", TYPES)
+        out[f"use_{i}"] = choice_q(f"How does this speech use «{name}» (a {type_}, in the words «{it['mention']}»)?",
+                                   USES)
     return out
 
 
@@ -152,36 +128,36 @@ def summary_state(s: dict, summary: str, items: list[dict]) -> str:
             f"Summary of the speech: {summary}\n\nWords of the speech about each item:\n" + "\n".join(lines))
 
 
-def keep(j: dict, t: Thresholds = Thresholds()) -> bool:
-    """The stage 4 decision for one item, from its stored probabilities.
-    A topic: central enough. A named item: part of the point, and the name is what the words refer to."""
+def p_keep(j: dict) -> float:
+    if j.get("subject_p") is not None:
+        return j["subject_p"]
+    if j.get("use_p") is not None:
+        return j["use_p"]["point"]
     if j.get("level_p") is not None:
-        return j["level_p"][2] + j["level_p"][3] >= t.level
-    return j["role_p"]["point"] >= t.point and j["refers_p"] >= t.refers
+        return j["level_p"][2] + j["level_p"][3]
+    return j["role_p"]["point"]
+
+
+def keep(j: dict, t: Thresholds = Thresholds()) -> bool:
+    limit = t.llm if j["source"] == "llm" else t.other
+    if p_keep(j) < limit:
+        return False
+    return j.get("role_p") is None or j["refers_p"] >= t.refers
 
 
 def read_item(answers: dict, item: dict) -> tuple[dict, list[str], dict]:
-    """Check and read the answers of one item. Returns the judgement, the warnings, and the raw answers."""
     i, warnings, raw = item["id"], [], {}
-    j = {"level_p": None, "role_p": None, "refers_p": None, "type_p": None, "type": None}
+    j = {"subject_p": None, "use_p": None, "source": item.get("source", "llm")}
     if is_level(item):
-        raw["level"] = answers[f"level_{i}"]
-        j["level_p"] = score_probabilities(raw["level"], LEVELS)
-        if sum_is_off(j["level_p"]):
-            warnings.append(f"level probabilities sum to {sum(j['level_p']):.3f}")
+        raw["subject"] = answers[f"level_{i}"]
+        j["subject_p"] = noul_probability(raw["subject"])
+        if not 0 <= j["subject_p"] <= 1:
+            warnings.append(f"subject probability out of range: {j['subject_p']}")
         return j, warnings, raw
-    raw["role"], raw["refers"], raw["type"] = answers[f"role_{i}"], answers[f"refers_{i}"], answers[f"type_{i}"]
-    j["role_p"] = choice_probabilities(raw["role"], list(ROLES))
-    j["refers_p"] = noul_probability(raw["refers"])
-    j["type_p"] = choice_probabilities(raw["type"], list(TYPES))
-    for label, probs in (("role", j["role_p"]), ("type", j["type_p"])):
-        if sum_is_off(list(probs.values())):
-            warnings.append(f"{label} probabilities sum to {sum(probs.values()):.3f}")
-    if not 0 <= j["refers_p"] <= 1:
-        warnings.append(f"refers probability out of range: {j['refers_p']}")
-    top = max(j["type_p"], key=j["type_p"].get)
-    if j["type_p"][top] >= TYPE_P:
-        j["type"] = top
+    raw["use"] = answers[f"use_{i}"]
+    j["use_p"] = choice_probabilities(raw["use"], list(USES))
+    if sum_is_off(list(j["use_p"].values())):
+        warnings.append(f"use probabilities sum to {sum(j['use_p'].values()):.3f}")
     return j, warnings, raw
 
 
@@ -204,22 +180,23 @@ def store(conn, items: list[dict], state_kind: str, data: dict, version: str, t:
         k = keep(j, t)
         kept_n += k
         conn.execute(text("""
-            UPDATE speech_items SET judge_level_p = :lp, judge_role_p = :rp, judge_refers_p = :fp,
-                   judge_type_p = CAST(:tp AS jsonb), judge_type = :jt, kept = :k, judge_state = :st,
+            UPDATE speech_items SET judge_subject_p = :sp, judge_use_p = :up,
+                   judge_level_p = NULL, judge_role_p = NULL, judge_refers_p = NULL, judge_type_p = NULL,
+                   judge_type = NULL, kept = :k, judge_state = :st,
                    judge_raw = CAST(:raw AS jsonb), judge_warnings = :w, judged_by = :by, judged_at = now()
             WHERE id = :id
-        """), {"lp": j["level_p"], "rp": [j["role_p"][r] for r in ROLES] if j["role_p"] else None,
-               "fp": j["refers_p"], "tp": json.dumps(j["type_p"]) if j["type_p"] else None, "jt": j["type"],
+        """), {"sp": j["subject_p"], "up": [j["use_p"][u] for u in USES] if j["use_p"] else None,
                "k": k, "st": state_kind, "raw": json.dumps(raw, ensure_ascii=False), "w": warnings,
                "by": version, "id": it["id"]})
     return kept_n
 
 
 def judgement(row) -> dict:
-    """The judgement of one stored row, in the shape that keep() reads."""
-    return {"level_p": row.judge_level_p,
+    return {"subject_p": row.judge_subject_p,
+            "use_p": dict(zip(USES, row.judge_use_p)) if row.judge_use_p else None,
+            "level_p": row.judge_level_p,
             "role_p": dict(zip(ROLES, row.judge_role_p)) if row.judge_role_p else None,
-            "refers_p": row.judge_refers_p}
+            "refers_p": row.judge_refers_p, "source": row.source}
 
 
 def select_items(conn, where: str | None, params: dict, version: str, force: bool) -> tuple[dict[int, list[dict]], int]:
@@ -242,7 +219,8 @@ def select_items(conn, where: str | None, params: dict, version: str, force: boo
     return todo, done
 
 
-JUDGED_COLUMNS = "i.id, i.judge_level_p, i.judge_role_p, i.judge_refers_p, i.kept"
+JUDGED_COLUMNS = ("i.id, i.source, i.judge_subject_p, i.judge_use_p, i.judge_level_p, i.judge_role_p, "
+                  "i.judge_refers_p, i.kept")
 
 
 def rethreshold(engine, where: str | None, params: dict, version: str, t: Thresholds) -> None:
@@ -293,7 +271,7 @@ def score(engine, path: Path, version: str, t: Thresholds) -> None:
     if not marks:
         raise SystemExit(f"no row in {path} has keep or drop in the review column")
     with engine.connect() as conn:
-        rows = conn.execute(text(f"SELECT {JUDGED_COLUMNS}, i.type, i.source FROM speech_items i "
+        rows = conn.execute(text(f"SELECT {JUDGED_COLUMNS}, i.type FROM speech_items i "
                                  "WHERE i.id = ANY(:ids) AND i.judged_by = :by"), {"ids": list(marks), "by": version}).all()
     print(f"{len(marks)} items marked by hand, {len(rows)} of them judged with {version}. {t}.")
     for label, sel in score_groups(rows):
@@ -311,9 +289,9 @@ def write_review(engine, speech_ids: list[int], label: str, model: str, prefill:
         summaries = dict(conn.execute(text(
             "SELECT speech_id, summary FROM speech_extractions WHERE speech_id = ANY(:ids)"), {"ids": speech_ids}).all())
         items = conn.execute(text("""
-            SELECT i.id, i.speech_id, i.list, i.type, i.name, i.mention, i.mention_found, i.judge_level_p, i.judge_role_p,
-                   i.judge_refers_p, i.judge_type, i.kept, i.judge_state, i.judge_warnings, i.source, i.evidence,
-                   g.description
+            SELECT i.id, i.speech_id, i.list, i.type, i.name, i.mention, i.mention_found, i.judge_subject_p,
+                   i.judge_use_p, i.judge_level_p, i.judge_role_p, i.judge_refers_p, i.judge_type, i.kept,
+                   i.judge_state, i.judge_warnings, i.source, i.evidence, g.description
             FROM speech_items i LEFT JOIN tags g ON g.id = i.tag_id
             WHERE i.speech_id = ANY(:ids) ORDER BY i.speech_id, i.list DESC, i.position
         """), {"ids": speech_ids}).all()
@@ -323,9 +301,10 @@ def write_review(engine, speech_ids: list[int], label: str, model: str, prefill:
     t = Thresholds()
     md = [f"# Relevance check review: {label}", "",
           f"Model `{model}`, questions `{QUESTIONS_VERSION}`, written on {date.today().isoformat()}. "
-          f"{len(speech_ids)} speeches. For a topic, `P(keep)` is P(central or supporting), kept at {t.level}. "
-          f"For a named item, `P(keep)` is P(part of the member's point), kept at {t.point} together with "
-          f"`P(refers)` at {t.refers}. `Model type` shows the model's type only when it differs from the extraction type. "
+          f"{len(speech_ids)} speeches. For a topic or a recognised tag, `P(keep)` is P(a main or supporting subject). "
+          f"For a named item, `P(keep)` is P(part of the member's point). An `llm` item is kept at {t.llm}, "
+          f"a `dict` or `recognised` item at {t.other}. `P(refers)` and `Model type` exist only for rows that "
+          f"question version q4 judged. "
           f"`Source`: `llm` = the extraction, `dict` = the entity dictionary found the words in the text, "
           f"`recognised` = a recognised tag, near the summary in meaning (its rank and distance in brackets). "
           f"Write keep or drop in the `review` column of `{stem}.tsv`. "
@@ -346,14 +325,11 @@ def write_review(engine, speech_ids: list[int], label: str, model: str, prefill:
                    "| Kept | P(keep) | P(refers) | Source | Type | Model type | Name | Mention |",
                    "|---|---|---|---|---|---|---|---|"]
             for i in mine:
-                if i.judge_level_p:
-                    pk = f"{i.judge_level_p[2] + i.judge_level_p[3]:.2f}"
-                elif i.judge_role_p:
-                    pk = f"{i.judge_role_p[list(ROLES).index('point')]:.2f}"
-                else:
-                    pk = "-"
+                j = judgement(i)
+                judged = any(j[k] is not None for k in ("subject_p", "use_p", "level_p", "role_p"))
+                pk = f"{p_keep(j):.2f}" if judged else "-"
                 pr = f"{i.judge_refers_p:.2f}" if i.judge_refers_p is not None else "-"
-                mt = i.judge_type if i.judge_type and i.judge_type != i.type else ("?" if i.type != "topic" and not i.judge_type else "")
+                mt = i.judge_type if i.judge_type and i.judge_type != i.type else ""
                 kept = {True: "yes", False: "no", None: "-"}[i.kept]
                 src = {"llm": "llm", "dictionary": "dict", "summary_tag": "recognised"}[i.source]
                 if i.source == "summary_tag":
@@ -386,9 +362,12 @@ def main() -> None:
     ap.add_argument("--model", default=MODEL)
     ap.add_argument("--state", choices=("auto", "speech", "summary"), default="auto",
                     help="what the model reads (default auto: the speech, or the summary when the speech is too long)")
-    ap.add_argument("--keep-level", type=float, default=Thresholds.level, help="topics: P(level 2 or 3)")
-    ap.add_argument("--keep-point", type=float, default=Thresholds.point, help="named items: P(point)")
-    ap.add_argument("--keep-refers", type=float, default=Thresholds.refers, help="named items: P(refers)")
+    ap.add_argument("--keep-llm", type=float, default=Thresholds.llm, help="limit for llm items")
+    ap.add_argument("--keep-other", type=float, default=Thresholds.other,
+                    help="limit for dictionary entities and recognised tags")
+    ap.add_argument("--keep-refers", type=float, default=Thresholds.refers, help="q4 named items only: P(refers)")
+    ap.add_argument("--questions", default=QUESTIONS_VERSION,
+                    help="the question version of the rows that --rethreshold and --score read (q4 or q5)")
     ap.add_argument("--workers", type=int, default=4)
     ap.add_argument("--force", action="store_true", help="judge again the items done with this version")
     ap.add_argument("--dry-run", action="store_true", help="print the counts, call no model")
@@ -398,8 +377,8 @@ def main() -> None:
     args = ap.parse_args()
 
     engine = get_engine()
-    t = Thresholds(args.keep_level, args.keep_point, args.keep_refers)
-    version = judged_by(args.model)
+    t = Thresholds(args.keep_llm, args.keep_other, args.keep_refers)
+    version = judged_by(args.model, args.questions)
     if args.speech_ids:
         where, params = "s.id = ANY(:ids)", {"ids": [int(x) for x in args.speech_ids.split(",")]}
     else:
@@ -412,6 +391,9 @@ def main() -> None:
     if args.rethreshold:
         return rethreshold(engine, where, params, version, t)
 
+    if args.questions != QUESTIONS_VERSION:
+        raise SystemExit(f"only question version {QUESTIONS_VERSION} can judge; --questions works with "
+                         "--rethreshold and --score")
     label = (f"LS{args.term}" if args.term else str(args.year) if args.year else
              "sample" if args.speech_ids else "all")
     with engine.connect() as conn:
