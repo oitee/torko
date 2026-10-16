@@ -7,22 +7,7 @@ A speech that has an extraction is skipped. --redo-stale extracts again the spee
 version made. --force extracts every selected speech again.
 The prompts are in tags/extraction_v1/prompts/. --prompt v<N> picks a version. The default is the highest.
 
-Idempotent. The tables speech_extractions and speech_items
-(db/init/11-extractions.sql) hold at most one extraction per speech. A speech
-that has a row is never sent again, whatever model made the row. The column model_id
-(table models) is metadata for review and audit only. A row made with an older prompt
-version is "stale". It is counted and skipped, unless
---redo-stale. --force extracts every selected speech again, also the speeches
-done with the current version. An old row is deleted in the same transaction
-that stores its new answer, so a failed answer keeps the old row. A speech
-with no row and a failed answer stays without a row, and the next run tries
-that speech again. Each answer is written as soon as it arrives.
-
-The prompts are tags/extraction_v1/prompts/extract_v<N>.md. The default is the
-highest N, and --prompt v<N> picks another. Each row stores the version. Do
-not edit a prompt file after a run uses it: a changed prompt is a new file.
-
-Needs GEMINI_API_KEY. Run from the repo root:
+It needs GEMINI_API_KEY. Run from the repo root:
 
     set -a && source .env && set +a
     python3 scripts/extract_entities.py --year 2019

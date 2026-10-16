@@ -11,12 +11,15 @@ from debate_fetch import (
 )
 
 _SCHEMA = (
-    pathlib.Path(__file__).resolve().parent.parent / "db" / "init" / "06-speaker-roles.sql"
+    pathlib.Path(__file__).resolve().parent.parent / "db" / "init" / "02-members.sql"
 )
 
 
 def _sql_text() -> str:
-    return _SCHEMA.read_text()
+    text = _SCHEMA.read_text()
+    start = text.index("CREATE TABLE IF NOT EXISTS speaker_roles")
+    end = text.index("ON CONFLICT (code) DO NOTHING;", start)
+    return text[start:end]
 
 
 def _sql_without_comments() -> str:

@@ -2,7 +2,7 @@
 
 This folder holds stage 5 of the tag pipeline. Torko reads the debate transcripts of the Lok Sabha, the lower house of India's parliament. Stage 4 (`tags/judging/`) keeps the items of each speech that are real subjects. Stage 5 links each kept item to one tag of the tag list (`tags/seed_tags_v1/`), or to no tag (`NONE`).
 
-The unit is one distinct entity name: the name in lower case, with single spaces, without outer punctuation, plus its type. One decision serves every speech that holds the name. The table is `entity_names` (`db/init/12-entity-links.sql`). Each kept item points to its row through `speech_items.entity_name_id`.
+The unit is one distinct entity name: the name in lower case, with single spaces, without outer punctuation, plus its type. One decision serves every speech that holds the name. The table is `entity_names` (`db/init/06-tag-pipeline.sql`). Each kept item points to its row through `speech_items.entity_name_id`.
 
 `scripts/link_entities.py` does these steps for each name:
 

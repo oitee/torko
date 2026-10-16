@@ -117,7 +117,7 @@ def list_debates(
         params["q"] = f"%{q}%"
     if text_query:
         # Whole-word keyword match over every turn's body, served by the GIN
-        # index in 08-turns-fts.sql. Same 'simple' config as the index, or it
+        # index in 04-speeches-and-turns.sql. Same 'simple' config as the index, or it
         # would not be used. plainto_tsquery ANDs the words together.
         clauses.append(
             "EXISTS (SELECT 1 FROM turns t WHERE t.debate_id = d.id "

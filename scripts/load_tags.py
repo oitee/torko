@@ -5,26 +5,7 @@ A tag that exists keeps its id and its source. The script deletes a tag only whe
 and the file no longer holds the tag. It stops before any write on a duplicate name or on a tag that
 entity_names still uses.
 
-Columns of each file: tag, type, subtype, domain, description, aliases ('|'
-between names, '-' for none), debate_count.
-
-Safe to run again. The script matches a tag by its exact name. A tag that
-exists gets the new values from the file and keeps its id and its source. A
-new tag gets an id and the source of its list. A tag is deleted only when its
-own source is loaded and the file of that source no longer holds the tag. A
-tag from a source that is not in SOURCES is never deleted. A delete removes
-the vectors of the tag too. A delete stops with an error when a row in
-entity_names still points to the tag.
-
-The script stops before any write in these cases:
-- Two lists hold the same tag name. The script compares names with norm_name from
-  scripts/link_entities.py.
-- A file tag has the same name as a table tag from another source.
-- A tag to delete is still used by a row in entity_names.
-The script only reports (does not stop) when a name in one list equals an alias
-in another list.
-
-Run from the repo root, with .env loaded and db/init/10-tags.sql applied:
+Run from the repo root, with .env loaded:
 
     python3 scripts/load_tags.py --dry-run          # print the plan, write nothing
     python3 scripts/load_tags.py                    # load all sources

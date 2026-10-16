@@ -12,7 +12,7 @@ No distance limit separates a match from a non-match. So N is a fixed count, and
 
 ## Table
 
-`speech_summary_embeddings` (`db/init/14-summary-embeddings.sql`). The key is `extraction_id`. The table keeps `speech_id`, the model, the task type, the number of dimensions, the md5 hash of the summary, and the vector. When a new extraction replaces an old one, the old vector goes with it. The script embeds a summary again only when its hash changes. Summaries of the model `rule-stub` are fixed texts and get no vector.
+`speech_summary_embeddings` (`db/init/06-tag-pipeline.sql`). The key is `extraction_id`. The table keeps `speech_id`, the model, the task type, the number of dimensions, the md5 hash of the summary, and the vector. When a new extraction replaces an old one, the old vector goes with it. The script embeds a summary again only when its hash changes. Summaries of the model `rule-stub` are fixed texts and get no vector.
 
 ## Scripts
 

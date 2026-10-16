@@ -1,4 +1,4 @@
-"""Load data/label_aliases.tsv into the table label_aliases (db/init/13-label-aliases.sql).
+"""Load data/label_aliases.tsv into the table label_aliases.
 
 Each row says that one speaker label, in one Lok Sabha term, names one member.
 The script checks every row, stops on the first bad row, then replaces the whole table in one transaction.

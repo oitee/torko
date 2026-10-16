@@ -1,25 +1,3 @@
-"""How `debates.raw_html` stores non-ASCII -- and why grepping it lies.
-
-This pins the fact behind the correction in db/init/05-debates.sql. The old
-guidance (recommended in that file AND in .claude/STATE.md, which called the
-query "the highest-value query in the project") measured old-font pages with a
-literal-glyph regex over raw_html. That regex found ~1% of them and reported it
-as the whole corpus:
-
-    LS13 old-font debates:  regex said 43   truth 4,443
-    second font:            regex said  7   truth   370
-
-The cause is that this source mixes representations. Most old-font pages store
-their glyphs as HTML NAMED entities (&Eacute;), a minority store them
-literally, and Unicode Devanagari is stored as NUMERIC entities (&#2358;).
-
-The parser was never affected -- both readers go through BeautifulSoup, which
-decodes entities before matching. Only hand-written SQL over raw_html was. That
-is precisely the tooling used to decide what to work on next, which is what
-made a silent 100x undercount expensive.
-
-These tests are offline and use verbatim fragments from the real corpus.
-"""
 import html
 import re
 

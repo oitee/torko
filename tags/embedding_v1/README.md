@@ -17,7 +17,7 @@ A vector from one model cannot be compared with a vector from another model. A v
 | Model             | Google `gemini-embedding-001`                                                                      |
 | Size              | 1,536 numbers for each vector, scaled to length 1 (Google asks for this below 3,072 numbers)       |
 | Text for each tag | name, aliases, type, domain, and description, in one line                                          |
-| Storage           | PostgreSQL with the pgvector extension, tables `tags` and `tag_embeddings` (`db/init/10-tags.sql`) |
+| Storage           | PostgreSQL with the pgvector extension, tables `tags` and `tag_embeddings` (`db/init/05-tags.sql`) |
 | Index             | none, because a full scan of 4,473 rows takes a few milliseconds                                   |
 
 Example of the text for one tag:

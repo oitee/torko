@@ -251,22 +251,6 @@ _ROLE_CODES: tuple[tuple[str, re.Pattern[str]], ...] = (
 
 
 def role_code_for_label(label: str) -> str | None:
-    """Map a speaker label to a canonical `speaker_roles.code`, or None.
-
-    Returns one of the office slugs seeded in db/init/06-speaker-roles.sql --
-    'speaker', 'deputy_speaker', 'chairman', 'members_crowd' -- so a turn that
-    names no person still records WHICH non-person it named.
-
-    The corpus prints 143 distinct role spellings, but they are 3 offices plus
-    spacing/punctuation/typo noise. We search for the office word instead of
-    matching whole strings, which absorbs "MR.SPEAKER", "HON . SPEAKER",
-    "M R . CHAIRMAN", the "*m75 " index-marker prefix and the "DEPUPTY" typo
-    without a rule per variant. The Devanagari forms are the same three
-    offices, not extra ones.
-
-    Args:
-        label: the raw speaker label as printed in the transcript.
-    """
     if not label:
         return None
     if is_crowd_label(label):

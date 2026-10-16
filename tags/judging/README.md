@@ -14,7 +14,7 @@ Every candidate is a row of `speech_items`. The column `source` tells where the 
 | `dictionary` | `scripts/add_candidates.py` | `other` | 8 (`--k`) | `use` |
 | `summary_tag` (a recognised tag) | `scripts/add_candidates.py` | `topic` | 12 (`--n`) | `subject`, with the tag type only |
 
-A `dictionary` row is a known entity name from `tags/entity_dictionary/` whose words are in the speech text, but which the extraction did not list. Its mention is the matched words. A name is not added when every match of its words lies inside a longer name: another dictionary name, or the words of a named item of the extraction (not a topic, not a group). For example, "शिमला" inside "शिमला एग्रीमेंट" does not add the place Shimla. A skipped name frees its place under the cap. A `summary_tag` row is a recognised tag: one of the 12 tags nearest in meaning to the one-sentence summary of the speech. It holds the tag in `tag_id`, so stage 5 does not link it. The column `evidence` keeps why each added row exists: the number of matches and the rank, or the distance and the rank. `db/init/20-candidate-sources.sql` adds these columns.
+A `dictionary` row is a known entity name from `tags/entity_dictionary/` whose words are in the speech text, but which the extraction did not list. Its mention is the matched words. A name is not added when every match of its words lies inside a longer name: another dictionary name, or the words of a named item of the extraction (not a topic, not a group). For example, "शिमला" inside "शिमला एग्रीमेंट" does not add the place Shimla. A skipped name frees its place under the cap. A `summary_tag` row is a recognised tag: one of the 12 tags nearest in meaning to the one-sentence summary of the speech. It holds the tag in `tag_id`, so stage 5 does not link it. The column `evidence` keeps why each added row exists: the number of matches and the rank, or the distance and the rank. `db/init/06-tag-pipeline.sql` defines these columns.
 
 Run `scripts/add_candidates.py` before `scripts/judge_items.py`. It is idempotent: a speech with rows of one source gets no new rows of that source.
 
@@ -48,7 +48,7 @@ An item is kept when P(true), or P(point) for a named item, reaches the limit of
 | `llm` | 0.4 (`--keep-llm`) | The extraction chose the item. Stage 4 is an extra check. The bad error is to drop a correct item. To keep a wrong item is acceptable. |
 | `dictionary` and `summary_tag` | 0.8 (`--keep-other`) | The item is an addition. The bad error is to keep a wrong item, because it adds noise to the tags. To drop a correct item is acceptable. |
 
-Each item keeps its probabilities in `speech_items`: `judge_subject_p` and `judge_use_p` (`db/init/21-judge-q5.sql`). So `--rethreshold` applies new limits without a new call. q5 asks no type question, so stage 5 uses the extraction type.
+Each item keeps its probabilities in `speech_items`: `judge_subject_p` and `judge_use_p` (`db/init/06-tag-pipeline.sql`). So `--rethreshold` applies new limits without a new call. q5 asks no type question, so stage 5 uses the extraction type.
 
 The state is the member, the debate title, the date, and the speech text. When the speech does not fit in the model's context, the state is the stage 3 summary and the mention of each item. The column `judge_state` records which state was used.
 
