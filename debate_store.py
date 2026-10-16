@@ -36,3 +36,17 @@ def load_debate(loksabha: int, session: int, db_slno: int) -> dict | None:
             {"loksabha": loksabha, "session": session, "dbslno": db_slno},
         ).first()
     return _row_to_payload(row) if row else None
+
+
+def read_debate_ids(path: str) -> list[int]:
+    """Read one debate id per line. Skip blank and "#" lines. Raise ValueError on any other non-number line."""
+    ids = []
+    with open(path, encoding="utf-8") as f:
+        for n, line in enumerate(f, 1):
+            line = line.strip()
+            if not line or line.startswith("#"):
+                continue
+            if not line.isdigit():
+                raise ValueError(f"{path} line {n}: not a debate id: {line!r}")
+            ids.append(int(line))
+    return ids

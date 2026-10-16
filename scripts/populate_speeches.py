@@ -7,6 +7,7 @@ sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 from sqlalchemy import text
 
 from db import get_engine
+from debate_store import read_debate_ids
 from speech_stitch import check_integrity, stitch_turns
 
 
@@ -67,6 +68,12 @@ def main() -> None:
         help="stitch only the debates of this term, for example 13 after apply_turn_text_repairs.py",
     )
     ap.add_argument(
+        "--debate-ids-file",
+        default=None,
+        help="stitch only the debates in this file (one debates.id per line), "
+             "for example after populate_turns.py --debate-ids-file",
+    )
+    ap.add_argument(
         "--verify",
         action="store_true",
         help="check speeches against turns and exit non-zero on drift; write nothing",
@@ -80,12 +87,18 @@ def main() -> None:
 
     with engine.connect() as conn:
         q = "SELECT DISTINCT t.debate_id FROM turns t JOIN debates d ON d.id = t.debate_id"
+        where, params = [], {}
         if args.loksabha:
-            q += f" WHERE d.loksabha = {int(args.loksabha)}"
+            where.append(f"d.loksabha = {int(args.loksabha)}")
+        if args.debate_ids_file:
+            where.append("d.id = ANY(:ids)")
+            params["ids"] = read_debate_ids(args.debate_ids_file)
+        if where:
+            q += " WHERE " + " AND ".join(where)
         q += " ORDER BY t.debate_id"
         if args.limit:
             q += f" LIMIT {int(args.limit)}"
-        debate_ids = [r[0] for r in conn.execute(text(q)).fetchall()]
+        debate_ids = [r[0] for r in conn.execute(text(q), params).fetchall()]
 
     print(f"{len(debate_ids)} debates to stitch", flush=True)
 

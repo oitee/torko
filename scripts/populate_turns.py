@@ -16,6 +16,7 @@ from debate_fetch import (
 )
 from debate_fetch_legacy import looks_legacy, split_by_speaker_legacy
 from db_roster import load_db_roster
+from debate_store import read_debate_ids
 from label_attribution import build_unique_index, label_alias_person, resolve_label_to_person
 
 
@@ -67,6 +68,12 @@ def parse_debate(raw_html: str, mp_list_raw: list[dict], db_roster: list[dict]) 
 def main() -> None:
     ap = argparse.ArgumentParser()
     ap.add_argument("--limit", type=int, default=None, help="cap debates processed, for a dry run")
+    ap.add_argument(
+        "--debate-ids-file",
+        default=None,
+        help="parse only the debates in this file (one debates.id per line). The speeches of "
+             "other debates keep their ids. Then run populate_speeches.py with the same file",
+    )
     args = ap.parse_args()
 
     engine = get_engine()
@@ -83,10 +90,14 @@ def main() -> None:
 
     # Read ids first and fetch each body inside the loop. This keeps one raw_html in memory at a time.
     with engine.connect() as conn:
-        query = "SELECT id FROM debates ORDER BY id"
+        query, params = "SELECT id FROM debates", {}
+        if args.debate_ids_file:
+            query += " WHERE id = ANY(:ids)"
+            params["ids"] = read_debate_ids(args.debate_ids_file)
+        query += " ORDER BY id"
         if args.limit:
             query += f" LIMIT {int(args.limit)}"
-        debate_ids = [r[0] for r in conn.execute(text(query)).fetchall()]
+        debate_ids = [r[0] for r in conn.execute(text(query), params).fetchall()]
 
     print(f"{len(debate_ids)} debates to process", flush=True)
 

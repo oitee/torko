@@ -99,3 +99,16 @@ class TestFallbackIsLoudWhereItMatters:
         with patch.object(debate_store, "load_debate", return_value={"debateDesc": "corpus"}):
             with patch.object(debate_fetch, "fetch_debate", side_effect=AssertionError("hit the API")):
                 assert debate_fetch.load_debate(18, 3, 1758, source="auto")["debateDesc"] == "corpus"
+
+
+class TestReadDebateIds:
+    def test_reads_one_id_per_line_and_skips_blanks_and_comments(self, tmp_path):
+        f = tmp_path / "ids.txt"
+        f.write_text("# LS14 debates\n37513\n\n 36243 \n")
+        assert debate_store.read_debate_ids(str(f)) == [37513, 36243]
+
+    def test_stops_on_a_line_that_is_not_an_id(self, tmp_path):
+        f = tmp_path / "ids.txt"
+        f.write_text("37513\nLS14/2/294\n")
+        with pytest.raises(ValueError, match="line 2"):
+            debate_store.read_debate_ids(str(f))
