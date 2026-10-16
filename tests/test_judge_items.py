@@ -1,6 +1,6 @@
 from types import SimpleNamespace
 
-from scripts.judge_items import (ROLES, USES, Thresholds, gate_rates, judged_by, judgement, keep, p_keep,
+from scripts.judge_items import (ROLES, USES, RunGuard, Thresholds, gate_rates, judged_by, judgement, keep, p_keep,
                                  questions_for, read_item, read_marks, summary_state)
 
 
@@ -125,3 +125,25 @@ def test_marks_are_read_from_a_review_column_and_from_an_old_owner_column(tmp_pa
         path = tmp_path / f"{column}.tsv"
         path.write_text(f"item_id\tname\t{column}\n1\ta\tKeep\n2\tb\tdrop\n3\tc\t\n4\td\tmaybe\n", encoding="utf-8")
         assert read_marks(path) == {1: True, 2: False}
+
+
+def test_a_run_stops_after_failures_in_a_row_and_a_success_resets_the_count():
+    g = RunGuard(max_failures=3)
+    g.failure(); g.failure(); g.success(100); g.failure(); g.failure()
+    assert g.reason is None
+    g.failure()
+    assert g.reason == "3 calls in a row failed"
+
+
+def test_a_run_stops_when_its_tokens_reach_the_budget():
+    g = RunGuard(max_tokens=10_000)
+    g.success(6_000)
+    assert g.reason is None and g.tokens == 6_000
+    g.success(4_000)
+    assert g.reason and "10,000" in g.reason
+
+
+def test_a_run_with_no_budget_never_stops_on_tokens():
+    g = RunGuard()
+    g.success(10**12)
+    assert g.reason is None

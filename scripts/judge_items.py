@@ -9,45 +9,7 @@ An item that the current model and question version judged is skipped. --force j
 --score FILE compares the marks of a review file with the decisions of the model.
 A run stops after --max-failures failed calls in a row, or when the input tokens reach --max-tokens.
 
-  Topics and summary tags:
-    subject (noul): "X (a <type>) is a main or supporting subject of this
-            speech, not only a passing mention." No tag description.
-  Named types (place, person, institution, law, scheme, group, role):
-    use     (choice): absent / aside (an example, a precedent, a comparison,
-            a courtesy, a side list) / point (part of the member's point) /
-            other_meaning (the words mean something else than this name). The
-            question shows the words of the speech, because the name can be a
-            full name that the speech does not say.
-
-An item is kept when P(true) or P(point) reaches the limit of its source. The
-two kinds of source have opposite risks. An llm item is the extraction's own
-choice, so the bad error is to drop a correct item: --keep-llm is low (0.4).
-A dictionary entity or a summary tag is an addition, so the bad error is to
-keep a wrong item: --keep-other is high (0.8). Every item keeps its
-probabilities, so --rethreshold computes `kept` again and calls no model.
-
-Rows judged with question version q4 keep their q4 probabilities (level,
-role, refers). keep() reads both versions, and --questions q4 selects the q4
-rows for --rethreshold and --score. A q4 named item also needs
-P(refers) >= --keep-refers. Only q5 can judge new rows.
-
-State: the member, the debate title, the date, and the speech text. When the
-speech does not fit in the model's context, the state is the stage 3 summary
-plus the mention of each item ('summary' in judge_state). --state forces one.
-
-Idempotent. An item that has judged_by equal to the current model and question
-version is skipped. --force judges every selected item again. A new question
-version judges every item again and replaces its stage 4 columns. Each speech
-is written in its own transaction as soon as its answer arrives.
-
-Which speeches: every speech with an extraction, or only those in one --year
-or one --term. In sample mode (no --all) a review file is written in
-tags/judging/results/: a Markdown file to read and a TSV file with an empty
-`review` column. You write keep or drop in that column, and --score FILE
-compares your marks with the model's decisions. --score also reads the old
-column name `owner`.
-
-Needs TYPESAFE_API_KEY. Run from the repo root:
+It needs TYPESAFE_API_KEY. Run from the repo root:
 
     set -a && source .env && set +a
     python3 scripts/judge_items.py --year 2019 --max-words 5000 --dry-run
@@ -239,6 +201,25 @@ def rethreshold(engine, where: str | None, params: dict, version: str, t: Thresh
           f"No model was called.", flush=True)
 
 
+class RunGuard:
+    def __init__(self, max_failures: int = 5, max_tokens: int | None = None):
+        self.max_failures, self.max_tokens = max_failures, max_tokens
+        self.failures_in_a_row = 0
+        self.tokens = 0
+        self.reason: str | None = None
+
+    def success(self, tokens: int) -> None:
+        self.failures_in_a_row = 0
+        self.tokens += tokens
+        if self.max_tokens is not None and self.tokens >= self.max_tokens:
+            self.reason = f"the input tokens reached {self.tokens:,} (limit {self.max_tokens:,})"
+
+    def failure(self) -> None:
+        self.failures_in_a_row += 1
+        if self.failures_in_a_row >= self.max_failures:
+            self.reason = f"{self.failures_in_a_row} calls in a row failed"
+
+
 def gate_rates(pairs: list[tuple[bool, bool]]) -> dict:
     """pairs holds (manual keep, model keep) for each item."""
     manual_keep = [m for o, m in pairs if o]
@@ -369,6 +350,8 @@ def main() -> None:
     ap.add_argument("--questions", default=QUESTIONS_VERSION,
                     help="the question version of the rows that --rethreshold and --score read (q4 or q5)")
     ap.add_argument("--workers", type=int, default=4)
+    ap.add_argument("--max-failures", type=int, default=5, help="stop after this many failed calls in a row")
+    ap.add_argument("--max-tokens", type=int, help="stop when the input tokens of this run reach this number")
     ap.add_argument("--force", action="store_true", help="judge again the items done with this version")
     ap.add_argument("--dry-run", action="store_true", help="print the counts, call no model")
     ap.add_argument("--rethreshold", action="store_true", help="compute `kept` again from the stored probabilities")
@@ -408,8 +391,11 @@ def main() -> None:
     ids = list(todo)
     stored = failed = kept_total = 0
     states = {"speech": 0, "summary": 0}
-    tokens = 0
+    guard = RunGuard(args.max_failures, args.max_tokens)
+    stopping = False
     for start in range(0, len(ids), 100):
+        if guard.reason:
+            break
         batch_ids = ids[start:start + 100]
         with engine.connect() as conn:
             speeches = {s["speech_id"]: s for s in fetch_speeches(conn, batch_ids)}
@@ -420,6 +406,8 @@ def main() -> None:
             futures = {pool.submit(judge_one, speeches[sid], summaries[sid], todo[sid], args.state, key, args.model): sid
                        for sid in batch_ids}
             for fut in as_completed(futures):
+                if fut.cancelled():
+                    continue
                 sid = futures[fut]
                 try:
                     state_kind, data = fut.result()
@@ -428,14 +416,22 @@ def main() -> None:
                 except DecisionError as exc:
                     failed += 1
                     print(f"  speech {sid}: failed, nothing written ({exc!s:.200})", flush=True)
-                    continue
-                stored += 1
-                states[state_kind] += 1
-                tokens += (data.get("usage") or {}).get("input_tokens") or 0
-                print(f"  speech {sid}: {len(todo[sid])} items, state {state_kind} "
-                      f"({stored + failed}/{len(ids)})", flush=True)
+                    guard.failure()
+                else:
+                    stored += 1
+                    states[state_kind] += 1
+                    guard.success((data.get("usage") or {}).get("input_tokens") or 0)
+                    print(f"  speech {sid}: {len(todo[sid])} items, state {state_kind} "
+                          f"({stored + failed}/{len(ids)})", flush=True)
+                if guard.reason and not stopping:
+                    # Cancel the calls that have not started. The calls in flight are paid for,
+                    # so the loop still stores their answers.
+                    stopping = True
+                    for f in futures:
+                        f.cancel()
+                    print(f"STOP: {guard.reason}. The speeches not reached stay unjudged.", flush=True)
     print(f"judged {stored} speeches, failed {failed}. Kept {kept_total} of the items in the judged speeches. "
-          f"State: speech {states['speech']}, summary {states['summary']}. Input tokens {tokens:,}.", flush=True)
+          f"State: speech {states['speech']}, summary {states['summary']}. Input tokens {guard.tokens:,}.", flush=True)
     if not args.all:
         path = write_review(engine, ids, label, args.model, read_marks(args.prefill) if args.prefill else None)
         print(f"review files: {path}.md and {path}.tsv", flush=True)
