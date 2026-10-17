@@ -27,3 +27,6 @@ tags/*/atlas/tags.json
 
 # one-off loader of the extraction folders, not part of the repo
 db_load/
+
+tags/linking/results/*
+!tags/linking/results/links_q1_2026-10-04.tsv
