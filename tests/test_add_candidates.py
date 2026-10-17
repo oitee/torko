@@ -69,4 +69,5 @@ def test_a_general_tag_is_never_a_recognised_tag_and_the_next_tag_takes_its_plac
 def test_the_general_tag_file_holds_the_house_words():
     general = load_general_tags(GENERAL_TAGS_FILE)
     assert {"Members", "Parliament", "Statement", "Government Of India"} <= general
-    assert "Law Amendment" not in general
+    assert "Law Amendment" in general
+    assert "Demands For Grants" not in general
