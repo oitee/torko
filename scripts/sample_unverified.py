@@ -27,8 +27,8 @@ import debate_fetch
 import debate_fetch_legacy
 import legacy_hindi
 from db_roster import load_db_roster
+from debate_fetch import search_page
 
-SEARCH_API = "https://sansad.in/api_ls/debate/debate-search"
 DEBATE_PAGE = "https://sansad.in/ls/debates/view-debate"
 
 STRATA = {"legacy": [13, 14], "modern": [15, 16, 17, 18]}
@@ -62,16 +62,6 @@ def default_out_path(now: datetime | None = None) -> Path:
 
 def debate_url(ls: int, session: int, db_slno: int) -> str:
     return f"{DEBATE_PAGE}?ls={ls}&session={session}&dbslno={db_slno}"
-
-
-def search_page(loksabha: int, page: int, size: int = 100) -> dict:
-    resp = requests.get(
-        SEARCH_API,
-        params={"loksabha": loksabha, "page": page, "size": size},
-        timeout=60,
-    )
-    resp.raise_for_status()
-    return resp.json()
 
 
 def random_debate_refs(loksabha: int, k: int) -> list[dict]:

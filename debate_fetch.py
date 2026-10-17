@@ -17,6 +17,7 @@ from legacy_hindi import decode_legacy_hindi
 from urdu_names import urdu_label_to_name
 
 API_URL = "https://sansad.in/api_ls/debate/debate-details"
+SEARCH_API = "https://sansad.in/api_ls/debate/debate-search"
 
 # Minimum similarity for two name tokens to match, and the minimum share of roster tokens found in the label.
 ANCHOR_TOKEN_MIN = 0.8
@@ -349,6 +350,16 @@ def _clean_inline(text: str) -> str:
     text = re.sub(r"\s+", " ", text.replace("\xa0", " "))
     text = re.sub(r"\s+([।?!,.;:])", r"\1", text)
     return text.strip()
+
+
+def search_page(loksabha: int, page: int, size: int = 100) -> dict:
+    resp = requests.get(
+        SEARCH_API,
+        params={"loksabha": loksabha, "page": page, "size": size},
+        timeout=60,
+    )
+    resp.raise_for_status()
+    return resp.json()
 
 
 def fetch_debate(loksabha: int, session: int, db_slno: int) -> dict:

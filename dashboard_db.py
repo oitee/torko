@@ -6,6 +6,13 @@ from sqlalchemy import text
 
 from db import get_engine
 
+# Closed set of reasons a tagged MP may be missing from our speakers.
+# Do not add a reason without a deliberate decision.
+REASON_NOT_PRINTED = "not_printed"       # their name is nowhere in the debate text
+REASON_FOLD_COLLISION = "fold_collision"  # their key names >1 person: dropped, never guessed
+REASON_ROLE_ONLY = "role_only"           # present only as the Chair / a crowd label
+REASON_UNEXPLAINED = "unexplained"       # a fault in the parser or the resolver. Must be zero.
+
 
 def composite_id(loksabha: int, session: int, dbslno: int) -> str:
     return f"{loksabha}-{session}-{dbslno}"
@@ -268,12 +275,6 @@ def classify_tagged_not_attributed(
     import debate_fetch_legacy as legacy
     from debate_fetch import _folded_key
     from db_roster import load_db_roster
-    from scripts.audit_sansad_floor import (
-        REASON_FOLD_COLLISION,
-        REASON_NOT_PRINTED,
-        REASON_ROLE_ONLY,
-        REASON_UNEXPLAINED,
-    )
 
     if not mp_list:
         return []

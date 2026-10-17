@@ -15,10 +15,7 @@ from sqlalchemy import text
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 
 from db import get_engine  # noqa: E402
-from debate_fetch import fetch_debate  # noqa: E402
-
-sys.path.insert(0, str(Path(__file__).resolve().parent))
-from sample_unverified import search_page  # noqa: E402
+from debate_fetch import fetch_debate, search_page  # noqa: E402
 
 TERMS = (13, 14, 15, 16, 17, 18)
 DEBATE_PAGE = "https://sansad.in/ls/debates/view-debate"

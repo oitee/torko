@@ -2,8 +2,8 @@
 Check that every MP in a debate's mpPartDetailList is covered by our speakers, or missing for a named reason.
 
 Usage:
-    python3 scripts/audit_sansad_floor.py --limit 2000
-    python3 scripts/audit_sansad_floor.py --all --workers 8
+    python3 -m scripts.audit_sansad_floor --limit 2000
+    python3 -m scripts.audit_sansad_floor --all --workers 8
 The check passes when UNEXPLAINED is 0.
 """
 from __future__ import annotations
@@ -13,12 +13,12 @@ import multiprocessing as mp
 import sys
 from collections import Counter
 
-# Closed set of reasons a tagged MP may be missing from our speakers.
-# Do not add a reason without a deliberate decision.
-REASON_NOT_PRINTED = "not_printed"       # their name is nowhere in the debate text
-REASON_FOLD_COLLISION = "fold_collision"  # their key names >1 person: dropped, never guessed
-REASON_ROLE_ONLY = "role_only"           # present only as the Chair / a crowd label
-REASON_UNEXPLAINED = "unexplained"       # <- the bug bucket. Must be zero.
+from dashboard_db import (  # noqa: F401
+    REASON_FOLD_COLLISION,
+    REASON_NOT_PRINTED,
+    REASON_ROLE_ONLY,
+    REASON_UNEXPLAINED,
+)
 
 
 def _lazy():
