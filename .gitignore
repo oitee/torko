@@ -30,3 +30,8 @@ db_load/
 
 tags/linking/results/*
 !tags/linking/results/links_q1_2026-10-04.tsv
+
+# near-duplicate tags: scripts/split_vote_pairs.py rebuilds the run outputs. The accepted merges live in data/.
+tags/near_duplicates/results/*
+# working file of the manual review
+tags/near_duplicates/REVIEW_GUIDE.md
