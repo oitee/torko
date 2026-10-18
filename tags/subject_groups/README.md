@@ -32,3 +32,9 @@ The script needs numpy. numpy is not in `requirements.txt`, because only this pr
 ## Choosing the settings
 
 `scripts/subject_groups_eval.py` checks the settings. `--prepare` draws name pairs from each distance band for a blind manual label (`same` or `different` subject). `--sweep` scores each combination of neighbours, distance limit, and group-size limit on the labelled pairs. The defaults d = 0.10 and a limit of 15 come from this check. The labels and the score table stay in `eval/`, outside git.
+
+## Joining small groups
+
+`scripts/subject_join.py` joins small groups that are one subject. A unit is a group, or a single name with 2 or more speeches. `candidates` pairs each unit with its nearest units by the distance of their centres. `jobs` writes task files for an LLM that decides `same` or `different` for each pair. `ingest` reads the answers, and `export-joins` writes the `same` answers to `data/joins_v1.tsv`, keyed by the entity name IDs of each unit. `subjects` joins the units of every pair in that file and writes `results/subjects_v1.tsv`. `approach-a` and `compare` score a fixed distance limit and the LLM answers on labelled candidate pairs.
+
+`label-jobs` and `chain-jobs` write task files for two more LLM steps: a clean label for each subject, and a check of the pairs inside long chains of joins.
