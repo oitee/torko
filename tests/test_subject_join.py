@@ -47,3 +47,12 @@ def test_a_cannot_link_between_other_subjects_does_not_matter():
     subjects = join_units(4, [(0, 1, 0.05)], sizes=[1, 1, 1, 1], cannot={frozenset((2, 3))})
     assert sorted(sorted(s) for s in subjects) == [[0, 1], [2], [3]]
 
+
+
+def test_the_final_label_prefers_an_llm_label_for_the_exact_name_set():
+    from scripts.subject_join import choose_final_label, name_key
+    assert name_key("12 3 7") == "3 7 12"
+    labels = {"3 7": ("Sugarcane farmers' arrears", "llm")}
+    assert choose_final_label("3 7", 2, "Sugarcane farmers' dues", labels) == ("Sugarcane farmers' arrears", "llm")
+    assert choose_final_label("3 8", 2, "Wage arrears", labels) == ("Wage arrears", "auto")
+    assert choose_final_label("9", 1, "Cheque bouncing", labels) == ("Cheque bouncing", "name")

@@ -18,6 +18,10 @@ Subcommands:
               that no earlier answer judged directly (the chain guard).
   chain-ingest  Read the chain answers. Write data/cannot_links_v1.tsv: every pair of units inside one joined subject
               that an answer (the join run or the chain run) called different. `subjects` never joins across such a pair.
+  labels-ingest  Read the LLM labels. Write data/subject_labels_v1.tsv, keyed by the entity name IDs of each subject.
+              --folder holds the label answers for results/subjects_v1_before_guard.tsv. --relabels holds a TSV
+              (subject_id, label) for subjects of results/subjects_v1.tsv that the chain guard changed.
+  final       Write results/subjects_final_v1.tsv: one row per subject with its label, parent tag, names, and speech IDs.
   compare     Score approach A (each limit t) and approach C on the labelled candidate pairs of
               tags/subject_groups/eval/ (join_labels_A.tsv, join_labels_B.tsv). Gold = pairs where both labels agree.
               Each gold pair counts for the candidate pairs of its distance band of 0.02.
@@ -460,14 +464,83 @@ def chain_ingest(args) -> None:
           f"(join run {sum(r[2] == 'join' for r in rows)}, chain run {sum(r[2] == 'chain' for r in rows)})")
 
 
+LABELS = RESULTS.parent / "data" / "subject_labels_v1.tsv"
+
+
+def name_key(name_ids: str) -> str:
+    return " ".join(sorted(name_ids.split(), key=int))
+
+
+def labels_ingest(args) -> None:
+    before = {r["subject_id"]: name_key(r["name_ids"])
+              for r in csv.DictReader((RESULTS / "subjects_v1_before_guard.tsv").open(), delimiter="\t")}
+    after = {r["subject_id"]: name_key(r["name_ids"])
+             for r in csv.DictReader((RESULTS / "subjects_v1.tsv").open(), delimiter="\t")}
+    rows = {}
+    for p in sorted((args.folder / "out").glob("j*.out.jsonl")):
+        for line in p.read_text(encoding="utf-8").splitlines():
+            try:
+                obj = json.loads(line)
+            except json.JSONDecodeError:
+                continue
+            sid, label = obj.get("subject"), (obj.get("label") or "").strip()
+            if sid in before and label:
+                rows[before[sid]] = (label, "llm")
+    n_llm = len(rows)
+    if args.relabels:
+        for r in csv.DictReader(args.relabels.open(), delimiter="\t"):
+            if r["subject_id"] in after and r["label"].strip():
+                rows[after[r["subject_id"]]] = (r["label"].strip(), "llm_relabel")
+    with LABELS.open("w", newline="") as f:
+        w = csv.writer(f, delimiter="\t")
+        w.writerow(["name_ids", "label", "source"])
+        for k, (label, src) in sorted(rows.items()):
+            w.writerow([k, label, src])
+    print(f"labels {len(rows)} (label run {n_llm}, relabels {len(rows) - n_llm if args.relabels else 0})")
+
+
+def choose_final_label(key: str, n_names: int, label_auto: str, labels: dict) -> tuple[str, str]:
+    """An LLM label when one exists for this exact set of names. A single name is its own label. Else the most common name."""
+    if key in labels:
+        return labels[key]
+    return (label_auto, "name") if n_names == 1 else (label_auto, "auto")
+
+
+def final(args) -> None:
+    from db import get_engine
+    from scripts.subject_groups import load_speeches
+    labels = {}
+    if LABELS.exists():
+        labels = {r["name_ids"]: (r["label"], r["source"]) for r in csv.DictReader(LABELS.open(), delimiter="\t")}
+    with get_engine().connect() as conn:
+        speeches = defaultdict(set)
+        for nid, sid, _ in load_speeches(conn):
+            speeches[nid].add(sid)
+    cols = ["subject_id", "label", "label_source", "parent_tag", "parent_share", "n_names", "n_speeches", "n_debates",
+            "names", "speech_ids"]
+    counts = defaultdict(int)
+    with (RESULTS / "subjects_final_v1.tsv").open("w", newline="") as f:
+        w = csv.DictWriter(f, fieldnames=cols, delimiter="\t")
+        w.writeheader()
+        for r in csv.DictReader((RESULTS / "subjects_v1.tsv").open(), delimiter="\t"):
+            label, src = choose_final_label(name_key(r["name_ids"]), int(r["n_names"]), r["label_auto"], labels)
+            counts[src] += 1
+            sp = sorted(set().union(*(speeches[int(m)] for m in r["name_ids"].split())))
+            w.writerow({"subject_id": r["subject_id"], "label": label, "label_source": src, "parent_tag": r["parent_tag"],
+                        "parent_share": r["parent_share"], "n_names": r["n_names"], "n_speeches": r["n_speeches"],
+                        "n_debates": r["n_debates"], "names": r["names"], "speech_ids": " ".join(map(str, sp))})
+    print("subjects by label source:", dict(counts))
+
+
 def main() -> None:
     ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
-    ap.add_argument("command", choices=["candidates", "jobs", "approach-a", "ingest", "export-joins", "chain-ingest", "compare", "subjects", "label-jobs", "chain-jobs"])
+    ap.add_argument("command", choices=["candidates", "jobs", "approach-a", "ingest", "export-joins", "chain-ingest", "labels-ingest", "final", "compare", "subjects", "label-jobs", "chain-jobs"])
     ap.add_argument("--cache", type=Path)
     ap.add_argument("--folder", type=Path)
     ap.add_argument("--max-dist", type=float, default=MAX_DIST)
+    ap.add_argument("--relabels", type=Path)
     args = ap.parse_args()
-    {"candidates": build, "jobs": jobs, "approach-a": approach_a, "ingest": ingest, "export-joins": export_joins, "chain-ingest": chain_ingest, "compare": compare,
+    {"candidates": build, "jobs": jobs, "approach-a": approach_a, "ingest": ingest, "export-joins": export_joins, "chain-ingest": chain_ingest, "labels-ingest": labels_ingest, "final": final, "compare": compare,
      "subjects": subjects, "label-jobs": label_jobs, "chain-jobs": chain_jobs}[args.command](args)
 
 
