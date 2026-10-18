@@ -182,3 +182,35 @@ CREATE TABLE IF NOT EXISTS speech_summary_embeddings (
 );
 
 CREATE INDEX IF NOT EXISTS speech_summary_embeddings_speech_idx ON speech_summary_embeddings (speech_id);
+
+
+-- subjects: the specific subjects under the tags. A subject is a group of entity
+-- names that mean one specific subject, for example "Sugarcane farmers' arrears"
+-- under the tag Arrears. scripts/subject_join.py makes the subjects, and
+-- scripts/load_subjects.py writes these rows. A speech has a subject when one of
+-- its kept items has a name of that subject.
+--
+-- subject_key is the sorted list of entity name IDs, joined by spaces. It stays the
+-- same when a rebuild makes the same subject. parent_tag_id is the tag with the
+-- most speeches among the linked names of the subject, or NULL when no name links.
+CREATE TABLE IF NOT EXISTS subjects (
+    id             SERIAL  PRIMARY KEY,
+    subject_key    TEXT    NOT NULL UNIQUE,
+    label          TEXT    NOT NULL,
+    label_source   TEXT    NOT NULL CHECK (label_source IN ('llm', 'llm_relabel', 'auto', 'name')),
+    parent_tag_id  INTEGER REFERENCES tags(id),
+    n_names        INTEGER NOT NULL,
+    n_speeches     INTEGER NOT NULL,
+    n_debates      INTEGER NOT NULL,
+    created_at     TIMESTAMPTZ NOT NULL DEFAULT now()
+);
+
+CREATE INDEX IF NOT EXISTS subjects_parent_idx ON subjects (parent_tag_id);
+
+-- subject_names: the entity names of each subject. A name is in one subject only.
+CREATE TABLE IF NOT EXISTS subject_names (
+    entity_name_id BIGINT  PRIMARY KEY REFERENCES entity_names(id),
+    subject_id     INTEGER NOT NULL REFERENCES subjects(id) ON DELETE CASCADE
+);
+
+CREATE INDEX IF NOT EXISTS subject_names_subject_idx ON subject_names (subject_id);
