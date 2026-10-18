@@ -1,6 +1,7 @@
 from flask import Flask, jsonify, request, send_from_directory
 
 import dashboard_db
+import tag_search
 from debate_fetch import fetch_debate, split_by_speaker, speaker_distribution
 from debate_fetch_legacy import looks_legacy, split_by_speaker_legacy
 
@@ -77,6 +78,32 @@ def api_dashboard_speaker_detail(sansad_id):
 @app.route("/api/dashboard/facets")
 def api_dashboard_facets():
     return jsonify(dashboard_db.get_facets())
+
+
+_search_index = None
+
+
+def search_index():
+    """The tags and subjects for /api/search. Read once per process: they change only when the pipeline runs."""
+    global _search_index
+    if _search_index is None:
+        with dashboard_db.get_engine().connect() as conn:
+            _search_index = tag_search.load_index(conn)
+    return _search_index
+
+
+@app.route("/api/search")
+def api_search():
+    q = request.args.get("q", "").strip()
+    if not q:
+        return jsonify({"error": "q is required"}), 400
+    tags, subjects = search_index()
+    results = tag_search.search(q, tags, subjects, limit=20)
+    for r in results:
+        if r["kind"] == "tag":
+            r["subjects"] = [{"subject_id": s["subject_id"], "label": s["label"], "n_speeches": s["n_speeches"]}
+                             for s in r["subjects"][:50]]
+    return jsonify({"query": q, "results": results})
 
 
 @app.route("/")

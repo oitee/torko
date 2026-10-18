@@ -1,4 +1,4 @@
-from scripts.subject_search import matches, search, words
+from tag_search import matches, search, words
 
 TAGS = [{"tag": "Arrears", "aliases": [], "n_speeches": 10}, {"tag": "Tax Arrears", "aliases": [], "n_speeches": 1}]
 SUBJECTS = [
@@ -38,3 +38,13 @@ def test_a_query_that_misses_the_tag_name_still_finds_the_tag_through_its_subjec
     out = search("MGNREGA", tags, subjects)
     assert out[0]["kind"] == "tag" and out[0]["name"] == "Rural Employment Act (MNREGA)"
     assert [r["subject_id"] for r in out[1:]] == ["S2"]
+
+
+def test_the_search_endpoint_returns_the_tag_with_its_subjects(monkeypatch):
+    import server
+    monkeypatch.setattr(server, "_search_index", (TAGS, SUBJECTS))
+    client = server.app.test_client()
+    body = client.get("/api/search?q=arrears").get_json()
+    assert body["results"][0]["name"] == "Arrears"
+    assert [s["subject_id"] for s in body["results"][0]["subjects"]] == ["S1", "S2"]
+    assert client.get("/api/search").status_code == 400
