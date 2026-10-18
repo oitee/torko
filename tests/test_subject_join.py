@@ -35,3 +35,15 @@ def test_joins_find_units_by_their_name_ids_and_skip_lost_units():
             {"name_ids_a": "7 8", "name_ids_b": "1 2", "centre_distance": "0.2"}]
     pairs, unmatched = joins_to_pairs(units, rows)
     assert pairs == [(0, 1, 0.1)] and unmatched == 1
+
+
+def test_a_cannot_link_stops_a_chain_join():
+    pairs = [(0, 1, 0.05), (1, 2, 0.06)]
+    subjects = join_units(3, pairs, sizes=[2, 2, 2], cannot={frozenset((0, 2))})
+    assert sorted(sorted(s) for s in subjects) == [[0, 1], [2]]
+
+
+def test_a_cannot_link_between_other_subjects_does_not_matter():
+    subjects = join_units(4, [(0, 1, 0.05)], sizes=[1, 1, 1, 1], cannot={frozenset((2, 3))})
+    assert sorted(sorted(s) for s in subjects) == [[0, 1], [2], [3]]
+

@@ -16,6 +16,8 @@ Subcommands:
   label-jobs  Write task files for an LLM that writes a clean label for each subject with 2 or more names.
   chain-jobs  Write task files for an LLM that judges every pair of units inside a chain of 3 or more units
               that no earlier answer judged directly (the chain guard).
+  chain-ingest  Read the chain answers. Write data/cannot_links_v1.tsv: every pair of units inside one joined subject
+              that an answer (the join run or the chain run) called different. `subjects` never joins across such a pair.
   compare     Score approach A (each limit t) and approach C on the labelled candidate pairs of
               tags/subject_groups/eval/ (join_labels_A.tsv, join_labels_B.tsv). Gold = pairs where both labels agree.
               Each gold pair counts for the candidate pairs of its distance band of 0.02.
@@ -58,11 +60,15 @@ def unit_line(names: list) -> str:
     return shown + (f"; (+{more} more names)" if more > 0 else "")
 
 
-def join_units(n_units: int, pairs: list, sizes: list, max_joined: int = MAX_JOINED) -> list:
-    """pairs: (a, b, dist) to join, nearest first. Union-find over unit indexes. A join that makes a subject
-    with more than max_joined names is skipped. Return a list of subjects (lists of unit indexes)."""
+def join_units(n_units: int, pairs: list, sizes: list, max_joined: int = MAX_JOINED, cannot: set | None = None) -> list:
+    """pairs: (a, b, dist) to join, nearest first. Union-find over unit indexes.
+    A join is skipped when the joined subject would have more than max_joined names, or when any pair of units
+    across the two subjects is in cannot (a set of frozensets of two unit indexes that an answer called different).
+    Return a list of subjects (lists of unit indexes)."""
     parent = list(range(n_units))
     names = list(sizes)
+    members = {i: [i] for i in range(n_units)}
+    cannot = cannot or set()
 
     def root(x):
         while parent[x] != x:
@@ -74,8 +80,11 @@ def join_units(n_units: int, pairs: list, sizes: list, max_joined: int = MAX_JOI
         ra, rb = root(a), root(b)
         if ra == rb or names[ra] + names[rb] > max_joined:
             continue
+        if cannot and any(frozenset((x, y)) in cannot for x in members[ra] for y in members[rb]):
+            continue
         parent[rb] = ra
         names[ra] += names[rb]
+        members[ra] += members.pop(rb)
     out = defaultdict(list)
     for i in range(n_units):
         out[root(i)].append(i)
@@ -294,6 +303,20 @@ def joins_to_pairs(units: list, rows: list) -> tuple[list, int]:
     return pairs, unmatched
 
 
+CANNOT = RESULTS.parent / "data" / "cannot_links_v1.tsv"
+
+
+def cannot_links(units: list) -> set:
+    """Unit pairs that an answer called different, from data/cannot_links_v1.tsv. Missing file: no constraints."""
+    if not CANNOT.exists():
+        return set()
+    rows = [dict(r, centre_distance="0") for r in csv.DictReader(CANNOT.open(), delimiter="\t")]
+    pairs, unmatched = joins_to_pairs(units, rows)
+    if unmatched:
+        print(f"warning: {unmatched} cannot-links point to a unit that no longer exists", file=sys.stderr)
+    return {frozenset((a, b)) for a, b, _ in pairs}
+
+
 def llm_same_pairs(units: list) -> list:
     rows = list(csv.DictReader(JOINS.open(), delimiter="\t"))
     pairs, unmatched = joins_to_pairs(units, rows)
@@ -329,7 +352,7 @@ def subjects(args) -> None:
         for nid, sid, did in load_speeches(conn):
             speeches[nid].add(sid)
             debates[nid].add(did)
-    subs = join_units(len(units), llm_same_pairs(units), [len(u) for u in units])
+    subs = join_units(len(units), llm_same_pairs(units), [len(u) for u in units], cannot=cannot_links(units))
     tag_of = {m: info[m][2] for u in units for m in u}
     rows = []
     for s in subs:
@@ -393,14 +416,58 @@ def chain_jobs(args) -> None:
     print(f"{write_jobs(args.folder, blocks, 'PAIR', 12000)} job files for {len(blocks)} chain pairs")
 
 
+def read_answers(folder: Path, key: str = "pair") -> dict:
+    """Read folder/out/j*.out.jsonl. Return {id: (decision, confidence)} for valid lines."""
+    got = {}
+    for p in sorted((folder / "out").glob("j*.out.jsonl")):
+        for line in p.read_text(encoding="utf-8").splitlines():
+            try:
+                obj = json.loads(line)
+            except json.JSONDecodeError:
+                continue
+            if obj.get("decision") in DECISIONS:
+                got[obj.get(key)] = (obj["decision"], obj.get("confidence", ""))
+    return got
+
+
+def chain_ingest(args) -> None:
+    data = pickle.load(args.cache.open("rb"))
+    units = data["units"]
+    subs = join_units(len(units), llm_same_pairs(units), [len(u) for u in units])
+    where = {u: i for i, s in enumerate(subs) for u in s}
+    rows = []
+    cand = {r["pair_id"]: r for r in csv.DictReader((RESULTS / "join_candidates_v1.tsv").open(), delimiter="\t")}
+    for r in csv.DictReader((RESULTS / "join_llm_v1.tsv").open(), delimiter="\t"):
+        a, b = int(cand[r["pair_id"]]["unit_a"]), int(cand[r["pair_id"]]["unit_b"])
+        if r["decision"] == "different" and where[a] == where[b]:
+            rows.append((unit_key(units[a]), unit_key(units[b]), "join", r["confidence"]))
+    answers = read_answers(args.folder)
+    pairs = list(csv.DictReader((RESULTS / "chain_pairs_v1.tsv").open(), delimiter="\t"))
+    n_same = 0
+    for r in pairs:
+        dec = answers.get(r["pair_id"])
+        if dec is None:
+            continue
+        if dec[0] == "different":
+            rows.append((unit_key(units[int(r["unit_a"])]), unit_key(units[int(r["unit_b"])]), "chain", dec[1]))
+        else:
+            n_same += 1
+    with CANNOT.open("w", newline="") as f:
+        w = csv.writer(f, delimiter="\t")
+        w.writerow(["name_ids_a", "name_ids_b", "source", "confidence"])
+        w.writerows(rows)
+    print(f"chain answers {len(answers)} of {len(pairs)} (same {n_same}); cannot-links {len(rows)} "
+          f"(join run {sum(r[2] == 'join' for r in rows)}, chain run {sum(r[2] == 'chain' for r in rows)})")
+
+
 def main() -> None:
     ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
-    ap.add_argument("command", choices=["candidates", "jobs", "approach-a", "ingest", "export-joins", "compare", "subjects", "label-jobs", "chain-jobs"])
+    ap.add_argument("command", choices=["candidates", "jobs", "approach-a", "ingest", "export-joins", "chain-ingest", "compare", "subjects", "label-jobs", "chain-jobs"])
     ap.add_argument("--cache", type=Path)
     ap.add_argument("--folder", type=Path)
     ap.add_argument("--max-dist", type=float, default=MAX_DIST)
     args = ap.parse_args()
-    {"candidates": build, "jobs": jobs, "approach-a": approach_a, "ingest": ingest, "export-joins": export_joins, "compare": compare,
+    {"candidates": build, "jobs": jobs, "approach-a": approach_a, "ingest": ingest, "export-joins": export_joins, "chain-ingest": chain_ingest, "compare": compare,
      "subjects": subjects, "label-jobs": label_jobs, "chain-jobs": chain_jobs}[args.command](args)
 
 
