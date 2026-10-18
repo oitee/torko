@@ -7,6 +7,10 @@ The rule:
 3. The result for a tag is the tag and every subject whose parent is that tag.
    The result for a subject is the subject, with its parent tag for context.
 4. Ranking: a tag whose name is exactly the query comes first. Then subjects and tags by the number of speeches.
+   When no tag matches by its own name, the query can still mean a tag: when 2 or more matching subjects share one
+   parent tag, and that tag holds at least half of the speeches of all matching subjects. That tag comes first with
+   its subjects. Example: "MGNREGA" matches several subjects of the tag that says "MNREGA".
+   "farmers arrears" matches one subject of the tag Arrears, so it stays a subject result.
 5. With --vector, a query with no word match goes to a vector search over subject centres (one embedding call).
 
     source .venv/bin/activate && set -a && source .env && set +a
@@ -67,6 +71,17 @@ def search(query: str, tags: list, subjects: list, limit: int = 10) -> list:
             exact = " ".join(sorted(words(s["label"]))) == q
             out.append({"kind": "subject", "name": s["label"], "exact": exact, "n_speeches": s["n_speeches"],
                         "parent_tag": s["parent_tag"], "subject_id": s["subject_id"]})
+    if not any(r["kind"] == "tag" for r in out):
+        hit, n_hit = defaultdict(int), defaultdict(int)
+        hits = [r for r in out if r["kind"] == "subject"]
+        for r in hits:
+            hit[r["parent_tag"]] += r["n_speeches"]
+            n_hit[r["parent_tag"]] += 1
+        best = max((t for t in hit if t and n_hit[t] >= 2), key=lambda t: hit[t], default=None)
+        if best and hit[best] * 2 >= sum(hit.values()):
+            kids = sorted(children[best], key=lambda s: -s["n_speeches"])
+            out.append({"kind": "tag", "name": best, "exact": True, "via_subjects": True,
+                        "n_speeches": sum(s["n_speeches"] for s in kids), "subjects": kids})
     covered = {k["subject_id"] for r in out if r["kind"] == "tag" and r["exact"] for k in r["subjects"]}
     out = [r for r in out if not (r["kind"] == "subject" and r["subject_id"] in covered)]
     out.sort(key=lambda r: (not r["exact"], r["kind"] != "tag" if r["exact"] else False, -r["n_speeches"]))
