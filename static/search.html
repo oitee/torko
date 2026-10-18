@@ -1,0 +1,125 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Search subjects — Lok Sabha Debates</title>
+<style>
+  :root {
+    --page-plane:     #f9f9f7;
+    --surface-1:      #fcfcfb;
+    --text-primary:   #0b0b0b;
+    --text-secondary: #52514e;
+    --text-muted:     #898781;
+    --gridline:       #e1e0d9;
+    --series-1:       #2a78d6;
+    --border:         rgba(11,11,11,0.10);
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --page-plane:     #0d0d0d;
+      --surface-1:      #1a1a19;
+      --text-primary:   #ffffff;
+      --text-secondary: #c3c2b7;
+      --text-muted:     #898781;
+      --gridline:       #2c2c2a;
+      --series-1:       #3987e5;
+      --border:         rgba(255,255,255,0.10);
+    }
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--page-plane); color: var(--text-primary);
+         font-family: system-ui, -apple-system, "Segoe UI", sans-serif; }
+  .wrap { max-width: 780px; margin: 0 auto; padding: 32px 16px 80px; }
+  h1 { font-size: 20px; margin: 0 0 4px; }
+  .subtitle { color: var(--text-secondary); font-size: 14px; margin-bottom: 16px; }
+  .nav { font-size: 13px; margin-bottom: 20px; }
+  .nav a { color: var(--series-1); text-decoration: none; }
+  form { display: flex; gap: 8px; margin-bottom: 8px; }
+  input { flex: 1; min-width: 0; padding: 10px 12px; border-radius: 8px; border: 1px solid var(--border);
+          background: var(--surface-1); color: var(--text-primary); font-size: 15px; }
+  button { padding: 10px 16px; border-radius: 8px; border: 1px solid var(--border); background: var(--series-1);
+           color: #fff; font-size: 14px; cursor: pointer; }
+  .examples { font-size: 13px; color: var(--text-muted); margin-bottom: 20px; }
+  .examples a { color: var(--series-1); cursor: pointer; margin-right: 10px; }
+  .result { background: var(--surface-1); border: 1px solid var(--border); border-radius: 8px;
+            padding: 12px 14px; margin-bottom: 10px; }
+  .kind { font-size: 11px; text-transform: uppercase; letter-spacing: .04em; color: var(--text-muted); }
+  .name { font-size: 16px; font-weight: 600; margin: 2px 0; }
+  .meta { font-size: 13px; color: var(--text-secondary); }
+  ul { margin: 8px 0 0; padding-left: 18px; }
+  li { font-size: 14px; margin: 3px 0; }
+  li span { color: var(--text-muted); font-size: 12px; }
+  .empty, .note { color: var(--text-muted); font-size: 14px; }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="nav"><a href="/dashboard.html">Dashboard</a></div>
+  <h1>Search subjects</h1>
+  <div class="subtitle">A broad word finds a tag and the specific subjects under it. A specific phrase finds one subject.</div>
+  <form id="f">
+    <input id="q" type="search" placeholder="For example: arrears" autocomplete="off" aria-label="Search query">
+    <button type="submit">Search</button>
+  </form>
+  <div class="examples">Try:
+    <a data-q="arrears">arrears</a><a data-q="farmers arrears">farmers arrears</a><a data-q="MGNREGA">MGNREGA</a><a data-q="cheque bounce">cheque bounce</a>
+  </div>
+  <div id="out"></div>
+  <p class="note">Speech counts are distinct speeches of Lok Sabha terms 16 to 18 with a kept item of that tag or subject.</p>
+</div>
+<script>
+const out = document.getElementById("out");
+const q = document.getElementById("q");
+
+function el(tag, cls, text) {
+  const e = document.createElement(tag);
+  if (cls) e.className = cls;
+  if (text !== undefined) e.textContent = text;
+  return e;
+}
+
+function render(data) {
+  out.replaceChildren();
+  if (!data.results.length) { out.append(el("p", "empty", "No tag or subject matches every word.")); return; }
+  for (const r of data.results) {
+    const box = el("div", "result");
+    box.append(el("div", "kind", r.kind === "tag" ? "Tag" : "Subject"));
+    box.append(el("div", "name", r.name));
+    if (r.kind === "tag") {
+      box.append(el("div", "meta", `${r.n_speeches} speeches with its ${r.subjects.length} subjects`));
+      if (r.subjects.length) {
+        const ul = el("ul");
+        for (const s of r.subjects.slice(0, 12)) {
+          const li = el("li", null, s.label + " ");
+          li.append(el("span", null, `${s.n_speeches} speeches`));
+          ul.append(li);
+        }
+        box.append(ul);
+      }
+    } else {
+      box.append(el("div", "meta", `${r.n_speeches} speeches` + (r.parent_tag ? ` · under the tag ${r.parent_tag}` : " · no tag yet")));
+    }
+    out.append(box);
+  }
+}
+
+async function run(query) {
+  q.value = query;
+  history.replaceState(null, "", "?q=" + encodeURIComponent(query));
+  out.replaceChildren(el("p", "note", "Searching"));
+  try {
+    const res = await fetch("/api/search?q=" + encodeURIComponent(query));
+    render(await res.json());
+  } catch (e) {
+    out.replaceChildren(el("p", "empty", "The search failed. Is the server running?"));
+  }
+}
+
+document.getElementById("f").addEventListener("submit", e => { e.preventDefault(); if (q.value.trim()) run(q.value.trim()); });
+for (const a of document.querySelectorAll(".examples a")) a.addEventListener("click", () => run(a.dataset.q));
+const start = new URLSearchParams(location.search).get("q");
+if (start) run(start);
+</script>
+</body>
+</html>
