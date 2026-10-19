@@ -191,8 +191,9 @@ CREATE INDEX IF NOT EXISTS speech_summary_embeddings_speech_idx ON speech_summar
 -- its kept items has a name of that subject.
 --
 -- subject_key is the sorted list of entity name IDs, joined by spaces. It stays the
--- same when a rebuild makes the same subject. parent_tag_id is the tag with the
--- most speeches among the linked names of the subject, or NULL when no name links.
+-- same when a rebuild makes the same subject. parent_tag_id is the tag that the
+-- decision model chose for the subject (table subject_parents), or NULL when the
+-- model chose no tag or did not decide the subject yet.
 CREATE TABLE IF NOT EXISTS subjects (
     id             SERIAL  PRIMARY KEY,
     subject_key    TEXT    NOT NULL UNIQUE,
@@ -214,3 +215,22 @@ CREATE TABLE IF NOT EXISTS subject_names (
 );
 
 CREATE INDEX IF NOT EXISTS subject_names_subject_idx ON subject_names (subject_id);
+
+
+-- subject_parents: the decision model's choice of a parent tag for each subject.
+-- scripts/subject_parents.py writes these rows. The key is subject_key, not the
+-- subject ID, so a decision stays when scripts/load_subjects.py loads the same
+-- subject again. A subject has a parent only when one tag gets at least the link
+-- probability. The options are the tags of the linked names of the subject and
+-- the tags nearest to the centre of its name vectors.
+CREATE TABLE IF NOT EXISTS subject_parents (
+    subject_key      TEXT     PRIMARY KEY,
+    parent_tag_id    INTEGER  REFERENCES tags(id),
+    parent_p         REAL     NOT NULL,             -- the probability of the top option, also when it is NONE
+    options          JSONB    NOT NULL,             -- each option: tag_id, tag, source, distance, p
+    raw              JSONB,                         -- the model answer before the checks
+    warnings         TEXT[]   NOT NULL DEFAULT '{}',
+    decided_by       TEXT     NOT NULL,             -- the model and the question version
+    tag_set_version  INTEGER  NOT NULL,
+    decided_at       TIMESTAMPTZ NOT NULL DEFAULT now()
+);

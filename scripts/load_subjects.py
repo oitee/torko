@@ -3,7 +3,8 @@
 It reads tags/subject_groups/results/subjects_final_v1.tsv (written by scripts/subject_join.py final)
 and the name IDs of each subject from tags/subject_groups/results/subjects_v1.tsv.
 It replaces every row of both tables in one transaction, so a run after a rebuild leaves no old subject.
-It calls no model.
+The parent tag of each subject comes from the table subject_parents (scripts/subject_parents.py), by subject key.
+A subject that the decision model did not decide yet has no parent. It calls no model.
 
     source .venv/bin/activate && set -a && source .env && set +a
     python3 scripts/load_subjects.py --dry-run
@@ -23,20 +24,19 @@ from sqlalchemy import text
 RESULTS = Path(__file__).resolve().parent.parent / "tags" / "subject_groups" / "results"
 
 
-def subject_rows(final_rows: list, name_ids: dict, tag_ids: dict) -> tuple[list, list]:
-    """final_rows: rows of subjects_final_v1.tsv. name_ids: subject_id -> list of entity name IDs.
-    tag_ids: tag name -> tag ID. Return (subjects, problems). A parent tag that is not in tag_ids is a problem."""
-    out, problems = [], []
+def subject_rows(final_rows: list, name_ids: dict) -> list:
+    """final_rows: rows of subjects_final_v1.tsv. name_ids: subject_id -> list of entity name IDs."""
+    out = []
     for r in final_rows:
         ids = sorted(int(m) for m in name_ids[r["subject_id"]])
-        parent = r["parent_tag"] or None
-        if parent and parent not in tag_ids:
-            problems.append(f"{r['subject_id']}: unknown parent tag {parent!r}")
-            parent = None
         out.append({"key": " ".join(map(str, ids)), "label": r["label"], "source": r["label_source"],
-                    "parent": tag_ids.get(parent) if parent else None, "n_names": int(r["n_names"]),
-                    "n_speeches": int(r["n_speeches"]), "n_debates": int(r["n_debates"]), "names": ids})
-    return out, problems
+                    "n_names": int(r["n_names"]), "n_speeches": int(r["n_speeches"]),
+                    "n_debates": int(r["n_debates"]), "names": ids})
+    return out
+
+
+SYNC_PARENTS = """UPDATE subjects s SET parent_tag_id = p.parent_tag_id
+    FROM subject_parents p WHERE p.subject_key = s.subject_key AND s.parent_tag_id IS DISTINCT FROM p.parent_tag_id"""
 
 
 def main() -> None:
@@ -47,12 +47,11 @@ def main() -> None:
     final_rows = list(csv.DictReader((RESULTS / "subjects_final_v1.tsv").open(), delimiter="\t"))
     name_ids = {r["subject_id"]: r["name_ids"].split() for r in csv.DictReader((RESULTS / "subjects_v1.tsv").open(), delimiter="\t")}
     engine = get_engine()
+    rows = subject_rows(final_rows, name_ids)
     with engine.connect() as conn:
-        tag_ids = dict(conn.execute(text("SELECT tag, id FROM tags")).fetchall())
-    rows, problems = subject_rows(final_rows, name_ids, tag_ids)
-    for p in problems[:10]:
-        print("problem:", p)
-    print(f"subjects {len(rows)}, names {sum(len(r['names']) for r in rows)}, with a parent tag {sum(r['parent'] is not None for r in rows)}, problems {len(problems)}")
+        decided = {k for (k,) in conn.execute(text("SELECT subject_key FROM subject_parents"))}
+    print(f"subjects {len(rows)}, names {sum(len(r['names']) for r in rows)}, "
+          f"with a parent decision {sum(r['key'] in decided for r in rows)}")
     if args.dry_run:
         return
     with engine.begin() as conn:
@@ -60,9 +59,10 @@ def main() -> None:
         conn.execute(text("DELETE FROM subjects"))
         for r in rows:
             sid = conn.execute(text("""INSERT INTO subjects (subject_key, label, label_source, parent_tag_id, n_names, n_speeches, n_debates)
-                VALUES (:key, :label, :source, :parent, :n_names, :n_speeches, :n_debates) RETURNING id"""), r).scalar()
+                VALUES (:key, :label, :source, NULL, :n_names, :n_speeches, :n_debates) RETURNING id"""), r).scalar()
             conn.execute(text("INSERT INTO subject_names (entity_name_id, subject_id) VALUES (:n, :s)"),
                          [{"n": n, "s": sid} for n in r["names"]])
+        conn.execute(text(SYNC_PARENTS))
     print("loaded")
 
 
