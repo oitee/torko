@@ -143,7 +143,7 @@ def outcome(linked_tag: str | None, acceptable: list[str]) -> str:
 
 class Tags:
     def __init__(self, conn):
-        rows = conn.execute(text("SELECT id, tag, type, description, aliases FROM tags WHERE status <> 'rejected'")).all()
+        rows = conn.execute(text("SELECT id, tag, type, description, aliases FROM tags WHERE status NOT IN ('rejected', 'merged')")).all()
         self.by_id = {r.id: {"id": r.id, "tag": r.tag, "type": r.type, "description": r.description} for r in rows}
         self.exact: dict[str, list[int]] = {}
         for r in rows:
@@ -156,7 +156,7 @@ class Tags:
         return [(r.tag_id, r.distance) for r in conn.execute(text("""
             SELECT e.tag_id, e.embedding <=> CAST(:v AS vector) AS distance
             FROM tag_embeddings e JOIN tags t ON t.id = e.tag_id
-            WHERE e.model = :m AND e.task_type = :t AND t.status <> 'rejected'
+            WHERE e.model = :m AND e.task_type = :t AND t.status NOT IN ('rejected', 'merged')
             ORDER BY distance LIMIT :n
         """), {"v": to_pgvector(vector), "m": EMBED_MODEL, "t": TAG_TASK, "n": n})]
 

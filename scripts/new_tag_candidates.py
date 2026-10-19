@@ -46,7 +46,7 @@ def main() -> None:
         name_ids = sorted({int(m) for r in rows for m in r["name_ids"].split()})
         mat = load_vectors(conn, name_ids)
         tags = conn.execute(text("""SELECT t.tag, t.type, e.embedding::text FROM tags t
-            JOIN tag_embeddings e ON e.tag_id = t.id AND e.task_type = :t WHERE t.status <> 'rejected'"""),
+            JOIN tag_embeddings e ON e.tag_id = t.id AND e.task_type = :t WHERE t.status NOT IN ('rejected', 'merged')"""),
                             {"t": TAG_TASK}).fetchall()
     pos = {m: i for i, m in enumerate(name_ids)}
     tag_mat = np.array([np.array(v[1:-1].split(","), dtype=np.float32) for _, _, v in tags])

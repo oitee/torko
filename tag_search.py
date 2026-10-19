@@ -91,6 +91,6 @@ def load_index(conn) -> tuple[list, list]:
         SELECT t.tag, t.aliases, count(DISTINCT si.speech_id) n
         FROM tags t LEFT JOIN entity_names en ON en.tag_id = t.id AND en.link_status = 'linked'
         LEFT JOIN speech_items si ON si.entity_name_id = en.id AND si.kept
-        WHERE t.status <> 'rejected' GROUP BY t.id""")).fetchall()
+        WHERE t.status NOT IN ('rejected', 'merged') GROUP BY t.id""")).fetchall()
     tags = [{"tag": t, "aliases": list(a or []), "n_speeches": n} for t, a, n in rows]
     return tags, subjects

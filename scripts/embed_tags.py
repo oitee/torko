@@ -41,7 +41,7 @@ def main() -> None:
     engine = get_engine()
     with engine.connect() as conn:
         tags = [dict(r._mapping) for r in conn.execute(text(
-            "SELECT id, tag, type, domain, description, aliases FROM tags WHERE status <> 'rejected' ORDER BY id"))]
+            "SELECT id, tag, type, domain, description, aliases FROM tags WHERE status NOT IN ('rejected', 'merged') ORDER BY id"))]
         stored = dict(conn.execute(text(
             "SELECT tag_id, input_hash FROM tag_embeddings WHERE model = :m AND task_type = :t"),
             {"m": MODEL, "t": args.task_type}).all())

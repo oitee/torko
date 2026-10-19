@@ -3,7 +3,9 @@
 Sources: seed_v1 (tags/seed_tags_v1/results/seed_tags_v1.tsv) and places_v1 (tags/places/results/place_tags.tsv).
 A tag that exists keeps its id and its source. The script deletes a tag only when its own source is loaded
 and the file no longer holds the tag. It stops before any write on a duplicate name or on a tag that
-entity_names still uses.
+entity_names still uses. The accepted merges of near-duplicate tags (tag_merges.py) change the rows of each
+kept tag before the plan: its new name, its type, and the aliases from the merged tags. So a reload keeps
+the merges. scripts/apply_tag_merges.py marks the merged tags.
 
 Run from the repo root, with .env loaded:
 
@@ -24,6 +26,7 @@ from sqlalchemy import text
 
 from db import get_engine
 from scripts.link_entities import norm_name
+from tag_merges import Group, load_groups, merged_aliases
 
 ROOT = Path(__file__).resolve().parent.parent
 SEED_FILE = ROOT / "tags" / "seed_tags_v1" / "results" / "seed_tags_v1.tsv"
@@ -59,6 +62,21 @@ def parse_rows(path: Path) -> list[dict]:
     if any(n != n.strip() or not n for n in names):
         raise SystemExit("a tag name is empty or has outer spaces. Run scripts/build_seed_tags.py first.")
     return out
+
+
+def apply_groups(files: dict[str, list[dict]], groups: list[Group]) -> dict[str, list[dict]]:
+    """Returns new lists in which each kept tag has its name, type, and aliases after the merge.
+    A group whose tags are not all in the lists is left out, so a test list with a few rows still loads."""
+    by_name = {r["tag"]: r for rows in files.values() for r in rows}
+    changed: dict[str, dict] = {}
+    for g in groups:
+        if g.target not in by_name or any(m not in by_name for m in g.members):
+            continue
+        kept = by_name[g.target]
+        changed[g.target] = {**kept, "tag": g.final_name, "type": g.new_type or kept["type"],
+                             "aliases": merged_aliases(kept["aliases"], kept["tag"], g.final_name,
+                                                       [(m, by_name[m]["aliases"]) for m in g.members], norm_name)}
+    return {src: [changed.get(r["tag"], r) for r in rows] for src, rows in files.items()}
 
 
 def plan_load(files: dict[str, list[dict]], existing: list[dict], loaded: set[str]) -> dict:
@@ -133,7 +151,7 @@ def main() -> None:
     ap.add_argument("--source", choices=[s[0] for s in SOURCES], help="load only this source")
     args = ap.parse_args()
 
-    files = {name: parse_rows(path) for name, path, _ in SOURCES}
+    files = apply_groups({name: parse_rows(path) for name, path, _ in SOURCES}, load_groups())
     loaded = {args.source} if args.source else set(files)
     status = {name: st for name, _, st in SOURCES}
     engine = get_engine()

@@ -91,7 +91,7 @@ def nearest_tags(conn, speech_ids: list[int], n: int = 20) -> dict[int, list[dic
                    row_number() OVER (ORDER BY te.embedding <=> q.embedding, g.id) AS rank
             FROM tag_embeddings te
             JOIN tags g ON g.id = te.tag_id
-            WHERE te.model = :m AND te.task_type = :tt AND g.status <> 'rejected'
+            WHERE te.model = :m AND te.task_type = :tt AND g.status NOT IN ('rejected', 'merged')
             ORDER BY te.embedding <=> q.embedding, g.id
             LIMIT :n
         ) t

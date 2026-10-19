@@ -10,6 +10,10 @@
 --   unverified  the pipeline made this tag, and no person checked it
 --   rejected    a manual review refused this tag. The row stays, so that the
 --               pipeline does not make the same tag again.
+--   merged      a manual review found that this tag means the same thing as
+--               another tag. merged_into points to the kept tag. The row stays,
+--               so that the merge can be traced and undone.
+-- Every step that offers tags as options skips 'rejected' and 'merged'.
 CREATE TABLE IF NOT EXISTS tags (
     id           SERIAL PRIMARY KEY,
     tag          TEXT    NOT NULL UNIQUE,
@@ -20,8 +24,10 @@ CREATE TABLE IF NOT EXISTS tags (
     aliases      TEXT[]  NOT NULL DEFAULT '{}',
     debate_count INTEGER NOT NULL DEFAULT 0, -- keyword-to-debate links, not debates
     source       TEXT    NOT NULL,
-    status       TEXT    NOT NULL CHECK (status IN ('reviewed', 'unverified', 'rejected')),
-    created_at   TIMESTAMPTZ NOT NULL DEFAULT now()
+    status       TEXT    NOT NULL CHECK (status IN ('reviewed', 'unverified', 'rejected', 'merged')),
+    created_at   TIMESTAMPTZ NOT NULL DEFAULT now(),
+    merged_into  INTEGER REFERENCES tags(id),   -- the kept tag, set only when status is 'merged'
+    CONSTRAINT tags_merged_has_target CHECK ((status = 'merged') = (merged_into IS NOT NULL))
 );
 
 
