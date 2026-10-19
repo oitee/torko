@@ -70,3 +70,43 @@ def test_a_context_error_is_told_apart_from_other_errors():
     assert looks_too_long(400, '{"detail":{"error_type":"max_tokens_exceeded"}}')
     assert not looks_too_long(400, '{"error": "unknown question type"}')
     assert not looks_too_long(401, "context")
+
+
+class FakeResponse:
+    status_code = 200
+    text = ""
+
+    def json(self):
+        return {"answers": {"q": {"probabilities": {"A": 1.0}}}}
+
+
+def test_a_timeout_is_retried_and_does_not_stop_the_run(monkeypatch):
+    import requests
+
+    import decision_model
+    calls = []
+
+    def post(*args, **kwargs):
+        calls.append(1)
+        if len(calls) == 1:
+            raise requests.ReadTimeout("read timed out")
+        return FakeResponse()
+
+    monkeypatch.setattr(decision_model.requests, "post", post)
+    monkeypatch.setattr(decision_model.time, "sleep", lambda s: None)
+    data = decision_model.decide("state", {"q": {}}, "key")
+    assert len(calls) == 2 and data["answers"]["q"]["probabilities"] == {"A": 1.0}
+
+
+def test_a_connection_that_never_comes_back_is_a_decision_error(monkeypatch):
+    import requests
+
+    import decision_model
+
+    def post(*args, **kwargs):
+        raise requests.ConnectionError("reset")
+
+    monkeypatch.setattr(decision_model.requests, "post", post)
+    monkeypatch.setattr(decision_model.time, "sleep", lambda s: None)
+    with pytest.raises(DecisionError, match="no answer after 3 attempts"):
+        decision_model.decide("state", {"q": {}}, "key", retries=3)

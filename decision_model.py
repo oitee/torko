@@ -46,11 +46,17 @@ def looks_too_long(status: int, body: str) -> bool:
 
 
 def decide(state: str, questions: dict[str, dict], key: str, model: str = MODEL, retries: int = 8) -> dict:
-    """Retries on HTTP 429 and server errors."""
+    """Retries on HTTP 429, server errors, a timeout, and a dropped connection."""
     body = {"model": model, "state": state, "questions": questions}
     headers = {"Authorization": f"Bearer {key}", "Content-Type": "application/json"}
     for attempt in range(retries):
-        resp = requests.post(API_URL, json=body, headers=headers, timeout=120)
+        try:
+            resp = requests.post(API_URL, json=body, headers=headers, timeout=120)
+        except (requests.Timeout, requests.ConnectionError) as exc:
+            wait = min(60, 5 * 2 ** attempt)
+            print(f"  {type(exc).__name__}, wait {wait}s", flush=True)
+            time.sleep(wait)
+            continue
         if resp.status_code == 429 or resp.status_code >= 500:
             wait = min(60, 5 * 2 ** attempt)
             print(f"  HTTP {resp.status_code}, wait {wait}s", flush=True)
@@ -65,7 +71,7 @@ def decide(state: str, questions: dict[str, dict], key: str, model: str = MODEL,
         if missing:
             raise DecisionError(f"no answer for {len(missing)} questions, for example {sorted(missing)[:3]}")
         return data
-    raise DecisionError(f"still rate-limited after {retries} attempts")
+    raise DecisionError(f"no answer after {retries} attempts (rate limit, server error, or network)")
 
 
 def _probabilities(answer: dict) -> dict:
