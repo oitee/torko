@@ -55,3 +55,12 @@ python3 scripts/subject_parents.py --review
 For each subject, the options are the tags of its linked names (at most 10, most speeches first), the 3 tags nearest to the centre of its name vectors, and NONE. The state holds the label, up to 10 names with their speech counts, and up to 3 examples from the speeches. A subject gets a parent only when one tag gets 0.7 or more. The answer goes into the table `subject_parents` by subject key, so a reload of the same subject keeps it. `scripts/load_subjects.py` takes the parent from that table. A subject is decided again when the question version changes, or when it has no parent and the tag list grew.
 
 `--labels` decides only the named subjects. `--review` writes `results/parents_p1_<date>.tsv` with the vote parent next to the model's parent and its top options.
+
+## Candidates for new tags
+
+`scripts/new_tag_candidates.py` lists the subjects with no parent tag, 10 or more speeches, and 3 or more debates. It reads the parent from the table `subjects`, so the list follows the choice of the decision model. It writes `results/new_tag_candidates_v1.tsv` with the 5 nearest tags of each subject. It calls no model.
+
+An LLM review batch classified each candidate as `new` (propose a new tag, with a name, type, and domain), `existing` (a tag that exists already fits), `general` (too general for a tag), or `other`. The working file for the manual review is `results/new_tag_proposals_v1.tsv`. Its last two columns, `current_subject_keys` and `current_parent`, link each row to the subjects of today by their stable keys. One row can cover two or more subjects, when a later step split the subject that the reviewers saw.
+
+`data/new_tag_reviews_v1.tsv` holds the reviewer decisions in git: one row for each reviewed subject, keyed by the entity name IDs that the reviewers saw, with the review round. A rebuild of the subjects cannot make these answers again, so keep this file.
+
