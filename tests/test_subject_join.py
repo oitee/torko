@@ -56,3 +56,10 @@ def test_the_final_label_prefers_an_llm_label_for_the_exact_name_set():
     assert choose_final_label("3 7", 2, "Sugarcane farmers' dues", labels) == ("Sugarcane farmers' arrears", "llm")
     assert choose_final_label("3 8", 2, "Wage arrears", labels) == ("Wage arrears", "auto")
     assert choose_final_label("9", 1, "Cheque bouncing", labels) == ("Cheque bouncing", "name")
+
+
+def test_job_files_name_the_output_file_relative_to_the_job_folder(tmp_path):
+    from scripts.subject_join import write_jobs
+    assert write_jobs(tmp_path, [("C1", "A: x\nB: y")], "PAIR") == 1
+    lines = (tmp_path / "jobs" / "j0001.txt").read_text(encoding="utf-8").splitlines()
+    assert lines[1] == "Write one JSON line per pair, in this order, to out/j0001.out.jsonl"

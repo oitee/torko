@@ -151,8 +151,7 @@ def jobs(args) -> None:
             return
         n += 1
         name = f"j{n:04d}"
-        head = (f"PAIRS: {' '.join(ids)}\nWrite one JSON line per pair, in this order, to "
-                f"{args.folder / 'out' / (name + '.out.jsonl')}\n\n")
+        head = f"PAIRS: {' '.join(ids)}\nWrite one JSON line per pair, in this order, to out/{name}.out.jsonl\n\n"
         (out / f"{name}.txt").write_text(head + "".join(buf), encoding="utf-8")
         buf, ids = [], []
 
@@ -278,7 +277,7 @@ def write_jobs(folder: Path, blocks: list, item: str, max_bytes: int = JOB_BYTES
             n += 1
             name = f"j{n:04d}"
             head = (f"{item}S: {' '.join(ids)}\nWrite one JSON line per {item.lower()}, in this order, to "
-                    f"{folder / 'out' / (name + '.out.jsonl')}\n\n")
+                    f"out/{name}.out.jsonl\n\n")
             (out / f"{name}.txt").write_text(head + "".join(buf), encoding="utf-8")
             buf, ids, size = [], [], 0
         if iid is not None:
