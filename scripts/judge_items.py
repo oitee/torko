@@ -220,6 +220,12 @@ class RunGuard:
             self.reason = f"{self.failures_in_a_row} calls in a row failed"
 
 
+def batches(ids: list[int], size: int) -> list[list[int]]:
+    if size < 1:
+        raise ValueError(f"batch size must be 1 or more, not {size}")
+    return [ids[i:i + size] for i in range(0, len(ids), size)]
+
+
 def gate_rates(pairs: list[tuple[bool, bool]]) -> dict:
     """pairs holds (manual keep, model keep) for each item."""
     manual_keep = [m for o, m in pairs if o]
@@ -350,6 +356,8 @@ def main() -> None:
     ap.add_argument("--questions", default=QUESTIONS_VERSION,
                     help="the question version of the rows that --rethreshold and --score read (q4 or q5)")
     ap.add_argument("--workers", type=int, default=4)
+    ap.add_argument("--batch-size", type=int, default=100,
+                    help="speeches read from the database at a time; a batch waits for its slowest call")
     ap.add_argument("--max-failures", type=int, default=5, help="stop after this many failed calls in a row")
     ap.add_argument("--max-tokens", type=int, help="stop when the input tokens of this run reach this number")
     ap.add_argument("--force", action="store_true", help="judge again the items done with this version")
@@ -393,10 +401,9 @@ def main() -> None:
     states = {"speech": 0, "summary": 0}
     guard = RunGuard(args.max_failures, args.max_tokens)
     stopping = False
-    for start in range(0, len(ids), 100):
+    for batch_ids in batches(ids, args.batch_size):
         if guard.reason:
             break
-        batch_ids = ids[start:start + 100]
         with engine.connect() as conn:
             speeches = {s["speech_id"]: s for s in fetch_speeches(conn, batch_ids)}
             summaries = dict(conn.execute(text(

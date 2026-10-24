@@ -1,7 +1,9 @@
 from types import SimpleNamespace
 
-from scripts.judge_items import (ROLES, USES, RunGuard, Thresholds, gate_rates, judged_by, judgement, keep, p_keep,
-                                 questions_for, read_item, read_marks, summary_state)
+import pytest
+
+from scripts.judge_items import (ROLES, USES, RunGuard, Thresholds, batches, gate_rates, judged_by, judgement, keep,
+                                 p_keep, questions_for, read_item, read_marks, summary_state)
 
 
 def subject(p, source="llm"):
@@ -147,3 +149,14 @@ def test_a_run_with_no_budget_never_stops_on_tokens():
     g = RunGuard()
     g.success(10**12)
     assert g.reason is None
+
+
+def test_batches_keep_every_id_once_in_order_and_the_last_batch_is_short():
+    assert batches([1, 2, 3, 4, 5], 2) == [[1, 2], [3, 4], [5]]
+    assert batches([1, 2, 3], 1000) == [[1, 2, 3]]
+    assert batches([], 100) == []
+
+
+def test_a_batch_size_below_one_is_refused():
+    with pytest.raises(ValueError):
+        batches([1, 2], 0)
