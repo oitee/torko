@@ -6,6 +6,8 @@ The name links only when the top option is a tag with probability of at least --
 A name is decided again only when its linked_by value or the tag set changed. --force decides every name again.
 --test-pairs runs the steps on the hand-made test pairs and writes nothing to the database.
 --dry-run prints the counts and calls no model.
+--name-ids FILE decides only the names with an ID in FILE (IDs separated by spaces or new lines), and the names
+that the exact match rule links without a model call. Use it after new tags, to limit the model calls.
 
 It needs TYPESAFE_API_KEY, GEMINI_API_KEY, and numpy for the nearest-tag search (not in requirements.txt).
 Run from the repo root:
@@ -90,6 +92,15 @@ def needs_decision(row: dict, version: str, tag_set: int, force: bool = False,
     if force or row["link_status"] == "pending" or row["linked_by"] != version:
         return True
     return row["link_status"] == "none" and (row["tag_set_version"] or 0) < tag_set
+
+
+def read_ids(path: Path) -> set[int]:
+    return {int(x) for x in path.read_text().split()}
+
+
+def only_these(todo: list[dict], ids: set[int], exact: dict) -> list[dict]:
+    """The names of todo with an ID in ids, and the names that the exact match rule links (no model call)."""
+    return [r for r in todo if r["id"] in ids or exact_tag(exact, r["norm_name"]) is not None]
 
 
 def merge_candidates(exact: list[int], vector: list[tuple[int, float]], limit: int = MAX_OPTIONS) -> list[dict]:
@@ -317,6 +328,8 @@ def run_links(engine, args) -> None:
         """))]
     todo = [r for r in rows
             if needs_decision(r, version, tags.version, args.force, exact_tag(tags.exact, r["norm_name"]))]
+    if args.name_ids:
+        todo = only_these(todo, read_ids(args.name_ids), tags.exact)
     unregistered = 0
     with engine.connect() as conn:
         unregistered = conn.execute(text(
@@ -525,6 +538,7 @@ def main() -> None:
     ap.add_argument("--limit", type=int, help="decide at most this many names (the most frequent first)")
     ap.add_argument("--force", action="store_true", help="decide again every name, also those done with this version")
     ap.add_argument("--dry-run", action="store_true", help="print the counts, register nothing, call no model")
+    ap.add_argument("--name-ids", type=Path, help="decide only these entity name IDs, plus the exact match rule")
     ap.add_argument("--no-review", action="store_true", help="write no review file")
     ap.add_argument("--count-only", action="store_true",
                     help="with --test-pairs: print how many pairs link by the rule and how many need a model call, then stop")

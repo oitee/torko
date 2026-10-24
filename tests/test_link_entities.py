@@ -209,3 +209,10 @@ def test_nearest_rows_orders_tags_by_cosine_distance_and_keeps_n():
     assert [t for t, _ in rows[1]] == [20, 30]
     assert rows[1][0][1] == pytest.approx(0.0, abs=1e-6)
     assert rows[1][1][1] == pytest.approx(0.2, abs=1e-6)
+
+
+def test_only_these_keeps_listed_names_and_free_exact_links():
+    from scripts.link_entities import only_these
+    todo = [{"id": 1, "norm_name": "a"}, {"id": 2, "norm_name": "b"}, {"id": 3, "norm_name": "c"}]
+    exact = {"c": [7], "b": [7, 8]}
+    assert [r["id"] for r in only_these(todo, {1}, exact)] == [1, 3]
