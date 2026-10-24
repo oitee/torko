@@ -1,6 +1,7 @@
 from flask import Flask, jsonify, request, send_from_directory
 
 import dashboard_db
+import pages_api
 import tag_search
 from debate_fetch import fetch_debate, split_by_speaker, speaker_distribution
 from debate_fetch_legacy import looks_legacy, split_by_speaker_legacy
@@ -8,6 +9,9 @@ from debate_fetch_legacy import looks_legacy, split_by_speaker_legacy
 app = Flask(__name__, static_folder="static", static_url_path="")
 
 MAX_PAGE_SIZE = 100
+
+pages_api.register()
+app.register_blueprint(pages_api.bp)
 
 
 @app.route("/api/dashboard/debates")
