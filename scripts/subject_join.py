@@ -15,14 +15,17 @@ Subcommands:
   export-joins  Write the same answers to data/joins_v1.tsv, keyed by the entity name IDs of each unit, so that a later
               build does not depend on the pair IDs of one candidate run.
   subjects    Join the units of every pair in data/joins_v1.tsv. Write results/subjects_v1.tsv with one row per subject.
-  label-jobs  Write task files for an LLM that writes a clean label for each subject with 2 or more names.
+  label-jobs  Write task files for an LLM that writes a clean label for each subject with 2 or more names. A subject
+              whose exact set of names has a stored label gets no job. The job subjects go to
+              results/label_subjects_v1.tsv.
   chain-jobs  Write task files for an LLM that judges every pair of units inside a chain of 3 or more units
               that no earlier answer judged directly (the chain guard).
   chain-ingest  Read the chain answers. Write data/cannot_links_v1.tsv: every pair of units inside one joined subject
               that an answer (the join run or the chain run) called different. `subjects` never joins across such a pair.
   labels-ingest  Read the LLM labels. Write data/subject_labels_v1.tsv, keyed by the entity name IDs of each subject.
-              --folder holds the label answers for results/subjects_v1_before_guard.tsv. --relabels holds a TSV
-              (subject_id, label) for subjects of results/subjects_v1.tsv that the chain guard changed.
+              --folder holds the label answers for the subjects of results/label_subjects_v1.tsv. --relabels holds a
+              TSV (subject_id, label) for subjects of results/subjects_v1.tsv. A stored label stays, unless a new
+              label replaces it for the same set of names.
   final       Write results/subjects_final_v1.tsv: one row per subject with its label, parent tag, names, and speech IDs.
   compare     Score approach A (each limit t) and approach C on the labelled candidate pairs of
               tags/subject_groups/eval/ (join_labels_A.tsv, join_labels_B.tsv). Gold = pairs where both labels agree.
@@ -424,8 +427,28 @@ def subjects(args) -> None:
     print(f"subjects {len(rows)}, with 2+ names {sum(r['n_names'] >= 2 for r in rows)}, joined {sum(r['n_units'] > 1 for r in rows)}")
 
 
+LABEL_SUBJECTS = RESULTS / "label_subjects_v1.tsv"
+
+
+def read_labels() -> dict:
+    """The stored labels: name key -> (label, source). Missing file: no labels."""
+    if not LABELS.exists():
+        return {}
+    return {r["name_ids"]: (r["label"], r["source"]) for r in csv.DictReader(LABELS.open(), delimiter="\t")}
+
+
 def label_jobs(args) -> None:
+    """A subject whose exact set of names has a stored label gets no job. The subject IDs of the jobs go to
+    results/label_subjects_v1.tsv, so that labels-ingest reads them even after a later rebuild of the subjects."""
+    known = read_labels()
     rows = [r for r in csv.DictReader((RESULTS / "subjects_v1.tsv").open(), delimiter="\t") if int(r["n_names"]) >= 2]
+    before = len(rows)
+    rows = [r for r in rows if name_key(r["name_ids"]) not in known]
+    print(f"{before - len(rows)} of {before} subjects have a stored label and get no job")
+    with LABEL_SUBJECTS.open("w", newline="") as f:
+        w = csv.writer(f, delimiter="\t")
+        w.writerow(["subject_id", "name_ids"])
+        w.writerows((r["subject_id"], name_key(r["name_ids"])) for r in rows)
     random.Random(9).shuffle(rows)
     blocks = []
     for r in rows:
@@ -519,9 +542,14 @@ def name_key(name_ids: str) -> str:
     return " ".join(sorted(name_ids.split(), key=int))
 
 
+def merge_labels(new: dict, old: dict) -> tuple[dict, int]:
+    """The new labels, and each old label whose name key has no new label. Returns (labels, old labels kept)."""
+    kept = {k: v for k, v in old.items() if k not in new}
+    return {**kept, **new}, len(kept)
+
+
 def labels_ingest(args) -> None:
-    before = {r["subject_id"]: name_key(r["name_ids"])
-              for r in csv.DictReader((RESULTS / "subjects_v1_before_guard.tsv").open(), delimiter="\t")}
+    before = {r["subject_id"]: r["name_ids"] for r in csv.DictReader(LABEL_SUBJECTS.open(), delimiter="\t")}
     after = {r["subject_id"]: name_key(r["name_ids"])
              for r in csv.DictReader((RESULTS / "subjects_v1.tsv").open(), delimiter="\t")}
     rows = {}
@@ -539,12 +567,14 @@ def labels_ingest(args) -> None:
         for r in csv.DictReader(args.relabels.open(), delimiter="\t"):
             if r["subject_id"] in after and r["label"].strip():
                 rows[after[r["subject_id"]]] = (r["label"].strip(), "llm_relabel")
+    n_new = len(rows)
+    rows, kept = merge_labels(rows, read_labels())
     with LABELS.open("w", newline="") as f:
         w = csv.writer(f, delimiter="\t")
         w.writerow(["name_ids", "label", "source"])
         for k, (label, src) in sorted(rows.items()):
             w.writerow([k, label, src])
-    print(f"labels {len(rows)} (label run {n_llm}, relabels {len(rows) - n_llm if args.relabels else 0})")
+    print(f"labels {len(rows)}: label run {n_llm}, relabels {n_new - n_llm}, older labels kept {kept}")
 
 
 def choose_final_label(key: str, n_names: int, label_auto: str, labels: dict) -> tuple[str, str]:
@@ -557,9 +587,7 @@ def choose_final_label(key: str, n_names: int, label_auto: str, labels: dict) ->
 def final(args) -> None:
     from db import get_engine
     from scripts.subject_groups import load_speeches
-    labels = {}
-    if LABELS.exists():
-        labels = {r["name_ids"]: (r["label"], r["source"]) for r in csv.DictReader(LABELS.open(), delimiter="\t")}
+    labels = read_labels()
     with get_engine().connect() as conn:
         speeches = defaultdict(set)
         for nid, sid, _ in load_speeches(conn):

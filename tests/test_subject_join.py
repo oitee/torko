@@ -117,3 +117,48 @@ def test_chain_ingest_keeps_the_old_cannot_links(tmp_path, monkeypatch):
     sj.chain_ingest(argparse.Namespace(cache=cache, folder=folder))
     lines = (data / "cannot.tsv").read_text().splitlines()
     assert lines == ["name_ids_a\tname_ids_b\tsource\tconfidence", "1\t3\tchain\tlow", "7\t8\tchain\thigh"]
+
+
+def test_merge_labels_keeps_old_labels_and_a_new_label_wins():
+    from scripts.subject_join import merge_labels
+    labels, kept = merge_labels({"1 2": ("New", "llm")}, {"1 2": ("Old", "llm"), "3 4": ("Other", "llm")})
+    assert kept == 1
+    assert labels == {"1 2": ("New", "llm"), "3 4": ("Other", "llm")}
+
+
+def label_files(tmp_path, monkeypatch):
+    import scripts.subject_join as sj
+    results, data = tmp_path / "results", tmp_path / "data"
+    results.mkdir()
+    data.mkdir()
+    monkeypatch.setattr(sj, "RESULTS", results)
+    monkeypatch.setattr(sj, "LABELS", data / "labels.tsv")
+    monkeypatch.setattr(sj, "LABEL_SUBJECTS", results / "label_subjects.tsv")
+    (results / "subjects_v1.tsv").write_text(
+        "subject_id\tn_names\tnames\tname_ids\n"
+        "S00001\t2\tDues (5) | Arrears (3)\t7 3\n"
+        "S00002\t2\tRail fare (4) | Train fare (2)\t5 9\n"
+        "S00003\t1\tCheque bouncing (2)\t8\n", encoding="utf-8")
+    (data / "labels.tsv").write_text("name_ids\tlabel\tsource\n5 9\tRailway fares\tllm\n1 2\tLost subject\tllm\n",
+                                     encoding="utf-8")
+    return sj, results, data
+
+
+def test_label_jobs_skip_subjects_with_a_stored_label(tmp_path, monkeypatch):
+    import argparse
+    sj, results, _ = label_files(tmp_path, monkeypatch)
+    sj.label_jobs(argparse.Namespace(folder=tmp_path / "jobs"))
+    assert (results / "label_subjects.tsv").read_text().splitlines() == ["subject_id\tname_ids", "S00001\t3 7"]
+    assert (tmp_path / "jobs" / "jobs" / "j0001.txt").read_text().startswith("SUBJECTS: S00001\n")
+
+
+def test_labels_ingest_reads_the_job_subjects_and_keeps_the_old_labels(tmp_path, monkeypatch):
+    import argparse
+    import json
+    sj, results, data = label_files(tmp_path, monkeypatch)
+    sj.label_jobs(argparse.Namespace(folder=tmp_path / "jobs"))
+    (results / "subjects_v1.tsv").write_text("subject_id\tn_names\tnames\tname_ids\n", encoding="utf-8")
+    (tmp_path / "jobs" / "out" / "j0001.out.jsonl").write_text(json.dumps({"subject": "S00001", "label": "Dues"}) + "\n")
+    sj.labels_ingest(argparse.Namespace(folder=tmp_path / "jobs", relabels=None))
+    assert (data / "labels.tsv").read_text().splitlines() == [
+        "name_ids\tlabel\tsource", "1 2\tLost subject\tllm", "3 7\tDues\tllm", "5 9\tRailway fares\tllm"]
