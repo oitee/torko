@@ -152,13 +152,13 @@ class ApiError(Exception):
     pass
 
 
-def generate(model: str, system: str, body_text: str, key: str, retries: int = 8) -> tuple[dict, dict]:
+def generate(model: str, system: str, body_text: str, key: str, retries: int = 8, schema: dict | None = None) -> tuple[dict, dict]:
     """Returns the parsed answer and the token counts."""
     url = f"https://generativelanguage.googleapis.com/v1beta/models/{model}:generateContent"
     body = {
         "systemInstruction": {"parts": [{"text": system}]},
         "contents": [{"role": "user", "parts": [{"text": body_text}]}],
-        "generationConfig": {"responseMimeType": "application/json", "responseJsonSchema": SCHEMA},
+        "generationConfig": {"responseMimeType": "application/json", "responseJsonSchema": schema or SCHEMA},
     }
     for attempt in range(retries):
         resp = requests.post(url, json=body, headers={"x-goog-api-key": key}, timeout=300)

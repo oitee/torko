@@ -1,6 +1,7 @@
 """Load the tag lists into the table `tags`. This script calls no model.
 
-Sources: seed_v1 (tags/seed_tags_v1/results/seed_tags_v1.tsv) and places_v1 (tags/places/results/place_tags.tsv).
+Sources: seed_v1 (tags/seed_tags_v1/results/seed_tags_v1.tsv), places_v1 (tags/places/results/place_tags.tsv), and
+subjects_v1 (tags/new_tags/results/new_tags_v1.tsv, new tags from large subjects with no tag).
 A tag that exists keeps its id and its source. The script deletes a tag only when its own source is loaded
 and the file no longer holds the tag. It stops before any write on a duplicate name or on a tag that
 entity_names still uses. The accepted merges of near-duplicate tags (tag_merges.py) change the rows of each
@@ -31,13 +32,15 @@ from tag_merges import Group, load_groups, merged_aliases
 ROOT = Path(__file__).resolve().parent.parent
 SEED_FILE = ROOT / "tags" / "seed_tags_v1" / "results" / "seed_tags_v1.tsv"
 PLACES_FILE = ROOT / "tags" / "places" / "results" / "place_tags.tsv"
+NEW_TAGS_FILE = ROOT / "tags" / "new_tags" / "results" / "new_tags_v1.tsv"
 SOURCE = "seed_v1"
 
 # (source name, file, status of the new tags).
-# Each list had a manual review, so both lists load as 'reviewed'.
+# Each list had a manual review, so all lists load as 'reviewed'.
 SOURCES = [
     ("seed_v1", SEED_FILE, "reviewed"),
     ("places_v1", PLACES_FILE, "reviewed"),
+    ("subjects_v1", NEW_TAGS_FILE, "reviewed"),
 ]
 FIELDS = ("type", "subtype", "domain", "description", "aliases", "debate_count")
 
