@@ -1,3 +1,4 @@
+import pytest
 import json
 
 from scripts.link_entities import (MODEL_ONLY, EXACT_MATCH, EXACT_VERSION, MAX_OPTIONS, NONE, Tags, decide_link, exact_tag,
@@ -197,3 +198,14 @@ def test_the_report_counts_the_names_that_the_list_sent_to_the_model():
     rep = rule_report([name_row("mandi", "place"), name_row("meerut", "place")], tags)
     assert [r["norm_name"] for r in rep["model_only"]] == ["mandi"]
     assert [r["norm_name"] for r in rep["one"]] == ["meerut"]
+
+
+def test_nearest_rows_orders_tags_by_cosine_distance_and_keeps_n():
+    np = pytest.importorskip("numpy")
+    from scripts.link_entities import nearest_rows
+    tags = np.array([[1.0, 0.0], [0.0, 1.0], [0.6, 0.8]], dtype=np.float32)
+    rows = nearest_rows([10, 20, 30], tags, [[2.0, 0.1], [0.0, 3.0]], n=2, chunk=1)
+    assert [t for t, _ in rows[0]] == [10, 30]
+    assert [t for t, _ in rows[1]] == [20, 30]
+    assert rows[1][0][1] == pytest.approx(0.0, abs=1e-6)
+    assert rows[1][1][1] == pytest.approx(0.2, abs=1e-6)

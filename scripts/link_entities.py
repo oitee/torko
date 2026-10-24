@@ -7,7 +7,8 @@ A name is decided again only when its linked_by value or the tag set changed. --
 --test-pairs runs the steps on the hand-made test pairs and writes nothing to the database.
 --dry-run prints the counts and calls no model.
 
-It needs TYPESAFE_API_KEY and GEMINI_API_KEY. Run from the repo root:
+It needs TYPESAFE_API_KEY, GEMINI_API_KEY, and numpy for the nearest-tag search (not in requirements.txt).
+Run from the repo root:
 
     set -a && source .env && set +a
     python3 scripts/link_entities.py --test-pairs
@@ -159,6 +160,34 @@ class Tags:
             WHERE e.model = :m AND e.task_type = :t AND t.status NOT IN ('rejected', 'merged')
             ORDER BY distance LIMIT :n
         """), {"v": to_pgvector(vector), "m": EMBED_MODEL, "t": TAG_TASK, "n": n})]
+
+    def matrix(self, conn):
+        """The tag ids and their vectors scaled to length 1, for the same tags as nearest."""
+        import numpy as np
+        rows = conn.execute(text("""
+            SELECT e.tag_id, e.embedding::text AS v
+            FROM tag_embeddings e JOIN tags t ON t.id = e.tag_id
+            WHERE e.model = :m AND e.task_type = :t AND t.status NOT IN ('rejected', 'merged')
+            ORDER BY e.tag_id
+        """), {"m": EMBED_MODEL, "t": TAG_TASK}).all()
+        mat = np.array([json.loads(r.v) for r in rows], dtype=np.float32)
+        return [r.tag_id for r in rows], mat / np.linalg.norm(mat, axis=1, keepdims=True)
+
+
+def nearest_rows(tag_ids: list[int], tag_matrix, vectors: list[list[float]], n: int = N_VECTOR,
+                 chunk: int = 2000) -> list[list[tuple[int, float]]]:
+    """For each vector, the n nearest tags by cosine distance, nearest first. An exact search in numpy:
+    the same order as tags.nearest, at a small part of its time."""
+    import numpy as np
+    out = []
+    for start in range(0, len(vectors), chunk):
+        q = np.array(vectors[start:start + chunk], dtype=np.float32).reshape(-1, tag_matrix.shape[1])
+        q /= np.linalg.norm(q, axis=1, keepdims=True)
+        dist = 1.0 - q @ tag_matrix.T
+        for row in dist:
+            top = np.argsort(row, kind="stable")[:n]
+            out.append([(tag_ids[j], float(row[j])) for j in top])
+    return out
 
 
 def build_options(tags: Tags, candidates: list[dict]) -> dict[str, str]:
@@ -324,13 +353,16 @@ def run_links(engine, args) -> None:
         examples = examples_for(conn, [r["id"] for r in todo])
         linked = {r.norm_name: r.tag_id for r in conn.execute(text(
             "SELECT norm_name, tag_id FROM entity_names WHERE link_status = 'linked'"))}
-        jobs = []
-        for r in todo:
-            vector = json.loads(conn.execute(text("SELECT embedding_query::text FROM entity_names WHERE id = :id"),
-                                             {"id": r["id"]}).scalar())
-            exact = tags.exact.get(r["norm_name"], []) + ([linked[r["norm_name"]]] if r["norm_name"] in linked else [])
-            cands = merge_candidates(exact, tags.nearest(conn, vector))
-            jobs.append((r, cands, link_state(r["name"], r["type"], r["n_speeches"], examples.get(r["id"], []))))
+        vectors = {r.id: json.loads(r.v) for r in conn.execute(text(
+            "SELECT id, embedding_query::text AS v FROM entity_names WHERE id = ANY(:ids)"),
+            {"ids": [r["id"] for r in todo]})}
+        tag_ids, tag_matrix = tags.matrix(conn)
+    nearest = nearest_rows(tag_ids, tag_matrix, [vectors[r["id"]] for r in todo])
+    jobs = []
+    for r, near in zip(todo, nearest):
+        exact = tags.exact.get(r["norm_name"], []) + ([linked[r["norm_name"]]] if r["norm_name"] in linked else [])
+        cands = merge_candidates(exact, near)
+        jobs.append((r, cands, link_state(r["name"], r["type"], r["n_speeches"], examples.get(r["id"], []))))
 
     key = api_key()
     counts = Counter()
