@@ -6,10 +6,12 @@ Candidate pairs: for each unit, its 5 nearest units by centre, when the cosine d
 
 Subcommands:
   candidates  Build the units and the candidate pairs. Write results/join_candidates_v1.tsv and a cache file.
-  jobs        Write task files for an LLM judge (approach C) to a folder outside the repository.
+  jobs        Write task files for an LLM judge (approach C) to a folder outside the repository. With --cache, a pair
+              that an earlier run answered (data/joins_v1.tsv, data/cannot_links_v1.tsv) gets no job.
   approach-a  Join the units of every pair with a centre distance below t, for several t. Score each t
               with the labelled name pairs of tags/subject_groups/eval/.
-  ingest      Read the LLM answers (approach C), validate them, and write results/join_llm_v1.tsv.
+  ingest      Read the LLM answers (approach C), validate them, and write results/join_llm_v1.tsv. With --cache, the
+              earlier answers of the pairs that got no job are added, with the confidence `reused`.
   export-joins  Write the same answers to data/joins_v1.tsv, keyed by the entity name IDs of each unit, so that a later
               build does not depend on the pair IDs of one candidate run.
   subjects    Join the units of every pair in data/joins_v1.tsv. Write results/subjects_v1.tsv with one row per subject.
@@ -139,6 +141,11 @@ def build(args) -> None:
 
 def jobs(args) -> None:
     rows = list(csv.DictReader((RESULTS / "join_candidates_v1.tsv").open(), delimiter="\t"))
+    if args.cache:
+        known = known_answers(pickle.load(args.cache.open("rb"))["units"])
+        before = len(rows)
+        rows = [r for r in rows if frozenset((int(r["unit_a"]), int(r["unit_b"]))) not in known]
+        print(f"{before - len(rows)} of {before} pairs have an earlier answer and get no job")
     random.Random(5).shuffle(rows)
     out = args.folder / "jobs"
     out.mkdir(parents=True, exist_ok=True)
@@ -309,6 +316,20 @@ def joins_to_pairs(units: list, rows: list) -> tuple[list, int]:
 CANNOT = RESULTS.parent / "data" / "cannot_links_v1.tsv"
 
 
+def known_answers(units: list, joins: Path | None = None, cannot: Path | None = None) -> dict:
+    """Unit pairs that an earlier run answered: frozenset of two unit indexes -> decision.
+    `same` comes from data/joins_v1.tsv and `different` from data/cannot_links_v1.tsv. A `different` answer wins
+    over a `same` answer for the same pair. A row whose unit no longer exists is skipped."""
+    out = {}
+    for path, decision in ((cannot or CANNOT, "different"), (joins or JOINS, "same")):
+        if not path.exists():
+            continue
+        rows = [dict(r, centre_distance="0") for r in csv.DictReader(path.open(), delimiter="\t")]
+        for a, b, _ in joins_to_pairs(units, rows)[0]:
+            out.setdefault(frozenset((a, b)), decision)
+    return out
+
+
 def cannot_links(units: list) -> set:
     """Unit pairs that an answer called different, from data/cannot_links_v1.tsv. Missing file: no constraints."""
     if not CANNOT.exists():
@@ -455,12 +476,17 @@ def chain_ingest(args) -> None:
             rows.append((unit_key(units[int(r["unit_a"])]), unit_key(units[int(r["unit_b"])]), "chain", dec[1]))
         else:
             n_same += 1
+    cols = ["name_ids_a", "name_ids_b", "source", "confidence"]
+    new_rows = [dict(zip(cols, r)) for r in rows]
+    old_rows = list(csv.DictReader(CANNOT.open(), delimiter="\t")) if CANNOT.exists() else []
+    merged, kept = merge_pair_rows(new_rows, old_rows)
     with CANNOT.open("w", newline="") as f:
-        w = csv.writer(f, delimiter="\t")
-        w.writerow(["name_ids_a", "name_ids_b", "source", "confidence"])
-        w.writerows(rows)
-    print(f"chain answers {len(answers)} of {len(pairs)} (same {n_same}); cannot-links {len(rows)} "
-          f"(join run {sum(r[2] == 'join' for r in rows)}, chain run {sum(r[2] == 'chain' for r in rows)})")
+        w = csv.DictWriter(f, fieldnames=cols, delimiter="\t", extrasaction="ignore")
+        w.writeheader()
+        w.writerows(merged)
+    print(f"chain answers {len(answers)} of {len(pairs)} (same {n_same}); new cannot-links {len(rows)} "
+          f"(join run {sum(r[2] == 'join' for r in rows)}, chain run {sum(r[2] == 'chain' for r in rows)}) "
+          f"+ {kept} older kept = {len(merged)} written to {CANNOT}")
 
 
 LABELS = RESULTS.parent / "data" / "subject_labels_v1.tsv"

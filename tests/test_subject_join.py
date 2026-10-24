@@ -63,3 +63,20 @@ def test_job_files_name_the_output_file_relative_to_the_job_folder(tmp_path):
     assert write_jobs(tmp_path, [("C1", "A: x\nB: y")], "PAIR") == 1
     lines = (tmp_path / "jobs" / "j0001.txt").read_text(encoding="utf-8").splitlines()
     assert lines[1] == "Write one JSON line per pair, in this order, to out/j0001.out.jsonl"
+
+
+def test_known_answers_read_both_files_by_name_ids_and_a_different_answer_wins(tmp_path):
+    from scripts.subject_join import known_answers
+    units = [[5, 3], [9], [7, 8], [4]]
+    joins = tmp_path / "joins.tsv"
+    joins.write_text("name_ids_a\tname_ids_b\tcentre_distance\tconfidence\n"
+                     "3 5\t9\t0.1\thigh\n7 8\t4\t0.1\thigh\n1 2\t9\t0.1\thigh\n", encoding="utf-8")
+    cannot = tmp_path / "cannot.tsv"
+    cannot.write_text("name_ids_a\tname_ids_b\tsource\tconfidence\n7 8\t4\tchain\tlow\n", encoding="utf-8")
+    known = known_answers(units, joins, cannot)
+    assert known == {frozenset((0, 1)): "same", frozenset((2, 3)): "different"}
+
+
+def test_known_answers_with_no_files_is_empty(tmp_path):
+    from scripts.subject_join import known_answers
+    assert known_answers([[1], [2]], tmp_path / "none.tsv", tmp_path / "none2.tsv") == {}
