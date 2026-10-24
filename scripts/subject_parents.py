@@ -13,10 +13,22 @@ when it has no parent and the tag set grew. --force decides every subject again.
 Each answer goes into the table subject_parents by subject key, and the parent goes into subjects.parent_tag_id.
 It needs TYPESAFE_API_KEY and numpy.
 
+--jobs FOLDER takes the subjects with no parent that no agent run answered, and writes the same questions as job files for an agent run, and calls no model. Each option has a
+letter. An agent answers one JSON line per subject: the letter or NONE, and the confidence high or low.
+The job files show no examples. --jobs needs no job for a subject when stage 5 already answers it: the subject has
+exactly one linked tag, and that tag is also nearer to the centre of the names than every near tag. That tag is
+the parent (the strict rule). Such subjects go to rule.jsonl. --skip-answered FOLDER leaves out the subjects with
+an answer in an earlier job folder.
+--ingest FOLDER [FOLDER ...] reads those answers and rule.jsonl. A subject gets a parent only for a high answer.
+The agent gives no probability, so parent_p holds 1.0 for a high answer and 0.5 for a low answer, and decided_by
+names the agent run or the rule.
+
     source .venv/bin/activate && set -a && source .env && set +a
     python3 scripts/subject_parents.py --dry-run
     python3 scripts/subject_parents.py --labels "Pradhan Mantri Shram Yogi Maandhan" "Wage arrears" --review
     python3 scripts/subject_parents.py
+    python3 scripts/subject_parents.py --jobs ~/Downloads/subject_parents_v3 --skip-answered ~/Downloads/subject_parents_v2
+    python3 scripts/subject_parents.py --ingest ~/Downloads/subject_parents_v2 ~/Downloads/subject_parents_v3
 """
 from __future__ import annotations
 
@@ -47,14 +59,24 @@ SHOW_NAMES = 10
 N_EXAMPLES = 3
 NONE_TEXT = "no option covers the whole subject, or each option is only one part of the subject"
 RESULTS = Path(__file__).resolve().parent.parent / "tags" / "subject_groups" / "results"
+JOB_BYTES = 30000
+AGENT_P = {"high": 1.0, "low": 0.5}
 
 
 def decided_by(model: str) -> str:
     return f"{model} {QUESTIONS_VERSION}"
 
 
+AGENT_PREFIXES = ("agent ", "rule ")
+
+
 def needs_decision(row: dict | None, version: str, tag_set: int, force: bool = False) -> bool:
-    if force or row is None or row["decided_by"] != version:
+    """An answer of an agent run or of the strict rule stays, except with force."""
+    if force or row is None:
+        return True
+    if row["decided_by"].startswith(AGENT_PREFIXES):
+        return False
+    if row["decided_by"] != version:
         return True
     return row["parent_tag_id"] is None and row["tag_set_version"] < tag_set
 
@@ -167,6 +189,77 @@ def ask(state: str, label: str, options: dict[str, str], key: str, model: str) -
     return probs, data, warnings
 
 
+def letters(n: int) -> list[str]:
+    """A to Z, then AA, AB and on."""
+    out = []
+    for i in range(n):
+        out.append(chr(65 + i) if i < 26 else chr(64 + i // 26) + chr(65 + i % 26))
+    return out
+
+
+def job_block(state: str, label: str, options: list[tuple[str, str, str]]) -> str:
+    """options: (letter, tag, option text). The question has the words of parent_question."""
+    lines = [state, "", f"Question: which option covers the subject «{label}» in these speeches?", "Options:"]
+    lines += [f"{code}. {tag}: {desc}" for code, tag, desc in options]
+    lines.append(f"NONE. {NONE_TEXT}")
+    return "\n".join(lines)
+
+
+def needs_agent(row: dict | None) -> bool:
+    """For --jobs: a subject with no parent that no agent run and no strict rule answered yet."""
+    return row is None or (row["parent_tag_id"] is None and not row["decided_by"].startswith(AGENT_PREFIXES))
+
+
+def strict_rule(cands: list[dict]) -> int | None:
+    """The index of the one linked option when it is also nearer than every near option, else None."""
+    linked = [i for i, c in enumerate(cands) if c["source"] == "linked"]
+    if len(linked) != 1 or cands[linked[0]]["distance"] is None:
+        return None
+    d = cands[linked[0]]["distance"]
+    if any(c["source"] == "near" and c["distance"] < d for c in cands):
+        return None
+    return linked[0]
+
+
+def read_answers(folder: Path) -> tuple[dict, dict]:
+    """Returns (job subject ID -> subjects.jsonl row, job subject ID -> answer) of one job folder.
+    The answers are the agent outputs, then rule.jsonl."""
+    subjects = {}
+    for line in (folder / "subjects.jsonl").read_text(encoding="utf-8").splitlines():
+        obj = json.loads(line)
+        subjects[obj["subject"]] = obj
+    answers = {}
+    files = sorted((folder / "out").glob("j*.out.jsonl"))
+    if (folder / "rule.jsonl").exists():
+        files.append(folder / "rule.jsonl")
+    for p in files:
+        for line in p.read_text(encoding="utf-8").splitlines():
+            try:
+                obj = json.loads(line.strip().strip("`"))
+            except json.JSONDecodeError:
+                continue
+            if obj.get("subject") in subjects:
+                answers[obj["subject"]] = obj
+    return subjects, answers
+
+
+def agent_decision(answer: dict, codes: dict[str, int]) -> tuple[int | None, float, list[str]]:
+    """answer: one output line. codes: letter -> tag ID. Returns (parent tag ID or None, parent_p, warnings).
+    A low answer or an unknown letter gives no parent."""
+    code = str(answer.get("parent", "")).strip().upper()
+    conf = str(answer.get("confidence", "")).strip().lower()
+    warnings = []
+    if conf not in AGENT_P:
+        warnings.append(f"unknown confidence {conf!r}")
+    if code != NONE and code not in codes:
+        warnings.append(f"unknown option {code!r}")
+        return None, 0.0, warnings
+    p = AGENT_P.get(conf, 0.0)
+    if code == NONE or conf != "high":
+        return None, p, warnings
+    return codes[code], p, warnings
+
+
 def write_review(rows: list[dict]) -> Path:
     RESULTS.mkdir(parents=True, exist_ok=True)
     stem = free_stem(RESULTS, f"parents_{QUESTIONS_VERSION}_{date.today().isoformat()}")
@@ -178,6 +271,64 @@ def write_review(rows: list[dict]) -> Path:
             w.writerow([r["key"], r["label"], r["n_names"], r["n_speeches"], r["vote_parent"] or "", r["parent"] or NONE,
                         f"{r['p']:.2f}", r["options"], ""])
     return path
+
+
+def write_agent_jobs(folder: Path, jobs: list, states: dict, tags: dict, tag_set: int) -> None:
+    """Write folder/jobs/jNNNN.txt and folder/subjects.jsonl, the map from job subject ID to subject key and options."""
+    from scripts.subject_join import write_jobs
+    folder.mkdir(parents=True, exist_ok=True)
+    blocks, n_rule = [], 0
+    with (folder / "subjects.jsonl").open("w", encoding="utf-8") as f, \
+            (folder / "rule.jsonl").open("w", encoding="utf-8") as rf:
+        for i, (s, cands) in enumerate(jobs, 1):
+            pid = f"P{i:05d}"
+            codes = letters(len(cands))
+            rule = strict_rule(cands)
+            if rule is not None:
+                n_rule += 1
+                rf.write(json.dumps({"subject": pid, "parent": codes[rule], "confidence": "high", "by": "rule"}) + "\n")
+            else:
+                opts = [(code, tags[c["tag_id"]]["tag"], option_text(tags[c["tag_id"]]))
+                        for code, c in zip(codes, cands)]
+                blocks.append((pid, job_block(states[s["id"]], s["label"], opts)))
+            stored = [{**c, "code": code, "tag": tags[c["tag_id"]]["tag"]} for code, c in zip(codes, cands)]
+            f.write(json.dumps({"subject": pid, "key": s["key"], "label": s["label"], "tag_set": tag_set,
+                                "options": stored}, ensure_ascii=False) + "\n")
+    n = write_jobs(folder, blocks, "SUBJECT", JOB_BYTES)
+    print(f"{len(jobs)} subjects: {n_rule} decided by the strict rule (rule.jsonl), {len(blocks)} in {n} job files "
+          f"in {folder}")
+
+
+def ingest(folders: list[Path], agent: str) -> None:
+    """A later folder wins when two folders answer the same subject key."""
+    from db import get_engine
+    rows = {}
+    for folder in folders:
+        subjects, answers = read_answers(folder)
+        print(f"{folder}: answers {len(answers)} of {len(subjects)} subjects")
+        for pid, ans in answers.items():
+            rows[subjects[pid]["key"]] = (subjects[pid], ans)
+    counts = Counter()
+    with get_engine().begin() as conn:
+        for sub, ans in rows.values():
+            version = f"rule linked+nearest {QUESTIONS_VERSION}" if ans.get("by") == "rule" else f"agent {agent} {QUESTIONS_VERSION}"
+            counts[ans.get("by", "agent")] += 1
+            tid, p, warnings = agent_decision(ans, {o["code"]: o["tag_id"] for o in sub["options"]})
+            counts["parent" if tid else "none"] += 1
+            counts["warning"] += bool(warnings)
+            conn.execute(text("""
+                INSERT INTO subject_parents (subject_key, parent_tag_id, parent_p, options, raw, warnings,
+                                             decided_by, tag_set_version, decided_at)
+                VALUES (:k, :t, :p, CAST(:o AS jsonb), CAST(:raw AS jsonb), :w, :by, :tsv, now())
+                ON CONFLICT (subject_key) DO UPDATE SET parent_tag_id = EXCLUDED.parent_tag_id,
+                    parent_p = EXCLUDED.parent_p, options = EXCLUDED.options, raw = EXCLUDED.raw,
+                    warnings = EXCLUDED.warnings, decided_by = EXCLUDED.decided_by,
+                    tag_set_version = EXCLUDED.tag_set_version, decided_at = now()
+            """), {"k": sub["key"], "t": tid, "p": p, "o": json.dumps(sub["options"], ensure_ascii=False),
+                   "raw": json.dumps(ans, ensure_ascii=False), "w": warnings, "by": version, "tsv": sub["tag_set"]})
+        synced = conn.execute(text(SYNC_PARENTS)).rowcount
+    print(f"subjects {len(rows)} (agent {counts['agent']}, rule {counts['rule']}): parent {counts['parent']}, none {counts['none']}, "
+          f"with a warning {counts['warning']}. subjects.parent_tag_id changed for {synced} subjects.")
 
 
 def main() -> None:
@@ -193,14 +344,25 @@ def main() -> None:
     ap.add_argument("--force", action="store_true")
     ap.add_argument("--dry-run", action="store_true", help="print the counts and a token estimate, call no model")
     ap.add_argument("--review", action="store_true", help="also write a review file of the decided subjects")
+    ap.add_argument("--jobs", type=Path, help="write job files for an agent run into this folder, call no model")
+    ap.add_argument("--ingest", type=Path, nargs="+", help="read the answers of agent runs from these folders")
+    ap.add_argument("--skip-answered", type=Path, nargs="*", default=[],
+                    help="with --jobs: leave out the subjects with an answer in these job folders")
+    ap.add_argument("--agent", default="gemini-flash", help="the agent model, for decided_by of --ingest")
     args = ap.parse_args()
+    if args.ingest:
+        ingest(args.ingest, args.agent)
+        return
     version = decided_by(args.model)
     engine = get_engine()
     with engine.connect() as conn:
         subjects, tags, tag_set = load(conn)
         done = {r.subject_key: dict(r._mapping) for r in conn.execute(text(
             "SELECT subject_key, parent_tag_id, decided_by, tag_set_version FROM subject_parents"))}
-        todo = [s for s in subjects if needs_decision(done.get(s["key"]), version, tag_set, args.force)]
+        if args.jobs:
+            todo = [s for s in subjects if needs_agent(done.get(s["key"]))]
+        else:
+            todo = [s for s in subjects if needs_decision(done.get(s["key"]), version, tag_set, args.force)]
         if args.labels:
             todo = [s for s in todo if s["label"] in set(args.labels)]
         todo.sort(key=lambda s: (-s["n_speeches"], s["id"]))
@@ -219,11 +381,21 @@ def main() -> None:
                 skipped += 1
                 continue
             jobs.append((s, cands))
-        examples = examples_for(conn, [n["id"] for s, _ in jobs for n in s["names"][:SHOW_NAMES]]) if jobs else {}
+        if args.jobs:
+            examples = {}
+        else:
+            examples = examples_for(conn, [n["id"] for s, _ in jobs for n in s["names"][:SHOW_NAMES]]) if jobs else {}
     states = {s["id"]: parent_state(s["label"], s["names"], s["n_speeches"], pick_examples(s["names"], examples))
               for s, _ in jobs}
     print(f"{len(subjects)} subjects, {len(done)} decided before. To decide with {version}: {len(jobs)} "
           f"({skipped} have no option). Tag set version {tag_set}.", flush=True)
+    if args.jobs:
+        answered = set()
+        for folder in args.skip_answered:
+            subs, answers = read_answers(folder)
+            answered |= {subs[pid]["key"] for pid in answers}
+        write_agent_jobs(args.jobs, [(s, c) for s, c in jobs if s["key"] not in answered], states, tags, tag_set)
+        return
     if args.dry_run:
         chars = sum(len(states[s["id"]]) + sum(len(option_text(tags[c["tag_id"]])) + 40 for c in cands) + 400
                     for s, cands in jobs)
