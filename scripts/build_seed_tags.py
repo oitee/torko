@@ -126,6 +126,13 @@ def apply_edit(groups: dict[str, dict], tag: str, field: str, value: str) -> lis
         g["aliases"] = [] if value == "-" else value.split("|")
     elif field == "add_alias":
         g["aliases"].append(value)
+    elif field == "rename":
+        if value in groups:
+            raise SystemExit(f"rename: a group named {value!r} exists already")
+        del groups[tag]
+        g["aliases"] = [tag] + [a for a in g["aliases"] if a != value]
+        g["tag"] = value
+        groups[value] = g
     elif field == "merge":
         if value not in groups:
             raise SystemExit(f"merge target {value!r} not found")

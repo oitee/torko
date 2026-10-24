@@ -106,11 +106,16 @@ def plan_load(files: dict[str, list[dict]], existing: list[dict], loaded: set[st
     out: dict[str, dict] = {}
     for src in sorted(loaded):
         rows = files[src]
-        res = {"insert": [], "update": [], "unchanged": 0, "delete": []}
+        res = {"insert": [], "update": [], "unchanged": 0, "delete": [], "rename": []}
         names = {r["tag"] for r in rows}
         for r in rows:
             e = by_name.get(r["tag"]) or by_norm.get(norm_name(r["tag"]))
-            if e is None:
+            # A renamed tag: the file keeps the old name only as an alias, and the table still has the old name.
+            old = next((by_name[a] for a in r["aliases"] if a in by_name and a not in names
+                        and by_name[a]["source"] == src), None) if e is None else None
+            if old is not None:
+                res["rename"].append({**r, "old": old["tag"]})
+            elif e is None:
                 res["insert"].append(r)
             elif e["source"] != src:
                 errors.append(f"tag {r['tag']!r} of {src} exists in the table with source {e['source']!r}"
@@ -121,7 +126,9 @@ def plan_load(files: dict[str, list[dict]], existing: list[dict], loaded: set[st
                 res["update"].append(r)
             else:
                 res["unchanged"] += 1
-        res["delete"] = sorted(e["tag"] for e in existing if e["source"] == src and e["tag"] not in names)
+        renamed = {r["old"] for r in res["rename"]}
+        res["delete"] = sorted(e["tag"] for e in existing
+                               if e["source"] == src and e["tag"] not in names and e["tag"] not in renamed)
         out[src] = res
     return {"sources": out, "errors": errors, "warnings": warnings}
 
@@ -133,7 +140,9 @@ def read_existing(conn) -> list[dict]:
 
 def print_plan(plan: dict) -> None:
     for src, res in plan["sources"].items():
-        print(f"{src}: insert {len(res['insert'])}, update {len(res['update'])}, "
+        for r in res["rename"]:
+            print(f"  will rename: {r['old']!r} -> {r['tag']!r}", flush=True)
+        print(f"{src}: insert {len(res['insert'])}, rename {len(res['rename'])}, update {len(res['update'])}, "
               f"unchanged {res['unchanged']}, delete {len(res['delete'])}", flush=True)
         for name in res["delete"][:20]:
             print(f"  will delete: {name!r}", flush=True)
@@ -170,6 +179,12 @@ def main() -> None:
             print("dry run: nothing written", flush=True)
             return
         for src, res in plan["sources"].items():
+            if res["rename"]:
+                conn.execute(text("""
+                    UPDATE tags SET tag = :tag, type = :type, subtype = :subtype, domain = :domain,
+                        description = :description, aliases = :aliases, debate_count = :debate_count
+                    WHERE tag = :old AND source = :source
+                """), [{**r, "source": src} for r in res["rename"]])
             if res["insert"]:
                 conn.execute(text("""
                     INSERT INTO tags (tag, type, subtype, domain, description, aliases, debate_count, source, status)

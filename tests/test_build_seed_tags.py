@@ -112,3 +112,16 @@ def test_assemble_stops_when_a_trimmed_name_is_the_name_of_another_group():
     merged = [["Land Pooling ", "topic", "-", "d", "-", "2"], ["Land Pooling", "topic", "-", "d", "-", "3"]]
     with pytest.raises(SystemExit):
         assemble(merged, {"Land Pooling ": 2, "Land Pooling": 3})
+
+
+def test_rename_edit_keeps_the_old_name_as_the_first_alias():
+    groups = {"Financial Bill": group("Financial Bill", ["Finance Bill", "Budget Bill"])}
+    apply_edit(groups, "Financial Bill", "rename", "Finance Bill")
+    assert list(groups) == ["Finance Bill"]
+    assert groups["Finance Bill"]["tag"] == "Finance Bill"
+    assert groups["Finance Bill"]["aliases"] == ["Financial Bill", "Budget Bill"]
+
+
+def test_rename_to_the_name_of_another_group_stops_the_build():
+    with pytest.raises(SystemExit):
+        apply_edit({"A": group("A"), "B": group("B")}, "A", "rename", "B")

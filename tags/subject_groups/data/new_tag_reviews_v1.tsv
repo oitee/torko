@@ -331,7 +331,7 @@ name_ids	round	decision	tag	name	type	domain	note	review	review_note
 1790	2026-10-18	existing	Power Supply					ok	
 1792 70533 86355 89397 99417 125506 127190 128126 131644 225431	2026-10-18	new		Rubber Prices	topic	Agriculture and Farmers		ok	
 17925 72287 92822 184153 184193 184305 184323	2026-10-18	new		Banning of Unregulated Deposit Schemes Act	law	Economy, Finance and Taxation		ok	
-17968	2026-10-18	new		Finance Bill	law	Economy, Finance and Taxation		ok	
+17968	2026-10-18	new		Finance Bill	law	Economy, Finance and Taxation		edit	decision=existing | tag=Finance Bill | reason: the same Finance Bill as row S00252. The tag Financial Bill is renamed to Finance Bill (manual review 2026-10-22)
 17992 62778	2026-10-18	existing	Financial Bill				Finance Bill is the annual money bill	edit	decision=existing | tag=Financial Bill | rename_tag=Finance Bill | reason: the tag Financial Bill describes the annual Finance Bill, so only its name is wrong
 18006 75684 87317 108444	2026-10-18	existing	Economic Growth				Economic growth and policy; close	ok	
 18054 54331	2026-10-18	new		Special Economic Zones Act	law	Industry, Trade and Commerce		ok	

@@ -65,3 +65,18 @@ def test_sources_have_distinct_names_and_the_seed_keeps_its_stored_value():
     names = [s[0] for s in SOURCES]
     assert len(set(names)) == len(names) and names[0] == "seed_v1"
     assert dict((n, st) for n, _, st in SOURCES)["seed_v1"] == "reviewed"
+
+
+def test_a_renamed_tag_is_renamed_in_place_and_not_deleted():
+    files = {"seed_v1": [row("Finance Bill", aliases=["Financial Bill"], typ="law")]}
+    plan = plan_load(files, [stored("Financial Bill", "seed_v1", typ="law")], {"seed_v1"})
+    res = plan["sources"]["seed_v1"]
+    assert [(r["old"], r["tag"]) for r in res["rename"]] == [("Financial Bill", "Finance Bill")]
+    assert res["insert"] == [] and res["delete"] == [] and plan["errors"] == []
+
+
+def test_an_alias_that_is_still_a_tag_of_the_file_is_no_rename():
+    files = {"seed_v1": [row("Railway Budget", aliases=["Rail Budget"]), row("Rail Budget")]}
+    existing = [stored("Railway Budget", "seed_v1"), stored("Rail Budget", "seed_v1")]
+    res = plan_load(files, existing, {"seed_v1"})["sources"]["seed_v1"]
+    assert res["rename"] == [] and res["insert"] == []

@@ -130,3 +130,4 @@ Satluj Yamuna Link Canal	add_alias	Sutlej-Yamuna Link Canal	manual review, 2026-
 Satluj Yamuna Link Canal	add_alias	Sutlej Yamuna Link Canal	manual review, 2026-10-09: spelling variant of Satluj. 2 speech items use it
 Kachchh Region	add_alias	Kutch	manual review, 2026-10-09: the district name. The place list had made a second tag for the same place
 Kachchh Region	add_alias	Kachchh	manual review, 2026-10-09: the official district and constituency spelling
+Financial Bill	rename	Finance Bill	manual review, 2026-10-22: the tag describes the annual Finance Bill, so only its name was wrong
