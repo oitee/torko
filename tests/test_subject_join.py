@@ -80,3 +80,40 @@ def test_known_answers_read_both_files_by_name_ids_and_a_different_answer_wins(t
 def test_known_answers_with_no_files_is_empty(tmp_path):
     from scripts.subject_join import known_answers
     assert known_answers([[1], [2]], tmp_path / "none.tsv", tmp_path / "none2.tsv") == {}
+
+
+def test_merge_pair_rows_keeps_old_joins_that_the_new_answers_do_not_cover():
+    from scripts.subject_join import merge_pair_rows
+    new = [{"name_ids_a": "1 2", "name_ids_b": "3", "centre_distance": "0.1", "confidence": "high"}]
+    old = [{"name_ids_a": "3", "name_ids_b": "1 2", "centre_distance": "0.2", "confidence": "low"},
+           {"name_ids_a": "7", "name_ids_b": "8 9", "centre_distance": "0.1", "confidence": "high"}]
+    rows, kept = merge_pair_rows(new, old)
+    assert kept == 1
+    assert rows == [new[0], old[1]]
+
+
+def test_chain_ingest_keeps_the_old_cannot_links(tmp_path, monkeypatch):
+    import argparse
+    import json
+    import pickle
+    import scripts.subject_join as sj
+    results, data = tmp_path / "results", tmp_path / "data"
+    results.mkdir()
+    data.mkdir()
+    monkeypatch.setattr(sj, "RESULTS", results)
+    monkeypatch.setattr(sj, "JOINS", data / "joins.tsv")
+    monkeypatch.setattr(sj, "CANNOT", data / "cannot.tsv")
+    units = [[1], [2], [3]]
+    cache = tmp_path / "units.pkl"
+    cache.write_bytes(pickle.dumps({"units": units}))
+    (data / "joins.tsv").write_text("name_ids_a\tname_ids_b\tcentre_distance\tconfidence\n1\t2\t0.1\thigh\n2\t3\t0.1\thigh\n")
+    (data / "cannot.tsv").write_text("name_ids_a\tname_ids_b\tsource\tconfidence\n7\t8\tchain\thigh\n")
+    (results / "join_candidates_v1.tsv").write_text("pair_id\tunit_a\tunit_b\nP1\t0\t1\nP2\t1\t2\n")
+    (results / "join_llm_v1.tsv").write_text("pair_id\tdecision\tconfidence\nP1\tsame\thigh\nP2\tsame\thigh\n")
+    (results / "chain_pairs_v1.tsv").write_text("pair_id\tunit_a\tunit_b\nC1\t0\t2\n")
+    folder = tmp_path / "chains"
+    (folder / "out").mkdir(parents=True)
+    (folder / "out" / "j0001.out.jsonl").write_text(json.dumps({"pair": "C1", "decision": "different", "confidence": "low"}) + "\n")
+    sj.chain_ingest(argparse.Namespace(cache=cache, folder=folder))
+    lines = (data / "cannot.tsv").read_text().splitlines()
+    assert lines == ["name_ids_a\tname_ids_b\tsource\tconfidence", "1\t3\tchain\tlow", "7\t8\tchain\thigh"]

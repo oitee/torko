@@ -219,13 +219,21 @@ def ingest(args) -> None:
                 got[pid] = (dec, obj.get("confidence", ""))
             else:
                 bad.append((p.name, line[:120]))
+    reused = 0
+    if args.cache:
+        known = known_answers(pickle.load(args.cache.open("rb"))["units"])
+        for pid, r in rows.items():
+            dec = known.get(frozenset((int(r["unit_a"]), int(r["unit_b"]))))
+            if dec and pid not in got:
+                got[pid] = (dec, "reused")
+                reused += 1
     with (RESULTS / "join_llm_v1.tsv").open("w", newline="") as f:
         w = csv.writer(f, delimiter="\t")
         w.writerow(["pair_id", "centre_distance", "decision", "confidence"])
         for pid, r in rows.items():
             if pid in got:
                 w.writerow([pid, r["centre_distance"], *got[pid]])
-    print(f"answers {len(got)} of {len(rows)} pairs, bad lines {len(bad)}")
+    print(f"answers {len(got)} of {len(rows)} pairs ({reused} reused from an earlier run), bad lines {len(bad)}")
 
 
 def weighted_pr(gold: list, predict) -> dict:
@@ -349,21 +357,36 @@ def llm_same_pairs(units: list) -> list:
     return pairs
 
 
+JOIN_COLUMNS = ["name_ids_a", "name_ids_b", "centre_distance", "confidence"]
+
+
+def merge_pair_rows(new_rows: list, old_rows: list) -> tuple[list, int]:
+    """The new rows, then each old row whose pair of name ID sets is not in the new rows. It serves the joins and the
+    cannot-links. An old row can belong to units of an earlier run, so a new run must not delete it.
+    Returns (rows, old rows kept)."""
+    seen = {frozenset((r["name_ids_a"], r["name_ids_b"])) for r in new_rows}
+    kept = [r for r in old_rows if frozenset((r["name_ids_a"], r["name_ids_b"])) not in seen]
+    return new_rows + kept, len(kept)
+
+
 def export_joins(args) -> None:
     units = pickle.load(args.cache.open("rb"))["units"]
     cand = {r["pair_id"]: r for r in csv.DictReader((RESULTS / "join_candidates_v1.tsv").open(), delimiter="\t")}
+    new_rows = []
+    for r in csv.DictReader((RESULTS / "join_llm_v1.tsv").open(), delimiter="\t"):
+        if r["decision"] != "same":
+            continue
+        c = cand[r["pair_id"]]
+        new_rows.append({"name_ids_a": unit_key(units[int(c["unit_a"])]), "name_ids_b": unit_key(units[int(c["unit_b"])]),
+                         "centre_distance": c["centre_distance"], "confidence": r["confidence"]})
+    old_rows = list(csv.DictReader(JOINS.open(), delimiter="\t")) if JOINS.exists() else []
+    rows, kept = merge_pair_rows(new_rows, old_rows)
     JOINS.parent.mkdir(parents=True, exist_ok=True)
-    n = 0
     with JOINS.open("w", newline="") as f:
-        w = csv.writer(f, delimiter="\t")
-        w.writerow(["name_ids_a", "name_ids_b", "centre_distance", "confidence"])
-        for r in csv.DictReader((RESULTS / "join_llm_v1.tsv").open(), delimiter="\t"):
-            if r["decision"] != "same":
-                continue
-            c = cand[r["pair_id"]]
-            w.writerow([unit_key(units[int(c["unit_a"])]), unit_key(units[int(c["unit_b"])]), c["centre_distance"], r["confidence"]])
-            n += 1
-    print(f"{n} joins written to {JOINS}")
+        w = csv.DictWriter(f, fieldnames=JOIN_COLUMNS, delimiter="\t", extrasaction="ignore")
+        w.writeheader()
+        w.writerows(rows)
+    print(f"{len(new_rows)} joins from the answers + {kept} older joins kept = {len(rows)} written to {JOINS}")
 
 
 def subjects(args) -> None:
