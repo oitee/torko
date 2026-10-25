@@ -128,15 +128,19 @@ def resolve_tag(conn, key, tag_type=None):
     return dict(row) if row else None
 
 
-# The party and seat of a member at the date of a debate.
+# The party and seat of a member at the date of a debate, as pa.party and pa.seat.
+# The lateral part runs once for each row, so it finds only the speakers period in force.
+# The join to parties runs once after it, not once for each row.
 PARTY_AT_DATE = """
 LEFT JOIN LATERAL (
-    SELECT p.code AS party, sp.constituency AS seat
-    FROM speakers sp LEFT JOIN parties p ON p.id = sp.party_id
+    SELECT sp.party_id, sp.constituency AS seat
+    FROM speakers sp
     WHERE sp.person_id = s.person_id AND sp.lok_sabha_term = d.loksabha
       AND sp.effective_from <= COALESCE(d.debate_date, sp.effective_from)
     ORDER BY sp.effective_from DESC LIMIT 1
-) pa ON true
+) pa_row ON true
+LEFT JOIN parties pa_party ON pa_party.id = pa_row.party_id
+CROSS JOIN LATERAL (SELECT pa_party.code AS party, pa_row.seat AS seat) pa
 """
 
 
