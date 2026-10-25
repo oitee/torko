@@ -204,4 +204,4 @@ def member_page(conn, member_id, args=None):
     }
 
 
-ROUTES = [("/member/<member_id>", member_page)]
+ROUTES = [("/member/<int:member_id>", member_page)]

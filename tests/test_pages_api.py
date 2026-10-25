@@ -15,5 +15,5 @@ def test_register_skips_missing_modules_and_adds_routes(monkeypatch):
 def test_page_routes_sit_directly_under_api():
     import server
     rules = {r.rule for r in server.app.url_map.iter_rules()}
-    assert "/api/member/<member_id>" in rules and "/api/tags" in rules
+    assert "/api/member/<int:member_id>" in rules and "/api/tags" in rules
     assert not any(r.startswith("/api/pages") for r in rules)

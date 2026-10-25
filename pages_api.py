@@ -31,6 +31,7 @@ def _view(fn):
             abort(404)
         return jsonify(out)
     view.__name__ = f"{fn.__module__}.{fn.__name__}".replace(".", "_")
+    view.page_module = fn.__module__
     return view
 
 

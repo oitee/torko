@@ -1,6 +1,7 @@
 from flask import Flask, jsonify, request, send_from_directory
 
 import dashboard_db
+import openapi
 import pages_api
 import tag_search
 from debate_fetch import fetch_debate, split_by_speaker, speaker_distribution
@@ -12,10 +13,12 @@ MAX_PAGE_SIZE = 100
 
 pages_api.register()
 app.register_blueprint(pages_api.bp)
+app.register_blueprint(openapi.bp)
 
 
 @app.route("/api/dashboard/debates")
 def api_dashboard_debates():
+    """The debates of the dashboard, filtered, one page at a time."""
     page = max(request.args.get("page", 1, type=int), 1)
     page_size = min(max(request.args.get("pageSize", 20, type=int), 1), MAX_PAGE_SIZE)
 
@@ -45,6 +48,7 @@ def api_dashboard_debates():
 
 @app.route("/api/dashboard/debates/<debate_id>")
 def api_dashboard_debate_detail(debate_id):
+    """One debate of the dashboard, with all its turns."""
     parsed = dashboard_db.parse_composite_id(debate_id)
     if parsed is None:
         return jsonify({"error": f"Malformed debate id {debate_id!r}, expected loksabha-session-dbslno"}), 400
@@ -56,6 +60,7 @@ def api_dashboard_debate_detail(debate_id):
 
 @app.route("/api/dashboard/debates/<debate_id>/mp-diff")
 def api_dashboard_debate_mp_diff(debate_id):
+    """The members of the official list of one debate, compared with the members who have a turn."""
     parsed = dashboard_db.parse_composite_id(debate_id)
     if parsed is None:
         return jsonify({"error": f"Malformed debate id {debate_id!r}, expected loksabha-session-dbslno"}), 400
@@ -67,12 +72,14 @@ def api_dashboard_debate_mp_diff(debate_id):
 
 @app.route("/api/dashboard/speakers")
 def api_dashboard_speakers():
+    """The members who have a turn, filtered by name."""
     q = (request.args.get("q") or "").strip()
     return jsonify({"results": dashboard_db.list_speakers(q)})
 
 
 @app.route("/api/dashboard/speakers/<sansad_id>")
 def api_dashboard_speaker_detail(sansad_id):
+    """One member of the dashboard, with the debates in which the member has a turn."""
     detail = dashboard_db.get_speaker_detail(sansad_id)
     if detail is None:
         return jsonify({"error": f"No speaker with sansadId {sansad_id!r}"}), 404
@@ -81,6 +88,7 @@ def api_dashboard_speaker_detail(sansad_id):
 
 @app.route("/api/dashboard/facets")
 def api_dashboard_facets():
+    """The filter values of the dashboard: terms, sessions, parties, and debate types."""
     return jsonify(dashboard_db.get_facets())
 
 
@@ -98,6 +106,7 @@ def search_index():
 
 @app.route("/api/search")
 def api_search():
+    """The tags and subjects that match a search text."""
     q = request.args.get("q", "").strip()
     if not q:
         return jsonify({"error": "q is required"}), 400
@@ -127,6 +136,7 @@ def analysis():
 
 @app.route("/api/distribution")
 def api_distribution():
+    """One debate read live from the official site, split by speaker."""
     try:
         loksabha = int(request.args["loksabha"])
         session = int(request.args["session"])
