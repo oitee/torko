@@ -12,7 +12,7 @@ from pages.common import engine
 
 PAGES = ["home", "tag", "member", "place", "speech", "debate", "party", "compare", "trends", "today", "my_mp"]
 
-bp = Blueprint("pages", __name__, url_prefix="/api/pages")
+bp = Blueprint("pages", __name__, url_prefix="/api")
 _engine = None
 
 
