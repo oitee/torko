@@ -200,3 +200,26 @@ def tidy_type(t):
         return t
     t = re.sub(r"\s+", " ", t).strip()
     return t.capitalize() if t.isupper() else t
+
+
+# The speeches of one tag, with the best source of the tag in each speech. A kept item carries the tag when its
+# own tag_id is the tag, or when it has no tag_id and its linked entity name has the tag. A tag merged into the
+# tag counts as the tag. The two roads are two queries joined by UNION ALL, so each road can use its index.
+TAG_SPEECHES_SQL = """
+WITH ids AS (SELECT id FROM tags WHERE id = :id OR merged_into = :id),
+items AS (
+    SELECT si.speech_id, si.source FROM speech_items si
+    WHERE si.kept AND si.tag_id IN (SELECT id FROM ids)
+    UNION ALL
+    SELECT si.speech_id, si.source FROM speech_items si
+    JOIN entity_names en ON en.id = si.entity_name_id
+    WHERE si.kept AND si.tag_id IS NULL AND en.link_status = 'linked' AND en.tag_id IN (SELECT id FROM ids)
+)
+SELECT DISTINCT ON (speech_id) speech_id, source FROM items
+ORDER BY speech_id, CASE source WHEN 'llm' THEN 0 WHEN 'dictionary' THEN 1 ELSE 2 END
+"""
+
+
+def tag_speeches(conn, tag_id):
+    """(speech_id, best source) for each speech of the tag, sorted by speech_id."""
+    return [(r[0], r[1]) for r in conn.execute(text(TAG_SPEECHES_SQL), {"id": tag_id})]

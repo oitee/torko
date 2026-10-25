@@ -5,7 +5,7 @@ through tags.merged_into. The slug of a merged tag therefore opens the page of i
 """
 from sqlalchemy import text
 
-from pages.common import (PARTY_AT_DATE, SPEECH_TAGS_CTE, corpus_party_totals, resolve_slug, resolve_tag, slug,
+from pages.common import (PARTY_AT_DATE, SPEECH_TAGS_CTE, corpus_party_totals, resolve_slug, resolve_tag, slug, tag_speeches,
                           speech_rows, speech_tags_cte)
 
 COUNTS_NOTE = (
@@ -45,25 +45,13 @@ def shape_tag(t, by_source, sessions, parties, members, subjects, related, recen
     }
 
 
-# The speeches of one tag. The shared CTE builds the tags of every speech and is slow for one tag,
-# so this query looks only at the items that link to the tag or to a tag merged into it.
-TAG_SPEECHES_SQL = """
-WITH ids AS (SELECT id FROM tags WHERE id = :id OR merged_into = :id),
-ens AS (SELECT en.id FROM entity_names en WHERE en.link_status = 'linked' AND en.tag_id IN (SELECT id FROM ids))
-SELECT DISTINCT ON (si.speech_id) si.speech_id, si.source
-FROM speech_items si
-WHERE si.kept AND (si.tag_id IN (SELECT id FROM ids)
-                   OR (si.tag_id IS NULL AND si.entity_name_id IN (SELECT id FROM ens)))
-ORDER BY si.speech_id, CASE si.source WHEN 'llm' THEN 0 WHEN 'dictionary' THEN 1 ELSE 2 END
-"""
-
 # The shared CTE, limited to the speeches of this tag (passed as :sids).
 LIMITED_SPEECH_TAGS = speech_tags_cte("si.speech_id = ANY(:sids)")
 
 
 def tag_data(c, tag_id):
     t = c.execute(text("SELECT * FROM tags WHERE id = :i"), {"i": tag_id}).mappings().one()
-    found = c.execute(text(TAG_SPEECHES_SQL), {"id": tag_id}).all()
+    found = tag_speeches(c, tag_id)
     sids = [r[0] for r in found]
     srcs = [r[1] for r in found]
     p = {"sids": sids, "srcs": srcs, "id": tag_id}

@@ -72,6 +72,8 @@ CREATE TABLE IF NOT EXISTS entity_names (
     created_at       TIMESTAMPTZ NOT NULL DEFAULT now(),
     UNIQUE (norm_name, type)
 );
+-- The linked names of one tag, for the page queries that find the speeches of a tag.
+CREATE INDEX IF NOT EXISTS entity_names_tag_linked_idx ON entity_names (tag_id) WHERE link_status = 'linked';
 
 
 -- speech_items: one row for each candidate subject of one speech. Stage 3
@@ -152,6 +154,8 @@ CREATE TABLE IF NOT EXISTS speech_items (
 
 CREATE INDEX IF NOT EXISTS speech_items_speech_idx ON speech_items (speech_id);
 CREATE INDEX IF NOT EXISTS speech_items_entity_name_idx ON speech_items (entity_name_id);
+-- The kept items of one tag, for the page queries that find the speeches of a tag.
+CREATE INDEX IF NOT EXISTS speech_items_tag_kept_idx ON speech_items (tag_id) WHERE kept;
 
 
 -- speech_summary_embeddings: one vector for the summary of one speech.

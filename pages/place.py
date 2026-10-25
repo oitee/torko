@@ -9,7 +9,8 @@ import re
 from sqlalchemy import text
 
 from pages.common import slug as to_slug
-from pages.common import PARTY_AT_DATE, SPEECH_TAGS_CTE, cached, corpus_party_totals, resolve_tag, speech_rows, speech_tags_cte
+from pages.common import (PARTY_AT_DATE, SPEECH_TAGS_CTE, cached, corpus_party_totals, resolve_tag, speech_rows,
+                          speech_tags_cte, tag_speeches)
 
 # Subjects most associated with a place. lift = the share of the place's tagged speeches that carry the tag,
 # divided by the share of all tagged speeches that carry it.
@@ -33,12 +34,7 @@ LOCAL_TAGS_CTE = speech_tags_cte("si.speech_id = ANY(:ids)")
 
 def speech_ids_for_tag(conn, tag_id):
     """The ids of the speeches that carry the tag (a kept item that links to it, or to a tag merged into it), sorted."""
-    return [r[0] for r in conn.execute(text("""
-        SELECT DISTINCT si.speech_id FROM speech_items si
-        LEFT JOIN entity_names en ON en.id = si.entity_name_id AND en.link_status = 'linked'
-        WHERE si.kept AND (COALESCE(si.tag_id, en.tag_id) = :id OR COALESCE(si.tag_id, en.tag_id) IN
-              (SELECT id FROM tags WHERE merged_into = :id))
-        ORDER BY 1"""), {"id": tag_id})]
+    return [sid for sid, _ in tag_speeches(conn, tag_id)]
 
 
 def corpus_tag_counts(conn):
