@@ -98,7 +98,7 @@ def place_page(conn, slug, args):
     holders = []
     if t["subtype"] != "state":
         holders = conn.execute(text("""
-            SELECT sp.lok_sabha_term AS term, pe.sansad_id, pe.name, pa.code AS party, sp.constituency AS seat,
+            SELECT sp.lok_sabha_term AS term, pe.id AS mid, pe.name, pa.code AS party, sp.constituency AS seat,
                    min(sp.effective_from) AS since
             FROM speakers sp JOIN persons pe ON pe.id = sp.person_id LEFT JOIN parties pa ON pa.id = sp.party_id
             WHERE lower(regexp_replace(sp.constituency, '\\s*\\(.*\\)$', '')) = lower(:n)
@@ -106,13 +106,13 @@ def place_page(conn, slug, args):
 
     # The record gives the same start date to two holders of one term (a bypoll),
     # so the page also gives the first and last day each holder spoke in the term.
-    spoke = {(r["sansad_id"], r["term"]): (str(r["first"]), str(r["last"])) for r in conn.execute(text("""
-        SELECT pe.sansad_id, d.loksabha AS term, min(d.debate_date) AS first, max(d.debate_date) AS last
-        FROM speeches s JOIN debates d ON d.id = s.debate_id JOIN persons pe ON pe.id = s.person_id
-        WHERE pe.sansad_id = ANY(:ids) GROUP BY 1, 2"""), {"ids": [h["sansad_id"] for h in holders] or [0]}).mappings()}
+    spoke = {(r["mid"], r["term"]): (str(r["first"]), str(r["last"])) for r in conn.execute(text("""
+        SELECT s.person_id AS mid, d.loksabha AS term, min(d.debate_date) AS first, max(d.debate_date) AS last
+        FROM speeches s JOIN debates d ON d.id = s.debate_id
+        WHERE s.person_id = ANY(:ids) GROUP BY 1, 2"""), {"ids": [h["mid"] for h in holders] or [0]}).mappings()}
 
     members = conn.execute(text(f"""
-        SELECT pe.sansad_id, pe.name, count(*) AS n, max(d.debate_date) AS last,
+        SELECT pe.id AS mid, pe.name, count(*) AS n, max(d.debate_date) AS last,
                (array_agg(pa.party ORDER BY d.debate_date DESC))[1] AS party,
                (array_agg(pa.seat ORDER BY d.debate_date DESC))[1] AS seat
         FROM speeches s JOIN debates d ON d.id = s.debate_id
@@ -151,14 +151,14 @@ def place_page(conn, slug, args):
         },
         "sessions": [{"term": r["term"], "session": r["session"], "n": by_session.get((r["term"], r["session"]), 0),
                       "year": r["first"].year if r["first"] else None} for r in sessions],
-        "holders": [{"term": r["term"], "id": r["sansad_id"], "name": r["name"], "party": r["party"],
+        "holders": [{"term": r["term"], "id": r["mid"], "name": r["name"], "party": r["party"],
                      "seat": r["seat"], "since": str(r["since"]),
-                     "first_spoke": spoke.get((r["sansad_id"], r["term"]), (None, None))[0],
-                     "last_spoke": spoke.get((r["sansad_id"], r["term"]), (None, None))[1]} for r in holders],
+                     "first_spoke": spoke.get((r["mid"], r["term"]), (None, None))[0],
+                     "last_spoke": spoke.get((r["mid"], r["term"]), (None, None))[1]} for r in holders],
         "associated": associated(conn, ids, t["id"], total) if total else [],
         "parties": [{"party": party, "n": n, "per100": round(100 * n / totals[party], 2), "party_total": totals[party]}
                     for party, n in tagged_party if totals.get(party)],
-        "members": [{"id": r["sansad_id"], "name": r["name"], "n": r["n"], "party": r["party"], "seat": r["seat"],
+        "members": [{"id": r["mid"], "name": r["name"], "n": r["n"], "party": r["party"], "seat": r["seat"],
                      "last": str(r["last"]), "own_seat": same_seat(r["seat"], name)} for r in members],
         "related": [{"name": r["tag"], "slug": to_slug(r["tag"]), "type": r["type"], "n": r["n"]} for r in related],
         "recent": speech_rows(conn, recent_ids),

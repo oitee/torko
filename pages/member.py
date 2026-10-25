@@ -1,6 +1,6 @@
 """The member page: the data of one member of parliament, as JSON.
 
-Route: /member/<sansad_id>. The key is persons.sansad_id. An unknown key gives None.
+Route: /member/<member_id>. The key is persons.id. An unknown key gives None.
 The page shows terms, typical subjects, places, specific subjects, one mark per speech, and house turns.
 Every query is read-only.
 """
@@ -88,12 +88,12 @@ def party_path(term_list):
     return path
 
 
-def member_page(conn, sansad_id, args=None):
+def member_page(conn, member_id, args=None):
     try:
-        sid = int(sansad_id)
+        pid = int(member_id)
     except (TypeError, ValueError):
         return None
-    pe = conn.execute(text("SELECT id, name FROM persons WHERE sansad_id = :s"), {"s": sid}).mappings().first()
+    pe = conn.execute(text("SELECT id, name FROM persons WHERE id = :p"), {"p": pid}).mappings().first()
     if pe is None:
         return None
     gtags, gtotal = global_tags(conn)
@@ -177,7 +177,7 @@ def member_page(conn, sansad_id, args=None):
         SELECT s.id FROM speeches s WHERE s.person_id = :p ORDER BY s.word_count DESC, s.id LIMIT 4"""), p)]
 
     return {
-        "id": sid, "name": name, "known_as": known_as, "raw_name": pe["name"],
+        "id": pid, "name": name, "known_as": known_as, "raw_name": pe["name"],
         "party_path": party_path(term_list), "seat": term_list[-1]["seat"] if term_list else None,
         "terms": term_list, "speeches": sum(t["speeches"] for t in term_list), "tagged_speeches": mtotal,
         "typical": typical[:14], "typical_total_candidates": len(typical),
@@ -204,4 +204,4 @@ def member_page(conn, sansad_id, args=None):
     }
 
 
-ROUTES = [("/member/<sansad_id>", member_page)]
+ROUTES = [("/member/<member_id>", member_page)]

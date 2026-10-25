@@ -37,8 +37,8 @@ def test_restricted_cte_adds_condition():
 
 
 def test_member_page_real(page_conn):
-    d = m.member_page(page_conn, "97", {})
-    assert d["name"] == "Adhir Ranjan Chowdhury"
+    d = m.member_page(page_conn, "368", {})
+    assert d["name"] == "Adhir Ranjan Chowdhury" and d["id"] == 368
     assert d["speeches"] > 1000 and 0 < d["tagged_speeches"] <= d["speeches"]
     assert d["typical"] and all(t["n"] <= t["all"] for t in d["typical"])
     assert len(d["marks"]) <= d["speeches"]

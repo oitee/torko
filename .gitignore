@@ -41,3 +41,5 @@ tags/near_duplicates/REVIEW_GUIDE.md
 tags/subject_groups/results/*
 # labels and ratings of the blind reviews that chose the settings
 tags/subject_groups/eval/
+
+docs/api/

@@ -1,6 +1,6 @@
 """The compare page: two members or two parties side by side, as JSON.
 
-Route: /compare?kind=member|party&a=<key>&b=<key>. A member key is persons.sansad_id. A party key is parties.code.
+Route: /compare?kind=member|party&a=<key>&b=<key>. A member key is persons.id. A party key is parties.code.
 Optional query argument terms: a comma list of Lok Sabha numbers, for example terms=17,18.
 Without terms, the page uses the terms in which both sides have tagged speeches.
 Missing or unknown keys, or a kind that is not member or party, give None.
@@ -82,10 +82,10 @@ def compare_sides(tags, hidden, all_cnt, all_n, ca, na, cb, nb, min_n):
 
 def _member_side(conn, key):
     try:
-        sid = int(key)
+        pid = int(key)
     except (TypeError, ValueError):
         return None
-    pe = conn.execute(text("SELECT id, sansad_id, name FROM persons WHERE sansad_id = :s"), {"s": sid}).mappings().first()
+    pe = conn.execute(text("SELECT id, name FROM persons WHERE id = :p"), {"p": pid}).mappings().first()
     if pe is None:
         return None
     rows = member_tag_rows(conn, pe["id"])
@@ -93,7 +93,7 @@ def _member_side(conn, key):
     for sp, term, tid in rows:
         by_term_sp.setdefault(term, set()).add(sp)
         by_term_cnt.setdefault(term, Counter())[tid] += 1
-    return {"info": {"id": pe["sansad_id"], "name": pe["name"], "_pid": pe["id"]},
+    return {"info": {"id": pe["id"], "name": pe["name"], "_pid": pe["id"]},
             "sp": {t: len(v) for t, v in by_term_sp.items()}, "cnt": by_term_cnt}
 
 

@@ -9,7 +9,7 @@ def test_shape_tag_keeps_keys_and_adds_named_counts():
         t, {"llm": 3, "dictionary": 1},
         [{"term": 18, "session": 1, "n": 2, "first": datetime.date(2024, 6, 1)}],
         [{"party": "BJP", "n": 1, "party_total": 4}],
-        [{"sansad_id": 9, "name": "A", "n": 3, "last": datetime.date(2024, 7, 1), "party": "BJP", "seat": "X"}],
+        [{"mid": 9, "name": "A", "n": 3, "last": datetime.date(2024, 7, 1), "party": "BJP", "seat": "X"}],
         [{"id": 1, "label": "l", "n_speeches": 5, "n_debates": 2}],
         [{"tag": "Farmers", "type": "group", "n": 2}], [], [])
     assert out["total"] == 4 and out["slug"] == "onions" and out["counts_note"]

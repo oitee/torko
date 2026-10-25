@@ -149,7 +149,7 @@ def speech_rows(conn, speech_ids, with_tags=True):
     if not speech_ids:
         return []
     rows = conn.execute(text(f"""
-        SELECT s.id, s.person_id, pe.sansad_id, pe.name AS member, pa.party, pa.seat,
+        SELECT s.id, s.person_id, pe.name AS member, pa.party, pa.seat,
                d.debate_date, d.loksabha, d.session, s.word_count, d.title, d.debate_type,
                d.source_url, se.summary
         FROM speeches s
@@ -166,7 +166,7 @@ def speech_rows(conn, speech_ids, with_tags=True):
         if not r:
             continue
         out.append({
-            "id": r["id"], "member_id": r["sansad_id"], "member": r["member"],
+            "id": r["id"], "member_id": r["person_id"], "member": r["member"],
             "party": r["party"], "seat": r["seat"],
             "date": r["debate_date"].isoformat() if r["debate_date"] else None,
             "term": r["loksabha"], "session": r["session"], "words": r["word_count"],

@@ -56,26 +56,25 @@ def home_page(conn, args):
         {"t": term, "s": session, "minn": MIN_SPEECHES, "lim": TOP_SUBJECTS}).mappings().all()
     chamber = conn.execute(text("""
         WITH m AS (
-            SELECT DISTINCT ON (pe.id) pe.sansad_id, pe.name, p.code AS party
+            SELECT DISTINCT ON (pe.id) pe.id AS mid, pe.name, p.code AS party
             FROM speeches s JOIN debates d ON d.id = s.debate_id JOIN persons pe ON pe.id = s.person_id
             LEFT JOIN speakers sp ON sp.person_id = pe.id AND sp.lok_sabha_term = d.loksabha
             LEFT JOIN parties p ON p.id = sp.party_id
-            WHERE d.loksabha = :t AND pe.sansad_id IS NOT NULL
+            WHERE d.loksabha = :t
             ORDER BY pe.id, sp.effective_from DESC)
-        SELECT sansad_id, name, party, count(*) OVER (PARTITION BY party) AS size FROM m
+        SELECT mid, name, party, count(*) OVER (PARTITION BY party) AS size FROM m
         ORDER BY size DESC, party, name"""), {"t": term}).all()
     # The members who spoke on each of the top subjects in the newest session, in one query.
     top = [r["tag"] for r in rows[:LIT_SUBJECTS]]
     lit = {slug(n): [] for n in top}
     if top:
-        for tag, sid in conn.execute(text(f"""
+        for tag, pid in conn.execute(text(f"""
             WITH {TERM_SPEECH_TAGS}
-            SELECT DISTINCT t.tag, pe.sansad_id FROM speech_tags st JOIN tags t ON t.id = st.tag_id
+            SELECT DISTINCT t.tag, s.person_id FROM speech_tags st JOIN tags t ON t.id = st.tag_id
             JOIN speeches s ON s.id = st.speech_id JOIN debates d ON d.id = s.debate_id
-            JOIN persons pe ON pe.id = s.person_id
             WHERE t.tag = ANY(:tags) AND d.loksabha = :t AND d.session = :s
-            ORDER BY t.tag, pe.sansad_id"""), {"tags": top, "t": term, "s": session}).all():
-            lit[slug(tag)].append(sid)
+            ORDER BY t.tag, s.person_id"""), {"tags": top, "t": term, "s": session}).all():
+            lit[slug(tag)].append(pid)
     return {
         "chamber": [[r[0], r[1], r[2]] for r in chamber], "lit": lit,
         "term": term, "session": session, "first": str(span[0]), "last": str(span[1]), "debates": span[2],

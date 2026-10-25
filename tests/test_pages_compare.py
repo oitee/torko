@@ -29,8 +29,8 @@ def test_compare_sides_hidden_and_zero_side():
 
 
 def test_compare_members_real(page_conn):
-    d = c.compare_page(page_conn, {"kind": "member", "a": "3754", "b": "4569"})
-    assert d["a"]["name"] == "N K Premachandran" and d["terms"]
+    d = c.compare_page(page_conn, {"kind": "member", "a": "1355", "b": "1994"})
+    assert d["a"]["name"] == "N K Premachandran" and d["a"]["id"] == 1355 and d["terms"]
     assert d["a_tagged"] > 0 and d["b_tagged"] > 0
     assert d["a_tagged"] <= d["tagged_all"]
 

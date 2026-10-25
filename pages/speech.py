@@ -47,7 +47,7 @@ def group_reasons(tags, items):
 def speech_page(conn, speech_id, args=None):
     s = conn.execute(text(f"""
         SELECT s.id, s.debate_id, s.person_id, s.seq_start, s.seq_end, s.turn_count, s.interruption_count,
-               s.word_count, pe.sansad_id, pe.name AS member, pa.party, pa.seat,
+               s.word_count, pe.id AS mid, pe.name AS member, pa.party, pa.seat,
                d.debate_date, d.loksabha, d.session, d.title, d.debate_type, d.source_url,
                se.summary, se.language
         FROM speeches s JOIN debates d ON d.id = s.debate_id
@@ -60,14 +60,14 @@ def speech_page(conn, speech_id, args=None):
 
     turns = conn.execute(text("""
         SELECT t.seq, t.speaker_label, t.text, t.word_count, t.text_source, t.speech_id, t.role_kind,
-               sr.display_name AS role, pe.name AS person, pe.sansad_id
+               sr.display_name AS role, pe.name AS person, pe.id AS mid
         FROM turns t LEFT JOIN speaker_roles sr ON sr.id = t.role_id LEFT JOIN persons pe ON pe.id = t.person_id
         WHERE t.debate_id = :d AND t.seq BETWEEN :a AND :b ORDER BY t.seq"""),
         {"d": s["debate_id"], "a": s["seq_start"], "b": s["seq_end"]}).mappings().all()
     turn_list = [{
         "seq": t["seq"], "label": t["speaker_label"], "text": clean_layout(t["text"]), "words": t["word_count"],
         "repair": t["text_source"], "own": t["speech_id"] == speech_id,
-        "member": t["person"], "member_id": t["sansad_id"], "role": t["role"], "role_kind": t["role_kind"],
+        "member": t["person"], "member_id": t["mid"], "role": t["role"], "role_kind": t["role_kind"],
         "attributed": t["person"] is not None,
     } for t in turns]
 
@@ -91,7 +91,7 @@ def speech_page(conn, speech_id, args=None):
     title, laid = split_title(s["title"])
     return {
         "id": s["id"], "debate_id": s["debate_id"], "laid": laid,
-        "member": s["member"], "member_id": s["sansad_id"], "party": s["party"], "seat": s["seat"],
+        "member": s["member"], "member_id": s["mid"], "party": s["party"], "seat": s["seat"],
         "date": s["debate_date"].isoformat() if s["debate_date"] else None,
         "term": s["loksabha"], "session": s["session"], "debate": tidy_title(title),
         "debate_type": tidy_type(s["debate_type"]), "source_url": s["source_url"],

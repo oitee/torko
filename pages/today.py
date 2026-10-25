@@ -193,7 +193,7 @@ def debates_for(conn, days):
 def best_quote(conn, day):
     """Return (sentence, turn row, language) for the best quote of the day, or None."""
     turns = conn.execute(text(f"""
-        SELECT t.id, t.text, t.speaker_label, pe.sansad_id, pe.name, d.id AS debate_id, d.title, d.source_url,
+        SELECT t.id, t.text, t.speaker_label, pe.id AS mid, pe.name, d.id AS debate_id, d.title, d.source_url,
                pa.party, pa.seat
         FROM turns t JOIN debates d ON d.id = t.debate_id JOIN speeches s ON s.id = t.speech_id
         JOIN persons pe ON pe.id = t.person_id
@@ -249,7 +249,7 @@ def today_page(conn, args):
         found = cached(("quote", day), lambda: best_quote(conn, day))
         if found:
             s, t, lang = found
-            it.update(member=t["name"], member_id=t["sansad_id"], party=t["party"], seat=t["seat"],
+            it.update(member=t["name"], member_id=t["mid"], party=t["party"], seat=t["seat"],
                       debate=tidy_title(re.sub(r"\s+", " ", t["title"] or "").strip()), quote=s, lang=lang,
                       source_url=t["source_url"])
         items.append(it)

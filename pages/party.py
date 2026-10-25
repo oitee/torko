@@ -169,9 +169,9 @@ def party_page(conn, code, args=None):
     for r, tid in zip(typ_all[:3], top_ids):
         best = member_tag.get(tid, [])[:5]
         people = {x["id"]: x for x in conn.execute(text(
-            "SELECT id, sansad_id, name FROM persons WHERE id = ANY(:i)"), {"i": [b[0] for b in best]}).mappings()}
+            "SELECT id, name FROM persons WHERE id = ANY(:i)"), {"i": [b[0] for b in best]}).mappings()}
         top3.append({"tag": r["tag"], "slug": r["slug"], "members": [
-            {"id": people[pid]["sansad_id"], "name": people[pid]["name"], "n": n, "terms": terms}
+            {"id": pid, "name": people[pid]["name"], "n": n, "terms": terms}
             for pid, n, terms in best if n >= 3]})
 
     return {

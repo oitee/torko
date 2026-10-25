@@ -81,7 +81,7 @@ def my_mp_page(conn, args):
 
     rows = conn.execute(text("""
         SELECT DISTINCT ON (sp.constituency, sp.person_id, sp.lok_sabha_term)
-               sp.constituency AS seat, sp.person_id, sp.lok_sabha_term AS term, pe.sansad_id, pe.name AS member,
+               sp.constituency AS seat, sp.person_id, sp.lok_sabha_term AS term, pe.name AS member,
                p.code AS party
         FROM speakers sp JOIN persons pe ON pe.id = sp.person_id LEFT JOIN parties p ON p.id = sp.party_id
         WHERE sp.constituency = ANY(:seats)
@@ -117,7 +117,8 @@ def my_mp_page(conn, args):
         for p in s["current"]:
             p["top_tags"] = tags.get(p["person_id"], [])
         for p in s["current"] + s["older"]:
-            del p["person_id"], p["seat"]
+            p["id"] = p.pop("person_id")
+            del p["seat"]
         s["same_name_note"] = ("More than one current member: two seats may share this name."
                                if len(s["current"]) > 1 else None)
     return {

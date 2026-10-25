@@ -74,7 +74,7 @@ def debate_page(conn, debate_id, args=None):
     people = {}
     for t in turns:
         if t["pid"]:
-            p = people.setdefault(t["pid"], {"id": t["sansad_id"], "name": t["person"], "turns": 0, "words": 0,
+            p = people.setdefault(t["pid"], {"id": t["pid"], "name": t["person"], "turns": 0, "words": 0,
                                             "listed": listed(t), "first": t["seq"]})
             p["turns"] += 1
             p["words"] += t["word_count"] or 0
@@ -88,7 +88,7 @@ def debate_page(conn, debate_id, args=None):
     turn_list = [{
         "seq": t["seq"], "label": t["speaker_label"], "text": t["text"], "words": t["word_count"],
         "kind": turn_kind(t["person"], t["role_kind"]), "attributed": t["person"] is not None,
-        "member": t["person"], "member_id": t["sansad_id"], "role": t["role"], "role_kind": t["role_kind"],
+        "member": t["person"], "member_id": t["pid"], "role": t["role"], "role_kind": t["role_kind"],
         "how": t["name_source"], "repair": t["text_source"], "speech": t["speech_id"], "span": span_of(t["seq"]),
         "listed": listed(t) if t["pid"] else None,
     } for t in turns]
