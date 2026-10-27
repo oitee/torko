@@ -23,6 +23,41 @@ def engine():
     return eng
 
 
+# Layout marks of the source page, such as [r11], (l1/1150 and /rc. Only these marks go. No word goes.
+LAYOUT = re.compile(r"\[[rl]\d+\]|\(l\d+/\d+|(?<=\s)/rc\b")
+
+
+def clean_layout(t):
+    """Remove layout marks from the shown text. Runs of spaces collapse."""
+    t = LAYOUT.sub("", t or "")
+    return re.sub(r"[ \t]{2,}", " ", t)
+
+
+# The kind of a speech, from the debate type of sansad.in (upper case, single spaces). A type not listed is "other".
+# The data has no Question Hour debates, so no kind names it.
+KINDS = {
+    "zero_hour": ("Zero Hour", ["SPECIAL MENTION (ZERO HOUR)", "SPECIAL MENTION"]),
+    "rule_377": ("Rule 377", ["MATTERS UNDER RULE-377"]),
+    "bill": ("Bill", ["GOVERNMENT BILLS", "PRIVATE MEMBERS' BILLS", "STATUTORY RESOLUTION AND GOVERNMENT BILL"]),
+    "budget": ("Budget", ["BUDGET (GENERAL)", "BUDGET (RAILWAYS)", "UNION BUDGET", "BUDGET (STATES)"]),
+    "discussion": ("Discussion", [
+        "SHORT DURATION DISCUSSIONS (RULE-193)", "CALLING ATTENTION (RULE-197)", "MOTION OF THANKS ON THE PRESIDENT'S ADDRESS",
+        "GOVERNMENT MOTION", "ADJOURNMENT MOTION", "NO-CONFIDENCE MOTION (RULE-198)", "CONFIDENCE MOTION", "SPECIAL DISCUSSION",
+        "HALF-AN-HOUR DISCUSSIONS (RULE-55)", "NO-DAY-YET-NAMED MOTION (RULE-184)", "DISCUSSION ON SPECIAL SITTING",
+        "MOTION TO CONSIDER POLICY, SITUATION, STATEMENT OR ANY OTHER MATTER (RULE- 191 & 342)"]),
+    "statement": ("Statement", ["STATEMENT BY MINISTER", "STATEMENT BY PRIME MINISTER", "STATEMENT REGARDING ORDINANCE",
+                                "CLARIFICATION ON THE STATEMENT BY MINISTER"]),
+}
+KIND_LABELS = {k: label for k, (label, _) in KINDS.items()} | {"other": "Other"}
+KIND_OF_TYPE = {t: k for k, (_, types) in KINDS.items() for t in types}
+SHORT_WORDS = 50  # a speech with fewer words is a short remark
+
+
+def speech_kind(debate_type):
+    """Return the kind of a debate type, for example 'rule_377'. An unknown or empty type is 'other'."""
+    return KIND_OF_TYPE.get(re.sub(r"\s+", " ", debate_type or "").strip().upper(), "other")
+
+
 def slug(name: str) -> str:
     return re.sub(r"[^a-z0-9]+", "-", name.lower()).strip("-")
 
@@ -157,7 +192,11 @@ def speech_rows(conn, speech_ids, with_tags=True):
     rows = conn.execute(text(f"""
         SELECT s.id, s.person_id, pe.name AS member, pa.party, pa.seat, pa.state,
                d.debate_date, d.loksabha, d.session, s.word_count, d.title, d.debate_type,
-               d.source_url, se.summary
+               d.source_url, se.summary,
+               (SELECT count(*) FROM speeches s2 WHERE s2.debate_id = s.debate_id AND s2.seq_start <= s.seq_start) AS position,
+               (SELECT count(*) FROM speeches s2 WHERE s2.debate_id = s.debate_id) AS n_in_debate,
+               CASE WHEN s.person_id IS NULL THEN
+                   (SELECT t.speaker_label FROM turns t WHERE t.debate_id = s.debate_id AND t.seq = s.seq_start) END AS printed
         FROM speeches s
         JOIN debates d ON d.id = s.debate_id
         LEFT JOIN persons pe ON pe.id = s.person_id
@@ -178,6 +217,9 @@ def speech_rows(conn, speech_ids, with_tags=True):
             "term": r["loksabha"], "session": r["session"], "words": r["word_count"],
             "debate": tidy_title(r["title"]), "debate_type": tidy_type(r["debate_type"]),
             "source_url": r["source_url"], "summary": r["summary"],
+            "kind": speech_kind(r["debate_type"]), "kind_label": KIND_LABELS[speech_kind(r["debate_type"])],
+            "short": (r["word_count"] or 0) < SHORT_WORDS,
+            "position": r["position"], "of": r["n_in_debate"], "printed": r["printed"],
             "tags": tags.get(sid, []),
         })
     return out

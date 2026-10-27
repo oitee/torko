@@ -6,11 +6,11 @@ key is unknown (the route then answers 404). A module that does not exist yet is
 """
 import importlib
 
-from flask import Blueprint, abort, jsonify, request
+from flask import Blueprint, Response, abort, jsonify, request
 
 from pages.common import engine
 
-PAGES = ["home", "tag", "member", "place", "speech", "debate", "party", "compare", "trends", "today", "my_mp"]
+PAGES = ["home", "tag", "member", "place", "speech", "debate", "party", "compare", "trends", "today", "my_mp", "speeches"]
 
 bp = Blueprint("pages", __name__, url_prefix="/api")
 _engine = None
@@ -29,6 +29,8 @@ def _view(fn):
             out = fn(conn, **kw, args=request.args)
         if out is None:
             abort(404)
+        if isinstance(out, Response):  # a page that sends a file, such as CSV, makes its own response
+            return out
         return jsonify(out)
     view.__name__ = f"{fn.__module__}.{fn.__name__}".replace(".", "_")
     view.page_module = fn.__module__

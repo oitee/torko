@@ -3,11 +3,9 @@ import re
 
 from sqlalchemy import text
 
-from pages.common import PARTY_AT_DATE, slug, speech_tag_map, tidy_title, tidy_type
+from pages.common import PARTY_AT_DATE, clean_layout, slug, speech_tag_map, tidy_title, tidy_type
 
 LAID = re.compile(r"\s*-\s*Laid\s*$", re.I)
-# Layout marks of the source page, such as [r11], (l1/1150 and /rc. Only these marks go. No word goes.
-LAYOUT = re.compile(r"\[[rl]\d+\]|\(l\d+/\d+|(?<=\s)/rc\b")
 
 # Meaning of each source, for the reader.
 SOURCE_NOTE = {
@@ -15,12 +13,6 @@ SOURCE_NOTE = {
     "dictionary": "The name matched a known tag name in the speech text.",
     "summary_tag": "The tag is near the speech summary in the embedding space.",
 }
-
-
-def clean_layout(t):
-    """Remove layout marks from the shown text. Runs of spaces collapse."""
-    t = LAYOUT.sub("", t or "")
-    return re.sub(r"[ \t]{2,}", " ", t)
 
 
 def split_title(title):
