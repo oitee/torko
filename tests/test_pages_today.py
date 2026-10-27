@@ -52,3 +52,8 @@ def test_today_on_a_date(page_conn):
 def test_today_default_and_bad_date(page_conn):
     assert today_page(page_conn, {})["items"]
     assert today_page(page_conn, {"date": "99-99"}) is None
+
+
+def test_an_address_with_hon_and_a_full_stop_is_not_a_quote():
+    # The pattern once ended "hon\." with a word boundary, which never matches before a space.
+    assert not good("I request the hon. Finance Minister to be magnanimous in releasing funds for the same project.")

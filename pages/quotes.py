@@ -8,7 +8,7 @@ BACK_REF = {w.lower() for w in """This That These Those It Its He She They His H
 Therefore Moreover Also Now Then Because Which Who Whereas Yes No Further Besides Similarly Secondly Firstly Thirdly
 Again Otherwise Still Yet Or Nor There Here What Why How When While Even Both Either Neither Some Many Most
 Another Other One Hon Honourable Madam Sir Mr""".split()}
-BAD = re.compile(r"\b(sir|madam|hon\.|hon'ble|honourable|speaker|chair|clause|annexure|question no|the said|aforesaid|"
+BAD = re.compile(r"\b(sir|madam|hon(?=\.)|hon'ble|honourable|speaker|chair|clause|annexure|question no|the said|aforesaid|"
                  r"they|them|their|he|she|his|her|these|those|above|in the same|in this regard|in that|in this|mentioned earlier|as i said|as i have said|thank you|point of order|yield)\b", re.I)
 HI_BACK = {w for w in """यह वह ये वे और तथा एवं लेकिन परंतु परन्तु किंतु किन्तु अतः इसलिए इसीलिए इसके इसमें इसी उसके उसमें उसी इस उस
 इन उन जो जिस जिन तो भी फिर अब तब क्योंकि क्योकि जबकि हालांकि साथ ही यहां वहां कि""".split()}
