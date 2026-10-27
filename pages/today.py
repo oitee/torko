@@ -8,8 +8,9 @@ Quote rule (a heuristic for a lay reader). The quote is one sentence from the tu
   1. The turn text is cleaned: HTML tags, editor markers like [r11], the leading "(Seat):" label and stage notes like
      (Interruptions) are removed. Torko never changes a word of the sentence.
   2. The sentence has 12 to 40 words, starts with a capital, ends with a full stop, and is English (at least 95% of letters are Latin).
-  3. It does not open with a word that points back to an earlier sentence (This, He, However, And, ...).
-  4. It has no pronoun that needs an earlier sentence (they, he, these, ...), no address to the chair (Sir, Madam, hon., Speaker),
+  3. It does not open with a word that points back to an earlier sentence (This, He, However, And, ...), or with an opening of
+     procedure (I would like to, I rise to, I request, I thank).
+  4. It has no pronoun that needs an earlier sentence (they, he, these, this, the same, ...), no address to the chair (Sir, Madam, hon., Speaker),
      no reference that needs the paper in hand (Clause, Annexure, Question No., "the said"), no phrase that points back
      ("in the same manner"), and no brackets, digits or quotation marks.
   Hindi rule. When the day has no good English sentence, a Devanagari sentence may be the quote. It has 10 to 40 words, ends with

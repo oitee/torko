@@ -9,7 +9,9 @@ Therefore Moreover Also Now Then Because Which Who Whereas Yes No Further Beside
 Again Otherwise Still Yet Or Nor There Here What Why How When While Even Both Either Neither Some Many Most
 Another Other One Hon Honourable Madam Sir Mr""".split()}
 BAD = re.compile(r"\b(sir|madam|hon(?=\.)|hon'ble|honourable|speaker|chair|clause|annexure|question no|the said|aforesaid|"
-                 r"they|them|their|he|she|his|her|these|those|above|in the same|in this regard|in that|in this|mentioned earlier|as i said|as i have said|thank you|point of order|yield)\b", re.I)
+                 r"they|them|their|he|she|his|her|these|those|this|the same|above|in the same|in this regard|in that|in this|mentioned earlier|as i said|as i have said|thank you|point of order|yield)\b", re.I)
+# Openings of procedure, not of content. A sentence that starts with one is not a quote.
+FILLER = re.compile(r"^(I would like to|I rise to|I request|I thank)\b", re.I)
 HI_BACK = {w for w in """यह वह ये वे और तथा एवं लेकिन परंतु परन्तु किंतु किन्तु अतः इसलिए इसीलिए इसके इसमें इसी उसके उसमें उसी इस उस
 इन उन जो जिस जिन तो भी फिर अब तब क्योंकि क्योकि जबकि हालांकि साथ ही यहां वहां कि""".split()}
 # Pronouns and addresses that need the context. The check is by whole word, because \\b does not work with Devanagari marks.
@@ -55,7 +57,7 @@ def good(s):
     words = s.split()
     if not 12 <= len(words) <= 40 or not s.endswith(".") or not s[0].isupper() or not english(s):
         return False
-    if words[0].strip(",").lower() in BACK_REF or BAD.search(s):
+    if words[0].strip(",").lower() in BACK_REF or BAD.search(s) or FILLER.match(s):
         return False
     return not re.search(r"[()\[\]<>\"“”…\d?]", s)
 

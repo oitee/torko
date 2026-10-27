@@ -48,9 +48,19 @@ def test_peak_year_tie_goes_to_earlier_year():
 def test_pick_quote_uses_good_sentence_only():
     texts = ["Thank you. This is short.",
              "Farmers in the country deserve a fair price for every single crop grown across the country every year."]
-    assert tag.pick_quote(texts, "Farmers welfare") == texts[1]
-    assert tag.pick_quote(["Hello."], "x") is None
-    assert tag.pick_quote([], "x") is None
+    assert tag.pick_quote(texts, "Farmers welfare") == (texts[1], "en")
+    assert tag.pick_quote(["Hello."], "x") == (None, None)
+    assert tag.pick_quote([], "x") == (None, None)
+
+
+HI = "किसानों को फसल का उचित मूल्य मिलना चाहिए और सरकार को नई योजना लानी चाहिए ताकि गांव मजबूत हों।"
+
+
+def test_pick_quote_takes_hindi_only_when_no_english_sentence_is_good():
+    assert tag.pick_quote([HI], "x") == (HI, "hi")
+    en = "Farmers across the country need a fair price for every crop that they grow on their small fields."
+    good_en = "Farmers across the country need a fair price for every crop grown on small family fields today."
+    assert tag.pick_quote([HI + " " + good_en], "x") == (good_en, "en")
 
 
 def test_shape_tag_header_members_and_peak():

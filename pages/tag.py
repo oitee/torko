@@ -9,7 +9,7 @@ from sqlalchemy import text
 
 from pages.common import (PARTY_AT_DATE, SPEECH_TAGS_CTE, corpus_party_totals, party_colours, resolve_slug, resolve_tag, slug, tag_speeches,
                           speech_rows, speech_tags_cte)
-from pages.quotes import clean, good, score, sentences
+from pages.quotes import clean, good, good_hi, score, sentences
 
 COUNTS_NOTE = (
     "total and by_source count speeches that carry this tag (each speech once). "
@@ -27,7 +27,8 @@ COUNTS_NOTE = (
     "total, by_source, sessions, subjects and related stay for all terms. "
     "members.first and members.last are the dates of the first and the last tagged speech of the member in the chosen terms, "
     "and members.terms are the terms with such a speech. "
-    "recent.quote is one English sentence from the own turns of the member in that speech, or null. "
+    "recent.quote is one sentence from the own turns of the member in that speech, or null. It is English when the speech has a good "
+    "English sentence, else Hindi. quote_lang is en or hi. "
     "recent.subject is the subject of the speech under this tag (the one with more speeches when there are two), or null."
 )
 
@@ -76,16 +77,26 @@ def peak_year(year_counts):
 
 
 def pick_quote(turn_texts, title):
-    """The best good sentence in the turn texts, or None. Same rule as the page "On this day"."""
+    """Return (sentence, language) for the best good sentence in the turn texts, or (None, None).
+
+    Same rule as the page "On this day": an English sentence first, and a Hindi sentence only when no English one is good.
+    """
     title_words = {w.lower() for w in re.findall(r"[A-Za-z]{5,}", title or "")}
+    sents = [sent for t in turn_texts for sent in sentences(clean(t or ""))]
     best = None
-    for t in turn_texts:
-        for sent in sentences(clean(t or "")):
-            if good(sent):
-                key = (score(sent, title_words), -abs(len(sent.split()) - 24))
-                if best is None or key > best[0]:
-                    best = (key, sent)
-    return best[1] if best else None
+    for sent in sents:
+        if good(sent):
+            key = (score(sent, title_words), -abs(len(sent.split()) - 24))
+            if best is None or key > best[0]:
+                best = (key, sent)
+    if best:
+        return best[1], "en"
+    for sent in sents:
+        if good_hi(sent):
+            key = -abs(len(sent.split()) - 18)
+            if best is None or key > best[0]:
+                best = (key, sent)
+    return (best[1], "hi") if best else (None, None)
 
 
 def add_quotes_and_subjects(c, rows, tag_id):
@@ -107,7 +118,7 @@ def add_quotes_and_subjects(c, rows, tag_id):
         ORDER BY si.speech_id, su.n_speeches DESC, su.label"""), {"ids": ids, "id": tag_id}):
         subj.setdefault(sid, label)  # the first row has the most speeches
     for r in rows:
-        r["quote"] = pick_quote(turns.get(r["id"], []), r["debate"])
+        r["quote"], r["quote_lang"] = pick_quote(turns.get(r["id"], []), r["debate"])
         r["subject"] = subj.get(r["id"])
     return rows
 

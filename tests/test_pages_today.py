@@ -28,7 +28,7 @@ def test_nearest_day_window_and_tie():
 
 
 def test_quote_rules():
-    assert good("The Government must build new irrigation canals across every drought district of the country this year.")
+    assert good("The Government must build new irrigation canals across every drought district of the country next year.")
     assert not good("Sir, the Government must build new irrigation canals across every drought district of the country.")
     assert not good("Too short a sentence.")
     assert not good_hi("यह एक वाक्य है जो पीछे की ओर इशारा करता है और बहुत लंबा है इसलिए नहीं चलेगा।")
@@ -57,3 +57,13 @@ def test_today_default_and_bad_date(page_conn):
 def test_an_address_with_hon_and_a_full_stop_is_not_a_quote():
     # The pattern once ended "hon\." with a word boundary, which never matches before a space.
     assert not good("I request the hon. Finance Minister to be magnanimous in releasing funds for the same project.")
+
+
+def test_filler_openings_and_pointers_are_not_quotes():
+    base = "the Government to release funds for the drinking water schemes of every district in the country."
+    assert good("The Government must release funds for the drinking water schemes of every district in the country.")
+    assert not good("I would like to ask " + base)
+    assert not good("I request " + base)
+    assert not good("I thank the Minister for the funds for the drinking water schemes of every district in the country.")
+    assert not good("The Government must release funds for this drinking water scheme of every district in the country.")
+    assert not good("The Government must release the same funds for drinking water schemes of every district in the country.")
