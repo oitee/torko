@@ -35,6 +35,7 @@ All files are tab-separated and have a header row.
 - `party_events.tsv`: `term`, `mpsno`, `name`, `effective_from`, `party`, `constituency`, `kind`, `source`, `note`. The loader reads it. A row of kind `election` has no date and gives the party at the election where a source was wrong. Other rows are formal changes inside a term with a date: by-election, split, merger, or expulsion.
 - `manual.tsv`: `term`, `mpsno`, `name`, `last_term`, `turns`, `words`, `why`, `party`, `constituency`, `source_url`, `note`. The (member, term) pairs that have no party after all rules. Fill `party` with a known party code and give a source link. The build refuses an unknown code.
 - `non_member_parties.tsv`: `term`, `mpsno`, `name`, `party`, `note`. The party of a speaker who is not a Lok Sabha member in the term, for example a Rajya Sabha minister.
+- `manual_states.tsv`: `term`, `mpsno`, `name`, `constituency`, `speakers_source`, `state`, `source_url`, `note`. The (member, term) pairs that get no state from `speaker_terms.tsv` or from sansad.in. Fill `state` by hand and give a source link. The loader reads this file last. A filled `state` replaces the state of every row of that pair. An empty `state` changes nothing, so the state stays empty. The loader stops if one pair has two rows.
 
 ## How a member is matched to a Wikipedia row
 

@@ -17,6 +17,7 @@ DATA = ROOT / "data" / "party_history"
 TSV = DATA / "results" / "speaker_terms.tsv"
 EVENTS = DATA / "party_events.tsv"
 NON_MEMBERS = DATA / "non_member_parties.tsv"
+MANUAL_STATES = DATA / "manual_states.tsv"
 OWNED = ("wikipedia", "sansad-term-list", "manual", "last-term-fallback", "event")
 
 
@@ -28,6 +29,22 @@ def read_rows() -> list[dict]:
 def read_events() -> list[dict]:
     with open(EVENTS, encoding="utf-8", newline="") as f:
         return list(csv.DictReader(f, delimiter="\t"))
+
+
+def read_manual_states(path: Path = MANUAL_STATES) -> list[dict]:
+    """Return the filled rows of the hand-made state list, as dicts with term, mpsno and state.
+
+    A row with an empty state is not filled yet, so it is not returned.
+    Two rows for one (term, mpsno) stop the load, because the file can then give two states.
+    """
+    with open(path, encoding="utf-8", newline="") as f:
+        rows = [{"term": int(r["term"]), "mpsno": int(r["mpsno"]), "state": r["state"].strip()}
+                for r in csv.DictReader(f, delimiter="\t")]
+    keys = [(r["term"], r["mpsno"]) for r in rows]
+    repeated = sorted({k for k in keys if keys.count(k) > 1})
+    if repeated:
+        raise SystemExit(f"manual_states.tsv: more than one row for (term, mpsno) {repeated}")
+    return [r for r in rows if r["state"]]
 
 
 def sansad_last_terms() -> dict[int, dict]:
@@ -203,6 +220,18 @@ def load(rows: list[dict], events: list[dict]) -> None:
             )
         ).rowcount
 
+        # Step 5: the hand-made states. A filled row replaces the state of every row of that (member, term).
+        manual_states = 0
+        for m in read_manual_states():
+            pid = persons.get(m["mpsno"])
+            if pid is None:
+                raise SystemExit(f"manual_states.tsv: no person with code {m['mpsno']}")
+            n = conn.execute(text("UPDATE speakers SET state = :state WHERE person_id = :pid AND lok_sabha_term = :term"),
+                             {"pid": pid, "term": m["term"], "state": m["state"]}).rowcount
+            if n == 0:
+                raise SystemExit(f"manual_states.tsv: no speakers row for member {m['mpsno']} in term {m['term']}")
+            manual_states += n
+
         print(f"removed old rows      : {removed}", flush=True)
         print(f"last-term rows reset  : {reset}", flush=True)
         print(f"first rows inserted   : {inserted} of {len(params)}", flush=True)
@@ -210,6 +239,7 @@ def load(rows: list[dict], events: list[dict]) -> None:
         print(f"dated event rows      : {dated}", flush=True)
         print(f"non-member parties    : {hand}", flush=True)
         print(f"last-term fallbacks   : {fallback}", flush=True)
+        print(f"hand-made states      : {manual_states}", flush=True)
         if inserted != len(params):
             print("some rows collided with a sansad-last-term row and were not inserted", flush=True)
 
