@@ -35,3 +35,35 @@ def test_debate_route(page_conn):
 
 def test_debate_unknown(page_conn):
     assert debate_page(page_conn, -5, {}) is None
+
+
+def test_role_in_debate():
+    from pages.debate import role_in_debate
+    assert role_in_debate(5, 5, None) == "speech"
+    assert role_in_debate(None, 5, "presiding") == "interruption"
+    assert role_in_debate(None, None, "presiding") == "chair"
+    assert role_in_debate(None, None, "crowd") == "between"
+    assert role_in_debate(None, None, None) == "between"
+
+
+def _check(conn, debate_id):
+    r = debate_page(conn, debate_id, {})
+    places = [t["role_in_debate"] for t in r["turn_list"]]
+    assert set(places) <= {"speech", "interruption", "chair", "between"}
+    assert places.count("interruption") == sum(s["interruptions"] for s in r["speeches"])
+    assert all("inside_speech" in t for t in r["turn_list"] if t["role_in_debate"] == "interruption")
+    assert len(r["speeches"]) and all("summary" in s and "tags" in s for s in r["speeches"])
+    no_member = sum(1 for s in r["speeches"] if s["member_id"] is None)
+    assert sum(p["speeches"] for p in r["people"]) + no_member == len(r["speeches"])
+    assert not {s["member_id"] for s in r["silent"]} & {p["id"] for p in r["people"]}
+    assert r["id"] not in [x["id"] for x in r["same_day"]]
+    return r
+
+
+def test_debate_new_fields_recent(page_conn):
+    r = _check(page_conn, 62933)
+    assert len(r["speeches"]) == 29
+
+
+def test_debate_new_fields_old(page_conn):
+    _check(page_conn, 2666)
