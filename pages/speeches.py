@@ -3,6 +3,8 @@
 One list serves the Member, Tag, Search and Place pages. All filters are optional and combine with AND.
 A speech with no identified member is in the list, with its printed name. It has no tags and no summary,
 so a tag, subject or place filter never finds it. A member or party filter leaves it out.
+
+format=csv is internal. No page uses it. It is for reports made by hand, and the public API description leaves it out.
 """
 import csv
 import io
@@ -315,6 +317,12 @@ CSV_COLUMNS = ["date", "term", "session", "debate", "kind", "words", "summary", 
 
 
 def csv_response(rows):
+    """Return every row as one CSV file. Internal: for reports made by hand, not for the pages.
+
+    TODO: make it faster before any page uses it. It builds all rows in memory with speech_rows and the tags,
+    up to MAX_CSV_ROWS. A tag with about 15,000 speeches takes about 21 s and gives 8.8 MB.
+    Stream the rows in batches, and read only the columns of the file.
+    """
     buf = io.StringIO()
     w = csv.writer(buf)
     w.writerow(CSV_COLUMNS)

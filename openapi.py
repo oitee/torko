@@ -41,7 +41,6 @@ QUERY = {
         ("per_page", "integer", False, "The rows on each page, from 1 to 50. The default is 20."),
         ("facets", "integer", False, "1 adds the counts for each filter value."),
         ("group", "string", False, "member gives one row for each member, not for each speech."),
-        ("format", "string", False, "csv gives every matching speech as a CSV file, with no paging."),
     ],
     "/api/tag/{slug}": [("term", "integer", False, "A Lok Sabha number. Parties, members and speech lists count only that term.")],
     "/api/today": [("date", "string", False, "A calendar day as YYYY-MM-DD. The default is today.")],
