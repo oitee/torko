@@ -178,7 +178,7 @@ def pick_seat_tag(seat, state, candidates):
     """Return the id of the place tag of a seat, or None when it is not certain.
 
     candidates are place tags: dicts with id, tag and description. A tag matches by name AND state:
-    "Seat (State)" with the state of the seat, or a tag named like the seat whose description says "in <State>",
+    "Seat (State)" with the state of the seat, or a tag named like the seat whose description names the state,
     or a tag whose description says "listed as <Seat>" and "in <State>". With no state, only a plain tag
     that is the only candidate matches. Two matches give None.
     """
@@ -188,7 +188,8 @@ def pick_seat_tag(seat, state, candidates):
     found = set()
     for c in candidates:
         name, desc = c["tag"].lower(), (c["description"] or "")
-        in_state = bool(state) and re.search(rf"\bin {re.escape(state)}\b", desc, re.I) is not None
+        # The description names the state, for example "in Kerala" or "Capital city of Kerala state."
+        in_state = bool(state) and re.search(rf"\b{re.escape(state)}\b", desc, re.I) is not None
         if state and name == f"{base} ({state.lower()})":
             found.add(c["id"])
         elif name == base and (in_state or (not state and len(candidates) == 1)):

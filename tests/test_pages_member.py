@@ -128,3 +128,9 @@ def test_member_page_house_share_over_member_terms(page_conn):
     assert row["house_share"] == round(r[0] / r[1], 4)
     assert row["member_share"] == round(row["n"] / d["tagged_speeches"], 4)
     assert "subjects" in row and d["other"]["n"] <= d["tagged_speeches"]
+
+
+def test_pick_seat_tag_reads_the_state_anywhere_in_the_description():
+    tags = [{"id": 1, "tag": "Thiruvananthapuram", "description": "Capital city of Kerala state."}]
+    assert m.pick_seat_tag("Thiruvananthapuram", "Kerala", tags) == 1
+    assert m.pick_seat_tag("Thiruvananthapuram", "Tamil Nadu", tags) is None
