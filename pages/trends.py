@@ -19,7 +19,11 @@ COUNTS_NOTE = (
     "speeches counts all speeches of the session, tagged or not. "
     "per1000 is n per 1,000 tagged speeches of the same session. "
     "strength is the peak per1000 divided by the per1000 over all non-thin sessions together. "
-    "A thin session has fewer than min_tagged tagged speeches. It is left out of peak and strength."
+    "A thin session has fewer than min_tagged tagged speeches. It is left out of peak and strength. "
+    "years has one row for each calendar year of the debate date. "
+    "years.n counts the speeches of the year that carry the tag, each speech once, by the same rule as sessions.n. "
+    "years.tagged counts the speeches of the year that have at least one kept item of any tag. "
+    "A session that crosses New Year is split between two years, so a year is not a session."
 )
 
 
@@ -76,6 +80,14 @@ def session_coverage(conn):
     return cached("session_coverage", load)
 
 
+def year_tagged(conn):
+    """Per calendar year of the debate date: the speeches with at least one kept item of any tag."""
+    return cached("year_tagged", lambda: {int(y): n for y, n in conn.execute(text("""
+        SELECT extract(year FROM d.debate_date), count(*) FROM debates d JOIN speeches s ON s.debate_id = d.id
+        WHERE d.debate_date IS NOT NULL AND EXISTS (SELECT 1 FROM speech_items si WHERE si.speech_id = s.id AND si.kept)
+        GROUP BY 1"""))})
+
+
 def rate_per_1000(n, tagged):
     return round(1000 * n / tagged, 2) if tagged else None
 
@@ -104,6 +116,11 @@ def trends_page(conn, slug, args):
     ids = speech_ids_for_tag(conn, t["id"])
     per = {}
     months = {}
+    per_year = {}
+    for y, n in conn.execute(text("""
+            SELECT extract(year FROM d.debate_date), count(*) FROM speeches s JOIN debates d ON d.id = s.debate_id
+            WHERE s.id = ANY(:ids) AND d.debate_date IS NOT NULL GROUP BY 1"""), {"ids": ids}):
+        per_year[int(y)] = n
     for r in conn.execute(text("""
             SELECT d.loksabha AS term, d.session, to_char(date_trunc('month', d.debate_date), 'YYYY-MM') AS m, count(*) AS n
             FROM speeches s JOIN debates d ON d.id = s.debate_id WHERE s.id = ANY(:ids) GROUP BY 1, 2, 3"""), {"ids": ids}).mappings():
@@ -119,6 +136,9 @@ def trends_page(conn, slug, args):
         sessions.append({**c, "n": n, "per1000": rate_per_1000(n, c["tagged"]),
                          "tagged_share": round(c["tagged"] / c["speeches"], 3) if c["speeches"] else None,
                          "thin": c["tagged"] < MIN_TAGGED, "peak_month": peak_month})
+    tagged_by_year = year_tagged(conn)
+    years = [{"year": y, "n": per_year.get(y, 0), "tagged": tagged_by_year.get(y, 0)}
+             for y in sorted(set(tagged_by_year) | set(per_year))]
     peak, strength = shape(sessions)
     return {
         "name": t["tag"], "slug": to_slug(t["tag"]), "type": t["type"], "subtype": t["subtype"], "domain": t["domain"],
@@ -126,8 +146,9 @@ def trends_page(conn, slug, args):
         "total": len(ids), "min_tagged": MIN_TAGGED, "strength": strength,
         "peak": {"term": sessions[peak]["term"], "session": sessions[peak]["session"]} if peak is not None else None,
         "counts_note": COUNTS_NOTE,
-        "order_notes": {"sessions": "by Lok Sabha term, then session number; every session of the database is listed, also those with n = 0"},
-        "sessions": sessions,
+        "order_notes": {"sessions": "by Lok Sabha term, then session number; every session of the database is listed, also those with n = 0",
+                        "years": "by calendar year, every year with a debate"},
+        "sessions": sessions, "years": years,
     }
 
 

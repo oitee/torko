@@ -5,7 +5,7 @@ than its share across the whole term. A general tag has a high count in every se
 """
 from sqlalchemy import text
 
-from pages.common import slug, speech_tags_cte
+from pages.common import cached, slug, speech_tags_cte
 
 # The shared CTE, limited to the speeches of one term (:t). It reads far fewer items than the whole table.
 TERM_SPEECH_TAGS = speech_tags_cte(
@@ -21,8 +21,31 @@ COUNTS_NOTE = (
     "lift is (speeches_in_session / session speeches with a kept tag) divided by (speeches_in_term / term speeches with a kept tag). "
     "A subject needs at least 12 speeches in the session. Order: highest lift first. "
     "chamber lists each member of the term who has at least one attributed speech, with the latest party of the term. "
-    "debates counts the debates of the newest session."
+    "debates counts the debates of the newest session. "
+    "corpus.debates counts all rows of the table debates. corpus.terms lists the Lok Sabha numbers of those debates. "
+    "corpus.first and corpus.last are the earliest and the latest debate date. "
+    "corpus.members counts the members with at least one speech that names them. "
+    "corpus.tags counts the tags with a status other than rejected and merged. "
+    "corpus.error_rate is fixed text from a manual review of a sample of named turns. No query computes it."
 )
+
+# The share of named turns with a wrong name. It comes from a manual review, so the API does not compute it.
+ERROR_RATE = {
+    "value": 0.0024, "text": "about 0.24%", "counts": "named turns with the wrong member name",
+    "source": "Manual review of a sample of named turns. The figure is fixed text. No query computes it.",
+}
+
+
+def corpus_figures(conn):
+    """The figures over the whole data. They change only when new data loads, so the result is cached."""
+    def load():
+        debates, first, last = conn.execute(text("SELECT count(*), min(debate_date), max(debate_date) FROM debates")).one()
+        terms = [r[0] for r in conn.execute(text("SELECT DISTINCT loksabha FROM debates ORDER BY 1"))]
+        members = conn.execute(text("SELECT count(DISTINCT person_id) FROM speeches")).scalar()
+        tags = conn.execute(text("SELECT count(*) FROM tags WHERE status NOT IN ('rejected', 'merged')")).scalar()
+        return {"debates": debates, "terms": terms, "first": str(first), "last": str(last),
+                "members": members, "tags": tags, "error_rate": ERROR_RATE}
+    return cached("corpus_figures", load)
 
 
 def shape_typical(rows):
@@ -78,7 +101,7 @@ def home_page(conn, args):
     return {
         "chamber": [[r[0], r[1], r[2]] for r in chamber], "lit": lit,
         "term": term, "session": session, "first": str(span[0]), "last": str(span[1]), "debates": span[2],
-        "typical": shape_typical(rows), "counts_note": COUNTS_NOTE,
+        "typical": shape_typical(rows), "corpus": corpus_figures(conn), "counts_note": COUNTS_NOTE,
     }
 
 

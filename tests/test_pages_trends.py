@@ -48,3 +48,10 @@ def test_jal_jeevan_mission(page_conn):
 
 def test_unknown_gives_none(page_conn):
     assert trends_page(page_conn, "no-such-tag-xyz", {}) is None
+
+
+def test_years_add_up_to_the_sessions(page_conn):  # noqa: F811
+    for slug in ("jal-jeevan-mission", "flood-relief"):
+        d = trends_page(page_conn, slug, {})
+        assert sum(y["n"] for y in d["years"]) == sum(s["n"] for s in d["sessions"]) == d["total"]
+        assert [y["year"] for y in d["years"]] == sorted(y["year"] for y in d["years"])
