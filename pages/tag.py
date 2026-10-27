@@ -5,7 +5,7 @@ through tags.merged_into. The slug of a merged tag therefore opens the page of i
 """
 from sqlalchemy import text
 
-from pages.common import (PARTY_AT_DATE, SPEECH_TAGS_CTE, corpus_party_totals, resolve_slug, resolve_tag, slug, tag_speeches,
+from pages.common import (PARTY_AT_DATE, SPEECH_TAGS_CTE, corpus_party_totals, party_colours, resolve_slug, resolve_tag, slug, tag_speeches,
                           speech_rows, speech_tags_cte)
 
 COUNTS_NOTE = (
@@ -32,7 +32,7 @@ def shape_tag(t, by_source, sessions, parties, members, subjects, related, recen
         "total": sum(by_source.values()), "by_source": by_source, "counts_note": COUNTS_NOTE,
         "sessions": [{"term": r["term"], "session": r["session"], "n": r["n"], "speeches_tagged": r["n"],
                       "year": r["first"].year if r["first"] else None} for r in sessions],
-        "parties": [{"party": r["party"], "n": r["n"], "speeches_tagged": r["n"],
+        "parties": [{"party": r["party"], "colour": r.get("colour"), "n": r["n"], "speeches_tagged": r["n"],
                      "per100": round(100 * r["n"] / r["party_total"], 2),
                      "party_total": r["party_total"], "party_speeches_with_tags": r["party_total"]} for r in parties],
         "members": [{"id": r["mid"], "name": r["name"], "n": r["n"], "speeches_tagged": r["n"],
@@ -68,7 +68,9 @@ def tag_data(c, tag_id):
         SELECT pa.party, count(*) AS n FROM ts JOIN speeches s ON s.id = ts.speech_id JOIN debates d ON d.id = s.debate_id
         {PARTY_AT_DATE} WHERE pa.party IS NOT NULL GROUP BY 1 ORDER BY n DESC, pa.party LIMIT 10"""), p).all()
     totals = corpus_party_totals(c)
-    parties = [{"party": party, "n": n, "party_total": totals.get(party, n)} for party, n in tagged_party]
+    colours = party_colours(c)
+    parties = [{"party": party, "colour": colours.get(party), "n": n, "party_total": totals.get(party, n)}
+               for party, n in tagged_party]
     members = c.execute(text(base + f"""
         SELECT pe.id AS mid, pe.name, count(*) AS n, max(d.debate_date) AS last,
                (array_agg(pa.party ORDER BY d.debate_date DESC))[1] AS party,

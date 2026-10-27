@@ -55,7 +55,7 @@ def find_party(conn, code):
     """Return the party row for a code, ignoring case, or None."""
     if not code:
         return None
-    return conn.execute(text("SELECT id, code, name FROM parties WHERE upper(code) = upper(:c) ORDER BY id LIMIT 1"),
+    return conn.execute(text("SELECT id, code, name, colour FROM parties WHERE upper(code) = upper(:c) ORDER BY id LIMIT 1"),
                         {"c": str(code)}).mappings().first()
 
 
@@ -175,7 +175,7 @@ def party_page(conn, code, args=None):
             for pid, n, terms in best if n >= 3]})
 
     return {
-        "code": code, "name": party["name"], "total_tagged": n_party, "all_tagged": n_all,
+        "code": code, "name": party["name"], "colour": party["colour"], "total_tagged": n_party, "all_tagged": n_all,
         "terms": terms, "typical_all": typ_all, "places": places, "top3": top3,
         "rules": {"min_party_tagged": MIN_PARTY_TAGGED, "min_n_term": MIN_N_TERM, "min_n_all": MIN_N_ALL,
                   "min_n_place": MIN_N_PLACE, "general_share": GENERAL_SHARE, "top": TOP},

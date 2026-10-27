@@ -43,8 +43,9 @@ CREATE TABLE IF NOT EXISTS persons (
 -- 'split from' (Shiv Sena to Shiv Sena UBT).
 CREATE TABLE IF NOT EXISTS parties (
     id    SERIAL PRIMARY KEY,
-    code  TEXT NOT NULL UNIQUE,
-    name  TEXT NOT NULL
+    code    TEXT NOT NULL UNIQUE,
+    name    TEXT NOT NULL,
+    colour  TEXT              -- '#RRGGBB' from the Wikipedia member lists, NULL if the lists give none
 );
 
 

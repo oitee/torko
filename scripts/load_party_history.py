@@ -19,6 +19,7 @@ EVENTS = DATA / "party_events.tsv"
 NON_MEMBERS = DATA / "non_member_parties.tsv"
 MANUAL_STATES = DATA / "manual_states.tsv"
 STATE_NAMES = DATA / "state_names.tsv"
+PARTY_COLOURS = DATA / "party_colours.tsv"
 OWNED = ("wikipedia", "sansad-term-list", "manual", "last-term-fallback", "event")
 
 
@@ -30,6 +31,16 @@ def read_rows() -> list[dict]:
 def read_events() -> list[dict]:
     with open(EVENTS, encoding="utf-8", newline="") as f:
         return list(csv.DictReader(f, delimiter="\t"))
+
+
+def read_party_colours(path: Path = PARTY_COLOURS) -> dict[str, str]:
+    """Return party code -> colour ('#RRGGBB') from the tracked colour file. A bad colour stops the load."""
+    with open(path, encoding="utf-8", newline="") as f:
+        out = {r["code"]: r["colour"].strip().upper() for r in csv.DictReader(f, delimiter="\t")}
+    bad = sorted(c for c, v in out.items() if not re.fullmatch(r"#[0-9A-F]{6}", v))
+    if bad:
+        raise SystemExit(f"party_colours.tsv: not a #RRGGBB colour for {bad}")
+    return out
 
 
 def read_state_names(path: Path = STATE_NAMES) -> dict[str, str]:
@@ -128,6 +139,13 @@ def load(rows: list[dict], events: list[dict]) -> None:
             conn.execute(text("INSERT INTO parties (code, name) VALUES (:c, :n) "
                               "ON CONFLICT (code) DO UPDATE SET name = EXCLUDED.name"), {"c": code, "n": name})
         party_ids = dict(conn.execute(text("SELECT code, id FROM parties")).all())
+        colours = read_party_colours()
+        unknown = sorted(set(colours) - set(party_ids))
+        if unknown:
+            raise SystemExit(f"party_colours.tsv: unknown party codes {unknown}")
+        conn.execute(text("UPDATE parties SET colour = NULL"))
+        for code, colour in colours.items():
+            conn.execute(text("UPDATE parties SET colour = :c WHERE code = :code"), {"c": colour, "code": code})
         spellings = read_state_names()
         state_ids = load_states(conn, spellings)
         persons = dict(conn.execute(text("SELECT sansad_id, id FROM persons WHERE sansad_id IS NOT NULL")).all())

@@ -75,6 +75,12 @@ def cached(key, fn):
     return value
 
 
+def party_colours(conn):
+    """Return a dict: party code to its colour ('#RRGGBB'). A party with no colour is not in the dict."""
+    return cached("party_colours", lambda: dict(conn.execute(text(
+        "SELECT code, colour FROM parties WHERE colour IS NOT NULL")).all()))
+
+
 def corpus_party_totals(conn):
     """Return a dict: party code to the number of speeches of that party that have any kept item.
 
