@@ -133,8 +133,8 @@ def resolve_tag(conn, key, tag_type=None):
 # The join to parties runs once after it, not once for each row.
 PARTY_AT_DATE = """
 LEFT JOIN LATERAL (
-    SELECT sp.party_id, sp.constituency AS seat, sp.state
-    FROM speakers sp
+    SELECT sp.party_id, sp.constituency AS seat, st.name AS state
+    FROM speakers sp LEFT JOIN states st ON st.id = sp.state_id
     WHERE sp.person_id = s.person_id AND sp.lok_sabha_term = d.loksabha
       AND sp.effective_from <= COALESCE(d.debate_date, sp.effective_from)
     ORDER BY sp.effective_from DESC LIMIT 1

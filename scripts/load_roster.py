@@ -74,9 +74,9 @@ def load(members: list[dict]) -> None:
                 text(
                     """
                     INSERT INTO speakers
-                        (person_id, lok_sabha_term, effective_from, name, party_id, constituency, state, source)
+                        (person_id, lok_sabha_term, effective_from, name, party_id, constituency, source)
                     SELECT :person_id, :lok_sabha_term, ls.start_date, :name, :party_id, :constituency,
-                           :state, 'sansad-last-term'
+                           'sansad-last-term'
                     FROM lok_sabhas ls WHERE ls.number = :lok_sabha_term
                     ON CONFLICT (lok_sabha_term, person_id, effective_from) DO NOTHING
                     """
@@ -87,7 +87,6 @@ def load(members: list[dict]) -> None:
                     "name": name,
                     "party_id": party_id(conn, m.get("partySname"), m.get("partyFname")),
                     "constituency": (m.get("constName") or "").strip() or None,
-                    "state": (m.get("stateName") or "").strip() or None,
                 },
             )
             inserted_speakers += result.rowcount

@@ -81,9 +81,10 @@ def my_mp_page(conn, args):
 
     rows = conn.execute(text("""
         SELECT DISTINCT ON (sp.constituency, sp.person_id, sp.lok_sabha_term)
-               sp.constituency AS seat, sp.state, sp.person_id, sp.lok_sabha_term AS term, pe.name AS member,
+               sp.constituency AS seat, st.name AS state, sp.person_id, sp.lok_sabha_term AS term, pe.name AS member,
                p.code AS party
         FROM speakers sp JOIN persons pe ON pe.id = sp.person_id LEFT JOIN parties p ON p.id = sp.party_id
+        LEFT JOIN states st ON st.id = sp.state_id
         WHERE sp.constituency = ANY(:seats)
         ORDER BY sp.constituency, sp.person_id, sp.lok_sabha_term, sp.effective_from DESC"""),
         {"seats": picked}).mappings().all()

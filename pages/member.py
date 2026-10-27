@@ -102,8 +102,8 @@ def member_page(conn, member_id, args=None):
     p = {"p": pid}
 
     seats = conn.execute(text("""
-        SELECT sp.lok_sabha_term AS term, sp.constituency, sp.state, pa.code AS party, sp.effective_from
-        FROM speakers sp LEFT JOIN parties pa ON pa.id = sp.party_id
+        SELECT sp.lok_sabha_term AS term, sp.constituency, st.name AS state, pa.code AS party, sp.effective_from
+        FROM speakers sp LEFT JOIN parties pa ON pa.id = sp.party_id LEFT JOIN states st ON st.id = sp.state_id
         WHERE sp.person_id = :p ORDER BY 1, 4"""), p).mappings().all()
     counts = {r["term"]: r for r in conn.execute(text("""
         SELECT d.loksabha AS term, count(*) AS n, sum(s.word_count) AS words,

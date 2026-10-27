@@ -48,6 +48,20 @@ CREATE TABLE IF NOT EXISTS parties (
 );
 
 
+-- states: one row for each state or union territory of a Lok Sabha seat, with one fixed name.
+-- The loader maps each source spelling to this name with data/party_history/state_names.tsv.
+-- A renamed state keeps one row (Orissa is Odisha). A state with a new area is a new row
+-- (Ladakh is not Jammu and Kashmir, and the merged Dadra and Nagar Haveli and Daman and Diu
+-- is not either of its two parts).
+-- tag_id is the place tag of the state, or NULL. It is NULL when no place tag of subtype state or
+-- union_territory has this name, or when more than one has it. It has no foreign key, because
+-- the tags table is created in a later file.
+CREATE TABLE IF NOT EXISTS states (
+    id      SERIAL PRIMARY KEY,
+    name    TEXT NOT NULL UNIQUE,
+    tag_id  INT
+);
+
 -- speakers: the party and the seat of a member in one term, from one date.
 --
 -- A member has one row for each term in which the member sat. A member whose
@@ -93,7 +107,7 @@ CREATE TABLE IF NOT EXISTS speakers (
     lok_sabha_term  INT  NOT NULL REFERENCES lok_sabhas(number),
     name            TEXT,                  -- the name as recorded in that term
     constituency    TEXT,
-    state           TEXT,                  -- the state or union territory of the seat, NULL if not known
+    state_id        INT  REFERENCES states(id),  -- the state of the seat, NULL if not known
     source          TEXT CHECK (source IN ('sansad-last-term', 'wikipedia', 'sansad-term-list', 'manual',
                                            'last-term-fallback', 'event')),
     match_method    TEXT CHECK (match_method IN ('name+seat', 'name', 'article', 'seat', 'manual')),

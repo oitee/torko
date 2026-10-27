@@ -99,8 +99,9 @@ def place_page(conn, slug, args):
     if t["subtype"] != "state":
         holders = conn.execute(text("""
             SELECT sp.lok_sabha_term AS term, pe.id AS mid, pe.name, pa.code AS party, sp.constituency AS seat,
-                   sp.state, min(sp.effective_from) AS since
+                   st.name AS state, min(sp.effective_from) AS since
             FROM speakers sp JOIN persons pe ON pe.id = sp.person_id LEFT JOIN parties pa ON pa.id = sp.party_id
+            LEFT JOIN states st ON st.id = sp.state_id
             WHERE lower(regexp_replace(sp.constituency, '\\s*\\(.*\\)$', '')) = lower(:n)
             GROUP BY 1, 2, 3, 4, 5, 6 ORDER BY 1, since, 2"""), {"n": name}).mappings().all()
 

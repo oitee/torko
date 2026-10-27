@@ -18,6 +18,7 @@ TSV = DATA / "results" / "speaker_terms.tsv"
 EVENTS = DATA / "party_events.tsv"
 NON_MEMBERS = DATA / "non_member_parties.tsv"
 MANUAL_STATES = DATA / "manual_states.tsv"
+STATE_NAMES = DATA / "state_names.tsv"
 OWNED = ("wikipedia", "sansad-term-list", "manual", "last-term-fallback", "event")
 
 
@@ -29,6 +30,55 @@ def read_rows() -> list[dict]:
 def read_events() -> list[dict]:
     with open(EVENTS, encoding="utf-8", newline="") as f:
         return list(csv.DictReader(f, delimiter="\t"))
+
+
+def read_state_names(path: Path = STATE_NAMES) -> dict[str, str]:
+    """Return a map from each source spelling to the fixed name of its state. An empty name means no state."""
+    with open(path, encoding="utf-8", newline="") as f:
+        names = {}
+        for r in csv.DictReader(f, delimiter="\t"):
+            spelling = r["spelling"].strip()
+            if spelling in names:
+                raise SystemExit(f"state_names.tsv: the spelling {spelling!r} is in the file more than once")
+            names[spelling] = r["state"].strip()
+    return names
+
+
+def state_tag_ids(names: list[str], tags: list[tuple[int, str]], spellings: dict[str, str]) -> dict[str, int]:
+    """Return the place tag of each state that has exactly one, by state name.
+
+    tags: (id, name) of the place tags of subtype state or union_territory.
+    A tag name is read through the same spelling map, so the tag 'Pondicherry' is the tag of Puducherry.
+    """
+    found: dict[str, list[int]] = {}
+    for tid, tag in tags:
+        name = spellings.get(tag, tag)
+        if name in names:
+            found.setdefault(name, []).append(tid)
+    return {name: ids[0] for name, ids in found.items() if len(ids) == 1}
+
+
+def state_id_of(spelling: str, spellings: dict[str, str], state_ids: dict[str, int], where: str) -> int | None:
+    """Return the states id of a source spelling. An empty spelling gives None. An unknown spelling stops the load."""
+    spelling = (spelling or "").strip()
+    if not spelling:
+        return None
+    if spelling not in spellings:
+        raise SystemExit(f"{where}: the state {spelling!r} is not in state_names.tsv")
+    name = spellings[spelling]
+    return state_ids[name] if name else None
+
+
+def load_states(conn, spellings: dict[str, str]) -> dict[str, int]:
+    """Write one states row for each fixed name, with its tag. Return the id of each name."""
+    names = sorted({n for n in spellings.values() if n})
+    tags = conn.execute(text("SELECT id, tag FROM tags WHERE type = 'place' AND subtype IN ('state', 'union_territory') "
+                             "AND merged_into IS NULL")).all()
+    tag_ids = state_tag_ids(names, [tuple(t) for t in tags], spellings)
+    for name in names:
+        conn.execute(text("INSERT INTO states (name, tag_id) VALUES (:n, :t) "
+                          "ON CONFLICT (name) DO UPDATE SET tag_id = EXCLUDED.tag_id"), {"n": name, "t": tag_ids.get(name)})
+    return dict(conn.execute(text("SELECT name, id FROM states")).all())
 
 
 def read_manual_states(path: Path = MANUAL_STATES) -> list[dict]:
@@ -78,6 +128,8 @@ def load(rows: list[dict], events: list[dict]) -> None:
             conn.execute(text("INSERT INTO parties (code, name) VALUES (:c, :n) "
                               "ON CONFLICT (code) DO UPDATE SET name = EXCLUDED.name"), {"c": code, "n": name})
         party_ids = dict(conn.execute(text("SELECT code, id FROM parties")).all())
+        spellings = read_state_names()
+        state_ids = load_states(conn, spellings)
         persons = dict(conn.execute(text("SELECT sansad_id, id FROM persons WHERE sansad_id IS NOT NULL")).all())
         names = dict(conn.execute(text("SELECT id, name FROM persons")).all())
         starts = dict(conn.execute(text("SELECT number, start_date FROM lok_sabhas")).all())
@@ -98,8 +150,8 @@ def load(rows: list[dict], events: list[dict]) -> None:
             pid = persons.get(code)
             if pid is None:
                 continue
-            conn.execute(text("UPDATE speakers SET state = :state WHERE person_id = :pid AND source = 'sansad-last-term'"),
-                         {"pid": pid, "state": (m.get("stateName") or "").strip() or None})
+            conn.execute(text("UPDATE speakers SET state_id = :state WHERE person_id = :pid AND source = 'sansad-last-term'"),
+                         {"pid": pid, "state": state_id_of(m.get("stateName"), spellings, state_ids, "sansad.in")})
             party = (m.get("partySname") or "").strip()
             reset += conn.execute(
                 text("UPDATE speakers SET party_id = :party_id, constituency = :constituency, match_method = NULL "
@@ -123,7 +175,7 @@ def load(rows: list[dict], events: list[dict]) -> None:
                 "name": names[pid],
                 "party_id": party_ids[r["party"]] if matched and r["party"] else None,
                 "constituency": (r["constituency"] or None) if matched else None,
-                "state": (r["state"] or None) if matched else None,
+                "state_id": state_id_of(r["state"], spellings, state_ids, "speaker_terms.tsv") if matched else None,
                 "source": "manual" if method == "manual" else "wikipedia" if matched else "sansad-term-list",
                 "method": method if matched else None,
             })
@@ -131,8 +183,8 @@ def load(rows: list[dict], events: list[dict]) -> None:
             text(
                 """
                 INSERT INTO speakers (person_id, lok_sabha_term, effective_from, name, party_id, constituency,
-                                      state, source, match_method)
-                VALUES (:person_id, :term, :start, :name, :party_id, :constituency, :state, :source, :method)
+                                      state_id, source, match_method)
+                VALUES (:person_id, :term, :start, :name, :party_id, :constituency, :state_id, :source, :method)
                 ON CONFLICT (lok_sabha_term, person_id, effective_from) DO NOTHING
                 """
             ),
@@ -169,8 +221,8 @@ def load(rows: list[dict], events: list[dict]) -> None:
                 text(
                     """
                     INSERT INTO speakers (person_id, lok_sabha_term, effective_from, name, party_id,
-                                          constituency, state, source)
-                    SELECT person_id, lok_sabha_term, :date, name, :party_id, constituency, state, 'event'
+                                          constituency, state_id, source)
+                    SELECT person_id, lok_sabha_term, :date, name, :party_id, constituency, state_id, 'event'
                     FROM speakers
                     WHERE person_id = :pid AND lok_sabha_term = :term AND effective_from = :start
                     """
@@ -226,8 +278,9 @@ def load(rows: list[dict], events: list[dict]) -> None:
             pid = persons.get(m["mpsno"])
             if pid is None:
                 raise SystemExit(f"manual_states.tsv: no person with code {m['mpsno']}")
-            n = conn.execute(text("UPDATE speakers SET state = :state WHERE person_id = :pid AND lok_sabha_term = :term"),
-                             {"pid": pid, "term": m["term"], "state": m["state"]}).rowcount
+            state_id = state_id_of(m["state"], spellings, state_ids, "manual_states.tsv")
+            n = conn.execute(text("UPDATE speakers SET state_id = :state WHERE person_id = :pid AND lok_sabha_term = :term"),
+                             {"pid": pid, "term": m["term"], "state": state_id}).rowcount
             if n == 0:
                 raise SystemExit(f"manual_states.tsv: no speakers row for member {m['mpsno']} in term {m['term']}")
             manual_states += n
