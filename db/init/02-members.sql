@@ -93,6 +93,7 @@ CREATE TABLE IF NOT EXISTS speakers (
     lok_sabha_term  INT  NOT NULL REFERENCES lok_sabhas(number),
     name            TEXT,                  -- the name as recorded in that term
     constituency    TEXT,
+    state           TEXT,                  -- the state or union territory of the seat, NULL if not known
     source          TEXT CHECK (source IN ('sansad-last-term', 'wikipedia', 'sansad-term-list', 'manual',
                                            'last-term-fallback', 'event')),
     match_method    TEXT CHECK (match_method IN ('name+seat', 'name', 'article', 'seat', 'manual')),

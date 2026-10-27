@@ -194,7 +194,7 @@ def best_quote(conn, day):
     """Return (sentence, turn row, language) for the best quote of the day, or None."""
     turns = conn.execute(text(f"""
         SELECT t.id, t.text, t.speaker_label, pe.id AS mid, pe.name, d.id AS debate_id, d.title, d.source_url,
-               pa.party, pa.seat
+               pa.party, pa.seat, pa.state
         FROM turns t JOIN debates d ON d.id = t.debate_id JOIN speeches s ON s.id = t.speech_id
         JOIN persons pe ON pe.id = t.person_id
         {PARTY_AT_DATE.replace('s.person_id', 't.person_id')}
@@ -244,12 +244,12 @@ def today_page(conn, args):
     items = []
     for y, day in chosen.items():
         it = {"year": y, "date": day.isoformat(), "days_from": (day - target_date(y, month_day)).days,
-              "debates": all_debates.get(day, []), "member": None, "member_id": None, "party": None, "seat": None,
+              "debates": all_debates.get(day, []), "member": None, "member_id": None, "party": None, "seat": None, "state": None,
               "debate": None, "quote": None, "lang": None, "source_url": None}
         found = cached(("quote", day), lambda: best_quote(conn, day))
         if found:
             s, t, lang = found
-            it.update(member=t["name"], member_id=t["mid"], party=t["party"], seat=t["seat"],
+            it.update(member=t["name"], member_id=t["mid"], party=t["party"], seat=t["seat"], state=t["state"],
                       debate=tidy_title(re.sub(r"\s+", " ", t["title"] or "").strip()), quote=s, lang=lang,
                       source_url=t["source_url"])
         items.append(it)

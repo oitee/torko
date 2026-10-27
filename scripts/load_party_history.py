@@ -75,12 +75,14 @@ def load(rows: list[dict], events: list[dict]) -> None:
         removed = conn.execute(text("DELETE FROM speakers WHERE source = ANY(:owned)"),
                                {"owned": list(OWNED)}).rowcount
 
-        # Step 1a: reset the last-term rows to the sansad.in values.
+        # Step 1a: reset the last-term rows to the sansad.in values. The state is set on every last-term row.
         reset = 0
         for code, m in sansad_last_terms().items():
             pid = persons.get(code)
             if pid is None:
                 continue
+            conn.execute(text("UPDATE speakers SET state = :state WHERE person_id = :pid AND source = 'sansad-last-term'"),
+                         {"pid": pid, "state": (m.get("stateName") or "").strip() or None})
             party = (m.get("partySname") or "").strip()
             reset += conn.execute(
                 text("UPDATE speakers SET party_id = :party_id, constituency = :constituency, match_method = NULL "
@@ -104,6 +106,7 @@ def load(rows: list[dict], events: list[dict]) -> None:
                 "name": names[pid],
                 "party_id": party_ids[r["party"]] if matched and r["party"] else None,
                 "constituency": (r["constituency"] or None) if matched else None,
+                "state": (r["state"] or None) if matched else None,
                 "source": "manual" if method == "manual" else "wikipedia" if matched else "sansad-term-list",
                 "method": method if matched else None,
             })
@@ -111,8 +114,8 @@ def load(rows: list[dict], events: list[dict]) -> None:
             text(
                 """
                 INSERT INTO speakers (person_id, lok_sabha_term, effective_from, name, party_id, constituency,
-                                      source, match_method)
-                VALUES (:person_id, :term, :start, :name, :party_id, :constituency, :source, :method)
+                                      state, source, match_method)
+                VALUES (:person_id, :term, :start, :name, :party_id, :constituency, :state, :source, :method)
                 ON CONFLICT (lok_sabha_term, person_id, effective_from) DO NOTHING
                 """
             ),
@@ -149,8 +152,8 @@ def load(rows: list[dict], events: list[dict]) -> None:
                 text(
                     """
                     INSERT INTO speakers (person_id, lok_sabha_term, effective_from, name, party_id,
-                                          constituency, source)
-                    SELECT person_id, lok_sabha_term, :date, name, :party_id, constituency, 'event'
+                                          constituency, state, source)
+                    SELECT person_id, lok_sabha_term, :date, name, :party_id, constituency, state, 'event'
                     FROM speakers
                     WHERE person_id = :pid AND lok_sabha_term = :term AND effective_from = :start
                     """

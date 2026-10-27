@@ -102,7 +102,7 @@ def member_page(conn, member_id, args=None):
     p = {"p": pid}
 
     seats = conn.execute(text("""
-        SELECT sp.lok_sabha_term AS term, sp.constituency, pa.code AS party, sp.effective_from
+        SELECT sp.lok_sabha_term AS term, sp.constituency, sp.state, pa.code AS party, sp.effective_from
         FROM speakers sp LEFT JOIN parties pa ON pa.id = sp.party_id
         WHERE sp.person_id = :p ORDER BY 1, 4"""), p).mappings().all()
     counts = {r["term"]: r for r in conn.execute(text("""
@@ -111,12 +111,13 @@ def member_page(conn, member_id, args=None):
         FROM speeches s JOIN debates d ON d.id = s.debate_id WHERE s.person_id = :p GROUP BY 1"""), p).mappings().all()}
     terms = {}
     for r in seats:
-        t = terms.setdefault(r["term"], {"term": r["term"], "seat": None, "parties": []})
-        t["seat"] = r["constituency"] or t["seat"]
+        t = terms.setdefault(r["term"], {"term": r["term"], "seat": None, "state": None, "parties": []})
+        if r["constituency"]:
+            t["seat"], t["state"] = r["constituency"], r["state"]
         if r["party"] and r["party"] not in t["parties"]:
             t["parties"].append(r["party"])
     for tnum in counts:
-        terms.setdefault(tnum, {"term": tnum, "seat": None, "parties": []})
+        terms.setdefault(tnum, {"term": tnum, "seat": None, "state": None, "parties": []})
     for tnum, t in terms.items():
         r = counts.get(tnum)
         t["speeches"] = r["n"] if r else 0
@@ -179,6 +180,7 @@ def member_page(conn, member_id, args=None):
     return {
         "id": pid, "name": name, "known_as": known_as, "raw_name": pe["name"],
         "party_path": party_path(term_list), "seat": term_list[-1]["seat"] if term_list else None,
+        "state": term_list[-1]["state"] if term_list else None,
         "terms": term_list, "speeches": sum(t["speeches"] for t in term_list), "tagged_speeches": mtotal,
         "typical": typical[:14], "typical_total_candidates": len(typical),
         "rule": {"general_share": GENERAL_SHARE, "min_member": MIN_MEMBER, "min_all": MIN_ALL,

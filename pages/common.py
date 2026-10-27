@@ -128,19 +128,19 @@ def resolve_tag(conn, key, tag_type=None):
     return dict(row) if row else None
 
 
-# The party and seat of a member at the date of a debate, as pa.party and pa.seat.
+# The party, seat and state of a member at the date of a debate, as pa.party, pa.seat and pa.state.
 # The lateral part runs once for each row, so it finds only the speakers period in force.
 # The join to parties runs once after it, not once for each row.
 PARTY_AT_DATE = """
 LEFT JOIN LATERAL (
-    SELECT sp.party_id, sp.constituency AS seat
+    SELECT sp.party_id, sp.constituency AS seat, sp.state
     FROM speakers sp
     WHERE sp.person_id = s.person_id AND sp.lok_sabha_term = d.loksabha
       AND sp.effective_from <= COALESCE(d.debate_date, sp.effective_from)
     ORDER BY sp.effective_from DESC LIMIT 1
 ) pa_row ON true
 LEFT JOIN parties pa_party ON pa_party.id = pa_row.party_id
-CROSS JOIN LATERAL (SELECT pa_party.code AS party, pa_row.seat AS seat) pa
+CROSS JOIN LATERAL (SELECT pa_party.code AS party, pa_row.seat AS seat, pa_row.state AS state) pa
 """
 
 
@@ -149,7 +149,7 @@ def speech_rows(conn, speech_ids, with_tags=True):
     if not speech_ids:
         return []
     rows = conn.execute(text(f"""
-        SELECT s.id, s.person_id, pe.name AS member, pa.party, pa.seat,
+        SELECT s.id, s.person_id, pe.name AS member, pa.party, pa.seat, pa.state,
                d.debate_date, d.loksabha, d.session, s.word_count, d.title, d.debate_type,
                d.source_url, se.summary
         FROM speeches s
@@ -167,7 +167,7 @@ def speech_rows(conn, speech_ids, with_tags=True):
             continue
         out.append({
             "id": r["id"], "member_id": r["person_id"], "member": r["member"],
-            "party": r["party"], "seat": r["seat"],
+            "party": r["party"], "seat": r["seat"], "state": r["state"],
             "date": r["debate_date"].isoformat() if r["debate_date"] else None,
             "term": r["loksabha"], "session": r["session"], "words": r["word_count"],
             "debate": tidy_title(r["title"]), "debate_type": tidy_type(r["debate_type"]),

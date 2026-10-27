@@ -47,7 +47,7 @@ def group_reasons(tags, items):
 def speech_page(conn, speech_id, args=None):
     s = conn.execute(text(f"""
         SELECT s.id, s.debate_id, s.person_id, s.seq_start, s.seq_end, s.turn_count, s.interruption_count,
-               s.word_count, pe.id AS mid, pe.name AS member, pa.party, pa.seat,
+               s.word_count, pe.id AS mid, pe.name AS member, pa.party, pa.seat, pa.state,
                d.debate_date, d.loksabha, d.session, d.title, d.debate_type, d.source_url,
                se.summary, se.language
         FROM speeches s JOIN debates d ON d.id = s.debate_id
@@ -91,7 +91,7 @@ def speech_page(conn, speech_id, args=None):
     title, laid = split_title(s["title"])
     return {
         "id": s["id"], "debate_id": s["debate_id"], "laid": laid,
-        "member": s["member"], "member_id": s["mid"], "party": s["party"], "seat": s["seat"],
+        "member": s["member"], "member_id": s["mid"], "party": s["party"], "seat": s["seat"], "state": s["state"],
         "date": s["debate_date"].isoformat() if s["debate_date"] else None,
         "term": s["loksabha"], "session": s["session"], "debate": tidy_title(title),
         "debate_type": tidy_type(s["debate_type"]), "source_url": s["source_url"],

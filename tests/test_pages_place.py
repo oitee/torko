@@ -31,6 +31,7 @@ def test_state_place(page_conn):
 def test_district_place_has_holders(page_conn):
     d = place_page(page_conn, "gorakhpur", {})
     assert d["holders"] and all(h["seat"] for h in d["holders"])
+    assert {h["state"] for h in d["holders"]} == {"Uttar Pradesh"}
     lifts = [a["lift"] for a in d["associated"]]
     assert lifts == sorted(lifts, reverse=True)
 

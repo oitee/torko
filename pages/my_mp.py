@@ -81,7 +81,7 @@ def my_mp_page(conn, args):
 
     rows = conn.execute(text("""
         SELECT DISTINCT ON (sp.constituency, sp.person_id, sp.lok_sabha_term)
-               sp.constituency AS seat, sp.person_id, sp.lok_sabha_term AS term, pe.name AS member,
+               sp.constituency AS seat, sp.state, sp.person_id, sp.lok_sabha_term AS term, pe.name AS member,
                p.code AS party
         FROM speakers sp JOIN persons pe ON pe.id = sp.person_id LEFT JOIN parties p ON p.id = sp.party_id
         WHERE sp.constituency = ANY(:seats)

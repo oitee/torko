@@ -36,7 +36,7 @@ def shape_tag(t, by_source, sessions, parties, members, subjects, related, recen
                      "per100": round(100 * r["n"] / r["party_total"], 2),
                      "party_total": r["party_total"], "party_speeches_with_tags": r["party_total"]} for r in parties],
         "members": [{"id": r["mid"], "name": r["name"], "n": r["n"], "speeches_tagged": r["n"],
-                     "party": r["party"], "seat": r["seat"], "last": str(r["last"])} for r in members],
+                     "party": r["party"], "seat": r["seat"], "state": r["state"], "last": str(r["last"])} for r in members],
         "subjects": [{"id": r["id"], "label": r["label"], "n": r["n_speeches"], "speeches": r["n_speeches"],
                       "debates": r["n_debates"]} for r in subjects],
         "related": [{"name": r["tag"], "slug": slug(r["tag"]), "type": r["type"], "n": r["n"],
@@ -72,7 +72,8 @@ def tag_data(c, tag_id):
     members = c.execute(text(base + f"""
         SELECT pe.id AS mid, pe.name, count(*) AS n, max(d.debate_date) AS last,
                (array_agg(pa.party ORDER BY d.debate_date DESC))[1] AS party,
-               (array_agg(pa.seat ORDER BY d.debate_date DESC))[1] AS seat
+               (array_agg(pa.seat ORDER BY d.debate_date DESC))[1] AS seat,
+               (array_agg(pa.state ORDER BY d.debate_date DESC))[1] AS state
         FROM ts JOIN speeches s ON s.id = ts.speech_id JOIN debates d ON d.id = s.debate_id
         JOIN persons pe ON pe.id = s.person_id {PARTY_AT_DATE}
         GROUP BY pe.id HAVING count(*) >= 3 ORDER BY n DESC, pe.name LIMIT 12"""), p).mappings().all()

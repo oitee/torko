@@ -45,6 +45,12 @@ def test_member_page_real(page_conn):
     assert d["recent"] and "counts_note" in d
 
 
+def test_member_page_gives_the_state_of_each_seat(page_conn):
+    d = m.member_page(page_conn, "368", {})
+    assert d["seat"] == "Baharampur" and d["state"] == "West Bengal"
+    assert all(t["state"] == "West Bengal" for t in d["terms"] if t["seat"])
+
+
 def test_member_page_unknown(page_conn):
     assert m.member_page(page_conn, "99999999", {}) is None
     assert m.member_page(page_conn, "abc", {}) is None
