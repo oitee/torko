@@ -96,24 +96,24 @@ _search_index = None
 
 
 def search_index():
-    """The tags and subjects for /api/search. Read once per process: they change only when the pipeline runs."""
+    """The tags, subjects and members for /api/search. Read once per process: they change only when the pipeline runs."""
     global _search_index
     if _search_index is None:
         with dashboard_db.get_engine().connect() as conn:
-            _search_index = tag_search.load_index(conn)
+            _search_index = (*tag_search.load_index(conn), tag_search.load_members(conn))
     return _search_index
 
 
 @app.route("/api/search")
 def api_search():
-    """The tags and subjects that match a search text."""
+    """The tags, places, subjects and members that match a search text."""
     q = request.args.get("q", "").strip()
     if not q:
         return jsonify({"error": "q is required"}), 400
-    tags, subjects = search_index()
-    results = tag_search.search(q, tags, subjects, limit=20)
+    tags, subjects, members = search_index()
+    results = tag_search.search(q, tags, subjects, limit=20, members=members)
     for r in results:
-        if r["kind"] == "tag":
+        if r["kind"] in ("tag", "place"):
             r["subjects"] = [{"subject_id": s["subject_id"], "label": s["label"], "n_speeches": s["n_speeches"]}
                              for s in r["subjects"][:50]]
     return jsonify({"query": q, "results": results})
