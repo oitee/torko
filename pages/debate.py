@@ -59,19 +59,19 @@ def kind_counts(turns):
 
 
 def party_at(conn, person_ids, term, date):
-    """Party code and seat of each member in the term, at the date. Returns {person_id: {party, seat}}."""
+    """Party code, seat and state of each member in the term, at the date. Returns {person_id: {party, seat, state}}."""
     if not person_ids:
         return {}
     rows = conn.execute(text("""
-        SELECT p.id, pa.party, pa.seat FROM persons p
+        SELECT p.id, pa.party, pa.seat, pa.state FROM persons p
         LEFT JOIN LATERAL (
-            SELECT pt.code AS party, sp.constituency AS seat
-            FROM speakers sp LEFT JOIN parties pt ON pt.id = sp.party_id
+            SELECT pt.code AS party, sp.constituency AS seat, st.name AS state
+            FROM speakers sp LEFT JOIN parties pt ON pt.id = sp.party_id LEFT JOIN states st ON st.id = sp.state_id
             WHERE sp.person_id = p.id AND sp.lok_sabha_term = :term
               AND sp.effective_from <= COALESCE(:date, sp.effective_from)
             ORDER BY sp.effective_from DESC LIMIT 1) pa ON true
         WHERE p.id = ANY(:ids)"""), {"ids": list(person_ids), "term": term, "date": date}).mappings().all()
-    return {r["id"]: {"party": r["party"], "seat": r["seat"]} for r in rows}
+    return {r["id"]: {"party": r["party"], "seat": r["seat"], "state": r["state"]} for r in rows}
 
 
 def silent_members(conn, official, spoke_ids, term, date):
@@ -98,7 +98,8 @@ def silent_members(conn, official, spoke_ids, term, date):
             continue
         done.add(pid)
         out.append({"member_id": pid, "name": names.get(pid) or e["name"], "code": e["code"],
-                    "party": standing.get(pid, {}).get("party"), "seat": standing.get(pid, {}).get("seat")})
+                    "party": standing.get(pid, {}).get("party"), "seat": standing.get(pid, {}).get("seat"),
+                    "state": standing.get(pid, {}).get("state")})
     return out
 
 
@@ -151,6 +152,7 @@ def debate_page(conn, debate_id, args=None):
                                             "listed": listed(t), "first": t["seq"],
                                             "party": standing.get(t["pid"], {}).get("party"),
                                             "seat": standing.get(t["pid"], {}).get("seat"),
+                                            "state": standing.get(t["pid"], {}).get("state"),
                                             "speeches": speech_count.get(t["pid"], 0)})
             p["turns"] += 1
             p["words"] += t["word_count"] or 0
@@ -213,7 +215,7 @@ def debate_page(conn, debate_id, args=None):
                       "interruptions": s["interruption_count"], "start": s["seq_start"], "end": s["seq_end"],
                       "member_id": by_speech[s["id"]]["member_id"], "member": by_speech[s["id"]]["member"],
                       "printed": by_speech[s["id"]]["printed"], "party": by_speech[s["id"]]["party"],
-                      "seat": by_speech[s["id"]]["seat"], "summary": by_speech[s["id"]]["summary"],
+                      "seat": by_speech[s["id"]]["seat"], "state": by_speech[s["id"]]["state"], "summary": by_speech[s["id"]]["summary"],
                       "tags": by_speech[s["id"]]["tags"]}
                      for s in speeches],
         "speeches_note": "A speech with no member has member null and printed, the name as printed in the transcript. "

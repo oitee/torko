@@ -246,11 +246,6 @@ def add_excerpts(conn, rows, q):
 
 def facets(conn, conds, f, labels):
     """Return the counts by term, session, subject, party and kind. Each leaves out its own filter."""
-    def run(sql_select, name, extra=""):
-        w, p, party = where(conds, OWN_FILTERS[name])
-        party = party or name == "party"
-        return conn.execute(text(f"{sql_select} {from_sql(party)} {extra} WHERE {w}"), p)
-
     out = {}
     w, p, party = where(conds, OWN_FILTERS["term"])
     out["term"] = [{"term": t, "n": n} for t, n in conn.execute(text(

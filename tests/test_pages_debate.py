@@ -67,3 +67,10 @@ def test_debate_new_fields_recent(page_conn):
 
 def test_debate_new_fields_old(page_conn):
     _check(page_conn, 2666)
+
+
+def test_debate_rows_with_a_seat_also_give_the_state(page_conn):
+    r = debate_page(page_conn, 62933, {})
+    seated = [p for p in r["people"] if p["seat"]] + [s for s in r["speeches"] if s["seat"]]
+    assert seated and all("state" in x for x in seated)
+    assert any(x["state"] for x in seated)
