@@ -1,3 +1,5 @@
+import datetime as dt
+
 import pages.member as m
 from pages.common import speech_tags_cte
 from tests.pages_db import page_conn  # noqa: F401
@@ -27,9 +29,40 @@ def test_pick_typical_rules():
     assert typical[0]["lift"] == 10.0
 
 
-def test_party_path_removes_repeats():
-    terms = [{"parties": ["INC"]}, {"parties": ["INC", "BJD"]}, {"parties": ["BJD"]}]
-    assert m.party_path(terms) == ["INC", "BJD"]
+def test_party_path_gives_years_in_date_order():
+    d = dt.date
+    rows = [(14, "SP", d(2004, 6, 2)), (15, "SP", d(2009, 6, 1)), (17, "BSP", d(2019, 6, 17)), (18, "SP", d(2024, 6, 24))]
+    ends = {15: d(2014, 2, 1), 17: d(2024, 3, 1), 18: d(2026, 1, 1)}
+    path = m.party_path(rows, ends, 18)
+    assert path == [{"code": "SP", "from": 2004, "to": 2019}, {"code": "BSP", "from": 2019, "to": 2024},
+                    {"code": "SP", "from": 2024, "to": None}]
+    assert m.party_path([(15, "SP", d(2009, 6, 1))], ends, 18) == [{"code": "SP", "from": 2009, "to": 2014}]
+    assert m.party_path([(15, None, d(2009, 6, 1))], ends, 18) == []
+
+
+def test_median_with_zeros():
+    assert m.median_with_zeros([5, 3], 5) == 0
+    assert m.median_with_zeros([5, 3, 4], 4) == 3.5
+    assert m.median_with_zeros([], 0) == 0
+
+
+def test_shares():
+    assert m.shares(10, 100, 50, 1000) == (0.1, 0.05, 2.0)
+    assert m.shares(1, 0, 0, 0) == (0, 0, None)
+
+
+def test_pick_seat_tag_uses_name_and_state():
+    bihar = {"id": 1, "tag": "Aurangabad (Bihar)", "description": "District and Lok Sabha constituency in Bihar, India."}
+    mah = {"id": 2, "tag": "Chhatrapati Sambhajinagar",
+           "description": "District and Lok Sabha constituency in Maharashtra, India. The constituency is listed as Aurangabad."}
+    assert m.pick_seat_tag("Aurangabad", "Bihar", [bihar, mah]) == 1
+    assert m.pick_seat_tag("Aurangabad", "Maharashtra", [bihar, mah]) == 2
+    assert m.pick_seat_tag("Aurangabad", None, [bihar, mah]) is None
+    assert m.pick_seat_tag("Aurangabad", "Assam", [bihar, mah]) is None
+    plain = {"id": 3, "tag": "Latur", "description": "District and Lok Sabha constituency in Maharashtra, India."}
+    assert m.pick_seat_tag("Latur (SC)", "Maharashtra", [plain]) == 3
+    assert m.pick_seat_tag("Latur", "Karnataka", [plain]) is None
+    assert m.pick_seat_tag("Latur", None, [plain]) == 3
 
 
 def test_restricted_cte_adds_condition():
@@ -54,3 +87,44 @@ def test_member_page_gives_the_state_of_each_seat(page_conn):
 def test_member_page_unknown(page_conn):
     assert m.member_page(page_conn, "99999999", {}) is None
     assert m.member_page(page_conn, "abc", {}) is None
+
+
+def test_member_page_sessions_sum_and_median(page_conn):
+    d = m.member_page(page_conn, "368", {})
+    assert sum(x["n"] for x in d["sessions"]) == d["speeches"]
+    assert all({"term", "session", "label", "n", "house_median"} <= set(x) for x in d["sessions"])
+    one = [x for x in d["sessions"] if (x["term"], x["session"]) == (17, 5)][0]
+    direct = page_conn.execute(m.text("""
+        SELECT percentile_cont(0.5) WITHIN GROUP (ORDER BY n) FROM (
+          SELECT (SELECT count(*) FROM speeches s JOIN debates d ON d.id = s.debate_id
+                  WHERE s.person_id = p.person_id AND d.loksabha = 17 AND d.session = 5) AS n
+          FROM (SELECT DISTINCT person_id FROM speakers WHERE lok_sabha_term = 17) p) x""")).scalar()
+    assert one["house_median"] == direct
+
+
+def test_member_page_party_path_of_a_changer(page_conn):
+    d = m.member_page(page_conn, "66", {})
+    assert [x["code"] for x in d["party_path"]] == ["SP", "BSP", "SP"]
+    assert d["party_path"][1] == {"code": "BSP", "from": 2019, "to": 2024}
+    assert d["party_path"][-1]["to"] is None
+
+
+def test_member_page_aurangabad_seats_go_to_their_own_place(page_conn):
+    assert m.member_page(page_conn, "1868", {})["seat_slug"] == "aurangabad-bihar"
+    assert m.member_page(page_conn, "754", {})["seat_slug"] == "chhatrapati-sambhajinagar"
+    own = [x for x in m.member_page(page_conn, "754", {})["places"] if x["own_seat"]]
+    assert [x["slug"] for x in own] == ["chhatrapati-sambhajinagar"]
+
+
+def test_member_page_house_share_over_member_terms(page_conn):
+    d = m.member_page(page_conn, "754", {})
+    row = d["typical"][0]
+    terms = [t["term"] for t in d["terms"]]
+    r = page_conn.execute(m.text(f"""
+        WITH {m.SPEECH_TAGS_CTE}
+        SELECT count(DISTINCT st.speech_id) FILTER (WHERE st.tag_id = :t), count(DISTINCT st.speech_id)
+        FROM speech_tags st JOIN speeches s ON s.id = st.speech_id JOIN debates d ON d.id = s.debate_id
+        WHERE d.loksabha = ANY(:terms)"""), {"t": row["tag_id"], "terms": terms}).one()
+    assert row["house_share"] == round(r[0] / r[1], 4)
+    assert row["member_share"] == round(row["n"] / d["tagged_speeches"], 4)
+    assert "subjects" in row and d["other"]["n"] <= d["tagged_speeches"]
