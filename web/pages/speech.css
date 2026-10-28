@@ -15,11 +15,15 @@
   margin: 0;
 }
 
+/* The kicker and the TLDR label follow the mockup: mono, with spaced letters. */
 .speech-header__kicker {
   margin: 0;
   color: var(--meta);
-  font-size: var(--size-label);
+  font-family: var(--font-mono);
+  font-size: var(--size-count);
   font-weight: 500;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
 }
 
 .speech-header__member {
@@ -183,6 +187,19 @@
 }
 
 /* The TLDR on this page: a sheet with a heavy ink rule on top. */
+.speech-main .tldr__label {
+  font-family: var(--font-mono);
+  font-size: var(--size-speech);
+  font-weight: 600;
+  letter-spacing: 0.04em;
+}
+
+.speech-main .tldr__text {
+  font-size: var(--size-speech);
+  line-height: var(--lh-speech);
+  max-width: 62ch;
+}
+
 .speech-main .tldr {
   padding: var(--space-6);
   background: var(--sheet);
