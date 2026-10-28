@@ -1,0 +1,7 @@
+{
+  "note": "The hand-checked content of the home page. Each item is a reference into the database. The route /api/home/featured checks each item and leaves out an item that fails. The content below is a first sample, not yet chosen by a person.",
+  "member": {"member_id": 1052, "speech_id": 178379, "printed": "SUSHRI MAHUA MOITRA (KRISHNANAGAR)"},
+  "quote": {"speech_id": 178379, "text": "The MGNREGA, which was a demand-driven employment program, has been now replaced by an allocation-based scheme which the Central Government can alter at whim."},
+  "trend": {"tag": "arrears"},
+  "search_ideas": ["latur", "mahatma-gandhi-national-rural-employment-guarantee-act-mnrega", "arrears", "gaya"]
+}
