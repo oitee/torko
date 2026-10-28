@@ -216,6 +216,29 @@ export default function PlaceWhen({
       </div>
 
       <div className="place-when__bottom">
+        {selectedSession && (() => {
+          const picked = (sessions || []).find((x) => `${x.term}-${x.session}` === selectedSession);
+          if (!picked) return null;
+          return (
+            <p className="place-when__selected" role="status">
+              <span>
+                The list of speeches shows {termOrdinal(picked.term)} LS, session {picked.session}
+                {picked.year ? ` (${picked.year})` : ""}: {formatNumber(picked.n)}{" "}
+                {picked.n === 1 ? "speech" : "speeches"}.
+              </span>{" "}
+              <a href="#speeches" className="place-when__selected-link">
+                Go to the speeches
+              </a>{" "}
+              <button
+                type="button"
+                className="button button--text"
+                onClick={() => onToggleSession && onToggleSession(picked)}
+              >
+                Show all sessions
+              </button>
+            </p>
+          );
+        })()}
         <p className="place-when__hint">
           Pick a session to read its speeches. An empty slot means no speech
           named this place in that session.

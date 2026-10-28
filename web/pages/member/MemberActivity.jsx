@@ -2,7 +2,12 @@ import React, { useId, useState } from "react";
 import { formatNumber, termLong, termShort } from "../../assets/js/format.js";
 import Button from "../../components/Button.jsx";
 
-export default function MemberActivity({ sessions = [], terms = [] }) {
+export default function MemberActivity({
+  sessions = [],
+  terms = [],
+  selectedSession = null,
+  onSelectSession,
+}) {
   const [showTable, setShowTable] = useState(false);
   const [activeSession, setActiveSession] = useState(null);
   const tableId = useId();
@@ -170,20 +175,24 @@ export default function MemberActivity({ sessions = [], terms = [] }) {
                               ? Math.min(100, Math.max(0, (s.house_median / yMax) * 100))
                               : 0;
                           const isHovered = activeSession === s;
+                          const isSelected = selectedSession === `${s.term}-${s.session}`;
                           const ariaLabel = `${s.label}: ${s.n} speeches, house median ${
                             s.house_median != null ? s.house_median : "none"
                           }`;
 
                           return (
-                            <div
+                            <button
+                              type="button"
                               key={sIdx}
-                              className="member-activity__bar-slot"
+                              className={`member-activity__bar-slot${
+                                isSelected ? " member-activity__bar-slot--selected" : ""
+                              }`}
                               onMouseEnter={() => setActiveSession(s)}
                               onMouseLeave={() => setActiveSession(null)}
                               onFocus={() => setActiveSession(s)}
                               onBlur={() => setActiveSession(null)}
-                              tabIndex={0}
-                              role="img"
+                              onClick={() => onSelectSession && onSelectSession(s)}
+                              aria-pressed={isSelected}
                               aria-label={ariaLabel}
                             >
                               {s.n > 0 && (
@@ -208,7 +217,7 @@ export default function MemberActivity({ sessions = [], terms = [] }) {
                                   </span>
                                 </div>
                               )}
-                            </div>
+                            </button>
                           );
                         })}
                       </div>
@@ -237,7 +246,17 @@ export default function MemberActivity({ sessions = [], terms = [] }) {
                           ? Math.min(100, Math.max(0, (s.house_median / yMax) * 100))
                           : 0;
                       return (
-                        <div key={sIdx} className="member-activity__narrow-row">
+                        <button
+                          type="button"
+                          key={sIdx}
+                          className={`member-activity__narrow-row${
+                            selectedSession === `${s.term}-${s.session}`
+                              ? " member-activity__narrow-row--selected"
+                              : ""
+                          }`}
+                          aria-pressed={selectedSession === `${s.term}-${s.session}`}
+                          onClick={() => onSelectSession && onSelectSession(s)}
+                        >
                           <span className="member-activity__narrow-label mono">
                             {s.label}
                           </span>
@@ -258,7 +277,7 @@ export default function MemberActivity({ sessions = [], terms = [] }) {
                           <span className="member-activity__narrow-count mono">
                             {s.n}
                           </span>
-                        </div>
+                        </button>
                       );
                     })}
                   </div>
@@ -267,6 +286,31 @@ export default function MemberActivity({ sessions = [], terms = [] }) {
             </div>
           </div>
         )}
+
+        {(() => {
+          const picked = selectedSession
+            ? sessions.find((x) => `${x.term}-${x.session}` === selectedSession)
+            : null;
+          if (!picked) return null;
+          return (
+            <p className="member-activity__selected" role="status">
+              <span>
+                The list of speeches shows {picked.label}: {formatNumber(picked.n)}{" "}
+                {picked.n === 1 ? "speech" : "speeches"}.
+              </span>{" "}
+              <a href="#speeches" className="member-activity__selected-link">
+                Go to the speeches
+              </a>{" "}
+              <button
+                type="button"
+                className="button button--text"
+                onClick={() => onSelectSession && onSelectSession(picked)}
+              >
+                Show all sessions
+              </button>
+            </p>
+          );
+        })()}
 
         <div className="member-activity__note meta">
           Pick a session to read its speeches. The dashed line is the median member in that session.

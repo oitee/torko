@@ -321,6 +321,7 @@
   min-width: 0;
   position: relative;
   padding: 0;
+  border: 0;
   background: transparent;
   cursor: pointer;
   outline: none;
@@ -976,4 +977,44 @@
 /* On the member page every speech is by this member, so the speaker line under each speech says nothing new. */
 .member-speeches .speaker-line {
   display: none;
+}
+
+.member-activity__bar-slot--selected .member-activity__bar {
+  background: var(--ink);
+}
+
+.member-activity__bar-slot--selected {
+  box-shadow: inset 0 -2px 0 var(--ink);
+}
+
+.member-activity__narrow-row {
+  width: 100%;
+  border-left: 0;
+  border-right: 0;
+  border-top: 0;
+  background: transparent;
+  font: inherit;
+  color: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+
+.member-activity__narrow-row--selected .member-activity__narrow-label {
+  font-weight: 600;
+}
+
+.member-activity__selected {
+  margin: var(--space-2) 0 0;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0 var(--space-3);
+  font-size: var(--size-body);
+  line-height: var(--lh-body);
+  color: var(--ink);
+}
+
+.member-activity__selected-link {
+  color: var(--action);
+  text-underline-offset: 3px;
 }

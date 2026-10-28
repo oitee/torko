@@ -109,6 +109,13 @@ export default function Place() {
     }
     next.delete("page");
     setSearchParams(next);
+    // The list is far below the chart, so the page moves to it after a pick.
+    if (selectedSession !== sessionVal) {
+      setTimeout(() => {
+        const el = document.getElementById("speeches");
+        if (el) el.scrollIntoView({ behavior: "smooth" });
+      }, 50);
+    }
   };
 
   if (loading && !place) {

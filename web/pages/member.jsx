@@ -28,7 +28,7 @@ export default function Member() {
 
   // Address search parameters for speeches
   const urlFilters = {};
-  for (const key of ["term", "kind", "subject", "min_words"]) {
+  for (const key of ["term", "kind", "subject", "session", "min_words"]) {
     const val = searchParams.get(key);
     if (val) {
       urlFilters[key] = val;
@@ -103,6 +103,26 @@ export default function Member() {
     setSearchParams(next);
   };
 
+  // A pick on the activity chart shows that session in the list. A second pick on it shows all sessions again.
+  const selectedSession = searchParams.get("session") || null;
+  const handleSelectSession = (s) => {
+    const value = `${s.term}-${s.session}`;
+    const next = new URLSearchParams(searchParams);
+    if (selectedSession === value) {
+      next.delete("session");
+    } else {
+      next.set("session", value);
+    }
+    next.delete("page");
+    setSearchParams(next);
+    if (selectedSession !== value) {
+      setTimeout(() => {
+        const el = document.getElementById("speeches");
+        if (el) el.scrollIntoView({ behavior: "smooth" });
+      }, 50);
+    }
+  };
+
   if (loading) {
     return (
       <main className="member-page member-page--loading">
@@ -158,6 +178,8 @@ export default function Member() {
             <MemberActivity
               sessions={member.sessions}
               terms={member.terms || []}
+              selectedSession={selectedSession}
+              onSelectSession={handleSelectSession}
             />
           )}
 
