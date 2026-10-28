@@ -9,10 +9,9 @@
   scroll-margin-top: 0.5rem;
 }
 
+/* The header adds no box of its own. The filter bar is then a child of the whole section, so it stays at the top until the record ends. */
 .debate-transcript__header {
-  display: flex;
-  flex-direction: column;
-  gap: var(--space-3);
+  display: contents;
 }
 
 .debate-transcript__header-top {
@@ -209,7 +208,7 @@
   flex: none;
   width: 15rem;
   position: sticky;
-  top: 1rem;
+  top: calc(var(--filter-bar-height, 0px) + var(--space-4));
   display: flex;
   flex-direction: column;
   gap: var(--space-2);
@@ -351,7 +350,7 @@
 
 .debate-speech-card {
   position: sticky;
-  top: 6rem;
+  top: calc(var(--filter-bar-height, 0px) + var(--space-4));
   background: var(--sheet);
   border: 1px solid var(--hairline);
   border-top: 2px solid var(--ink);
@@ -494,6 +493,10 @@
   color: var(--ink);
 }
 
+.debate-transcript__speaker-name--unidentified {
+  color: var(--ink-2);
+}
+
 .debate-transcript__turn-meta {
   font-size: var(--size-count);
   font-weight: 400;
@@ -619,5 +622,21 @@
     min-width: 0;
     max-width: 100%;
     font-size: 1rem;
+  }
+}
+
+/* On a touch screen, each control is at least 44px tall. */
+@media (pointer: coarse) {
+  .debate-transcript__read-more,
+  .debate-transcript__select,
+  .debate-transcript__filter-tag-pill {
+    min-height: var(--control-height);
+    align-items: center;
+  }
+
+  .debate-transcript__speaker-link {
+    display: inline-flex;
+    align-items: center;
+    min-height: var(--control-height);
   }
 }

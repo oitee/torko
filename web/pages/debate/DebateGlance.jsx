@@ -21,8 +21,12 @@ export function buildGlanceData(debate) {
   const memN = people.length;
   const spCountText = spN === 1 ? "1 speech" : `${formatNumber(spN)} speeches`;
   const memCountText = memN === 1 ? "1 member" : `${formatNumber(memN)} members`;
+  const hasUnidentified = (debate?.unidentified?.speeches || 0) > 0;
 
-  let sentence = `${spCountText} by ${memCountText}.`;
+  // With an unidentified speaker, "by N members" would leave that speech out, so the count says what it counts.
+  let sentence = hasUnidentified
+    ? `${spCountText}. ${memCountText} identified.`
+    : `${spCountText} by ${memCountText}.`;
 
   const topTag = tags.length > 0 ? tags[0] : null;
   if (topTag) {
@@ -39,7 +43,7 @@ export function buildGlanceData(debate) {
 
   const figures = [
     { n: formatNumber(spN), label: spN === 1 ? "speech" : "speeches" },
-    { n: formatNumber(memN), label: memN === 1 ? "member spoke" : "members spoke" },
+    { n: formatNumber(memN), label: memN === 1 ? "member identified" : "members identified" },
     { n: formatNumber(totalWords), label: "words in all speeches" },
     { n: formatNumber(totalInterruptions), label: "interruptions inside speeches" },
   ];

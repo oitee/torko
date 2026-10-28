@@ -22,8 +22,6 @@
   font-size: var(--size-count);
   line-height: 1;
   font-weight: 500;
-  letter-spacing: 0.06em;
-  text-transform: uppercase;
   color: var(--meta);
 }
 
@@ -34,6 +32,25 @@
   font-weight: 600;
   color: var(--ink);
   max-width: 32ch;
+}
+
+/* A long title stops after 3 lines, so the first screen still shows the answer. */
+.debate-head__title--cut {
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 3;
+  overflow: hidden;
+}
+
+/* The full title is long, so it uses the title size and a wider line. */
+.debate-head__title--open {
+  font-size: var(--size-title);
+  line-height: var(--lh-title);
+  max-width: 60ch;
+}
+
+.debate-head__title-toggle {
+  align-self: flex-start;
 }
 
 .debate-head__date {

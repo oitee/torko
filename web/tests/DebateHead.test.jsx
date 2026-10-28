@@ -75,3 +75,14 @@ describe("DebateHead", () => {
     ).toBeTruthy();
   });
 });
+
+describe("DebateHead title", () => {
+  it("has no title button when the title fits", () => {
+    render(
+      <MemoryRouter>
+        <DebateHead debate={{ title: "Short title", date: "2024-03-12", term: 17, session: 3 }} />
+      </MemoryRouter>
+    );
+    expect(screen.queryByRole("button", { name: "Show full title" })).toBeNull();
+  });
+});

@@ -1,4 +1,4 @@
-import React, { useRef, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { formatDateLong, termLong } from "../../assets/js/format.js";
 import Breadcrumb from "../../components/Breadcrumb.jsx";
 import Button from "../../components/Button.jsx";
@@ -56,6 +56,21 @@ export default function DebateHead({ debate }) {
   const [citeOpen, setCiteOpen] = useState(false);
   const [copied, setCopied] = useState(false);
   const citeButtonWrapRef = useRef(null);
+  const titleRef = useRef(null);
+  const [titleOpen, setTitleOpen] = useState(false);
+  const [titleCut, setTitleCut] = useState(false);
+
+  // The title stops after 3 lines. The button shows only when the title is longer than that.
+  useEffect(() => {
+    const el = titleRef.current;
+    if (!el || titleOpen) return undefined;
+    const measure = () => setTitleCut(el.scrollHeight > el.clientHeight + 1);
+    measure();
+    if (typeof ResizeObserver === "undefined") return undefined;
+    const observer = new ResizeObserver(measure);
+    observer.observe(el);
+    return () => observer.disconnect();
+  }, [debate?.title, titleOpen]);
 
   if (!debate) return null;
 
@@ -85,7 +100,26 @@ export default function DebateHead({ debate }) {
           <span className="debate-head__kicker mono">
             {debate.kind_label || "Debate"}
           </span>
-          <h1 className="debate-head__title">{debate.title}</h1>
+          <h1
+            ref={titleRef}
+            id="debate-title"
+            className={`debate-head__title ${
+              titleOpen ? "debate-head__title--open" : "debate-head__title--cut"
+            }`}
+          >
+            {debate.title}
+          </h1>
+          {(titleCut || titleOpen) && (
+            <button
+              type="button"
+              className="button button--text debate-head__title-toggle"
+              aria-controls="debate-title"
+              aria-expanded={titleOpen}
+              onClick={() => setTitleOpen(!titleOpen)}
+            >
+              {titleOpen ? "Show less of the title" : "Show full title"}
+            </button>
+          )}
           <span className="debate-head__date mono">{weekdayDate}</span>
         </div>
 

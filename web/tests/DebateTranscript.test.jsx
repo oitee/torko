@@ -224,3 +224,23 @@ describe("DebateTranscript", () => {
     expect(screen.getByText("This debate has no speech. It has 1 turn.")).toBeTruthy();
   });
 });
+
+describe("DebateTranscript counts and filters", () => {
+  it("writes one speech in the singular and hides filters with no options", () => {
+    render(
+      <MemoryRouter>
+        <DebateTranscript
+          speeches={[{ ...mockSpeeches[0], member: null, member_id: null, tags: [] }]}
+          turns={[{ ...mockTurns[1], member: null, member_id: null, attributed: false, kind: "unattributed" }]}
+          people={[]}
+          tags={[]}
+        />
+      </MemoryRouter>
+    );
+    expect(
+      screen.getByText("Showing the whole debate in order: 1 speech, 0 members identified.")
+    ).toBeTruthy();
+    expect(screen.queryByRole("combobox")).toBeNull();
+    expect(screen.queryByText(/1 speeches/)).toBeNull();
+  });
+});

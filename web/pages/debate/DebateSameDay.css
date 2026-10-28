@@ -35,7 +35,12 @@
   border-bottom: 1px solid var(--hair);
 }
 
+/* A very long title stops after 2 lines. The full title is in the link's tooltip and on the debate page. */
 .debate-same-day__link {
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  overflow: hidden;
   font: 500 0.875rem/1.35 var(--font-sans);
   color: var(--ink);
   text-decoration: none;
@@ -47,6 +52,17 @@
 }
 
 .debate-same-day__meta {
-  font: 400 0.75rem/1.35 var(--font-sans);
+  font: 400 var(--size-count)/var(--lh-count) var(--font-sans);
   color: var(--meta);
+}
+
+/* The whole row opens the debate, so the touch target is the row, not only the line of text. */
+.debate-same-day__item {
+  position: relative;
+}
+
+.debate-same-day__link::after {
+  content: "";
+  position: absolute;
+  inset: 0;
 }

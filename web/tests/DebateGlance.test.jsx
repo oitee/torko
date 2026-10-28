@@ -28,7 +28,7 @@ describe("DebateGlance", () => {
     );
     expect(data.figures).toHaveLength(4);
     expect(data.figures[0]).toEqual({ n: "2", label: "speeches" });
-    expect(data.figures[1]).toEqual({ n: "2", label: "members spoke" });
+    expect(data.figures[1]).toEqual({ n: "2", label: "members identified" });
     expect(data.figures[2]).toEqual({ n: "800", label: "words in all speeches" });
     expect(data.figures[3]).toEqual({ n: "3", label: "interruptions inside speeches" });
   });
@@ -59,5 +59,19 @@ describe("DebateGlance", () => {
     ).toBeTruthy();
     expect(screen.getByText("800")).toBeTruthy();
     expect(screen.getByText("words in all speeches")).toBeTruthy();
+  });
+});
+
+describe("buildGlanceData with an unidentified speaker", () => {
+  it("says how many members Torko identified, not who spoke", () => {
+    const data = buildGlanceData({
+      speeches: [{ id: 1, words: 177, interruptions: 0 }],
+      people: [],
+      turn_list: [],
+      tags: [],
+      unidentified: { speeches: 1, turns: 1, words: 177 },
+    });
+    expect(data.sentence).toBe("1 speech. 0 members identified.");
+    expect(data.figures[1]).toEqual({ n: "0", label: "members identified" });
   });
 });

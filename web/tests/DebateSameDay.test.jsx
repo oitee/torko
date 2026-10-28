@@ -1,6 +1,6 @@
 import React from "react";
 import { describe, it, expect, afterEach } from "vitest";
-import { cleanup, render, screen } from "@testing-library/react";
+import { cleanup, fireEvent, render, screen } from "@testing-library/react";
 import { MemoryRouter } from "react-router-dom";
 import DebateSameDay from "../pages/debate/DebateSameDay.jsx";
 
@@ -65,5 +65,24 @@ describe("DebateSameDay", () => {
       </MemoryRouter>
     );
     expect(c2.firstChild).toBeNull();
+  });
+});
+
+describe("DebateSameDay with a long list", () => {
+  it("shows the first 5 debates and a button for all of them", () => {
+    const many = Array.from({ length: 8 }, (_, i) => ({
+      id: 200 + i,
+      title: `Debate ${i + 1}`,
+      kind_label: "Other",
+      speeches: 1,
+    }));
+    render(
+      <MemoryRouter>
+        <DebateSameDay sameDay={many} date="2024-03-12" />
+      </MemoryRouter>
+    );
+    expect(screen.getAllByRole("link")).toHaveLength(5);
+    fireEvent.click(screen.getByRole("button", { name: "Show all 8 debates" }));
+    expect(screen.getAllByRole("link")).toHaveLength(8);
   });
 });

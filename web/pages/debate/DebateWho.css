@@ -175,3 +175,13 @@ a.debate-who__silent-name:hover {
 .debate-who__more {
   padding: var(--space-2) var(--space-4);
 }
+
+/* On a touch screen, each member link is at least 44px tall. */
+@media (pointer: coarse) {
+  .debate-who__name,
+  a.debate-who__silent-name {
+    display: inline-flex;
+    align-items: center;
+    min-height: var(--control-height);
+  }
+}

@@ -29,7 +29,7 @@ export default function DebateMethodSource({ term, session_label, date, source_u
               inside a speech. It stays in its place, indented. It is not part of the speech.
             </p>
             <p>
-              <strong>TLDR.</strong> One or two sentences for each speech of 99 words or more.
+              <strong>TLDR.</strong> One or two sentences for each speech of 50 words or more.
               Shorter speeches have no TLDR. The record is the source.
             </p>
             <p>

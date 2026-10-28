@@ -10,6 +10,10 @@ import Popover from "../../components/Popover.jsx";
 import TLDR from "../../components/TLDR.jsx";
 import "./DebateTranscript.css";
 
+export function countText(n, one, many) {
+  return n === 1 ? `1 ${one}` : `${formatNumber(n)} ${many}`;
+}
+
 // Helper to format turn speaker display
 export function getSpeakerDetails(turn) {
   if (turn.kind === "presiding" || turn.role_kind === "presiding") {
@@ -53,6 +57,20 @@ export default function DebateTranscript({
   const [phoneSheetOpen, setPhoneSheetOpen] = useState(false);
   const [cardExpandedPhone, setCardExpandedPhone] = useState({});
   const jumpButtonRef = useRef(null);
+  const sectionRef = useRef(null);
+  const filterBarRef = useRef(null);
+
+  // The rail and the speech card stick below the filter bar, so the section holds the bar's height.
+  useEffect(() => {
+    const bar = filterBarRef.current;
+    const section = sectionRef.current;
+    if (!bar || !section || typeof ResizeObserver === "undefined") return undefined;
+    const observer = new ResizeObserver(() => {
+      section.style.setProperty("--filter-bar-height", `${bar.offsetHeight}px`);
+    });
+    observer.observe(bar);
+    return () => observer.disconnect();
+  }, []);
 
   // Map speech id to speech object
   const speechMap = {};
@@ -193,9 +211,11 @@ export default function DebateTranscript({
       ? `This debate has no speech. It has ${turns.length} ${
           turns.length === 1 ? "turn" : "turns"
         }.`
-      : `Showing the whole debate in order: ${formatNumber(
-          speeches.length
-        )} speeches by ${formatNumber(people.length)} members.`;
+      : `Showing the whole debate in order: ${countText(
+          speeches.length,
+          "speech",
+          "speeches"
+        )}, ${countText(people.length, "member", "members")} identified.`;
   if (activeTag) {
     const count = activeTag.speeches;
     const spWord = count === 1 ? "1 speech" : `${count} speeches`;
@@ -223,13 +243,22 @@ export default function DebateTranscript({
 
   const visCountText =
     activeTag || activeMember
-      ? `${shownSpeechesCount} of ${speeches.length} speeches shown`
+      ? `${shownSpeechesCount} of ${countText(speeches.length, "speech", "speeches")} shown`
       : speeches.length === 0
       ? `${formatNumber(turns.length)} turns`
-      : `${formatNumber(speeches.length)} speeches · ${formatNumber(people.length)} members`;
+      : `${countText(speeches.length, "speech", "speeches")} · ${countText(
+          people.length,
+          "member",
+          "members"
+        )} identified`;
 
   return (
-    <section id="debate" className="debate-transcript" aria-labelledby="debate-heading">
+    <section
+      id="debate"
+      ref={sectionRef}
+      className="debate-transcript"
+      aria-labelledby="debate-heading"
+    >
       <div className="debate-transcript__header">
         <div className="debate-transcript__header-top">
           <h2 id="debate-heading" className="debate-transcript__title">
@@ -238,14 +267,16 @@ export default function DebateTranscript({
           <span className="debate-transcript__meta mono">
             {speeches.length === 0
               ? `${formatNumber(turns.length)} turns · in the order of the record`
-              : `${formatNumber(speeches.length)} speeches · ${formatNumber(
-                  people.length
-                )} members · in the order of the record`}
+              : `${countText(speeches.length, "speech", "speeches")} · ${countText(
+                  people.length,
+                  "member",
+                  "members"
+                )} identified · in the order of the record`}
           </span>
         </div>
 
         {/* Filter bar */}
-        <div className="debate-transcript__filter-bar" role="status">
+        <div ref={filterBarRef} className="debate-transcript__filter-bar" role="status">
           <div className="debate-transcript__filter-status">
             <p className="debate-transcript__filter-sentence">{filterSentence}</p>
             {activeTag && (
@@ -271,6 +302,7 @@ export default function DebateTranscript({
           </div>
 
           <div className="debate-transcript__filter-controls">
+            {tags.length > 0 && (
             <label className="debate-transcript__filter-label">
               Tag
               <select
@@ -289,7 +321,9 @@ export default function DebateTranscript({
                 ))}
               </select>
             </label>
+            )}
 
+            {people.length > 0 && (
             <label className="debate-transcript__filter-label">
               Member
               <select
@@ -308,6 +342,7 @@ export default function DebateTranscript({
                 ))}
               </select>
             </label>
+            )}
 
             <span className="debate-transcript__vis-count mono">{visCountText}</span>
           </div>
@@ -597,7 +632,13 @@ function TurnItem({ turn, muted = false, expanded = false, onToggle }) {
     );
   } else {
     headerSpeaker = (
-      <span className="debate-transcript__speaker-name">{details.name}</span>
+      <span
+        className={`debate-transcript__speaker-name${
+          details.isUnidentified ? " debate-transcript__speaker-name--unidentified" : ""
+        }`}
+      >
+        {details.name}
+      </span>
     );
   }
 
