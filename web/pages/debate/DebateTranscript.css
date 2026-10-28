@@ -1,0 +1,623 @@
+/* DebateTranscript styles. All values come from tokens.css. */
+
+.debate-transcript {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+  border-top: 1px solid var(--ink);
+  padding-top: var(--space-5);
+  scroll-margin-top: 0.5rem;
+}
+
+.debate-transcript__header {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+
+.debate-transcript__header-top {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: var(--space-2) var(--space-4);
+}
+
+.debate-transcript__title {
+  margin: 0;
+  font-size: var(--size-title);
+  line-height: var(--lh-title);
+  font-weight: 600;
+  color: var(--ink);
+}
+
+.debate-transcript__meta {
+  font-size: var(--size-count);
+  line-height: var(--lh-count);
+  color: var(--ink-2);
+}
+
+/* Filter bar */
+.debate-transcript__filter-bar {
+  position: sticky;
+  top: 0;
+  z-index: 10;
+  background: var(--sheet);
+  border: 1px solid var(--hairline);
+  border-top: 2px solid var(--ink);
+  padding: var(--space-3) var(--space-4);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+
+.debate-transcript__filter-status {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-2) var(--space-4);
+}
+
+.debate-transcript__filter-sentence {
+  margin: 0;
+  flex: 1 1 20rem;
+  font-size: var(--size-body);
+  line-height: var(--lh-body);
+  font-weight: 500;
+  color: var(--ink);
+}
+
+.debate-transcript__filter-tag-pill {
+  min-height: 2.25rem;
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  padding: 0 var(--space-3);
+  border: 1px solid var(--action);
+  background: var(--ground);
+  color: var(--action);
+  font-family: var(--font-sans);
+  font-size: var(--size-count);
+  line-height: 1;
+  font-weight: 500;
+  cursor: pointer;
+}
+
+.debate-transcript__filter-tag-pill:hover {
+  background: var(--hairline);
+}
+
+.debate-transcript__filter-controls {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-2) var(--space-5);
+  border-top: 1px solid var(--hairline);
+  padding-top: var(--space-2);
+}
+
+.debate-transcript__filter-label {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  font-size: var(--size-count);
+  line-height: 1;
+  font-weight: 500;
+  color: var(--ink-2);
+}
+
+.debate-transcript__select {
+  min-height: 2.25rem;
+  padding: 0 var(--space-2);
+  border: 1px solid var(--control);
+  background: var(--sheet);
+  color: var(--ink);
+  font-family: var(--font-sans);
+  font-size: var(--size-label);
+  line-height: var(--lh-label);
+  cursor: pointer;
+}
+
+.debate-transcript__vis-count {
+  margin-left: auto;
+  font-size: var(--size-count);
+  line-height: var(--lh-count);
+  color: var(--meta);
+}
+
+/* Phone jump button */
+.debate-transcript__phone-jump {
+  display: none;
+}
+
+.debate-transcript__jump-wrap {
+  position: relative;
+  width: 100%;
+}
+
+.debate-transcript__jump-btn {
+  width: 100%;
+  min-height: var(--control-height);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 var(--space-3);
+  border: 1px solid var(--control);
+  background: var(--sheet);
+  color: var(--ink);
+  font-family: var(--font-sans);
+  font-size: var(--size-label);
+  font-weight: 500;
+  cursor: pointer;
+}
+
+.debate-transcript__jump-popover {
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 50;
+  max-height: 80vh;
+  background: var(--sheet);
+  border-top: 2px solid var(--ink);
+  box-shadow: var(--shadow-popover);
+  overflow-y: auto;
+}
+
+.debate-transcript__jump-sheet-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: var(--space-2) var(--space-4);
+  border-bottom: 1px solid var(--hairline);
+}
+
+.debate-transcript__jump-sheet-title {
+  font-size: var(--size-title);
+  font-weight: 600;
+  color: var(--ink);
+}
+
+.debate-transcript__jump-close {
+  min-width: var(--control-height);
+  min-height: var(--control-height);
+  border: 0;
+  background: transparent;
+  color: var(--ink);
+  font-family: var(--font-mono);
+  font-size: 1.125rem;
+  cursor: pointer;
+}
+
+.debate-transcript__jump-list {
+  list-style: none;
+  margin: 0;
+  padding: var(--space-2) var(--space-4) var(--space-8);
+  display: flex;
+  flex-direction: column;
+}
+
+/* Columns layout */
+.debate-transcript__columns {
+  display: flex;
+  gap: var(--space-6);
+  align-items: flex-start;
+  margin-top: var(--space-4);
+}
+
+/* Left rail */
+.debate-transcript__rail {
+  flex: none;
+  width: 15rem;
+  position: sticky;
+  top: 1rem;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+.debate-transcript__rail-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  padding-bottom: var(--space-2);
+  border-bottom: 1px solid var(--ink);
+}
+
+.debate-transcript__rail-title {
+  font-size: var(--size-label);
+  line-height: var(--lh-label);
+  font-weight: 600;
+  color: var(--ink);
+}
+
+.debate-transcript__rail-total {
+  font-size: var(--size-count);
+  line-height: var(--lh-count);
+  color: var(--meta);
+}
+
+.debate-transcript__rail-note {
+  margin: 0;
+  font-size: var(--size-count);
+  line-height: var(--lh-count);
+}
+
+.debate-transcript__rail-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+.debate-transcript__rail-btn {
+  display: grid;
+  grid-template-columns: 1.5rem minmax(0, 1fr) 0.75rem;
+  gap: var(--space-2);
+  align-items: center;
+  width: 100%;
+  min-height: 2.75rem;
+  padding: var(--space-1) var(--space-2);
+  border: 0;
+  border-bottom: 1px solid var(--hairline);
+  background: transparent;
+  text-align: left;
+  color: var(--ink);
+  cursor: pointer;
+  font-family: inherit;
+}
+
+.debate-transcript__rail-btn:hover {
+  background: var(--sheet);
+}
+
+.debate-transcript__rail-btn--active {
+  background: var(--sheet);
+  box-shadow: inset 3px 0 0 var(--ink);
+}
+
+.debate-transcript__rail-ord {
+  font-size: var(--size-count);
+  line-height: var(--lh-count);
+  color: var(--meta);
+}
+
+.debate-transcript__rail-text {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+
+.debate-transcript__rail-name {
+  font-size: var(--size-count);
+  line-height: 1.3;
+  font-weight: 500;
+  color: var(--ink);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.debate-transcript__rail-meta {
+  font-size: var(--size-count);
+  line-height: 1.2;
+}
+
+.debate-transcript__rail-mark {
+  font-size: 0.625rem;
+  line-height: 1;
+  color: var(--ink);
+}
+
+/* Flow: Middle and Right */
+.debate-transcript__flow {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-6);
+}
+
+/* Speech row grid (desktop: middle turns + right card) */
+.debate-transcript__speech-row {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 17rem;
+  column-gap: var(--space-6);
+  position: relative;
+  align-items: flex-start;
+}
+
+.debate-transcript__speech-row--bracket {
+  padding-left: var(--space-4);
+  border-left: 2px solid var(--ink);
+}
+
+.debate-transcript__phone-card-wrap {
+  display: none;
+}
+
+.debate-transcript__turns-col {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-5);
+  min-width: 0;
+}
+
+/* Card column (sticky on desktop) */
+.debate-transcript__card-col {
+  min-width: 0;
+}
+
+.debate-speech-card {
+  position: sticky;
+  top: 6rem;
+  background: var(--sheet);
+  border: 1px solid var(--hairline);
+  border-top: 2px solid var(--ink);
+  padding: var(--space-3) var(--space-4);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+
+.debate-speech-card__header {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.debate-speech-card__title {
+  font-size: var(--size-label);
+  line-height: var(--lh-label);
+  font-weight: 400;
+  color: var(--meta);
+}
+
+.debate-speech-card__name {
+  font-weight: 600;
+  color: var(--ink);
+}
+
+.debate-speech-card__stats {
+  font-size: var(--size-count);
+  line-height: var(--lh-count);
+}
+
+.debate-speech-card__tldr {
+  padding-top: var(--space-2);
+  border-top: 1px solid var(--hairline);
+}
+
+.debate-speech-card__chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-1);
+  padding-top: var(--space-2);
+  border-top: 1px solid var(--hairline);
+}
+
+.debate-speech-card__footer {
+  padding-top: var(--space-2);
+  border-top: 1px solid var(--hairline);
+}
+
+.debate-speech-card__link {
+  font-size: var(--size-count);
+  line-height: var(--lh-count);
+  font-weight: 500;
+  color: var(--action);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+.debate-speech-card__link:hover {
+  color: var(--action-hover);
+}
+
+/* Folded / hide bar */
+.debate-transcript__folded-box {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+
+.debate-transcript__fold-bar {
+  width: 100%;
+  min-height: 2.25rem;
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  padding: 0 var(--space-3);
+  border: 0;
+  border-top: 1px dashed var(--control);
+  border-bottom: 1px dashed var(--control);
+  background: transparent;
+  color: var(--meta);
+  cursor: pointer;
+  text-align: left;
+  font-family: var(--font-sans);
+  font-size: var(--size-count);
+  line-height: var(--lh-count);
+}
+
+.debate-transcript__fold-bar:hover {
+  background: var(--sheet);
+}
+
+.debate-transcript__fold-bar--opened {
+  border-bottom: 0;
+}
+
+.debate-transcript__fold-action {
+  margin-left: auto;
+  color: var(--action);
+  font-weight: 500;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+/* Turns */
+.debate-transcript__turn {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+}
+
+.debate-transcript__turn--interruption {
+  padding-left: 2rem;
+  border-left: 2px solid var(--hairline);
+}
+
+.debate-transcript__turn--muted {
+  opacity: 0.7;
+}
+
+.debate-transcript__turn-header {
+  font-size: var(--size-label);
+  line-height: var(--lh-label);
+  font-weight: 600;
+  color: var(--ink);
+}
+
+.debate-transcript__speaker-link {
+  color: var(--action);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+.debate-transcript__speaker-link:hover {
+  color: var(--action-hover);
+}
+
+.debate-transcript__speaker-name {
+  color: var(--ink);
+}
+
+.debate-transcript__turn-meta {
+  font-size: var(--size-count);
+  font-weight: 400;
+}
+
+.debate-transcript__turn-body {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  max-width: 64ch;
+}
+
+.debate-transcript__para {
+  margin: 0;
+  font-size: var(--size-speech);
+  line-height: var(--lh-speech);
+  color: var(--ink);
+}
+
+.debate-transcript__turn--interruption .debate-transcript__para {
+  font-size: var(--size-body);
+  line-height: var(--lh-body);
+  color: var(--ink-2);
+}
+
+.debate-transcript__read-more {
+  display: inline-flex;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: var(--action);
+  font-family: var(--font-sans);
+  font-size: var(--size-body);
+  font-weight: 500;
+  cursor: pointer;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  align-self: flex-start;
+}
+
+.debate-transcript__read-more:hover {
+  color: var(--action-hover);
+}
+
+/* Mobile responsive adjustments */
+@media (max-width: 1119px) {
+  .debate-transcript__rail {
+    display: none;
+  }
+
+  .debate-transcript__speech-row {
+    grid-template-columns: minmax(0, 1fr) 15rem;
+    column-gap: var(--space-4);
+  }
+}
+
+@media (max-width: 767px) {
+  .debate-transcript__phone-jump {
+    display: block;
+  }
+
+  .debate-transcript__speech-row {
+    grid-template-columns: 1fr;
+    gap: var(--space-4);
+  }
+
+  .debate-transcript__speech-row--bracket {
+    border-left: 2px solid var(--ink);
+    padding-left: var(--space-3);
+  }
+
+  .debate-transcript__card-col {
+    display: none;
+  }
+
+  .debate-transcript__phone-card-wrap {
+    display: flex;
+    flex-direction: column;
+    border: 1px solid var(--hairline);
+    background: var(--sheet);
+  }
+
+  .debate-transcript__phone-card-toggle {
+    width: 100%;
+    min-height: var(--control-height);
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: var(--space-1);
+    padding: var(--space-1) var(--space-3);
+    border: 0;
+    background: transparent;
+    color: var(--ink);
+    font-family: var(--font-sans);
+    font-size: var(--size-count);
+    font-weight: 500;
+    cursor: pointer;
+    text-align: left;
+  }
+
+  .debate-transcript__caret {
+    margin-left: auto;
+    color: var(--meta);
+  }
+
+  .debate-transcript__phone-card-content {
+    padding: 0 var(--space-3) var(--space-3);
+  }
+
+  .debate-transcript__turn--interruption {
+    padding-left: 1rem;
+  }
+}
+
+/* On a phone, each filter takes the whole width, so that a long tag name does not push the page wider than the screen. */
+@media (max-width: 767px) {
+  .debate-transcript__filter-label {
+    width: 100%;
+  }
+
+  .debate-transcript__select {
+    flex: 1;
+    min-width: 0;
+    max-width: 100%;
+    font-size: 1rem;
+  }
+}

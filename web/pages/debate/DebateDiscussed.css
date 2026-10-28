@@ -1,0 +1,37 @@
+/* DebateDiscussed styles. All values come from tokens.css. */
+
+.debate-discussed {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  border-top: 1px solid var(--ink);
+  padding-top: var(--space-5);
+}
+
+.debate-discussed__header {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+}
+
+.debate-discussed__heading {
+  margin: 0;
+  font-size: var(--size-heading);
+  line-height: var(--lh-heading);
+  font-weight: 600;
+  color: var(--ink);
+}
+
+.debate-discussed__sub {
+  margin: 0;
+  font-size: var(--size-body);
+  line-height: var(--lh-body);
+  color: var(--ink-2);
+}
+
+.debate-discussed__chips {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-2);
+}

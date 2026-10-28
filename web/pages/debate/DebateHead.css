@@ -1,0 +1,102 @@
+/* DebateHead styles. All values come from tokens.css. */
+
+/* PageLayout draws the sheet band and its padding. The head adds none of its own. */
+.debate-head {
+}
+
+.debate-head__container {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  margin: 0;
+  padding: 0;
+}
+
+.debate-head__title-group {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+.debate-head__kicker {
+  font-size: var(--size-count);
+  line-height: 1;
+  font-weight: 500;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--meta);
+}
+
+.debate-head__title {
+  margin: 0;
+  font-size: var(--size-display);
+  line-height: var(--lh-display);
+  font-weight: 600;
+  color: var(--ink);
+  max-width: 32ch;
+}
+
+.debate-head__date {
+  font-size: var(--size-label);
+  line-height: var(--lh-label);
+  color: var(--ink-2);
+}
+
+.debate-head__laid {
+  margin: 0;
+  font-size: var(--size-body);
+  line-height: var(--lh-body);
+  color: var(--meta);
+}
+
+.debate-head__actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-2);
+  margin-top: var(--space-1);
+}
+
+.debate-head__cite-wrap {
+  position: relative;
+  display: inline-block;
+}
+
+.debate-citation-popover {
+  position: absolute;
+  top: calc(100% + var(--space-2));
+  left: 0;
+  z-index: 20;
+  width: min(48rem, calc(100vw - 32px));
+  padding: var(--space-3) var(--space-4);
+  background: var(--ground);
+  border: 1px solid var(--hairline);
+  box-shadow: var(--shadow-popover);
+}
+
+.debate-citation {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+
+.debate-citation__text {
+  margin: 0;
+  font-size: var(--size-body);
+  line-height: var(--lh-body);
+  color: var(--ink);
+  overflow-wrap: anywhere;
+}
+
+.debate-citation__actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+.debate-citation__note {
+  font-size: var(--size-count);
+  line-height: var(--lh-count);
+  color: var(--meta);
+}

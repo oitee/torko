@@ -1,0 +1,48 @@
+/* Debate page top-level styles */
+
+.debate-page {
+  width: 100%;
+}
+
+.debate-page--loading,
+.debate-page--error {
+  max-width: 80rem;
+  margin: 0 auto;
+  padding: 3rem 1.5rem;
+  min-height: 50vh;
+}
+
+.debate-main {
+  display: flex;
+  flex-direction: column;
+  gap: clamp(1.75rem, 3.5vw, 2.5rem);
+  width: 100%;
+}
+
+/* Two-column responsive grid for What was discussed and Who spoke */
+.debate-two-col {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 30rem), 1fr));
+  gap: clamp(1.75rem, 3.5vw, 2.5rem);
+  align-items: start;
+}
+
+/* Bottom responsive grid for Same Day and Method / Source */
+.debate-bottom-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 20rem), 1fr));
+  gap: clamp(1.75rem, 3.5vw, 2.5rem);
+  align-items: start;
+}
+
+@media (max-width: 767px) {
+  .debate-two-col {
+    grid-template-columns: 1fr;
+    gap: 1.5rem;
+  }
+
+  .debate-bottom-grid {
+    grid-template-columns: 1fr;
+    gap: 1.5rem;
+  }
+}

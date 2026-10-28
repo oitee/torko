@@ -1,0 +1,53 @@
+/* DebateGlance styles. All values come from tokens.css. */
+
+.debate-glance {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+
+.debate-glance__heading {
+  margin: 0;
+  font-size: var(--size-title);
+  line-height: var(--lh-title);
+  font-weight: 600;
+  color: var(--ink);
+}
+
+.debate-glance__sentence {
+  margin: 0;
+  font-size: var(--size-speech);
+  line-height: var(--lh-speech);
+  color: var(--ink);
+  max-width: 62ch;
+}
+
+.debate-glance__figures {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 8.5rem), 1fr));
+  gap: 1px;
+  background: var(--hairline);
+  border: 1px solid var(--hairline);
+  margin-top: var(--space-1);
+}
+
+.debate-glance__fig-box {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+  padding: var(--space-3) var(--space-4);
+  background: var(--sheet);
+}
+
+.debate-glance__fig-num {
+  font-size: clamp(1.5rem, 2.6vw, 1.875rem);
+  line-height: 1;
+  font-weight: 500;
+  color: var(--ink);
+}
+
+.debate-glance__fig-label {
+  font-size: var(--size-count);
+  line-height: var(--lh-count);
+  color: var(--ink-2);
+}
