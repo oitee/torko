@@ -10,7 +10,8 @@ import "./SearchBox.css";
 const KIND_CONFIG = {
   tag: {
     heading: "Tags",
-    getHref: (item) => `/tag/${item.slug}`,
+    // A tag opens the search for its speeches. That page links to the tag page.
+    getHref: (item) => `/search?tag=${encodeURIComponent(item.slug)}`,
   },
   place: {
     heading: "Places",

@@ -28,7 +28,7 @@ function context(item) {
 }
 
 function href(item) {
-  if (item.kind === "tag") return `/tag/${item.slug}`;
+  if (item.kind === "tag") return `/search?tag=${encodeURIComponent(item.slug)}`;
   if (item.kind === "place") return `/place/${item.slug}`;
   if (item.kind === "member") return `/member/${item.id}`;
   return null;
@@ -73,7 +73,7 @@ export default function SearchMatches({ results, query }) {
                       {item.kind === "subject" && item.parent_tag_slug && (
                         <span className="search-matches__where">
                           Under{" "}
-                          <Link to={`/tag/${item.parent_tag_slug}`} className="search-matches__parent">
+                          <Link to={`/search?tag=${encodeURIComponent(item.parent_tag_slug)}`} className="search-matches__parent">
                             {item.parent_tag}
                           </Link>
                         </span>

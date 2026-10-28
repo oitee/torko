@@ -133,7 +133,7 @@ describe("SearchBox", () => {
     });
 
     const tagLink = screen.getByRole("option", { name: /Arrears 249/i });
-    expect(tagLink.getAttribute("href")).toBe("/tag/arrears");
+    expect(tagLink.getAttribute("href")).toBe("/search?tag=arrears");
 
     const placeLink = screen.getByRole("option", { name: /Latur 88/i });
     expect(placeLink.getAttribute("href")).toBe("/place/latur");
@@ -172,7 +172,7 @@ describe("SearchBox", () => {
 
     // Press Enter to navigate to selected suggestion
     fireEvent.keyDown(input, { key: "Enter" });
-    expect(screen.getByTestId("location").textContent).toBe("/tag/sugarcane-farmers-arrears");
+    expect(screen.getByTestId("location").textContent).toBe("/search?tag=sugarcane-farmers-arrears");
   });
 
   it("navigates to /search?q=<text> when Enter is pressed with no suggestion selected", () => {
