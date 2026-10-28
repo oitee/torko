@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import { Link } from "react-router-dom";
 import Button from "../../components/Button.jsx";
 import SourceChip, { SOURCE_CONFIG } from "./SourceChip.jsx";
 import "./SpeechTags.css";
@@ -56,8 +57,8 @@ export default function SpeechTags({
           <li key={tag.slug || tag.name} className="speech-tags__item">
             <SourceChip
               tag={tag}
-              isWhyOpen={openTag?.name === tag.name}
-              onWhyClick={() => handleWhyClick(tag)}
+              selected={openTag?.name === tag.name}
+              onSelect={() => handleWhyClick(tag)}
             />
           </li>
         ))}
@@ -107,6 +108,10 @@ export default function SpeechTags({
           </span>{" "}
           {SOURCE_CONFIG.summary_tag.word}
         </span>
+        <span className="speech-tags__legend-sep" aria-hidden="true">
+          ·
+        </span>
+        <span className="speech-tags__legend-item">Select a tag to see why it is here.</span>
       </div>
 
       {openTag && (
@@ -125,6 +130,9 @@ export default function SpeechTags({
             <span className="speech-tags__why-word">
               {(SOURCE_CONFIG[openTag.source] || SOURCE_CONFIG.llm).word}
             </span>
+            <Link to={`/tag/${openTag.slug}`} className="speech-tags__why-tag">
+              All speeches on {openTag.name}
+            </Link>
           </div>
 
           <div className="speech-tags__why-body">

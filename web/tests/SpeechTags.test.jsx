@@ -47,10 +47,10 @@ describe("SpeechTags", () => {
       </MemoryRouter>
     );
 
-    const chips = screen.getAllByRole("link");
-    expect(chips[0].textContent).toBe("Tag LLM");
-    expect(chips[1].textContent).toBe("Tag Dictionary");
-    expect(chips[2].textContent).toBe("Tag Summary");
+    const chips = screen.getAllByRole("button", { pressed: false });
+    expect(chips[0].textContent).toContain("Tag LLM");
+    expect(chips[1].textContent).toContain("Tag Dictionary");
+    expect(chips[2].textContent).toContain("Tag Summary");
   });
 
   it("renders the source legend under the chips", () => {
@@ -67,7 +67,7 @@ describe("SpeechTags", () => {
     expect(legend.textContent).toContain("near in meaning");
   });
 
-  it("opens Why panel on click and renders sentence, show words, and mailto report link", () => {
+  it("opens the panel when a chip is selected, with the sentence, show words, the tag link and the report link", () => {
     const onToggleMarks = vi.fn();
 
     render(
@@ -80,10 +80,12 @@ describe("SpeechTags", () => {
       </MemoryRouter>
     );
 
-    const whyBtn = screen.getByRole("button", {
-      name: "Why is tag Tag Dictionary here",
-    });
-    fireEvent.click(whyBtn);
+    const chip = screen.getByRole("button", { name: /Tag Dictionary/ });
+    fireEvent.click(chip);
+    expect(chip.getAttribute("aria-pressed")).toBe("true");
+    expect(screen.getByRole("link", { name: "All speeches on Tag Dictionary" }).getAttribute("href")).toBe(
+      "/tag/tag-dictionary"
+    );
 
     expect(
       screen.getByText(/The words “Dictionary Item” appear 1 time in this speech\./)
@@ -117,9 +119,9 @@ describe("SpeechTags", () => {
     );
 
     expect(screen.getByRole("button", { name: "Show all 12 tags" })).toBeTruthy();
-    expect(screen.getAllByRole("link").length).toBe(8);
+    expect(screen.getAllByRole("button", { name: /^the model named it: Tag/ }).length).toBe(8);
 
     fireEvent.click(screen.getByRole("button", { name: "Show all 12 tags" }));
-    expect(screen.getAllByRole("link").length).toBe(12);
+    expect(screen.getAllByRole("button", { name: /^the model named it: Tag/ }).length).toBe(12);
   });
 });

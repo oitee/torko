@@ -7,46 +7,21 @@ import AroundSpeech from "../pages/speech/AroundSpeech.jsx";
 afterEach(cleanup);
 
 describe("AroundSpeech", () => {
-  const beforeTurns = [
-    {
-      seq: 34,
-      attributed: true,
-      member: "Prior Speaker",
-      member_id: 111,
-      text: "This is a short turn before the speech.",
-    },
-  ];
-
-  const afterTurns = [
-    {
-      seq: 40,
-      role_kind: "presiding",
-      text: "Now Shrimati Kanimozhi Karunanidhi will speak. A longer text that will definitely exceed one hundred and twenty characters in length so that we can verify whether truncation with an ellipsis works properly.",
-    },
-  ];
-
-  it("renders heading, before turns, current marker, after turns and debate link", () => {
-    render(
+  it("lists the turns before, the speech itself, and the turns after, with a link to the debate", () => {
+    const before = [{ seq: 12, attributed: true, member: "Member A", member_id: 1, text: "Before text" }];
+    const current = { seq: 13, attributed: true, member: "Member B", member_id: 2, text: "Own text", own: true };
+    const after = [{ seq: 14, attributed: false, role_kind: "presiding", text: "After text" }];
+    const { container } = render(
       <MemoryRouter>
-        <AroundSpeech before={beforeTurns} after={afterTurns} debateId={683} />
+        <AroundSpeech before={before} after={after} current={current} debateId={683} />
       </MemoryRouter>
     );
 
-    expect(screen.getByRole("heading", { name: "Around this speech" })).toBeTruthy();
-
-    const priorLink = screen.getByRole("link", { name: "Prior Speaker" });
-    expect(priorLink).toBeTruthy();
-    expect(priorLink.getAttribute("href")).toBe("/member/111");
-    expect(screen.getByText("This is a short turn before the speech.")).toBeTruthy();
-
-    expect(screen.getByText("This speech")).toBeTruthy();
-
-    expect(screen.getByText("The Chair")).toBeTruthy();
-    const truncated = screen.getByText(/Now Shrimati Kanimozhi Karunanidhi will speak\..*…/);
-    expect(truncated).toBeTruthy();
-
-    const debateLink = screen.getByRole("link", { name: "Read the whole debate" });
-    expect(debateLink).toBeTruthy();
-    expect(debateLink.getAttribute("href")).toBe("/debate/683");
+    const rows = [...container.querySelectorAll(".around-speech__row")];
+    expect(rows.map((r) => r.querySelector(".around-speech__seq").textContent)).toEqual(["12", "13", "14"]);
+    expect(rows[1].getAttribute("aria-current")).toBe("true");
+    expect(rows[1].textContent).toContain("this speech");
+    expect(rows[2].textContent).toContain("The Chair");
+    expect(screen.getByRole("link", { name: "Read the whole debate" }).getAttribute("href")).toBe("/debate/683");
   });
 });

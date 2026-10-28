@@ -11,18 +11,48 @@
   gap: var(--space-3);
 }
 
-.speech-header__meta {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  gap: var(--space-2);
-  color: var(--meta);
-  font-size: var(--size-label);
-  line-height: var(--lh-label);
+.speech-header .page-answer {
+  margin: 0;
 }
 
-.speech-header__sep {
-  color: var(--hairline);
+.speech-header__kicker {
+  margin: 0;
+  color: var(--meta);
+  font-size: var(--size-label);
+  font-weight: 500;
+}
+
+.speech-header__member {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: var(--space-1) var(--space-3);
+}
+
+.speech-header__member-name {
+  color: var(--ink);
+  font-weight: 600;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+.speech-header__member-meta {
+  color: var(--meta);
+  font-family: var(--font-mono);
+  font-size: var(--size-count);
+}
+
+.speech-header__member-unknown {
+  color: var(--ink-2);
+  font-weight: 600;
+}
+
+/* Date, term, language and length: one mono row with wide gaps and no separators. */
+.speech-header__facts {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-1) var(--space-4);
+  color: var(--ink-2);
 }
 
 .speech-header__actions {
@@ -84,63 +114,85 @@
 .speech-margin {
   display: flex;
   flex-direction: column;
-  gap: var(--space-5);
+  gap: var(--space-8);
+}
+
+/* Each margin section starts with an ink rule and a heading. */
+.speech-margin__section {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  padding-top: var(--space-4);
+  border-top: 1px solid var(--ink);
+}
+
+.speech-margin__heading {
+  margin: 0;
+  font-size: var(--size-heading);
+  line-height: var(--lh-heading);
+  font-weight: 600;
 }
 
 .speech-margin__counts {
   display: flex;
   flex-direction: column;
   gap: var(--space-2);
-  font-size: var(--size-body);
-  line-height: var(--lh-body);
-  color: var(--ink);
+  margin: 0;
 }
 
-.speech-margin__count-item {
-  color: var(--ink);
+/* The number sits in its own right-aligned column, so the numbers line up. */
+.speech-margin__count-row {
+  display: grid;
+  grid-template-columns: 3.5em minmax(0, 1fr);
+  gap: var(--space-3);
+  align-items: baseline;
+}
+
+.speech-margin__count-n {
+  font-family: var(--font-mono);
+  font-size: var(--size-count);
+  font-weight: 500;
+  text-align: right;
+}
+
+.speech-margin__count-text {
+  margin: 0;
+  font-family: var(--font-mono);
+  font-size: var(--size-count);
+  line-height: var(--lh-count);
+  color: var(--ink-2);
 }
 
 .speech-margin__source {
-  display: flex;
-  flex-direction: column;
-  gap: var(--space-1);
-  padding-top: var(--space-4);
-  border-top: 1px solid var(--hairline);
-  font-size: var(--size-body);
-  line-height: var(--lh-body);
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  gap: var(--space-1) var(--space-4);
+  margin: 0;
+  font-family: var(--font-mono);
+  font-size: var(--size-count);
+  line-height: var(--lh-count);
 }
 
-.speech-margin__source-label {
-  font-size: var(--size-label);
-  line-height: var(--lh-label);
-  font-weight: 600;
-  color: var(--ink);
-}
-
-.speech-margin__source-date {
+.speech-margin__source dt {
   color: var(--meta);
 }
 
-.speech-margin__source-debate {
-  color: var(--ink);
-  font-weight: 500;
+.speech-margin__source dd {
+  margin: 0;
+  color: var(--ink-2);
 }
 
-.speech-margin__source-link {
-  color: var(--action);
-  text-decoration: underline;
-  text-underline-offset: 3px;
+/* The TLDR on this page: a sheet with a heavy ink rule on top. */
+.speech-main .tldr {
+  padding: var(--space-6);
+  background: var(--sheet);
+  border-top: 3px solid var(--ink);
 }
 
-.speech-margin__source-link:hover {
-  color: var(--action-hover);
-}
-
-/* The debate title under the answer. It can be very long, so it has heading size, not display size. */
 .speech-header__debate {
   font-size: var(--size-heading);
   line-height: var(--lh-heading);
   font-weight: 600;
-  margin: 0 0 var(--space-4);
+  margin: 0;
   max-width: 72ch;
 }

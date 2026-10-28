@@ -108,6 +108,7 @@ export default function SpeechText({
   turns = [],
   hasMember = true,
   activeMarks = null,
+  speaker = null,
 }) {
   const markIdRef = useRef(false);
   markIdRef.current = false;
@@ -123,6 +124,24 @@ export default function SpeechText({
   }, [activeMarks]);
 
   let globalParaCount = 0;
+  let afterInterruption = false;
+
+  // The line above an own turn: the member, seat and party. After an interruption it also says "continues".
+  const speakerLine = (continues) =>
+    speaker?.member ? (
+      <div className="speech-text__speaker">
+        {speaker.member_id ? (
+          <Link to={`/member/${speaker.member_id}`} className="speech-text__speaker-name">
+            {speaker.member}
+          </Link>
+        ) : (
+          <span className="speech-text__speaker-name">{speaker.member}</span>
+        )}
+        <span className="speech-text__speaker-meta">
+          {[speaker.seat, speaker.party, continues ? "continues" : null].filter(Boolean).join(" · ")}
+        </span>
+      </div>
+    ) : null;
 
   return (
     <section className="speech-text" aria-labelledby="speech-text-heading">
@@ -130,25 +149,29 @@ export default function SpeechText({
         The speech
       </h2>
 
-      {!hasMember && (
-        <div className="speech-text__unidentified">
-          <div className="speech-text__unidentified-name">
-            {SPEAKER_NOT_IDENTIFIED}
-          </div>
-          <p className="speech-text__unidentified-line meta">
-            {SPEAKER_NOT_IDENTIFIED_LINE}
-          </p>
-        </div>
-      )}
-
       <div className="speech-text__body">
+        {!hasMember && (
+          <div className="speech-text__unidentified">
+            <div className="speech-text__unidentified-name">
+              {SPEAKER_NOT_IDENTIFIED}
+            </div>
+            <p className="speech-text__unidentified-line meta">
+              {SPEAKER_NOT_IDENTIFIED_LINE}
+            </p>
+          </div>
+        )}
+
         {turns.map((turn) => {
           const isOwn = !hasMember || turn.own;
 
           if (isOwn) {
             const paragraphs = splitParagraphs(turn.text);
+            const isFirst = globalParaCount === 0;
+            const continues = afterInterruption;
+            afterInterruption = false;
             return (
               <div key={turn.seq} className="speech-text__turn speech-text__turn--own">
+                {hasMember && (isFirst || continues) && speakerLine(continues)}
                 {paragraphs.map((p, pIdx) => {
                   globalParaCount++;
                   const paraNum = globalParaCount;
@@ -163,13 +186,15 @@ export default function SpeechText({
                         aria-label={`Paragraph ${paraNum}`}
                       >
                         ¶{paraNum}
-                      </span>{" "}
-                      {renderParagraphContent(
-                        p,
-                        turn.seq,
-                        activeMarks,
-                        markIdRef
-                      )}
+                      </span>
+                      <span className="speech-text__para-body">
+                        {renderParagraphContent(
+                          p,
+                          turn.seq,
+                          activeMarks,
+                          markIdRef
+                        )}
+                      </span>
                     </p>
                   );
                 })}
@@ -178,6 +203,7 @@ export default function SpeechText({
           }
 
           // Interruption turn
+          afterInterruption = true;
           let speakerHeader = null;
           if (turn.attributed && turn.member_id) {
             speakerHeader = (

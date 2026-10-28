@@ -11,12 +11,10 @@ import {
 } from "../assets/js/format.js";
 import Breadcrumb from "../components/Breadcrumb.jsx";
 import Button from "../components/Button.jsx";
-import Count from "../components/Count.jsx";
 import HowTorkoCounts from "../components/HowTorkoCounts.jsx";
 import PageAnswer from "../components/PageAnswer.jsx";
 import PageLayout from "../components/PageLayout.jsx";
 import Popover from "../components/Popover.jsx";
-import SpeakerLine from "../components/SpeakerLine.jsx";
 import { ErrorState, Loading } from "../components/States.jsx";
 import TLDR from "../components/TLDR.jsx";
 import AroundSpeech from "./speech/AroundSpeech.jsx";
@@ -150,6 +148,7 @@ export default function Speech() {
 
   const answerBlock = (
     <div className="speech-header">
+      <p className="speech-header__kicker">Speech in the debate</p>
       <PageAnswer>{answerText}</PageAnswer>
       {speech.debate && (
         <p className="speech-header__debate">
@@ -157,41 +156,37 @@ export default function Speech() {
         </p>
       )}
 
-      <div className="speech-header__meta">
-        <SpeakerLine speech={speech} />
-        <span className="speech-header__sep" aria-hidden="true">
-          ·
-        </span>
-        <span className="mono">{formatDateISO(speech.date)}</span>
-        <span className="speech-header__sep" aria-hidden="true">
-          ·
-        </span>
-        <span className="mono">{termShort(speech.term)}</span>
-        {langText && (
+      <div className="speech-header__member">
+        {speech.member ? (
           <>
-            <span className="speech-header__sep" aria-hidden="true">
-              ·
+            <Link to={`/member/${speech.member_id}`} className="speech-header__member-name">
+              {speech.member}
+            </Link>
+            <span className="speech-header__member-meta">
+              {[
+                ["MP", speech.seat, speech.state].filter(Boolean).join(", "),
+                speech.party ? `${speech.party} on this day` : null,
+              ]
+                .filter(Boolean)
+                .join(" · ")}
             </span>
-            <span>{langText}</span>
           </>
+        ) : (
+          <span className="speech-header__member-unknown">{SPEAKER_NOT_IDENTIFIED}</span>
         )}
-        <span className="speech-header__sep" aria-hidden="true">
-          ·
-        </span>
-        <span>
-          <span className="mono">{formatNumber(speech.words)}</span> words
-        </span>
+      </div>
+
+      <div className="speech-header__facts mono">
+        <span>{formatDateISO(speech.date)}</span>
+        <span>{termShort(speech.term)}</span>
+        {langText && <span>{langText}</span>}
+        {speech.words ? <span>{formatNumber(speech.words)} words</span> : null}
       </div>
 
       <div className="speech-header__actions">
-        {speech.source_url && (
-          <Button variant="text" href={speech.source_url}>
-            Read the original on sansad.in
-          </Button>
-        )}
         <div ref={citeButtonRef} className="speech-header__cite-wrap">
           <Button
-            variant="text"
+            variant="secondary"
             onClick={() => setCitationOpen(!citationOpen)}
           >
             Cite this speech
@@ -217,58 +212,73 @@ export default function Speech() {
             </div>
           </Popover>
         </div>
+        {speech.source_url && (
+          <Button variant="text" href={speech.source_url}>
+            Read the original on sansad.in
+          </Button>
+        )}
       </div>
     </div>
   );
 
+  // The margin: each section has a heading over an ink rule. Counts have their number in a column of its own.
+  const countRows = [
+    speech.member && speech.member_counts?.term_speeches != null
+      ? {
+          n: speech.member_counts.term_speeches,
+          text: (
+            <>
+              <Link to={`/member/${speech.member_id}`}>speeches</Link> by {speech.member} in the{" "}
+              {termShort(speech.term)}
+            </>
+          ),
+        }
+      : null,
+    speech.debate_speeches
+      ? { n: speech.debate_speeches, text: `speeches in this debate. This is speech ${formatNumber(speech.earlier_speeches + 1)}.` }
+      : null,
+    speech.interruptions > 0
+      ? { n: speech.interruptions, text: speech.interruptions === 1 ? "interruption inside this speech" : "interruptions inside this speech" }
+      : null,
+  ].filter(Boolean);
+
   const marginBlock = (
     <div className="speech-margin">
-      <div className="speech-margin__counts">
-        {speech.member && speech.member_counts?.term_speeches != null && (
-          <div className="speech-margin__count-item">
-            <Count
-              n={speech.member_counts.term_speeches}
-              noun={`speeches by ${speech.member} in the ${termLong(speech.term)}`}
-              href={`/member/${speech.member_id}`}
-            />
-          </div>
-        )}
+      <section className="speech-margin__section">
+        <h2 className="speech-margin__heading">Counts</h2>
+        <dl className="speech-margin__counts">
+          {countRows.map((row, i) => (
+            <div key={i} className="speech-margin__count-row">
+              <dt className="speech-margin__count-n">{formatNumber(row.n)}</dt>
+              <dd className="speech-margin__count-text">{row.text}</dd>
+            </div>
+          ))}
+        </dl>
+        <HowTorkoCounts>
+          A speech is one range of the record that belongs to one member, from
+          their first words to their last. A short remark by another member or by
+          the chair inside it is an interruption. It is not part of the speech.
+          The TLDR is machine text. Cite the speech, not the TLDR.
+        </HowTorkoCounts>
+      </section>
 
-        <div className="speech-margin__count-item">
-          Speech <span className="mono">{speech.earlier_speeches + 1}</span> of{" "}
-          <span className="mono">{formatNumber(speech.debate_speeches)}</span> in this debate
-        </div>
-
-        {speech.interruptions > 0 && (
-          <div className="speech-margin__count-item">
-            <span className="mono">{formatNumber(speech.interruptions)}</span>{" "}
-            {speech.interruptions === 1 ? "interruption" : "interruptions"} inside this speech
-          </div>
-        )}
-      </div>
-
-      <HowTorkoCounts>
-        A speech is one range of the record that belongs to one member, from
-        their first words to their last. A short remark by another member or by
-        the chair inside it is an interruption. It is not part of the speech.
-        The TLDR is machine text. Cite the speech, not the TLDR.
-      </HowTorkoCounts>
-
-      <div className="speech-margin__source">
-        <div className="speech-margin__source-label label">Source</div>
-        <div className="speech-margin__source-date mono">
-          {formatDateLong(speech.date)}
-        </div>
-        <div className="speech-margin__source-debate">{speech.debate}</div>
-        {speech.source_url && (
-          <a
-            href={speech.source_url}
-            className="speech-margin__source-link"
-          >
-            sansad.in
-          </a>
-        )}
-      </div>
+      <section className="speech-margin__section">
+        <h2 className="speech-margin__heading">Source</h2>
+        <dl className="speech-margin__source">
+          <dt>Record</dt>
+          <dd>Lok Sabha Debates, {formatDateLong(speech.date)}</dd>
+          <dt>Debate</dt>
+          <dd>{speech.debate}</dd>
+          {speech.source_url && (
+            <>
+              <dt>Link</dt>
+              <dd>
+                <a href={speech.source_url}>sansad.in</a>
+              </dd>
+            </>
+          )}
+        </dl>
+      </section>
     </div>
   );
 
@@ -295,12 +305,14 @@ export default function Speech() {
           turns={speech.turn_list || []}
           hasMember={Boolean(speech.member)}
           activeMarks={activeMarks}
+          speaker={speech}
         />
 
         <AroundSpeech
           before={speech.before || []}
           after={speech.after || []}
           debateId={speech.debate_id}
+          current={(speech.turn_list || []).find((t) => t.own) || null}
         />
       </div>
     </PageLayout>

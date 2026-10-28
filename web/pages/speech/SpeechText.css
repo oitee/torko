@@ -1,4 +1,4 @@
-/* SpeechText component styles. All values come from tokens.css. */
+/* SpeechText styles. All values come from tokens.css. */
 
 .speech-text {
   display: flex;
@@ -14,18 +14,26 @@
   color: var(--ink);
 }
 
+/* The speech sits on one sheet, like a page of the record. */
+.speech-text__body {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-5);
+  padding: var(--space-6) var(--space-8) var(--space-8) var(--space-4);
+  background: var(--sheet);
+  border: 1px solid var(--hairline);
+}
+
 .speech-text__unidentified {
   display: flex;
   flex-direction: column;
   gap: var(--space-1);
-  padding: var(--space-3) var(--space-4);
-  background: var(--sheet);
-  border-left: 3px solid var(--control);
+  padding-left: var(--space-10);
 }
 
 .speech-text__unidentified-name {
-  font-size: var(--size-heading);
-  line-height: var(--lh-heading);
+  font-size: var(--size-label);
+  line-height: var(--lh-label);
   font-weight: 600;
   color: var(--ink-2);
 }
@@ -36,66 +44,75 @@
   line-height: var(--lh-body);
 }
 
-.speech-text__body {
-  display: flex;
-  flex-direction: column;
-  gap: var(--space-4);
-}
-
 .speech-text__turn--own {
   display: flex;
   flex-direction: column;
-  gap: var(--space-4);
+  gap: var(--space-5);
 }
 
+/* The line above the first own turn, and above each turn after an interruption. It lines up with the text. */
+.speech-text__speaker {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: var(--space-2);
+  padding-left: var(--space-10);
+}
+
+.speech-text__speaker-name {
+  color: var(--ink);
+  font-size: var(--size-label);
+  font-weight: 600;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+.speech-text__speaker-meta {
+  color: var(--meta);
+  font-family: var(--font-mono);
+  font-size: var(--size-count);
+}
+
+/* Each paragraph: a narrow column for its number, then the text. */
 .speech-text__paragraph {
+  display: grid;
+  grid-template-columns: var(--space-10) minmax(0, 62ch);
   margin: 0;
   font-size: var(--size-speech);
   line-height: var(--lh-speech);
-  font-weight: 400;
   color: var(--ink);
-  max-width: 62ch;
 }
 
 .speech-text__para-num {
-  display: inline-block;
   user-select: none;
-  margin-right: var(--space-2);
+  line-height: inherit;
 }
 
 .speech-text__mark {
-  background: #cfe6d7;
-  color: #12161b;
-  padding: 0 2px;
+  background: color-mix(in srgb, var(--ink) 12%, transparent);
+  color: inherit;
+  text-decoration: underline 2px var(--ink);
+  text-underline-offset: 4px;
 }
 
-:root[data-theme="dark"] .speech-text__mark {
-  background: rgba(95, 191, 134, 0.3);
-  color: var(--ink);
-}
-
-@media (prefers-color-scheme: dark) {
-  :root:not([data-theme="light"]) .speech-text__mark {
-    background: rgba(95, 191, 134, 0.3);
-    color: var(--ink);
-  }
-}
-
+/* An interruption: indented to the text, on the ground colour, with a rule on its left. */
 .speech-text__turn--interruption {
   display: flex;
   flex-direction: column;
   gap: var(--space-2);
-  margin-left: var(--space-4);
-  padding-left: var(--space-4);
-  border-left: 2px solid var(--hairline);
+  margin-left: var(--space-10);
   max-width: 62ch;
 }
 
 .speech-text__interruption-header {
   font-size: var(--size-label);
   line-height: var(--lh-label);
-  font-weight: 500;
   color: var(--ink);
+}
+
+.speech-text__interruption-header .meta {
+  font-family: var(--font-mono);
+  font-size: var(--size-count);
 }
 
 .speech-text__interruption-speaker {
@@ -104,15 +121,36 @@
 
 .speech-text__interruption-text {
   margin: 0;
+  padding: var(--space-3) var(--space-4);
+  background: var(--ground);
+  border-left: 2px solid var(--control);
   font-size: var(--size-body);
   line-height: var(--lh-body);
   color: var(--ink-2);
 }
 
 .speech-text__footer {
-  margin-top: var(--space-4);
-  padding-top: var(--space-3);
-  border-top: 1px solid var(--hairline);
+  margin: 0;
   font-size: var(--size-count);
   line-height: var(--lh-count);
+  font-family: var(--font-mono);
+}
+
+@media (max-width: 767px) {
+  .speech-text__body {
+    padding: var(--space-4) var(--space-4) var(--space-6) var(--space-2);
+  }
+
+  .speech-text__paragraph {
+    grid-template-columns: var(--space-8) minmax(0, 1fr);
+  }
+
+  .speech-text__speaker,
+  .speech-text__unidentified {
+    padding-left: var(--space-8);
+  }
+
+  .speech-text__turn--interruption {
+    margin-left: var(--space-8);
+  }
 }

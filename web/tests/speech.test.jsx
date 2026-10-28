@@ -214,19 +214,19 @@ describe("Speech Page", () => {
     expect(screen.getByText("¶3")).toBeTruthy();
 
     // Check margin
-    expect(screen.getByText(/15 speeches by Mahua Moitra in the 18th Lok Sabha/)).toBeTruthy();
+    expect(screen.getByText((_, el) => el?.tagName === "DD" && el.textContent === "speeches by Mahua Moitra in the 18th LS")).toBeTruthy();
     expect(
-      screen.getByText((_, el) => el?.textContent?.trim() === "Speech 13 of 132 in this debate")
+      screen.getByText((_, el) => el?.tagName === "DD" && el.textContent === "speeches in this debate. This is speech 13.")
     ).toBeTruthy();
     expect(
-      screen.getByText((_, el) => el?.textContent?.trim() === "2 interruptions inside this speech")
+      screen.getByText((_, el) => el?.tagName === "DD" && el.textContent === "interruptions inside this speech")
     ).toBeTruthy();
     expect(screen.getByText("How Torko counts")).toBeTruthy();
     expect(screen.getByText("sansad.in")).toBeTruthy();
 
     // Check around speech
     expect(screen.getByText("Earlier Member")).toBeTruthy();
-    expect(screen.getByText("This speech")).toBeTruthy();
+    expect(document.querySelector(".around-speech__row--current")?.textContent).toContain("this speech");
     expect(screen.getByText("Later Member")).toBeTruthy();
   });
 

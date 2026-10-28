@@ -131,3 +131,13 @@
 .speech-tags__report-link:hover {
   color: var(--action-hover);
 }
+
+.speech-tags__why-tag {
+  margin-left: auto;
+  font-weight: 500;
+}
+
+/* The panel of the selected tag hangs under the chips, with an ink rule like the other blocks of the page. */
+.speech-tags__why-panel {
+  border-top: 2px solid var(--ink);
+}

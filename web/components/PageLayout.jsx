@@ -15,10 +15,14 @@ export default function PageLayout({ breadcrumb, answer, margin, children }) {
 
   return (
     <div className="page-layout">
-      {breadcrumb && (
-        <div className="page-layout__breadcrumb">{breadcrumb}</div>
+      {(breadcrumb || answer) && (
+        <div className="page-layout__head">
+          {breadcrumb && (
+            <div className="page-layout__breadcrumb">{breadcrumb}</div>
+          )}
+          {answer && <div className="page-layout__answer">{answer}</div>}
+        </div>
       )}
-      {answer && <div className="page-layout__answer">{answer}</div>}
       <div
         className={`page-layout__grid ${
           margin ? "page-layout__grid--with-margin" : ""

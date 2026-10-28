@@ -69,4 +69,19 @@ describe("Chip", () => {
     fireEvent.click(button);
     expect(onRemove).toHaveBeenCalledTimes(1);
   });
+
+  it("is a button with aria-pressed when it has onClick, and shows its prefix", () => {
+    const onClick = vi.fn();
+    render(
+      <MemoryRouter>
+        <Chip label="Arrears" onClick={onClick} selected prefix={<span>◆</span>} />
+      </MemoryRouter>
+    );
+    const button = screen.getByRole("button", { name: /Arrears/ });
+    expect(button.getAttribute("aria-pressed")).toBe("true");
+    expect(button.textContent).toContain("◆");
+    expect(button.textContent).not.toContain("✓");
+    fireEvent.click(button);
+    expect(onClick).toHaveBeenCalled();
+  });
 });

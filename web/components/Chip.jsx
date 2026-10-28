@@ -5,12 +5,16 @@ import "./Chip.css";
 
 // The Chip component renders a single tag.
 // It supports counts, links, selected marks, and remove buttons.
+// prefix is an optional element before the name, for example the source glyph on the Speech page.
+// With onClick (and no href), the chip is a button that the page can select. selected then sets aria-pressed.
 export default function Chip({
   label,
   count,
   href,
   selected = false,
   onRemove,
+  onClick,
+  prefix,
 }) {
   const classes = [
     "chip",
@@ -22,7 +26,8 @@ export default function Chip({
 
   const innerContent = (
     <>
-      {selected && <span className="chip__check">✓</span>}
+      {selected && !onClick && <span className="chip__check">✓</span>}
+      {prefix && <span className="chip__prefix">{prefix}</span>}
       <span className="chip__label">{label}</span>
       {count !== null && count !== undefined && (
         <span className="chip__count">{formatNumber(count)}</span>
@@ -48,6 +53,14 @@ export default function Chip({
           ✕
         </button>
       </span>
+    );
+  }
+
+  if (onClick && !href) {
+    return (
+      <button type="button" className={`${classes} chip--button`} aria-pressed={selected} onClick={onClick}>
+        {innerContent}
+      </button>
     );
   }
 

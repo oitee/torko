@@ -21,43 +21,24 @@ export const SOURCE_CONFIG = {
   },
 };
 
-// SourceChip places the source glyph and hidden word before a Chip component.
-// It also provides a Why button next to the chip to inspect why the tag was assigned.
-export default function SourceChip({
-  tag,
-  onWhyClick,
-  isWhyOpen = false,
-}) {
+// SourceChip is a Chip with the source glyph inside it, before the name. The glyph is hidden from screen readers.
+// A visually hidden word says the source instead. A click selects the tag: the page then explains it and marks its words.
+export default function SourceChip({ tag, selected = false, onSelect }) {
   if (!tag) {
     return null;
   }
 
   const config = SOURCE_CONFIG[tag.source] || SOURCE_CONFIG.llm;
-
-  return (
-    <div className="source-chip">
-      <span
-        className="source-chip__glyph"
-        aria-hidden="true"
-        style={{ color: config.hue }}
-      >
+  const prefix = (
+    <>
+      <span className="source-chip__glyph" aria-hidden="true" style={{ color: config.hue }}>
         {config.glyph}
       </span>
-      <span className="source-chip__sr-word">{config.word}</span>
-      <Chip label={tag.name} href={`/tag/${tag.slug}`} />
-      {onWhyClick && (
-        <button
-          type="button"
-          className={`source-chip__why ${isWhyOpen ? "source-chip__why--active" : ""}`}
-          aria-expanded={isWhyOpen}
-          aria-label={`Why is tag ${tag.name} here`}
-          onClick={onWhyClick}
-        >
-          Why
-        </button>
-      )}
-    </div>
+      <span className="source-chip__sr-word">{config.word}:</span>
+    </>
   );
+
+  return <Chip label={tag.name} prefix={prefix} selected={selected} onClick={onSelect} />;
 }
 
 export { SourceChip };
