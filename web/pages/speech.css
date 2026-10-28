@@ -1,0 +1,146 @@
+/* Speech page styles. All values come from tokens.css. */
+
+.speech-page--loading,
+.speech-page--error {
+  padding: var(--space-8) 0;
+}
+
+.speech-header {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+
+.speech-header__meta {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-2);
+  color: var(--meta);
+  font-size: var(--size-label);
+  line-height: var(--lh-label);
+}
+
+.speech-header__sep {
+  color: var(--hairline);
+}
+
+.speech-header__actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-4);
+  margin-top: var(--space-1);
+}
+
+.speech-header__cite-wrap {
+  position: relative;
+  display: inline-block;
+}
+
+.speech-citation-popover {
+  position: absolute;
+  top: calc(100% + var(--space-2));
+  left: 0;
+  z-index: 20;
+  width: min(480px, calc(100vw - 32px));
+  padding: var(--space-4);
+  background: var(--sheet);
+  border: 1px solid var(--control);
+  box-shadow: var(--shadow-popover);
+}
+
+.speech-citation {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+
+.speech-citation__text {
+  margin: 0;
+  font-size: var(--size-body);
+  line-height: var(--lh-body);
+  color: var(--ink);
+  user-select: all;
+}
+
+.speech-citation__controls {
+  display: flex;
+  align-items: center;
+}
+
+.speech-citation__note {
+  margin: 0;
+  font-size: var(--size-count);
+  line-height: var(--lh-count);
+}
+
+.speech-main {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-8);
+}
+
+.speech-margin {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-5);
+}
+
+.speech-margin__counts {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  font-size: var(--size-body);
+  line-height: var(--lh-body);
+  color: var(--ink);
+}
+
+.speech-margin__count-item {
+  color: var(--ink);
+}
+
+.speech-margin__source {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+  padding-top: var(--space-4);
+  border-top: 1px solid var(--hairline);
+  font-size: var(--size-body);
+  line-height: var(--lh-body);
+}
+
+.speech-margin__source-label {
+  font-size: var(--size-label);
+  line-height: var(--lh-label);
+  font-weight: 600;
+  color: var(--ink);
+}
+
+.speech-margin__source-date {
+  color: var(--meta);
+}
+
+.speech-margin__source-debate {
+  color: var(--ink);
+  font-weight: 500;
+}
+
+.speech-margin__source-link {
+  color: var(--action);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+.speech-margin__source-link:hover {
+  color: var(--action-hover);
+}
+
+/* The debate title under the answer. It can be very long, so it has heading size, not display size. */
+.speech-header__debate {
+  font-size: var(--size-heading);
+  line-height: var(--lh-heading);
+  font-weight: 600;
+  margin: 0 0 var(--space-4);
+  max-width: 72ch;
+}

@@ -20,6 +20,7 @@ import SearchBox from "../components/SearchBox.jsx";
 import FilterBar from "../components/FilterBar.jsx";
 import Chart from "../components/Chart.jsx";
 import MemberLine from "../components/MemberLine.jsx";
+import PageLayout from "../components/PageLayout.jsx";
 
 // The development page displays each shared component in every form.
 // It serves as a visual reference for design and testing.
@@ -514,6 +515,48 @@ export default function DevComponents() {
         ) : (
           <MemberLine member={memberData} />
         )}
+      </section>
+
+      <section style={{ marginTop: "var(--space-8)" }}>
+        <h2>PageLayout example</h2>
+        <PageLayout
+          breadcrumb={
+            <Breadcrumb
+              items={[
+                { label: "17th Lok Sabha" },
+                { label: "Session 1" },
+                { label: "Invented Debate" },
+                { label: "Speech" },
+              ]}
+            />
+          }
+          answer={
+            <>
+              <PageAnswer as="h2">
+                A member spoke in the debate on rural electrification.
+              </PageAnswer>
+              <div className="meta" style={{ display: "flex", gap: "var(--space-2)" }}>
+                <span>Sample Speaker</span> · <span>2024-01-15</span> · <span>17th LS</span> · <span>420 words</span>
+              </div>
+            </>
+          }
+          margin={
+            <>
+              <div>
+                <span className="mono">12</span> speeches in this term
+              </div>
+              <HowTorkoCounts>
+                Counts include all speeches in the record for this term.
+              </HowTorkoCounts>
+            </>
+          }
+        >
+          <div>
+            <p style={{ maxWidth: "62ch", lineHeight: "var(--lh-speech)" }}>
+              This is the main column of the page frame. It holds the speech paragraphs, tags, and turns.
+            </p>
+          </div>
+        </PageLayout>
       </section>
     </div>
   );

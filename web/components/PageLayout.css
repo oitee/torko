@@ -1,0 +1,78 @@
+/* PageLayout component styles. All values come from tokens.css. */
+
+.page-layout {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-6);
+  padding: var(--space-6) 0 var(--space-14);
+}
+
+.page-layout__breadcrumb {
+  margin-bottom: calc(var(--space-2) * -1);
+}
+
+.page-layout__answer {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+
+/* Base / Mobile layout (< 768px): one column.
+   The margin comes after the answer and before the main column.
+*/
+.page-layout__grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: var(--space-6);
+}
+
+.page-layout__margin {
+  order: 1;
+}
+
+.page-layout__main {
+  order: 2;
+  min-width: 0;
+}
+
+/* Tablet (768px to 1119px): 8 columns, main 5, margin 3, gap 20px, margin on the right. */
+@media (min-width: 768px) {
+  .page-layout__grid {
+    grid-template-columns: repeat(8, 1fr);
+    gap: 20px;
+  }
+
+  .page-layout__main {
+    grid-column: span 8;
+    order: 1;
+  }
+
+  .page-layout__grid--with-margin .page-layout__main {
+    grid-column: span 5;
+  }
+
+  .page-layout__margin {
+    grid-column: span 3;
+    order: 2;
+  }
+}
+
+/* Desktop (1120px and wide): 12 columns, main 8, margin 4, gap 24px, margin on the right. */
+@media (min-width: 1120px) {
+  .page-layout__grid {
+    grid-template-columns: repeat(12, 1fr);
+    gap: 24px;
+  }
+
+  .page-layout__main {
+    grid-column: span 12;
+  }
+
+  .page-layout__grid--with-margin .page-layout__main {
+    grid-column: span 8;
+  }
+
+  .page-layout__margin {
+    grid-column: span 4;
+  }
+}

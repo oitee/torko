@@ -1,0 +1,133 @@
+/* SpeechTags component styles. All values come from tokens.css. */
+
+.speech-tags {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+
+.speech-tags__list {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-2);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.speech-tags__item {
+  display: inline-flex;
+  align-items: center;
+}
+
+.speech-tags__legend {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-2);
+  font-size: var(--size-count);
+  line-height: var(--lh-count);
+}
+
+.speech-tags__legend-item {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-1);
+}
+
+.speech-tags__legend-glyph {
+  font-weight: 600;
+}
+
+.speech-tags__legend-sep {
+  color: var(--hairline);
+}
+
+.speech-tags__why-panel {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  padding: var(--space-3) var(--space-4);
+  background: var(--sheet);
+  border: 1px solid var(--hairline);
+  border-radius: var(--radius);
+}
+
+.speech-tags__why-header {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  font-size: var(--size-label);
+  line-height: var(--lh-label);
+  font-weight: 500;
+  color: var(--ink);
+}
+
+.speech-tags__why-glyph {
+  font-weight: 600;
+}
+
+.speech-tags__why-word {
+  color: var(--ink-2);
+}
+
+.speech-tags__why-body {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+.speech-tags__why-item {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+}
+
+.speech-tags__why-sentence {
+  margin: 0;
+  font-size: var(--size-body);
+  line-height: var(--lh-body);
+  color: var(--ink);
+}
+
+.speech-tags__words-btn {
+  display: inline;
+  padding: 0;
+  background: transparent;
+  border: 0;
+  color: var(--action);
+  font-family: var(--font-sans);
+  font-size: var(--size-body);
+  line-height: inherit;
+  font-weight: 500;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  cursor: pointer;
+}
+
+.speech-tags__words-btn:hover {
+  color: var(--action-hover);
+}
+
+.speech-tags__why-subject {
+  margin: 0;
+  font-size: var(--size-count);
+  line-height: var(--lh-count);
+}
+
+.speech-tags__why-footer {
+  padding-top: var(--space-2);
+  border-top: 1px solid var(--hairline);
+}
+
+.speech-tags__report-link {
+  color: var(--action);
+  font-size: var(--size-label);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+.speech-tags__report-link:hover {
+  color: var(--action-hover);
+}

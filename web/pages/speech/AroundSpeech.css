@@ -1,0 +1,88 @@
+/* AroundSpeech component styles. All values come from tokens.css. */
+
+.around-speech {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+  margin-top: var(--space-6);
+  padding-top: var(--space-6);
+  border-top: 1px solid var(--hairline);
+}
+
+.around-speech__heading {
+  margin: 0;
+  font-size: var(--size-heading);
+  line-height: var(--lh-heading);
+  font-weight: 600;
+  color: var(--ink);
+}
+
+.around-speech__list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  max-width: 62ch;
+}
+
+.around-speech__turn {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+}
+
+.around-speech__speaker {
+  font-size: var(--size-label);
+  line-height: var(--lh-label);
+  font-weight: 500;
+  color: var(--ink);
+}
+
+.around-speech__speaker-link {
+  font-weight: 600;
+  color: var(--action);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+.around-speech__speaker-name {
+  font-weight: 600;
+  color: var(--ink);
+}
+
+.around-speech__text {
+  margin: 0;
+  font-size: var(--size-body);
+  line-height: var(--lh-body);
+  color: var(--ink-2);
+}
+
+.around-speech__current-marker {
+  display: flex;
+  align-items: center;
+  padding: var(--space-2) var(--space-3);
+  background: var(--sheet);
+  border: 1px solid var(--hairline);
+  border-left: 3px solid var(--action);
+}
+
+.around-speech__current-label {
+  font-size: var(--size-label);
+  line-height: var(--lh-label);
+  font-weight: 600;
+  color: var(--ink);
+}
+
+.around-speech__footer {
+  margin-top: var(--space-2);
+}
+
+.around-speech__debate-link {
+  font-size: var(--size-label);
+  color: var(--action);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+.around-speech__debate-link:hover {
+  color: var(--action-hover);
+}

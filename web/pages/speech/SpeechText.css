@@ -1,0 +1,118 @@
+/* SpeechText component styles. All values come from tokens.css. */
+
+.speech-text {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+}
+
+.speech-text__heading {
+  margin: 0;
+  font-size: var(--size-title);
+  line-height: var(--lh-title);
+  font-weight: 600;
+  color: var(--ink);
+}
+
+.speech-text__unidentified {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+  padding: var(--space-3) var(--space-4);
+  background: var(--sheet);
+  border-left: 3px solid var(--control);
+}
+
+.speech-text__unidentified-name {
+  font-size: var(--size-heading);
+  line-height: var(--lh-heading);
+  font-weight: 600;
+  color: var(--ink-2);
+}
+
+.speech-text__unidentified-line {
+  margin: 0;
+  font-size: var(--size-body);
+  line-height: var(--lh-body);
+}
+
+.speech-text__body {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+}
+
+.speech-text__turn--own {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+}
+
+.speech-text__paragraph {
+  margin: 0;
+  font-size: var(--size-speech);
+  line-height: var(--lh-speech);
+  font-weight: 400;
+  color: var(--ink);
+  max-width: 62ch;
+}
+
+.speech-text__para-num {
+  display: inline-block;
+  user-select: none;
+  margin-right: var(--space-2);
+}
+
+.speech-text__mark {
+  background: #cfe6d7;
+  color: #12161b;
+  padding: 0 2px;
+}
+
+:root[data-theme="dark"] .speech-text__mark {
+  background: rgba(95, 191, 134, 0.3);
+  color: var(--ink);
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) .speech-text__mark {
+    background: rgba(95, 191, 134, 0.3);
+    color: var(--ink);
+  }
+}
+
+.speech-text__turn--interruption {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  margin-left: var(--space-4);
+  padding-left: var(--space-4);
+  border-left: 2px solid var(--hairline);
+  max-width: 62ch;
+}
+
+.speech-text__interruption-header {
+  font-size: var(--size-label);
+  line-height: var(--lh-label);
+  font-weight: 500;
+  color: var(--ink);
+}
+
+.speech-text__interruption-speaker {
+  font-weight: 600;
+}
+
+.speech-text__interruption-text {
+  margin: 0;
+  font-size: var(--size-body);
+  line-height: var(--lh-body);
+  color: var(--ink-2);
+}
+
+.speech-text__footer {
+  margin-top: var(--space-4);
+  padding-top: var(--space-3);
+  border-top: 1px solid var(--hairline);
+  font-size: var(--size-count);
+  line-height: var(--lh-count);
+}
