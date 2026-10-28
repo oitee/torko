@@ -1,4 +1,7 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
+import { useSearchParams } from "react-router-dom";
+import { getJSON } from "../assets/js/api.js";
+import { termShort } from "../assets/js/format.js";
 import Button from "../components/Button.jsx";
 import Count from "../components/Count.jsx";
 import Breadcrumb from "../components/Breadcrumb.jsx";
@@ -13,12 +16,106 @@ import SpeechList from "../components/SpeechList.jsx";
 import TurnBox from "../components/TurnBox.jsx";
 import Margin from "../components/Margin.jsx";
 import HowTorkoCounts from "../components/HowTorkoCounts.jsx";
+import SearchBox from "../components/SearchBox.jsx";
+import FilterBar from "../components/FilterBar.jsx";
+import Chart from "../components/Chart.jsx";
+import MemberLine from "../components/MemberLine.jsx";
 
 // The development page displays each shared component in every form.
 // It serves as a visual reference for design and testing.
 export default function DevComponents() {
   const [removed, setRemoved] = useState(false);
   const [retried, setRetried] = useState(false);
+
+  // Address search parameters for filtering the real API data.
+  const [searchParams] = useSearchParams();
+  const filterParams = {};
+  for (const key of ["term", "party", "kind", "subject", "session"]) {
+    const val = searchParams.get(key);
+    if (val) {
+      filterParams[key] = val;
+    }
+  }
+  const speechesFilters = { tag: "arrears", ...filterParams };
+
+  const [speechesData, setSpeechesData] = useState(null);
+  const [speechesLoading, setSpeechesLoading] = useState(true);
+  const [speechesError, setSpeechesError] = useState(null);
+
+  const [memberData, setMemberData] = useState(null);
+  const [memberLoading, setMemberLoading] = useState(true);
+  const [memberError, setMemberError] = useState(null);
+
+  const filterKey = JSON.stringify(speechesFilters);
+
+  // The total of the tag with no filter, for the form "72 of 205 speeches".
+  const [tagTotal, setTagTotal] = useState(null);
+  useEffect(() => {
+    getJSON("/api/speeches", { tag: "arrears", per_page: 1 })
+      .then((res) => setTagTotal(res.total))
+      .catch(() => setTagTotal(null));
+  }, []);
+
+  useEffect(() => {
+    const controller = new AbortController();
+    setSpeechesLoading(true);
+    setSpeechesError(null);
+
+    getJSON(
+      "/api/speeches",
+      { ...speechesFilters, facets: 1, per_page: 1 },
+      { signal: controller.signal }
+    )
+      .then((res) => {
+        setSpeechesData(res);
+        setSpeechesLoading(false);
+      })
+      .catch((err) => {
+        if (controller.signal.aborted) {
+          return;
+        }
+        setSpeechesError(err);
+        setSpeechesLoading(false);
+      });
+
+    return () => {
+      controller.abort();
+    };
+  }, [filterKey]);
+
+  useEffect(() => {
+    const controller = new AbortController();
+    setMemberLoading(true);
+    setMemberError(null);
+
+    getJSON("/api/member/1052", {}, { signal: controller.signal })
+      .then((res) => {
+        setMemberData(res);
+        setMemberLoading(false);
+      })
+      .catch((err) => {
+        if (controller.signal.aborted) {
+          return;
+        }
+        setMemberError(err);
+        setMemberLoading(false);
+      });
+
+    return () => {
+      controller.abort();
+    };
+  }, []);
+
+  const partyRows = (speechesData?.facets?.party || []).map((p) => ({
+    label: p.party,
+    n: p.n,
+    colour: p.colour,
+  }));
+
+  const termRows = (speechesData?.facets?.term || []).map((t) => ({
+    label: termShort(t.term),
+    n: t.n,
+  }));
 
   const breadcrumbTwo = [
     { label: "Home", href: "/" },
@@ -348,8 +445,75 @@ export default function DevComponents() {
       </section>
 
       <section style={{ marginTop: "var(--space-8)" }}>
-        <h2>SpeechList (real API data)</h2>
-        <SpeechList filters={{ tag: "arrears" }} />
+        <h2>SearchBox (real API)</h2>
+        <SearchBox />
+      </section>
+
+      <section style={{ marginTop: "var(--space-8)" }}>
+        <h2>FilterBar with real facets</h2>
+        <p className="meta" style={{ marginBottom: "var(--space-4)" }}>
+          The FilterBar reads and writes filters in the address. SpeechList and Charts update together when you click a chip.
+        </p>
+        {speechesLoading ? (
+          <Loading />
+        ) : speechesError ? (
+          <ErrorState error={speechesError} />
+        ) : (
+          <FilterBar
+            facets={speechesData?.facets || {}}
+            total={speechesData?.total || 0}
+            unfilteredTotal={tagTotal}
+            noun="speeches"
+          />
+        )}
+
+        <h3 style={{ marginTop: "var(--space-6)" }}>
+          SpeechList under FilterBar (filtered by address)
+        </h3>
+        <SpeechList filters={speechesFilters} />
+      </section>
+
+      <section style={{ marginTop: "var(--space-8)" }}>
+        <h2>Chart: parties (party colours)</h2>
+        {speechesLoading ? (
+          <Loading />
+        ) : speechesError ? (
+          <ErrorState error={speechesError} />
+        ) : (
+          <Chart
+            title="From which party (speeches on arrears)"
+            rows={partyRows}
+            total={speechesData?.total}
+            party={true}
+          />
+        )}
+      </section>
+
+      <section style={{ marginTop: "var(--space-8)" }}>
+        <h2>Chart: Lok Sabha terms (no party colours)</h2>
+        {speechesLoading ? (
+          <Loading />
+        ) : speechesError ? (
+          <ErrorState error={speechesError} />
+        ) : (
+          <Chart
+            title="By Lok Sabha term (speeches on arrears)"
+            rows={termRows}
+            total={speechesData?.total}
+            party={false}
+          />
+        )}
+      </section>
+
+      <section style={{ marginTop: "var(--space-8)" }}>
+        <h2>MemberLine (real data: Mahua Moitra, ID 1052)</h2>
+        {memberLoading ? (
+          <Loading />
+        ) : memberError ? (
+          <ErrorState error={memberError} />
+        ) : (
+          <MemberLine member={memberData} />
+        )}
       </section>
     </div>
   );

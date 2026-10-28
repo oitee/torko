@@ -1,0 +1,9 @@
+/* Popover component styles. Tokens from tokens.css only. */
+
+.popover {
+  background: var(--sheet);
+  box-shadow: var(--shadow-popover);
+  border: 1px solid var(--hairline);
+  border-radius: var(--radius);
+  box-sizing: border-box;
+}

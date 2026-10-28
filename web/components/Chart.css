@@ -1,0 +1,152 @@
+.chart {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  margin-block: var(--space-4);
+}
+
+.chart__title {
+  font-size: var(--size-heading);
+  line-height: var(--lh-heading);
+  font-weight: 600;
+  margin: 0;
+  color: var(--ink);
+}
+
+.chart__table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-block: var(--space-2);
+  font-size: var(--size-body);
+  line-height: var(--lh-body);
+  color: var(--ink);
+}
+
+.chart__table caption {
+  font-size: var(--size-heading);
+  line-height: var(--lh-heading);
+  font-weight: 600;
+  text-align: left;
+  margin-bottom: var(--space-2);
+  color: var(--ink);
+}
+
+.chart__table th {
+  text-align: left;
+  font-weight: 600;
+  padding: var(--space-2);
+  border-bottom: 1px solid var(--hairline);
+  color: var(--ink);
+}
+
+.chart__table th:last-child {
+  text-align: right;
+}
+
+.chart__table td {
+  padding: var(--space-2);
+  border-bottom: 1px solid var(--hairline);
+}
+
+.chart__table td:last-child {
+  text-align: right;
+  font-family: var(--font-mono);
+  font-size: var(--size-count);
+  color: var(--meta);
+}
+
+.chart__bars {
+  width: 100%;
+}
+
+.chart__list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+.chart__row {
+  display: grid;
+  grid-template-columns: minmax(72px, max-content) 1fr max-content;
+  align-items: center;
+  gap: var(--space-3);
+}
+
+.chart__label {
+  font-size: var(--size-body);
+  line-height: var(--lh-body);
+  color: var(--ink);
+  white-space: nowrap;
+}
+
+.chart__link {
+  color: var(--action);
+  text-decoration: underline;
+}
+
+.chart__link:hover {
+  color: var(--action-hover);
+}
+
+.chart__track {
+  width: 100%;
+  height: 20px;
+  background: transparent;
+  display: flex;
+  align-items: center;
+}
+
+.chart__bar {
+  height: 100%;
+  min-width: 0;
+  border-radius: var(--radius);
+  background: var(--bar-light, var(--bar-color, var(--ink-2)));
+}
+
+.chart__bar--derived {
+  background: var(--bar-light);
+}
+
+:root[data-theme="dark"] .chart__bar--derived {
+  background: var(--bar-dark);
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) .chart__bar--derived {
+    background: var(--bar-dark);
+  }
+}
+
+.chart__value {
+  font-family: var(--font-mono);
+  font-size: var(--size-count);
+  line-height: var(--lh-count);
+  color: var(--meta);
+  text-align: right;
+  white-space: nowrap;
+}
+
+.chart__toggle {
+  margin-top: var(--space-2);
+}
+
+/* Visually hidden utility for screen readers */
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+/* A table ignores its width and grows to fit its cells. As a block, the hidden table keeps its 1px size. */
+table.sr-only {
+  display: block;
+}

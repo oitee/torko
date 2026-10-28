@@ -1,0 +1,128 @@
+/* FilterBar component styles. Tokens from tokens.css only. */
+
+.filter-bar {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+  width: 100%;
+}
+
+.filter-bar__groups {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+
+.filter-bar__group {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+.filter-bar__group-title {
+  font-family: var(--font-sans);
+  font-size: var(--size-label);
+  line-height: var(--lh-label);
+  font-weight: 600;
+  color: var(--ink);
+  margin-right: var(--space-2);
+  min-width: 60px;
+}
+
+.filter-bar__choices {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+.filter-bar__chip-btn {
+  background: transparent;
+  border: 0;
+  padding: 0;
+  margin: 0;
+  cursor: pointer;
+  display: inline-flex;
+  font: inherit;
+  color: inherit;
+  text-decoration: none;
+}
+
+.filter-bar__chip-btn:focus-visible {
+  outline: 2px solid var(--action);
+  outline-offset: 2px;
+}
+
+.filter-bar__summary {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-3);
+  padding-top: var(--space-2);
+  border-top: 1px solid var(--hairline);
+}
+
+.filter-bar__count {
+  margin-right: var(--space-2);
+}
+
+.filter-bar__mobile-trigger-wrap {
+  display: none;
+}
+
+.filter-bar__sheet {
+  position: fixed;
+  top: 10%;
+  left: var(--space-4);
+  right: var(--space-4);
+  max-height: 80vh;
+  overflow-y: auto;
+  padding: var(--space-4);
+  background: var(--sheet);
+  border: 1px solid var(--hairline);
+  box-shadow: var(--shadow-popover);
+  border-radius: var(--radius);
+  z-index: 1000;
+}
+
+.filter-bar__sheet-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: var(--space-3);
+  padding-bottom: var(--space-2);
+  border-bottom: 1px solid var(--hairline);
+}
+
+.filter-bar__sheet-title {
+  font-family: var(--font-sans);
+  font-size: var(--size-heading);
+  line-height: var(--lh-heading);
+  font-weight: 600;
+  color: var(--ink);
+}
+
+.filter-bar__sheet-content {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+
+.filter-bar__sheet-footer {
+  margin-top: var(--space-4);
+  padding-top: var(--space-3);
+  border-top: 1px solid var(--hairline);
+  display: flex;
+  justify-content: flex-end;
+}
+
+@media (max-width: 767px) {
+  .filter-bar__desktop-groups {
+    display: none;
+  }
+
+  .filter-bar__mobile-trigger-wrap {
+    display: block;
+  }
+}
