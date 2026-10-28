@@ -23,7 +23,8 @@ describe("search heading", () => {
   it("puts the count first and agrees in number", () => {
     expect(headingParts({ scope: { q: "arrears" }, count: 375 })).toEqual({ lead: 375, rest: " speeches use the word “arrears”" });
     expect(headingParts({ scope: { q: "sugar cane" }, count: 1 }).rest).toBe(" speech uses the words “sugar cane”");
-    expect(headingParts({ scope: { tag: "arrears" }, count: 205, scopeName: "Arrears" }).rest).toBe(" speeches on Arrears");
+    expect(headingParts({ scope: { tag: "arrears" }, count: 205, names: { tag: "Arrears" } }).rest).toBe(" speeches on Arrears");
+    expect(headingParts({ scope: { tag: "farmers", member: "1288" }, count: 3, names: { tag: "Farmers", member: "Shivraj V. Patil" } }).rest).toBe(" speeches on Farmers by Shivraj V. Patil");
     expect(headingParts({ scope: { q: "xqzvwk" }, count: 0 }).rest).toBe("No speech uses the word “xqzvwk”");
     expect(headingParts({ scope: {}, count: 10 }).rest).toBe("Search the speeches of the Lok Sabha");
     expect(headingParts({ scope: { q: "arrears" }, count: null })).toEqual({ lead: null, rest: "Speeches with the word “arrears”" });
@@ -87,6 +88,6 @@ describe("search rows", () => {
     );
     expect(screen.getByRole("link", { name: "Latur" }).getAttribute("href")).toBe("/place/latur");
     expect(screen.queryByRole("link", { name: "Latur Rail Coach Factory" })).toBeNull();
-    expect(screen.getByRole("link", { name: "Railway Coach Factories" }).getAttribute("href")).toBe("/tag/railway-coach-factories");
+    expect(screen.getByRole("link", { name: "Railway Coach Factories" }).getAttribute("href")).toBe("/search?tag=railway-coach-factories");
   });
 });

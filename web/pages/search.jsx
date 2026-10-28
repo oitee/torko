@@ -10,6 +10,8 @@ import PageLayout from "../components/PageLayout.jsx";
 import SearchBox from "../components/SearchBox.jsx";
 import SearchMatches from "./search/SearchMatches.jsx";
 import SearchResults from "./search/SearchResults.jsx";
+import SearchScopeCard from "./search/SearchScopeCard.jsx";
+import SearchScopePicker from "./search/SearchScopePicker.jsx";
 import { FILTER_KEYS, headingParts, readSearch, selectedTerms } from "./search/searchParams.js";
 import "./search.css";
 
@@ -49,7 +51,6 @@ export default function Search() {
   const { scope, filters, view, sort, page } = readSearch(searchParams);
   const q = scope.q || "";
   const hasFilters = Object.keys(filters).length > 0;
-  const scopeKind = ["tag", "place", "member"].find((k) => scope[k]);
 
   const listParams = { ...scope, ...filters, sort, page, per_page: PER_PAGE };
   const listKey = JSON.stringify({ listParams, view });
@@ -75,10 +76,11 @@ export default function Search() {
   );
 
   const matches = useApi(q || null, (signal) => getJSON("/api/search", { q }, { signal }));
-  const scopeName = useApi(scopeKind ? `${scopeKind}:${scope[scopeKind]}` : null, (signal) =>
-    getJSON(SCOPE_NAME_URL[scopeKind](scope[scopeKind]), undefined, { signal })
-  );
-  const scopeLabel = scopeName.data?.name || null;
+  // The tag, place and member each load their own name, so that they can be on at the same time.
+  const useScope = (k) =>
+    useApi(scope[k] ? `${k}:${scope[k]}` : null, (signal) => getJSON(SCOPE_NAME_URL[k](scope[k]), undefined, { signal }));
+  const scopeInfo = { tag: useScope("tag"), place: useScope("place"), member: useScope("member") };
+  const scopeNames = Object.fromEntries(Object.entries(scopeInfo).map(([k, v]) => [k, v.data?.name || null]));
 
   const speechTotal = speechData && !(view === "speeches" && list.loading) ? speechData.total : null;
   const membersTotal =
@@ -117,7 +119,7 @@ export default function Search() {
     party_not: [],
   };
 
-  const heading = headingParts({ scope, count: speechTotal, scopeName: scopeLabel });
+  const heading = headingParts({ scope, count: speechTotal, names: scopeNames });
   const csvHref = `/api/speeches?${new URLSearchParams(
     Object.entries({ ...scope, ...filters, sort, format: "csv" })
   ).toString()}`;
@@ -131,7 +133,7 @@ export default function Search() {
       <div className="search-head__box">
         <SearchBox key={q} initial={q} />
       </div>
-      <ActiveChips scope={scope} scopeLabel={scopeLabel} filters={filters} facets={facets} setWith={setWith} />
+      <ActiveChips scope={scope} scopeNames={scopeNames} filters={filters} facets={facets} setWith={setWith} />
     </div>
   );
 
@@ -141,6 +143,7 @@ export default function Search() {
         <aside className="search-rail" aria-label="Filters and method">
           <div className="search-rail__section">
             <h2 className="search-rail__title">Narrow the speeches</h2>
+            <SearchScopePicker onPick={setWith} />
             {speechData ? (
               <FilterBar
                 facets={barFacets}
@@ -170,6 +173,13 @@ export default function Search() {
         </aside>
 
         <div className="search-main">
+          {(scope.tag || scope.place) && (
+            <div className="search-scopes">
+              {["tag", "place"].map((k) =>
+                scope[k] ? <SearchScopeCard key={k} kind={k} value={scope[k]} info={scopeInfo[k].data} /> : null
+              )}
+            </div>
+          )}
           {q && matches.data && <SearchMatches results={matches.data.results} query={q} />}
           <SearchResults
             view={view}
@@ -195,12 +205,12 @@ export default function Search() {
 }
 
 // The scope and the filters that are on, as chips that remove themselves.
-function ActiveChips({ scope, scopeLabel, filters, facets, setWith }) {
+function ActiveChips({ scope, scopeNames, filters, facets, setWith }) {
   const chips = [];
   for (const k of ["tag", "place", "member"]) {
     if (scope[k]) {
       const what = { tag: "Tag", place: "Place", member: "Member" }[k];
-      chips.push({ key: k, label: `${what}: ${scopeLabel || scope[k]}`, remove: { [k]: null } });
+      chips.push({ key: k, label: `${what}: ${scopeNames[k] || scope[k]}`, remove: { [k]: null } });
     }
   }
   const list = (k) => (filters[k] || "").split(",").filter(Boolean);

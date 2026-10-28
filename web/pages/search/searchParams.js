@@ -38,13 +38,13 @@ function wordsPhrase(q) {
 }
 
 // The heading of the page, in parts, so that the page can set the count in mono.
-// count is null while the speeches load. scopeName is the name of the tag, member or place.
-export function headingParts({ scope, count, scopeName }) {
+// count is null while the speeches load. names holds the names of the tag, place and member.
+export function headingParts({ scope, count, names = {} }) {
   const q = scope.q || "";
   let on = "";
-  if (scope.tag) on = ` on ${scopeName || scope.tag}`;
-  else if (scope.place) on = ` about ${scopeName || scope.place}`;
-  else if (scope.member) on = ` by ${scopeName || "this member"}`;
+  if (scope.tag) on += ` on ${names.tag || scope.tag}`;
+  if (scope.place) on += ` about ${names.place || scope.place}`;
+  if (scope.member) on += ` by ${names.member || "this member"}`;
 
   if (!q && !on) {
     return { lead: null, rest: "Search the speeches of the Lok Sabha" };
