@@ -1,0 +1,100 @@
+/* Chip styles. Tokens define all colours, fonts, sizes, and spaces. */
+
+.chip {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  height: var(--chip-height);
+  padding: 0 var(--space-2);
+  background: var(--sheet);
+  border: 1px solid var(--hairline);
+  border-radius: var(--radius);
+  color: var(--ink);
+  font-family: var(--font-sans);
+  font-size: var(--size-label);
+  line-height: var(--lh-label);
+  font-weight: 500;
+  text-decoration: none;
+  box-sizing: border-box;
+}
+
+.chip:hover {
+  color: var(--ink);
+  text-decoration: none;
+}
+
+@media (pointer: coarse) {
+  .chip {
+    height: var(--control-height);
+  }
+}
+
+.chip--selected {
+  border: 1px solid var(--ink);
+}
+
+.chip--removable {
+  padding-right: 0;
+}
+
+.chip__link,
+.chip__content {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  height: 100%;
+  color: var(--ink);
+  text-decoration: none;
+}
+
+.chip__link:hover {
+  color: var(--ink);
+  text-decoration: none;
+}
+
+.chip__check {
+  display: inline-flex;
+  align-items: center;
+  color: var(--ink);
+}
+
+.chip__label {
+  display: inline-flex;
+  align-items: center;
+}
+
+.chip__count {
+  font-family: var(--font-mono);
+  font-size: var(--size-count);
+  line-height: var(--lh-count);
+  color: var(--meta);
+  font-weight: 400;
+}
+
+.chip__remove {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  min-width: var(--control-height);
+  padding: 0;
+  margin: 0;
+  border: 0;
+  background: transparent;
+  color: var(--ink);
+  font-family: var(--font-sans);
+  font-size: var(--size-label);
+  line-height: 1;
+  cursor: pointer;
+}
+
+.chip__remove::before {
+  content: "";
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  min-width: var(--control-height);
+  min-height: var(--control-height);
+}
