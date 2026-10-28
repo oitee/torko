@@ -313,7 +313,7 @@ export default function MemberActivity({
         })()}
 
         <div className="member-activity__note meta">
-          Pick a session to read its speeches. The dashed line is the median member in that session.
+          Pick a session to read its speeches. The green line is the median member in that session.
         </div>
       </div>
     </section>

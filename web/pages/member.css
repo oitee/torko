@@ -249,8 +249,8 @@
 
 .member-activity__legend-line {
   width: calc(var(--space-4) + var(--space-1));
-  height: 0;
-  border-top: 2px dashed var(--ink);
+  height: 2px;
+  background: var(--action);
   display: inline-block;
 }
 
@@ -349,8 +349,8 @@
   position: absolute;
   left: 0;
   right: 0;
-  height: 0;
-  border-top: 2px dashed var(--ink);
+  height: 2px;
+  background: var(--action);
   pointer-events: none;
 }
 
@@ -464,7 +464,7 @@
     top: -2px;
     bottom: -2px;
     width: 2px;
-    background: var(--ink);
+    background: var(--action);
   }
 
   .member-activity__narrow-count {
@@ -645,7 +645,7 @@
   top: -2px;
   bottom: -2px;
   width: 2px;
-  background: var(--ink);
+  background: var(--action);
 }
 
 .member-subjects__n-cell {
@@ -722,7 +722,7 @@
 .member-subjects__legend-tick {
   width: 2px;
   height: calc(var(--space-3) + 2px);
-  background: var(--ink);
+  background: var(--action);
 }
 
 .member-subjects__note {
@@ -812,7 +812,7 @@
 
 .member-places__own-seat {
   font-size: var(--size-count);
-  color: var(--meta);
+  color: var(--action);
   white-space: nowrap;
 }
 

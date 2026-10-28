@@ -30,7 +30,7 @@ export default function Place() {
 
   // Address search parameters for filtering speeches
   const filterParams = {};
-  for (const key of ["term", "party", "kind", "session", "subject"]) {
+  for (const key of ["term", "party", "kind", "session", "subject", "min_words"]) {
     const val = searchParams.get(key);
     if (val) {
       filterParams[key] = val;

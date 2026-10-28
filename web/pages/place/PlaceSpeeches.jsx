@@ -1,4 +1,5 @@
 import React from "react";
+import { useSearchParams } from "react-router-dom";
 import FilterBar from "../../components/FilterBar.jsx";
 import SpeechList from "../../components/SpeechList.jsx";
 import { formatNumber } from "../../assets/js/format.js";
@@ -11,6 +12,20 @@ export default function PlaceSpeeches({
   unfilteredTotal,
   speechesFilters = {},
 }) {
+  const [searchParams, setSearchParams] = useSearchParams();
+  const hideShort = searchParams.get("min_words") === "50";
+
+  const handleToggleHideShort = () => {
+    const next = new URLSearchParams(searchParams);
+    if (hideShort) {
+      next.delete("min_words");
+    } else {
+      next.set("min_words", "50");
+    }
+    next.delete("page");
+    setSearchParams(next);
+  };
+
   const currentTotal = total !== undefined && total !== null ? total : unfilteredTotal;
   const countLabel = `${formatNumber(currentTotal)} ${
     currentTotal === 1 ? "speech" : "speeches"
@@ -37,6 +52,16 @@ export default function PlaceSpeeches({
           noun="speeches"
           groups={FILTER_GROUPS}
         />
+
+        <label className="place-speeches__toggle">
+          <input
+            type="checkbox"
+            checked={hideShort}
+            onChange={handleToggleHideShort}
+            className="place-speeches__checkbox"
+          />
+          <span>Hide remarks under 50 words</span>
+        </label>
       </div>
 
       <div className="place-speeches__list">
