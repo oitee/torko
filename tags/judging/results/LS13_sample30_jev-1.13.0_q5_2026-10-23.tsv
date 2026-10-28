@@ -1,0 +1,617 @@
+item_id	speech_id	source	list	type	model_type	name	mention	p_keep	p_refers	kept	review
+2107242	408218	llm	topic	topic		Parliamentary decorum	सदन की गरिमा	0.93	-	yes	keep
+2362955	408218	summary_tag	topic	topic		Question of Privilege	A formal complaint that parliament's rights have been breached.	0.89	-	yes	drop
+2362957	408218	summary_tag	topic	topic		Contempt of House	An act that disrespects the authority of parliament and can bring punishment for the person who did it.	0.68	-	no	drop
+2362961	408218	summary_tag	topic	law		Rule 193	Lok Sabha procedural rule allowing members to raise discussions on matters of urgent public importance without formal voting.	0.05	-	no	drop
+2362963	408218	summary_tag	topic	law		Rule 374	Lok Sabha procedural rule empowering the Speaker to suspend members who disregard the authority of the Chair.	0.05	-	no	drop
+2362967	408218	summary_tag	topic	topic		Parliamentary Etiquette	Expected standards of conduct during parliament sessions.	0.90	-	yes	keep
+2362971	408218	summary_tag	topic	topic		Parliamentary Zero Hour	A period in a parliament session for raising urgent matters.	0.07	-	no	drop
+2362972	408218	summary_tag	topic	law		Rule 56	Parliamentary procedure rule	0.04	-	no	drop
+2362976	408218	summary_tag	topic	topic		Parliamentary Disruptions	Interruptions, protests, and adjournments that halt official proceedings in legislative houses.	0.81	-	yes	drop
+2362978	408218	summary_tag	topic	law		Rule 353	Lok Sabha procedural rule regarding advance notice required before making defamatory allegations against individuals.	0.04	-	no	drop
+2362981	408218	summary_tag	topic	topic		Observation	A formal note made by parliament on a matter.	0.35	-	no	drop
+2362984	408218	summary_tag	topic	topic		MP(s) Conduct	Behavior and ethics of parliament members	0.89	-	yes	keep
+2362988	408218	summary_tag	topic	topic		Rule 184	A specific rule that allows a parliamentary discussion with a vote.	0.11	-	no	drop
+3264970	408218	dictionary	other	person		Raghunath Jha	रघुनाथ झा	0.54	-	no	keep
+3264971	408218	dictionary	other	person		Raghuvansh Prasad Singh	रघुवंश बाबू	0.95	-	yes	keep
+2105000	407471	llm	topic	topic		Counter-terrorism	increasing terrorism	0.88	-	yes	keep
+2105001	407471	llm	topic	topic		Enclave residents welfare	exchange of Indian enclaves with Bangladeshi enclaves	0.90	-	yes	keep
+2381912	407471	summary_tag	topic	law		Land Boundary Agreement	Bilateral treaty between India and Bangladesh to exchange enclaves and resolve long-standing border disputes.	0.42	-	no	keep
+2381914	407471	summary_tag	topic	law		Citizenship (Amendment) Bill, 2015	Proposed legislation to merge the Person of Indian Origin and Overseas Citizen of India categories.	0.02	-	no	drop
+2381917	407471	summary_tag	topic	topic		Indo-Bangladesh Relation	Relations between India and Bangladesh.	0.86	-	yes	keep
+2381921	407471	summary_tag	topic	topic		Indian Citizens	Persons holding citizenship of India	0.87	-	yes	drop
+2381924	407471	summary_tag	topic	law		Constitution (One Hundred and Thirty-First Amendment) Bill	Proposed amendment to the Constitution of India introduced in parliament.	0.03	-	no	drop
+2381927	407471	summary_tag	topic	law		Land Acquisition Act, Fair Compensation and Transparency	Proposed legislative amendment to modify consent requirements and procedures for acquiring land in India.	0.02	-	no	drop
+2381930	407471	summary_tag	topic	topic		Rehabilitation of Kashmiri Pandits	Efforts and policies to resettle displaced Kashmiri Pandits back in the Kashmir Valley.	0.04	-	no	drop
+2381934	407471	summary_tag	topic	topic		Development of Jammu and Kashmir	Economic growth, infrastructure creation, and social progress within the region of Jammu and Kashmir.	0.40	-	no	drop
+2381936	407471	summary_tag	topic	topic		Special Category Status for Andhra Pradesh	Demand for preferential central financial assistance and tax concessions for Andhra Pradesh post-bifurcation.	0.02	-	no	drop
+2381939	407471	summary_tag	topic	law		Assam Accord	Settlement signed in 1985 between the Indian government and Assam movement leaders to detect and deport foreigners.	0.05	-	no	drop
+2381943	407471	summary_tag	topic	topic		Citizenship Amendment Act Protests	Nationwide public demonstrations and protests against the Citizenship (Amendment) Act of 2019.	0.02	-	no	drop
+2381946	407471	summary_tag	topic	law		Citizens Amendment Act (CAA)	Law amending citizenship provisions for religious minorities from neighboring countries.	0.01	-	no	drop
+2105002	407471	llm	other	place		Jammu and Kashmir	Jammu and Kashmir	0.95	-	yes	keep
+2105003	407471	llm	other	place		Punjab	Punjab	0.90	-	yes	keep
+2105004	407471	llm	other	place		North-Eastern region	North-Eastern region	0.97	-	yes	keep
+3266376	407471	dictionary	other	law		National Exit Test	NEXT	0.01	-	no	drop
+3266377	407471	dictionary	other	place		Bangladesh	Bangladeshi	0.99	-	yes	keep
+2102136	406612	llm	topic	topic		Judicial delay	delay in the administration of justice	0.99	-	yes	keep
+2102137	406612	llm	topic	topic		Judicial decentralization	decentralising judicial powers	0.95	-	yes	keep
+2102138	406612	llm	topic	topic		Appointment of judges	appointment of judges to the higher judiciary	0.97	-	yes	keep
+2102139	406612	llm	topic	topic		Contempt of court	Contempt of Court Act	0.91	-	yes	keep
+2102140	406612	llm	topic	topic		Alternative dispute resolution	arbitration, conciliation and judicial settlements	0.88	-	yes	keep
+2404830	406612	summary_tag	topic	law		Arbitration and Conciliation (Amendment) Act	Indian amending legislation updating arbitration and conciliation procedures to ensure speedy dispute resolution and attract investment.	0.23	-	no	drop
+2404833	406612	summary_tag	topic	topic		Judicial Delay	Slow pace of court cases affecting justice	0.99	-	yes	keep
+2404834	406612	summary_tag	topic	topic		High Court Benches	Setting up regional permanent or circuit benches of High Courts to improve judicial accessibility.	0.36	-	no	drop
+2404837	406612	summary_tag	topic	law		Land Acquisition Act, Fair Compensation and Transparency	Proposed legislative amendment to modify consent requirements and procedures for acquiring land in India.	0.01	-	no	drop
+2404840	406612	summary_tag	topic	law		Commercial Courts Act	Indian law establishing dedicated courts and divisions to fast-track the resolution of commercial disputes.	0.03	-	no	drop
+2404843	406612	summary_tag	topic	law		Constitution (One Hundred and Thirty-First Amendment) Bill	Proposed amendment to the Constitution of India introduced in parliament.	0.02	-	no	drop
+2404846	406612	summary_tag	topic	law		Advocates(Amendment) Bill	Legislation modifying the Advocates Act and regulations.	0.06	-	no	drop
+2404848	406612	summary_tag	topic	topic		Judicial Pendency and Vacancies	Accumulation of unresolved court cases and the shortage of judges across the judicial system.	0.97	-	yes	keep
+2404851	406612	summary_tag	topic	law		The Government of National Capital Territory of Delhi(Amendment)Bill, 2023	Legislative amendment changing governance of Delhi territory.	0.01	-	no	drop
+2404854	406612	summary_tag	topic	law		Delhi High Court (Amendment) Act	An Indian act amending the pecuniary jurisdiction and procedural rules of the Delhi High Court.	0.03	-	no	drop
+2404855	406612	summary_tag	topic	topic		Judicial Reforms	Changes made to improve the courts and legal process.	0.99	-	yes	keep
+2404858	406612	summary_tag	topic	law		Negotiable Instruments (Amendment) Act	Act amending the law on negotiable instruments to expedite trials for dishonoured cheques.	0.02	-	no	drop
+2102141	406612	llm	other	law		Code of Civil Procedure (Amendment) Bill, 1999	Code of Civil Procedure (Amendment) Bill, 1999	0.99	-	yes	keep
+2102142	406612	llm	other	law		Indian Evidence Act	Indian Evidence Act	1.00	-	yes	keep
+2102143	406612	llm	other	law		Contempt of Court Act	Contempt of Court Act	1.00	-	yes	keep
+2102144	406612	llm	other	institution		Supreme Court	Supreme Court	1.00	-	yes	keep
+2102145	406612	llm	other	institution		High Courts	High Courts	0.98	-	yes	keep
+3268650	406612	dictionary	other	group		Judges	Judges	0.69	-	no	keep
+3268651	406612	dictionary	other	law		Insolvency and Bankruptcy Code	Code	0.00	-	no	drop
+3268652	406612	dictionary	other	institution		Executive	Executive	0.20	-	no	drop
+3268653	406612	dictionary	other	law		Constitution of India	Constitution	0.86	-	yes	drop
+3268654	406612	dictionary	other	group		Left Parties	Left	0.00	-	no	drop
+3268655	406612	dictionary	other	law		Fundamental Rights	Fundamental Rights	0.97	-	yes	drop
+3268656	406612	dictionary	other	group		Ministers	Ministers	0.23	-	no	drop
+3268657	406612	dictionary	other	institution		Panchayati Raj	Panchayati Raj	0.05	-	no	drop
+2095671	404176	llm	topic	topic		Housing finance	housing finances	0.99	-	yes	keep
+2095672	404176	llm	topic	topic		Banking regulation	checks and balances	0.93	-	yes	keep
+2095673	404176	llm	topic	topic		Capital requirement	paid-up capitals	0.94	-	yes	keep
+2456256	404176	summary_tag	topic	institution		National Housing Bank	A government bank that funds housing loans and construction.	0.99	-	yes	keep
+2456259	404176	summary_tag	topic	law		Banking Regulation (Amendment) Act	Act amending banking regulations to bring urban and multi-state cooperative banks under Reserve Bank of India supervision.	0.04	-	no	drop
+2456261	404176	summary_tag	topic	law		Land Acquisition Act, Fair Compensation and Transparency	Proposed legislative amendment to modify consent requirements and procedures for acquiring land in India.	0.01	-	no	drop
+2456262	404176	summary_tag	topic	institution		HUDCO	A government agency that finances affordable housing projects.	0.03	-	no	drop
+2456264	404176	summary_tag	topic	law		Real Estate (Regulation and Development) Act	Act of parliament regulating the real estate sector and protecting home buyers' interests.	0.02	-	no	drop
+2456266	404176	summary_tag	topic	law		Taxation Laws (Amendment) Bill	Legislative bill introduced in the Indian parliament to amend existing income tax and financial statutes.	0.01	-	no	drop
+2456268	404176	summary_tag	topic	law		Constitution (One Hundred and Thirty-First Amendment) Bill	Proposed amendment to the Constitution of India introduced in parliament.	0.01	-	no	drop
+2456270	404176	summary_tag	topic	law		Insurance Laws (Amendment) Act	Indian act amending insurance legislation to permit increased foreign direct investment and update regulations.	0.01	-	no	drop
+2456273	404176	summary_tag	topic	law		SARFAESI Act	Act of Parliament allowing banks and financial institutions to auction commercial or residential properties to recover loans.	0.03	-	no	drop
+2456275	404176	summary_tag	topic	law		National Capital Territory of Delhi Laws (Special Provisions) Second (Amendment) Act	Indian act extending temporary protection to unauthorized constructions and encroachments in Delhi from punitive action.	0.01	-	no	drop
+2456277	404176	summary_tag	topic	law		Negotiable Instruments (Amendment) Act	Act amending the law on negotiable instruments to expedite trials for dishonoured cheques.	0.02	-	no	drop
+2456279	404176	summary_tag	topic	topic		Housing Loans	General credit that helps people pay for building or buying a home.	0.83	-	yes	drop
+2095674	404176	llm	other	law		National Housing Bank (Amendment) Bill, 2000	National Housing Bank (Amendment) Bill, 2000	0.99	-	yes	keep
+2095675	404176	llm	other	institution		Reserve Bank of India	Reserve Bank of India	1.00	-	yes	keep
+2095676	404176	llm	other	law		Public Debts Recovery Act	Public Debts Recovery Act	0.52	-	yes	keep
+2095677	404176	llm	other	institution		National Housing Bank	National Housing Bank	1.00	-	yes	keep
+2095678	404176	llm	other	institution		Grindlays Bank	Grindlays Bank	0.14	-	no	drop
+3274182	404176	dictionary	other	role		Director	Director	0.45	-	no	drop
+3274183	404176	dictionary	other	institution		Appellate Tribunal	Appellate Tribunal	0.19	-	no	keep
+3274184	404176	dictionary	other	person		Harshad Mehta	Harshad Mehta	0.14	-	no	drop
+2497393	402177	summary_tag	topic	topic		Diseases	Illness and conditions affecting health	0.28	-	no	drop
+2497395	402177	summary_tag	topic	topic		Cancer	Serious disease affecting population health	0.05	-	no	drop
+2497397	402177	summary_tag	topic	topic		Heart Diseases	Cardiovascular conditions affecting the heart	0.07	-	no	drop
+2497399	402177	summary_tag	topic	person		Rajiv Gandhi	Former Prime Minister of India	0.01	-	no	drop
+2497402	402177	summary_tag	topic	institution		Ministry of Health	Union ministry responsible for public health policies and medical programmes in India.	0.07	-	no	drop
+2497403	402177	summary_tag	topic	law		Senior Citizens (Provision of Geriatric and Dementia Care) Bill	Proposed law to provide specialised healthcare, geriatric services, and dementia care for elderly persons in India.	0.01	-	no	drop
+2497405	402177	summary_tag	topic	scheme		Pradhan Mantri Swasthya Suraksha Yojana	Central government scheme aimed at correcting regional imbalances in tertiary healthcare and medical education.	0.01	-	no	drop
+2497408	402177	summary_tag	topic	topic		Chronic Diseases	Long-term illnesses affecting health over extended periods	0.08	-	no	drop
+2497409	402177	summary_tag	topic	topic		Pan Masala	Betel leaf preparation with health concerns	0.01	-	no	drop
+2497411	402177	summary_tag	topic	institution		Ministry of Health and Family Welfare	Union ministry responsible for public health, family planning, medical education, and healthcare infrastructure.	0.06	-	no	drop
+2497413	402177	summary_tag	topic	scheme		PM Ayushman Bharat Health Infrastructure Mission	Central scheme aimed at strengthening primary, secondary, and tertiary public healthcare infrastructure and surveillance.	0.01	-	no	drop
+2497415	402177	summary_tag	topic	scheme		Pradhan Mantri Atmanirbhar Swasth Bharat Yojana	Central government scheme to strengthen healthcare infrastructure and disease surveillance across India.	0.01	-	no	drop
+3278337	402177	dictionary	other	institution		Union Cabinet	Union Cabinet	0.45	-	no	drop
+2088101	401361	llm	topic	topic		Passport regulation and security	Passport (Entry into India) Amendment Bill, 2000	0.98	-	yes	keep
+2088102	401361	llm	topic	topic		Passport computerization	computerisation	0.67	-	yes	keep
+2088103	401361	llm	topic	topic		NRI travel documentation	Orange Card	0.40	-	yes	keep
+2515861	401361	summary_tag	topic	law		Citizenship (Amendment) Bill, 2015	Proposed legislation to merge the Person of Indian Origin and Overseas Citizen of India categories.	0.01	-	no	drop
+2515864	401361	summary_tag	topic	law		Immigration Control	Government regulation of foreign nationals entering and residing in India.	0.71	-	no	keep
+2515867	401361	summary_tag	topic	law		Passports	Travel documents identifying citizens.	0.98	-	yes	keep
+2515869	401361	summary_tag	topic	law		Photo Identity Cards	Official documents with photographs identifying individuals for security purposes.	0.09	-	no	drop
+2515873	401361	summary_tag	topic	law		Aadhaar and Other Laws (Amendment) Act	An Indian act amending laws to allow voluntary use of Aadhaar for identity verification and address privacy concerns.	0.01	-	no	drop
+2515876	401361	summary_tag	topic	topic		Overseas Citizen of India	Immigration status granting foreign citizens of Indian origin multiple-entry, lifelong visas and residency rights.	0.20	-	no	drop
+2515878	401361	summary_tag	topic	law		E-VISA	Electronic travel permit.	0.06	-	no	drop
+2515881	401361	summary_tag	topic	law		Constitution (One Hundred and Thirty-First Amendment) Bill	Proposed amendment to the Constitution of India introduced in parliament.	0.01	-	no	drop
+2515885	401361	summary_tag	topic	law		Land Acquisition Act, Fair Compensation and Transparency	Proposed legislative amendment to modify consent requirements and procedures for acquiring land in India.	0.01	-	no	drop
+2515886	401361	summary_tag	topic	topic		Indian Citizens	Persons holding citizenship of India	0.34	-	no	drop
+2515890	401361	summary_tag	topic	law		National Investigation Agency (Amendment) Act	Act expanding the National Investigation Agency's jurisdiction to investigate offences committed outside India.	0.01	-	no	drop
+2515894	401361	summary_tag	topic	law		Taxation Laws (Amendment) Bill	Legislative bill introduced in the Indian parliament to amend existing income tax and financial statutes.	0.01	-	no	drop
+2088104	401361	llm	other	law		Passport (Entry into India) Amendment Act	Passport (Entry into India) Amendment Bill, 2000	0.68	-	yes	keep
+2088105	401361	llm	other	law		Passport Act, 1967	Passport Bill of 1967	0.35	-	no	keep
+2088106	401361	llm	other	institution		Ministry of External Affairs	Ministry of External Affairs	0.98	-	yes	keep
+2088107	401361	llm	other	institution		Ministry of Home Affairs	Ministry of Home	1.00	-	yes	keep
+3280496	401361	dictionary	other	group		Non-Resident Indians	NRIs	0.98	-	yes	keep
+3280497	401361	dictionary	other	place		Chennai	Chennai	0.56	-	no	drop
+3280498	401361	dictionary	other	place		Mumbai	Mumbai	0.24	-	no	drop
+3280499	401361	dictionary	other	place		Delhi	Delhi	0.29	-	no	drop
+2087286	401111	llm	topic	topic		Natural calamities relief	प्राकृतिक आपदा	0.98	-	yes	keep
+2087287	401111	llm	topic	topic		Agricultural drought	सूखे	0.63	-	yes	keep
+2521172	401111	summary_tag	topic	scheme		National Calamity Contingency Fund (NECF)	Central government emergency fund for relief after a natural disaster.	0.28	-	no	drop
+2521173	401111	summary_tag	topic	scheme		State Disaster Response Fund (SDRF)	Government fund, run by each state, that pays for disaster relief. Formerly the Calamity Relief Fund.	0.48	-	no	drop
+2521175	401111	summary_tag	topic	topic		Drought Relief	Government assistance to areas affected by drought conditions.	0.95	-	yes	keep
+2521178	401111	summary_tag	topic	topic		Flood Relief	Government assistance to flooded areas.	0.76	-	no	keep
+2521180	401111	summary_tag	topic	scheme		National Disaster Relief Fund	Government fund that provides financial aid for natural disaster recovery.	0.37	-	no	drop
+2521182	401111	summary_tag	topic	topic		Disaster Relief Funds	Financial reserves and budgetary allocations dedicated to emergency relief, rehabilitation, and disaster recovery.	0.93	-	yes	keep
+2521183	401111	summary_tag	topic	topic		Flood and Drought Management	Policies, preventive measures, and relief actions to manage extreme excess or scarcity of water.	0.94	-	yes	keep
+2521186	401111	summary_tag	topic	topic		Natural Calamities	Destructive natural events such as floods, earthquakes, and cyclones.	0.97	-	yes	keep
+2521188	401111	summary_tag	topic	topic		Natural Disaster Relief	General government assistance given to people affected by a disaster.	0.97	-	yes	keep
+2521190	401111	summary_tag	topic	scheme		Prime Minister's National Relief Fund	Government fund controlled by the prime minister for emergency relief.	0.18	-	no	drop
+2521192	401111	summary_tag	topic	topic		National Calamity	Natural disaster and emergency response.	0.91	-	yes	drop
+2521194	401111	summary_tag	topic	scheme		PM-CARES Fund	Prime minister's relief fund set up for national emergencies.	0.02	-	no	drop
+2087288	401111	llm	other	place		Madhya Pradesh	मध्य प्रदेश	1.00	-	yes	keep
+2087289	401111	llm	other	place		Tamil Nadu	तमिलनाडु	0.11	-	no	drop
+2087290	401111	llm	other	place		West Bengal	वैस्ट बंगाल	0.06	-	no	drop
+2087291	401111	llm	other	place		Himachal Pradesh	हिमाचल प्रदेश	0.01	-	no	drop
+2087292	401111	llm	other	place		Orissa	उड़ीसा	0.02	-	no	drop
+3280957	401111	dictionary	other	place		Khargone	खरगौन	0.95	-	yes	keep
+3280958	401111	dictionary	other	place		Khandwa	खंडवा	0.83	-	yes	drop
+3280959	401111	dictionary	other	place		Sagar	सागर	0.20	-	no	drop
+3280960	401111	dictionary	other	place		Khajuraho	खजुराहो	0.10	-	no	drop
+3280961	401111	dictionary	other	place		Barh	बाढ़	0.17	-	no	drop
+3280962	401111	dictionary	other	role		District Collector	कलेक्टर	1.00	-	yes	keep
+3280963	401111	dictionary	other	place		Mandsaur	मंदसौर	0.05	-	no	drop
+2086970	401012	llm	topic	topic		Bridge construction and repair	bridge, which is connecting the Kolli Hills	0.29	-	no	keep
+2086971	401012	llm	topic	topic		Educational grants and scholarships	अनुसूचित जातियों, जनजातियों और पिछड़े वगा् के छात्रों को वजीफा और सुविधाएं	0.42	-	yes	keep
+2523671	401012	summary_tag	topic	topic		Scholarships for Backward Classes	Government financial assistance schemes supporting students belonging to Other Backward Classes in pursuing education.	0.37	-	no	keep
+2523674	401012	summary_tag	topic	topic		Scholarships for Scheduled Castes	Government financial grants and welfare aid supporting students from Scheduled Castes in schooling and higher education.	0.37	-	no	keep
+2523677	401012	summary_tag	topic	topic		Educational Support for Backward Classes	Scholarships, fee waivers, hostels, and specialized schemes for students from socially and educationally backward communities.	0.39	-	no	keep
+2523678	401012	summary_tag	topic	topic		SCs and STs welfare	Support for scheduled communities	0.39	-	no	drop
+2523682	401012	summary_tag	topic	scheme		Minority Scholarships	Government financial aid programmes supporting students from religious minority communities for schooling and higher education.	0.31	-	no	drop
+2523686	401012	summary_tag	topic	topic		Social Problems	Issues affecting society and welfare	0.48	-	no	drop
+2523687	401012	summary_tag	topic	topic		Scheduled Castes and Scheduled Tribes	The two groups of communities that India officially recognises as disadvantaged.	0.37	-	no	keep
+2523690	401012	summary_tag	topic	topic		Backward Classes	Communities that are socially and economically disadvantaged.	0.28	-	no	keep
+2523693	401012	summary_tag	topic	institution		Committee on the Welfare of Scheduled Castes and Scheduled Tribes	Parliamentary committee overseeing the implementation of constitutional safeguards and welfare measures for SCs and STs.	0.19	-	no	drop
+2523697	401012	summary_tag	topic	topic		Scs & Sts Atrocities	Crimes against scheduled castes and tribes.	0.07	-	no	drop
+2523700	401012	summary_tag	topic	topic		Welfare Schemes	General government programs that improve the well-being of citizens.	0.47	-	no	drop
+2523703	401012	summary_tag	topic	law		SCs & STs lists	Lists of scheduled castes and scheduled tribes.	0.18	-	no	drop
+2086972	401012	llm	other	place		Sendhamangalam	Sendhamangalam	0.91	-	yes	keep
+2086973	401012	llm	other	place		Kolli Hills	Kolli Hills	0.87	-	yes	keep
+2086974	401012	llm	other	group		Scheduled Castes	अनुसूचित जातियों	0.89	-	yes	keep
+2086975	401012	llm	other	group		Scheduled Tribes	जनजातियों	0.87	-	yes	keep
+3281258	401012	dictionary	other	person		Mulayam Singh Yadav	मुलायम सिंह यादव	0.68	-	no	keep
+3281259	401012	dictionary	other	scheme		Aadhaar	आधार	0.00	-	no	drop
+3281260	401012	dictionary	other	group		Students	छात्रों	0.91	-	yes	drop
+3281261	401012	dictionary	other	group		Other Backward Classes	पिछड़े	0.76	-	no	keep
+2075434	397266	llm	topic	topic		Educational policy	एन.सी.ई.आर.टी. के डॉक्यूमेंटस	0.93	-	yes	keep
+2616615	397266	summary_tag	topic	topic		Saffronisation	Alleged promotion of Hindu nationalist ideology	0.90	-	yes	keep
+2616618	397266	summary_tag	topic	institution		National Council for Educational Research and Training (NCERT)	Authority developing curriculum and textbooks	0.90	-	yes	keep
+2616620	397266	summary_tag	topic	law		National Education Policy	Comprehensive education policy framework	0.57	-	no	keep
+2616621	397266	summary_tag	topic	scheme		PM SHRI	Central initiative upgrading select schools to showcase exemplary education under the National Education Policy 2020.	0.02	-	no	drop
+2616623	397266	summary_tag	topic	scheme		Samagra Shiksha Abhiyan	Centrally sponsored overarching programme for the school education sector from preschool to class twelve.	0.02	-	no	drop
+2616626	397266	summary_tag	topic	topic		Medical Education Reform	Policy changes and initiatives aimed at improving the quality and accessibility of medical training in India.	0.02	-	no	drop
+2616627	397266	summary_tag	topic	scheme		PM POSHAN	Central scheme providing free hot cooked mid-day meals to school children across India.	0.01	-	no	drop
+2616629	397266	summary_tag	topic	law		National Council for Teacher Education Act	Indian act establishing a statutory council to oversee and maintain standards in teacher education.	0.14	-	no	drop
+2616631	397266	summary_tag	topic	topic		School Curriculum	The subjects and content that schools teach students.	0.69	-	no	keep
+2616633	397266	summary_tag	topic	institution		Department of Higher Education	A central government department overseeing university education, policy formulation, and academic institutes of national importance.	0.09	-	no	drop
+2616636	397266	summary_tag	topic	topic		Minority Education	Educational access, institutions, and policies for religious and linguistic minority groups in India.	0.37	-	no	drop
+2616638	397266	summary_tag	topic	institution		Standing Committee on Human Resource Development	Parliamentary body that examined policies, legislation, and budgets related to education and human resource development in India.	0.12	-	no	drop
+2075435	397266	llm	other	institution		National Council of Educational Research and Training	एन.सी.ई.आर.टी.	1.00	-	yes	keep
+2065470	394255	llm	topic	topic		Road construction	राषट्रीय राजमार्ग की स्थापना	0.99	-	yes	keep
+2065471	394255	llm	topic	topic		Regional connectivity	दिल्ली से दूरी कम करने	0.96	-	yes	keep
+2065472	394255	llm	topic	topic		National security	भारत की सुरक्षा	0.63	-	yes	keep
+2684768	394255	summary_tag	topic	topic		Highway Construction and Safety	Building and widening national highways alongside engineering measures to prevent road accidents.	0.94	-	yes	drop
+2684769	394255	summary_tag	topic	place		National Highway 24	National highway in Uttar Pradesh connecting Delhi with Lucknow.	0.78	-	no	keep
+2684771	394255	summary_tag	topic	topic		National Highway Expansion	Widening, upgrading, and acquiring land for India's national highway network.	0.96	-	yes	keep
+2684774	394255	summary_tag	topic	scheme		National Highways Development Project	Major government project aimed at upgrading and widening key national highways across India.	0.08	-	no	drop
+2684776	394255	summary_tag	topic	scheme		Bharatmala Pariyojana	Government program that builds and connects national highways.	0.03	-	no	drop
+2684778	394255	summary_tag	topic	institution		National Highways Authority of India (NHAI)	The government body that builds and manages India's national highways.	0.08	-	no	drop
+2684781	394255	summary_tag	topic	place		National Highways	Major roads managed by the central government connecting different regions.	0.84	-	yes	keep
+2684783	394255	summary_tag	topic	scheme		Delhi-Mumbai Expressway	A major access-controlled expressway connecting India's national capital Delhi with its financial hub Mumbai.	0.01	-	no	drop
+2684785	394255	summary_tag	topic	topic		Rail Connectivity and Overbridge Construction	Expansion of railway networks and building overbridges or underpasses to improve road and rail traffic.	0.09	-	no	drop
+2684786	394255	summary_tag	topic	institution		Ministry of Road Transport and Highways	Indian union ministry responsible for the development and maintenance of national highways and road transport systems.	0.50	-	no	drop
+2684788	394255	summary_tag	topic	topic		Road Construction	Building or improving roads and highways.	0.98	-	yes	keep
+2684791	394255	summary_tag	topic	place		National Highway 19	Major national highway in India connecting Delhi and Kolkata.	0.02	-	no	drop
+2065473	394255	llm	other	law		National Highway No. 24	राषट्रीय राजमार्ग 24	0.99	-	yes	keep
+2065474	394255	llm	other	place		Pakbada	पाकबड़ा	1.00	-	yes	keep
+2065475	394255	llm	other	place		Moradabad	मुरादाबाद	1.00	-	yes	keep
+2065476	394255	llm	other	place		Kashipur	काशीपुर	1.00	-	yes	keep
+2065477	394255	llm	other	place		Ramganga River	राम गंगा नदी	1.00	-	yes	keep
+2065478	394255	llm	other	place		Uttaranchal	उत्तरांचल	1.00	-	yes	keep
+3257483	394255	dictionary	other	group		Petrol	पैट्रोल	0.71	-	no	drop
+3257484	394255	dictionary	other	group		Diesel	डीजल	0.76	-	no	drop
+3257485	394255	dictionary	other	place		Kumaon	कुमाऊं	0.99	-	yes	keep
+3257486	394255	dictionary	other	place		Delhi	दिल्ली	0.99	-	yes	keep
+3257487	394255	dictionary	other	place		Haridwar	हरिद्वार	0.98	-	yes	drop
+2064735	394084	llm	topic	topic		Suburban railway passenger amenities	passenger amenities needed for various Railway Stations	0.98	-	yes	keep
+2686495	394084	summary_tag	topic	institution		Central Railway	One of the zones of Indian Railways, headquartered at Chhatrapati Shivaji Maharaj Terminus in Mumbai.	0.90	-	yes	keep
+2686497	394084	summary_tag	topic	scheme		Adarsh Station Scheme	An Indian Railways programme to modernise and upgrade passenger amenities at selected railway stations.	0.04	-	no	drop
+2686499	394084	summary_tag	topic	institution		Western Railway	Zonal division of Indian Railways headquartered at Churchgate, Mumbai.	0.05	-	no	drop
+2686501	394084	summary_tag	topic	scheme		Amrit Bharat Station Scheme	Government program that modernises railway stations.	0.02	-	no	drop
+2686503	394084	summary_tag	topic	topic		Railway Passenger Amenities	Facilities and services provided to railway passengers.	0.98	-	yes	keep
+2686505	394084	summary_tag	topic	topic		Railway Cleanliness	Hygiene, sanitation, and waste management initiatives on trains and across railway stations in India.	0.10	-	no	drop
+2686507	394084	summary_tag	topic	topic		Rail Connectivity and Overbridge Construction	Expansion of railway networks and building overbridges or underpasses to improve road and rail traffic.	0.69	-	no	drop
+2686509	394084	summary_tag	topic	scheme		Mumbai Urban Transport Project	Joint government project improving suburban rail, roads, and mass transit infrastructure in the Mumbai metropolitan region.	0.04	-	no	drop
+2686511	394084	summary_tag	topic	topic		Railway Modernisation	Upgrading rail infrastructure, rolling stock, signaling, and technology across Indian Railways.	0.39	-	no	drop
+2686512	394084	summary_tag	topic	topic		Railway Station Infrastructure	Physical facilities, amenities, platforms, and passenger buildings at railway stations.	0.97	-	yes	keep
+2686514	394084	summary_tag	topic	place		Mumbai Suburban	District in Maharashtra, India.	0.90	-	yes	keep
+2686517	394084	summary_tag	topic	institution		South Central Railway	Zone of Indian Railways headquartered at Secunderabad, serving parts of Telangana, Andhra Pradesh, and nearby states.	0.02	-	no	drop
+2064736	394084	llm	other	institution		Central Railway	Central Railway	0.99	-	yes	keep
+2064737	394084	llm	other	place		Mumbai	Mumbai	1.00	-	yes	keep
+2064738	394084	llm	other	institution		Rakesh Mohan Committee	Rakesh Mohan Committee	0.96	-	yes	keep
+2064739	394084	llm	other	place		Mulund	Mulund	0.96	-	yes	keep
+2064740	394084	llm	other	place		Ghatkopar	Ghatkopar	0.94	-	yes	keep
+2064741	394084	llm	other	place		Chembur	Chembur	0.92	-	yes	keep
+3257860	394084	dictionary	other	place		Govandi	Govandi	0.98	-	yes	keep
+3257861	394084	dictionary	other	place		Nag River	Nagar	0.29	-	no	drop
+3257862	394084	dictionary	other	place		Mankhurd	Mankhurd	0.94	-	yes	keep
+3257863	394084	dictionary	other	group		Employers	employer	0.99	-	yes	drop
+3257864	394084	dictionary	other	law		Railway Budget	Railway Budget	0.99	-	yes	keep
+3257865	394084	dictionary	other	scheme		Graduate Aptitude Test in Engineering	GATE	0.00	-	no	drop
+3257866	394084	dictionary	other	place		Bhandup	Bhandup	0.95	-	yes	keep
+3257867	394084	dictionary	other	place		Vikhroli	Vikhroli	0.41	-	no	keep
+2062276	393356	llm	topic	topic		Fishermen welfare and deep-sea trawling	fishermen community	0.98	-	yes	keep
+2706891	393356	summary_tag	topic	topic		Fishermen Welfare	Government support for people who work in fishing.	0.98	-	yes	keep
+2706893	393356	summary_tag	topic	topic		Fishermen Security	Protection of fishers from maritime disputes, coastal piracy, and detention by neighbouring countries.	0.95	-	yes	drop
+2706895	393356	summary_tag	topic	institution		Department of Fisheries	A central government department responsible for developing, managing, and regulating fisheries and aquaculture in India.	0.26	-	no	drop
+2706897	393356	summary_tag	topic	scheme		Pradhan Mantri Matsya Sampada Yojana	Government scheme that supports fish farming and fishing communities.	0.04	-	no	drop
+2706899	393356	summary_tag	topic	topic		Coastal Regulation Zone	Regulatory classification of coastal stretches in India to protect marine ecology and control development.	0.12	-	no	drop
+2706901	393356	summary_tag	topic	topic		Fishermen Safety	Protection and emergency rescue measures for individuals engaged in marine and inland fishing.	0.87	-	yes	keep
+2706903	393356	summary_tag	topic	scheme		Kuttanad Package	Government rehabilitation programme to support wetland farming, flood management, and ecological development in Kuttanad, Kerala.	0.02	-	no	drop
+2706905	393356	summary_tag	topic	institution		Ministry of Fisheries, Animal Husbandry and Dairying	Union ministry overseeing livestock development, dairy farming, and marine and inland fisheries in India.	0.33	-	no	drop
+2706907	393356	summary_tag	topic	group		Nishad Community	Traditional river-dependent and fishing community in India.	0.02	-	no	drop
+2706909	393356	summary_tag	topic	topic		Coastal Fishing	Marine resources harvesting.	0.97	-	yes	keep
+2706911	393356	summary_tag	topic	topic		Deep Sea Fishing	Ocean fishing far from shore.	0.92	-	yes	keep
+2706913	393356	summary_tag	topic	topic		Special Category Status for Andhra Pradesh	Demand for preferential central financial assistance and tax concessions for Andhra Pradesh post-bifurcation.	0.01	-	no	drop
+2062277	393356	llm	other	place		Dakshin Kannada	Dakshin Kannada	1.00	-	yes	keep
+2062278	393356	llm	other	place		Malpe	Malpe	0.84	-	yes	keep
+3260312	393356	dictionary	other	group		Fishermen	fishermen	1.00	-	yes	keep
+3260313	393356	dictionary	other	place		Udupi	Udupi	0.79	-	no	drop
+2060207	392699	llm	topic	topic		Patent law and intellectual property	पेटेंट विधेयक	0.98	-	yes	keep
+2060208	392699	llm	topic	topic		Multinational corporations influence	मल्टीनेशनल कम्पनियों	0.97	-	yes	keep
+2060209	392699	llm	topic	topic		Public health and life-saving drugs	लाइफ सेविंग ड्रग्स	0.96	-	yes	keep
+2060210	392699	llm	topic	topic		National interest and security	national interest	0.83	-	yes	keep
+2723297	392699	summary_tag	topic	law		Health Security se National Security Cess Bill	Proposed law to levy a special tax for funding healthcare infrastructure and national security initiatives.	0.09	-	no	drop
+2723299	392699	summary_tag	topic	law		The Government of National Capital Territory of Delhi(Amendment)Bill, 2023	Legislative amendment changing governance of Delhi territory.	0.01	-	no	drop
+2723301	392699	summary_tag	topic	law		Land Acquisition Act, Fair Compensation and Transparency	Proposed legislative amendment to modify consent requirements and procedures for acquiring land in India.	0.01	-	no	drop
+2723303	392699	summary_tag	topic	law		Constitution (One Hundred and Thirty-First Amendment) Bill	Proposed amendment to the Constitution of India introduced in parliament.	0.02	-	no	drop
+2723305	392699	summary_tag	topic	law		Sabka Bima Sabki Raksha Bill	Insurance legislation for comprehensive coverage	0.02	-	no	drop
+2723307	392699	summary_tag	topic	law		The Nari Shakti Vandan Adhiniyam	Law that reserves seats for women in Parliament and state assemblies.	0.01	-	no	drop
+2723309	392699	summary_tag	topic	law		National Anti-Doping (amendment) Bill 2025	Legislative amendment to anti-doping regulations	0.01	-	no	drop
+2723311	392699	summary_tag	topic	law		Aadhaar and Other Laws (Amendment) Act	An Indian act amending laws to allow voluntary use of Aadhaar for identity verification and address privacy concerns.	0.01	-	no	drop
+2723314	392699	summary_tag	topic	law		Insurance Laws (Amendment) Act	Indian act amending insurance legislation to permit increased foreign direct investment and update regulations.	0.01	-	no	drop
+2723315	392699	summary_tag	topic	law		Advocates(Amendment) Bill	Legislation modifying the Advocates Act and regulations.	0.77	-	no	drop
+2723317	392699	summary_tag	topic	law		NATIONAL FOOD SECURITY ACT	Law guaranteeing subsidized food for poor households	0.06	-	no	drop
+2723319	392699	summary_tag	topic	law		Taxation Laws (Amendment) Bill	Legislative bill introduced in the Indian parliament to amend existing income tax and financial statutes.	0.01	-	no	drop
+2060211	392699	llm	other	law		Patents (Amendment) Bill, 2002	पेटेंट विधेयक	1.00	-	yes	keep
+3262187	392699	dictionary	other	group		Developing countries	developing countries	0.99	-	yes	keep
+3262188	392699	dictionary	other	institution		PepsiCo	पेप्सी कोला	0.01	-	no	drop
+3262189	392699	dictionary	other	group		Multinational corporations	multi-national companies	0.93	-	yes	keep
+3262190	392699	dictionary	other	person		Murasoli Maran	मुरासोली मारन	0.13	-	no	drop
+3262191	392699	dictionary	other	person		Mani Shankar Aiyar	मणि शंकर जी	0.59	-	no	drop
+2059808	392545	llm	topic	topic		Scheduled Tribe status for Tharu community	थारु जाति	0.98	-	yes	keep
+2059809	392545	llm	topic	topic		Constitutional equality	भारतीय संविधान के अनुच्छेद 14 तथा 15	0.89	-	yes	keep
+2724371	392545	summary_tag	topic	group		Tharu	Indigenous community living predominantly in the Terai plains of Nepal and northern India.	0.99	-	yes	keep
+2724373	392545	summary_tag	topic	law		Constitution (Scheduled Tribes) Order Amendment Bill	Proposed legislation to modify the official list of Scheduled Tribes in Indian states and union territories.	0.62	-	no	drop
+2724375	392545	summary_tag	topic	topic		SCs and STs welfare	Support for scheduled communities	0.94	-	yes	drop
+2724377	392545	summary_tag	topic	topic		Scheduled Tribe Status	Official constitutional recognition of historically disadvantaged indigenous tribal communities in India.	0.98	-	yes	keep
+2724379	392545	summary_tag	topic	law		SCs & STs lists	Lists of scheduled castes and scheduled tribes.	0.94	-	yes	keep
+2724381	392545	summary_tag	topic	topic		Scheduled Tribes	Communities of India officially recognised as indigenous tribal groups.	0.97	-	yes	keep
+2724383	392545	summary_tag	topic	topic		Scheduled Tribes Representation	Participation and representation of Scheduled Tribes in political bodies, public offices, and administrative systems.	0.96	-	yes	drop
+2724384	392545	summary_tag	topic	law		Constitution (Scheduled Castes) Order (Amendment) Act	Legislation amending the official list of recognized Scheduled Castes for specific states and union territories.	0.16	-	no	drop
+2724387	392545	summary_tag	topic	topic		Scheduled Castes and Scheduled Tribes	The two groups of communities that India officially recognises as disadvantaged.	0.97	-	yes	drop
+2724389	392545	summary_tag	topic	law		Constitution (Scheduled Tribes) Order	Presidential order specifying the communities recognised as Scheduled Tribes across Indian states and union territories.	0.66	-	no	drop
+2724391	392545	summary_tag	topic	group		Nishad Community	Traditional river-dependent and fishing community in India.	0.02	-	no	drop
+2724393	392545	summary_tag	topic	law		Constitution (Scheduled Tribes) Order (Amendment) Act	Indian legislation amending the list of recognised Scheduled Tribes in specific states.	0.52	-	no	drop
+2059810	392545	llm	other	group		Tharu	थारु जाति	1.00	-	yes	keep
+2059811	392545	llm	other	place		Bihar	बिहार	1.00	-	yes	keep
+2059812	392545	llm	other	place		Uttar Pradesh	उत्तर प्रदेश	0.63	-	yes	keep
+2059813	392545	llm	other	law		Article 14 of the Constitution	अनुच्छेद 14	0.99	-	yes	keep
+2059814	392545	llm	other	law		Article 15 of the Constitution	अनुच्छेद 15	0.97	-	yes	keep
+3262390	392545	dictionary	other	group		Scheduled Tribes	अनुसूचित जनजातियों	1.00	-	yes	keep
+3262391	392545	dictionary	other	law		Constitution of India	संविधान	0.99	-	yes	drop
+3262392	392545	dictionary	other	group		Other Backward Classes	पिछड़े	0.78	-	no	drop
+3262393	392545	dictionary	other	place		Bagaha	बगहा	0.74	-	no	drop
+3262394	392545	dictionary	other	place		Pilibhit	पीलीभीत	0.21	-	no	drop
+3262395	392545	dictionary	other	place		Kheri	खीरी	0.13	-	no	drop
+3262396	392545	dictionary	other	place		West Champaran	पश्चिम चम्पारण	0.99	-	yes	keep
+3262397	392545	dictionary	other	place		Ramnagar	रामनगर	0.73	-	no	drop
+2059426	392445	llm	topic	topic		Haj pilgrimage management	Haj Committee Bill	0.98	-	yes	keep
+2059427	392445	llm	topic	topic		Haj committee operations	Haj Committee	0.98	-	yes	keep
+2728859	392445	summary_tag	topic	institution		All India Muslim Personal Law Board	A non-governmental organization in India that advocates for the protection and application of Muslim personal laws.	0.03	-	no	drop
+2728860	392445	summary_tag	topic	institution		Sachar Committee	A government committee that studied the condition of Muslim communities in India.	0.03	-	no	drop
+2728862	392445	summary_tag	topic	law		Citizenship (Amendment) Bill, 2015	Proposed legislation to merge the Person of Indian Origin and Overseas Citizen of India categories.	0.01	-	no	drop
+2728864	392445	summary_tag	topic	law		Constitution (One Hundred and Thirty-First Amendment) Bill	Proposed amendment to the Constitution of India introduced in parliament.	0.01	-	no	drop
+2728866	392445	summary_tag	topic	institution		Bezbaruah Committee	Committee established to examine concerns and recommend safety measures for people from Northeast India living nationwide.	0.05	-	no	drop
+2728868	392445	summary_tag	topic	institution		Central Wakf Council	A government body that oversees Muslim charitable religious trusts across India.	0.02	-	no	drop
+2728871	392445	summary_tag	topic	topic		Haj Pilgrimage	The annual Islamic pilgrimage that Muslims make to the city of Mecca.	0.99	-	yes	keep
+2728872	392445	summary_tag	topic	institution		Srikrishna Committee	Expert committee appointed by the central government, notably examining the Telangana statehood or data protection issues.	0.02	-	no	drop
+2728875	392445	summary_tag	topic	law		Land Acquisition Act, Fair Compensation and Transparency	Proposed legislative amendment to modify consent requirements and procedures for acquiring land in India.	0.01	-	no	drop
+2728876	392445	summary_tag	topic	topic		Islam	Religious faith with millions of followers in India	0.73	-	no	drop
+2728879	392445	summary_tag	topic	institution		Standing Committee on Human Resource Development	Parliamentary body that examined policies, legislation, and budgets related to education and human resource development in India.	0.02	-	no	drop
+2728880	392445	summary_tag	topic	law		Senior Citizens (Provision of Geriatric and Dementia Care) Bill	Proposed law to provide specialised healthcare, geriatric services, and dementia care for elderly persons in India.	0.01	-	no	drop
+2059428	392445	llm	other	law		Haj Committee Bill, 2002	Haj Committee Bill, 2002	1.00	-	yes	keep
+2059429	392445	llm	other	place		Saudi Arabia	Saudi Arabia	1.00	-	yes	keep
+2059430	392445	llm	other	place		Mumbai	Mumbai	1.00	-	yes	keep
+2059431	392445	llm	other	institution		State Haj Committees	State Haj Committees	0.85	-	yes	keep
+3262719	392445	dictionary	other	group		Haj pilgrims	Haj Pilgrims	0.60	-	no	keep
+3262720	392445	dictionary	other	group		Ministers	Ministers	0.85	-	yes	drop
+3262721	392445	dictionary	other	place		Theni	Theni	0.00	-	no	drop
+3262722	392445	dictionary	other	group		Muslims	Muslim	0.42	-	no	drop
+2055953	391370	llm	topic	topic		Drought and agricultural crisis	पूर्वी उत्तर प्रदेश में सूखे की स्थिति	0.98	-	yes	keep
+2055954	391370	llm	topic	topic		Starvation and food security	मौत भूख से होने का समाचार	0.99	-	yes	keep
+2758635	391370	summary_tag	topic	topic		Famine	Severe food shortage and starvation crisis.	0.97	-	yes	drop
+2758637	391370	summary_tag	topic	institution		Food Corporation of India (FCI)	The government corporation that buys, stores, and distributes food grain in India.	0.65	-	no	keep
+2758639	391370	summary_tag	topic	institution		Department of Food and Public Distribution	A central government department responsible for the procurement, storage, and subsidised distribution of food grains.	0.53	-	no	drop
+2758640	391370	summary_tag	topic	topic		Starvation	Severe food deprivation and hunger	0.99	-	yes	keep
+2758643	391370	summary_tag	topic	topic		Foodgrains	Cereal and other grain crops grown and stored for people to eat.	0.94	-	yes	keep
+2758644	391370	summary_tag	topic	scheme		Public Distribution System (PDS)	Government system that supplies subsidised food grains to poor families.	0.51	-	no	drop
+2758646	391370	summary_tag	topic	institution		Ministry of Consumer Affairs, Food and Public Distribution	Union ministry overseeing consumer protection, food grains procurement, and public distribution systems.	0.43	-	no	drop
+2758648	391370	summary_tag	topic	topic		Hunger	Condition of not having sufficient food for adequate nutrition.	0.99	-	yes	keep
+2758650	391370	summary_tag	topic	topic		Drought Relief	Government assistance to areas affected by drought conditions.	0.95	-	yes	keep
+2758652	391370	summary_tag	topic	scheme		Pradhan Mantri Garib Kalyan Anna Yojana (PM-GKAY)	Government scheme that gave free food grains to poor families.	0.03	-	no	drop
+2758654	391370	summary_tag	topic	place		Uttar Pradesh	Northern Indian state.	0.97	-	yes	keep
+2758656	391370	summary_tag	topic	law		NATIONAL FOOD SECURITY ACT	Law guaranteeing subsidized food for poor households	0.06	-	no	drop
+2055955	391370	llm	other	place		Uttar Pradesh	उत्तर प्रदेश	1.00	-	yes	keep
+2055956	391370	llm	other	institution		Food Corporation of India	एफ.सी.आई.	0.98	-	yes	keep
+3225751	391370	dictionary	other	place		Chandauli	चन्दौली	0.77	-	no	keep
+3225752	391370	dictionary	other	group		Farmers	किसान	0.97	-	yes	keep
+2055471	391213	llm	topic	topic		Public sector undertakings disinvestment	disinvestment of Public Sector Undertakings	0.45	-	yes	keep
+2759941	391213	summary_tag	topic	topic		Adjournment Motions	A procedure to stop normal business and discuss an urgent matter.	0.07	-	no	drop
+2759943	391213	summary_tag	topic	law		Rule 193	Lok Sabha procedural rule allowing members to raise discussions on matters of urgent public importance without formal voting.	0.04	-	no	drop
+2759944	391213	summary_tag	topic	topic		Parliamentary Zero Hour	A period in a parliament session for raising urgent matters.	0.06	-	no	drop
+2759946	391213	summary_tag	topic	topic		Privatisation of Visakhapatnam Steel Plant	Proposed sale of government equity and ownership in the public sector steel plant in Visakhapatnam.	0.08	-	no	drop
+2759949	391213	summary_tag	topic	topic		Public Sector Undertakings Revival	Financial restructuring and turnaround efforts for sick or loss-making government-owned enterprises.	0.22	-	no	drop
+2759951	391213	summary_tag	topic	topic		Special Category Status for Andhra Pradesh	Demand for preferential central financial assistance and tax concessions for Andhra Pradesh post-bifurcation.	0.01	-	no	drop
+2759953	391213	summary_tag	topic	topic		Short Duration Discussion	A brief parliamentary debate on one specific issue.	0.35	-	no	drop
+2759955	391213	summary_tag	topic	institution		Committee on Public Undertakings	Parliamentary committee that examines the reports, accounts, and operational efficiency of public sector enterprises.	0.07	-	no	drop
+2759957	391213	summary_tag	topic	topic		Parliamentary Disruptions	Interruptions, protests, and adjournments that halt official proceedings in legislative houses.	0.06	-	no	drop
+2759959	391213	summary_tag	topic	law		Land Acquisition Act, Fair Compensation and Transparency	Proposed legislative amendment to modify consent requirements and procedures for acquiring land in India.	0.02	-	no	drop
+2759961	391213	summary_tag	topic	topic		Rule 184	A specific rule that allows a parliamentary discussion with a vote.	0.09	-	no	drop
+2759963	391213	summary_tag	topic	topic		Development of North East	Socio-economic progress, connectivity enhancement, and infrastructure growth in India's northeastern states.	0.02	-	no	drop
+2054703	390939	llm	topic	topic		Communal situation	communal elements	0.90	-	yes	keep
+2762477	390939	summary_tag	topic	law		Rule 353	Lok Sabha procedural rule regarding advance notice required before making defamatory allegations against individuals.	0.03	-	no	drop
+2762480	390939	summary_tag	topic	topic		Communalism	Politics based on religion.	0.87	-	yes	keep
+2762482	390939	summary_tag	topic	topic		Communal Riots	Violent conflict or tension between groups of different religions.	0.86	-	yes	keep
+2762484	390939	summary_tag	topic	place		Ram Janma-bhumi Babri Masjid	Religious site disputed between communities	0.03	-	no	drop
+2762486	390939	summary_tag	topic	topic		Religious Minorities	Non-Hindu religious communities	0.51	-	no	drop
+2762488	390939	summary_tag	topic	topic		Naxalities	Violent communist movements operating in rural areas of India.	0.01	-	no	drop
+2762490	390939	summary_tag	topic	topic		Citizenship Amendment Act Protests	Nationwide public demonstrations and protests against the Citizenship (Amendment) Act of 2019.	0.01	-	no	drop
+2762492	390939	summary_tag	topic	topic		Manipur Violence	Incidents of ethnic conflict, social unrest, and displacement occurring among communities in Manipur.	0.02	-	no	drop
+2762494	390939	summary_tag	topic	institution		Janata Dal (United)	Indian political party primarily active in the state of Bihar.	0.04	-	no	drop
+2762495	390939	summary_tag	topic	topic		Communal Harmony	Peace between different religious groups	0.80	-	yes	drop
+2762498	390939	summary_tag	topic	topic		Sikhs	Sikh population and community issues	0.02	-	no	drop
+2762500	390939	summary_tag	topic	institution		Muslim League	Indian political party primarily based in Kerala, officially known as the Indian Union Muslim League.	0.02	-	no	drop
+3226332	390939	dictionary	other	place		Gujarat	Gujarat	1.00	-	yes	keep
+2052937	390360	llm	topic	topic		Traditional medicine systems	भारतीय चिकित्सा पrति	0.97	-	yes	keep
+2052938	390360	llm	topic	topic		Biopiracy and patenting of medicinal herbs	पेटेन्टीकरण	0.89	-	yes	keep
+2775522	390360	summary_tag	topic	law		National Commission for Indian System of Medicine Act	Indian act providing for the regulation of education and practice in traditional Indian medicine systems.	0.33	-	no	drop
+2775524	390360	summary_tag	topic	institution		Central Council of Indian Medicine	Former statutory body that regulated higher education in Ayurveda, Siddha, Unani, and Sowa-Rigpa systems of medicine.	0.97	-	yes	keep
+2775525	390360	summary_tag	topic	law		Indian Medical Council (Amendment) Act	Indian act amending medical council legislation to reform governance and regulation of medical education.	0.87	-	yes	drop
+2775527	390360	summary_tag	topic	topic		Ayurveda Education	Academic training, college standards, and syllabus development for the traditional Indian system of Ayurvedic medicine.	0.70	-	no	keep
+2775530	390360	summary_tag	topic	topic		Ayurveda	Traditional Indian system of medicine and wellness	0.75	-	no	keep
+2775531	390360	summary_tag	topic	law		Homoeopathy Central Council Act	Indian law regulating higher education, professional standards, and central registration for homoeopathic medical practice.	0.44	-	no	drop
+2775533	390360	summary_tag	topic	law		Indian Medical Council Act	Indian act establishing the Medical Council of India to regulate medical education and professional practice.	0.79	-	no	drop
+2775535	390360	summary_tag	topic	institution		AYUSH	System for traditional medicine	0.21	-	no	drop
+2775537	390360	summary_tag	topic	topic		Ayurveda Education and Research	Academic instruction, clinical training, and scientific investigation in the traditional Indian system of Ayurveda.	0.64	-	no	drop
+2775540	390360	summary_tag	topic	law		National Medical Commission Bill	Legislation regulating medical doctors and practice.	0.15	-	no	drop
+2775542	390360	summary_tag	topic	scheme		National AYUSH Mission	Central government scheme aimed at upgrading and promoting traditional systems of medicine across India.	0.04	-	no	drop
+2775544	390360	summary_tag	topic	topic		Traditional Medicine	Medical practices based on indigenous knowledge systems	0.97	-	yes	keep
+2052939	390360	llm	other	law		Indian Medicine Central Council (Amendment) Bill, 2002	भारतीय चिकित्सा केन्pीय परिषद संशोधन विधेयक, 2002	1.00	-	yes	keep
+2052940	390360	llm	other	person		Raj Narain	राज नारायण	0.09	-	no	drop
+3227721	390360	dictionary	other	person		Akhilesh Yadav	अखिलेश जी	0.13	-	no	drop
+3227722	390360	dictionary	other	group		Ayurveda	आयुर्वेद	0.13	-	no	keep
+3227723	390360	dictionary	other	scheme		Aadhaar	आधार	0.01	-	no	drop
+2048616	388980	llm	topic	topic		National highways maintenance and management	राषट्रीय राजमागा् पर	0.97	-	yes	keep
+2807590	388980	summary_tag	topic	topic		National Highway Expansion	Widening, upgrading, and acquiring land for India's national highway network.	0.85	-	yes	keep
+2807592	388980	summary_tag	topic	institution		National Highways Authority of India (NHAI)	The government body that builds and manages India's national highways.	0.70	-	no	keep
+2807594	388980	summary_tag	topic	topic		Highway Construction and Safety	Building and widening national highways alongside engineering measures to prevent road accidents.	0.95	-	yes	keep
+2807597	388980	summary_tag	topic	institution		Ministry of Road Transport and Highways	Indian union ministry responsible for the development and maintenance of national highways and road transport systems.	0.73	-	no	drop
+2807599	388980	summary_tag	topic	scheme		National Highways Development Project	Major government project aimed at upgrading and widening key national highways across India.	0.20	-	no	drop
+2807601	388980	summary_tag	topic	place		National Highways	Major roads managed by the central government connecting different regions.	0.89	-	yes	keep
+2807603	388980	summary_tag	topic	place		National Highway 66	Major national highway running parallel to India's western coast from Maharashtra to Tamil Nadu.	0.04	-	no	drop
+2807604	388980	summary_tag	topic	scheme		Delhi-Mumbai Expressway	A major access-controlled expressway connecting India's national capital Delhi with its financial hub Mumbai.	0.03	-	no	drop
+2807607	388980	summary_tag	topic	law		Land Acquisition Act, Fair Compensation and Transparency	Proposed legislative amendment to modify consent requirements and procedures for acquiring land in India.	0.03	-	no	drop
+2807609	388980	summary_tag	topic	topic		Road Safety and Traffic Congestion	Measures to prevent traffic accidents and manage vehicular congestion on roads.	0.79	-	no	drop
+2807611	388980	summary_tag	topic	place		National Highway 16	Major national highway running along the east coast of India from West Bengal to Tamil Nadu.	0.03	-	no	drop
+2807613	388980	summary_tag	topic	scheme		Bharatmala Pariyojana	Government program that builds and connects national highways.	0.02	-	no	drop
+2048617	388980	llm	other	law		Control of National Highways (Land and Traffic) Bill, 2002	राषट्रीय राजमार्ग नियंत्रण विधेयक	1.00	-	yes	keep
+2048618	388980	llm	other	place		Madhya Pradesh	मध्य प्रदेश	0.74	-	yes	keep
+2048908	389057	llm	topic	topic		MPLAD funds release delay	सांसद एवं विधायक निधि रिलीज नहीं करेंगे	0.98	-	yes	keep
+2811715	389057	summary_tag	topic	place		Etawah	District and Lok Sabha constituency in Uttar Pradesh, India.	0.95	-	yes	keep
+2811716	389057	summary_tag	topic	scheme		MPLADS	Government scheme giving each member of parliament funds for local projects.	0.94	-	yes	keep
+2811719	389057	summary_tag	topic	place		Etah	District and Lok Sabha constituency in Uttar Pradesh, India.	0.36	-	no	drop
+2811720	389057	summary_tag	topic	topic		Question of Privilege	A formal complaint that parliament's rights have been breached.	0.81	-	yes	keep
+2811722	389057	summary_tag	topic	institution		Privileges Committee	The Lok Sabha committee that handles breaches of a member's privilege.	0.70	-	no	keep
+2811725	389057	summary_tag	topic	place		Jhansi	District and Lok Sabha constituency in Uttar Pradesh, India.	0.02	-	no	drop
+2811727	389057	summary_tag	topic	law		Rule 353	Lok Sabha procedural rule regarding advance notice required before making defamatory allegations against individuals.	0.04	-	no	drop
+2811729	389057	summary_tag	topic	topic		Public Grievances	Complaints from citizens	0.86	-	yes	drop
+2811731	389057	summary_tag	topic	place		Prayagraj	District and Lok Sabha constituency in Uttar Pradesh, India. The constituency is listed as Allahabad.	0.02	-	no	drop
+2811733	389057	summary_tag	topic	place		Lucknow	District and Lok Sabha constituency in Uttar Pradesh, India.	0.03	-	no	drop
+2811735	389057	summary_tag	topic	place		Firozabad	District and Lok Sabha constituency in Uttar Pradesh, India.	0.02	-	no	drop
+2811737	389057	summary_tag	topic	place		Pratapgarh (Uttar Pradesh)	District and Lok Sabha constituency in Uttar Pradesh, India.	0.02	-	no	drop
+3231315	389057	dictionary	other	place		Etawah	इटावा	1.00	-	yes	keep
+3231316	389057	dictionary	other	role		Members of Legislative Assembly	विधायक	0.95	-	yes	drop
+3231317	389057	dictionary	other	role		District Magistrate	डी.एम.	1.00	-	yes	keep
+3231318	389057	dictionary	other	institution		Privilege Committee	विशेषाधिकार समिति	1.00	-	yes	keep
+3231319	389057	dictionary	other	institution		Election Commission of India	कमीशन	0.01	-	no	drop
+2042772	387066	llm	topic	topic		Railway safety	avoid accidents from taking place	0.98	-	yes	keep
+2042773	387066	llm	topic	topic		Railway budget allocations	allocations made by the Railways	0.98	-	yes	keep
+2852679	387066	summary_tag	topic	law		Railway Budget	Annual government allocation for railway operations and development.	0.97	-	yes	keep
+2852681	387066	summary_tag	topic	topic		Railway Budget Merger	Decision taken in 2016 to merge the separate railway budget into the general Union budget.	0.05	-	no	drop
+2852682	387066	summary_tag	topic	topic		Special Category Status for Andhra Pradesh	Demand for preferential central financial assistance and tax concessions for Andhra Pradesh post-bifurcation.	0.03	-	no	drop
+2852684	387066	summary_tag	topic	institution		South Central Railway	Zone of Indian Railways headquartered at Secunderabad, serving parts of Telangana, Andhra Pradesh, and nearby states.	0.96	-	yes	keep
+2852687	387066	summary_tag	topic	topic		Railway Finances	Financial management, capital expenditure, budget allocation, and funding of Indian Railways.	0.70	-	no	keep
+2852688	387066	summary_tag	topic	institution		Standing Committee on Railways	Parliamentary body that examines policies, budgets, and operational performance of the Indian Railways.	0.06	-	no	drop
+2852691	387066	summary_tag	topic	topic		Rail Connectivity and Overbridge Construction	Expansion of railway networks and building overbridges or underpasses to improve road and rail traffic.	0.70	-	no	keep
+2852693	387066	summary_tag	topic	institution		South Coast Railway Zone	Proposed zone of Indian Railways to be headquartered in Visakhapatnam, Andhra Pradesh.	0.15	-	no	drop
+2852695	387066	summary_tag	topic	scheme		Rashtriya Rail Sanraksha Kosh	Dedicated government fund created to finance safety-related works across Indian Railways.	0.04	-	no	drop
+2852696	387066	summary_tag	topic	topic		Railway Modernisation	Upgrading rail infrastructure, rolling stock, signaling, and technology across Indian Railways.	0.42	-	no	drop
+2852698	387066	summary_tag	topic	topic		Railway Safety	Measures to ensure safe railway operations.	0.97	-	yes	keep
+2852700	387066	summary_tag	topic	scheme		Kavach	Indigenous automatic train protection system developed by Indian Railways to prevent collisions.	0.02	-	no	drop
+2042774	387066	llm	other	place		Andhra Pradesh	Andhra Pradesh	0.99	-	yes	keep
+2042775	387066	llm	other	institution		South Central Railway Zone	South Central Railway Zone	1.00	-	yes	keep
+3235696	387066	dictionary	other	law		Union Budget	Budget	0.50	-	no	drop
+3235697	387066	dictionary	other	place		Raichur	Raichur	1.00	-	yes	keep
+3235698	387066	dictionary	other	institution		Ministry of Railways	Railway Minister	0.86	-	yes	drop
+3235699	387066	dictionary	other	place		Nalgonda	Nalgonda	1.00	-	yes	keep
+3235700	387066	dictionary	other	place		Kacheguda	Kacheguda	1.00	-	yes	keep
+3235701	387066	dictionary	other	institution		South Central Railway	South Central Railway	1.00	-	yes	keep
+3235702	387066	dictionary	other	place		Gadwal	Gadwal	0.98	-	yes	keep
+3235703	387066	dictionary	other	place		Kurnool	Kurnool	1.00	-	yes	keep
+2042877	387083	llm	topic	topic		Rail connectivity	रेल लाइन	0.98	-	yes	keep
+2042878	387083	llm	topic	topic		Railway budget	रेल बजट	0.98	-	yes	keep
+2042879	387083	llm	topic	topic		Gauge conversion	आमान परिवर्तन	0.89	-	yes	keep
+2042880	387083	llm	topic	topic		Railway overbridge	उपरिगामी पुल	0.93	-	yes	keep
+2042881	387083	llm	topic	topic		Alternative fuels	वैकल्पिक ईंधन	0.31	-	no	keep
+2853037	387083	summary_tag	topic	law		Railway Budget	Annual government allocation for railway operations and development.	0.94	-	yes	keep
+2853039	387083	summary_tag	topic	topic		Rail Connectivity and Overbridge Construction	Expansion of railway networks and building overbridges or underpasses to improve road and rail traffic.	0.97	-	yes	keep
+2853041	387083	summary_tag	topic	topic		Railway Budget Merger	Decision taken in 2016 to merge the separate railway budget into the general Union budget.	0.05	-	no	drop
+2853043	387083	summary_tag	topic	institution		Standing Committee on Railways	Parliamentary body that examines policies, budgets, and operational performance of the Indian Railways.	0.03	-	no	drop
+2853045	387083	summary_tag	topic	topic		Railway Finances	Financial management, capital expenditure, budget allocation, and funding of Indian Railways.	0.64	-	no	drop
+2853047	387083	summary_tag	topic	topic		Railway Modernisation	Upgrading rail infrastructure, rolling stock, signaling, and technology across Indian Railways.	0.44	-	no	drop
+2853049	387083	summary_tag	topic	topic		Development of North East	Socio-economic progress, connectivity enhancement, and infrastructure growth in India's northeastern states.	0.08	-	no	drop
+2853050	387083	summary_tag	topic	place		Shimla	District and Lok Sabha constituency in Himachal Pradesh, India.	0.32	-	no	drop
+2853052	387083	summary_tag	topic	place		Hamirpur (Himachal Pradesh)	District and Lok Sabha constituency in Himachal Pradesh, India.	0.04	-	no	drop
+2853054	387083	summary_tag	topic	place		Kangra	District and Lok Sabha constituency in Himachal Pradesh, India.	0.09	-	no	drop
+2853056	387083	summary_tag	topic	topic		Railway Development	Expansion and improvement of railway infrastructure and services.	0.96	-	yes	keep
+2853058	387083	summary_tag	topic	topic		Rail and Road Connectivity	Expansion and coordination of railway networks and road systems to improve transportation.	0.94	-	yes	drop
+2042882	387083	llm	other	place		Himachal Pradesh	हिमाचल	1.00	-	yes	keep
+2042883	387083	llm	other	institution		NTPC	एन.टी.पी.सी.	0.24	-	no	keep
+2042884	387083	llm	other	institution		Indian Oil Corporation	इण्डियन ऑयल कारपोरेशन	0.60	-	yes	keep
+2042885	387083	llm	other	place		Joginder Nagar	जोगेन्p नगर	1.00	-	yes	keep
+2042886	387083	llm	other	place		Pathankot	पठानकोट	1.00	-	yes	keep
+2042887	387083	llm	other	place		Kalka	कालका	0.75	-	yes	keep
+2042888	387083	llm	other	place		Shimla	शिमला	0.19	-	no	drop
+2042889	387083	llm	other	place		Nabinagar	नवीनगर	0.10	-	no	keep
+3235790	387083	dictionary	other	person		Nitish Kumar	नीतीश कुमार	0.95	-	yes	drop
+3235791	387083	dictionary	other	scheme		Pragati	प्रगति	0.18	-	no	drop
+3235792	387083	dictionary	other	place		Manali	मनाली	0.96	-	yes	keep
+3235793	387083	dictionary	other	person		Digvijaya Singh	दिग्विजय सिंह	0.81	-	yes	drop
+3235794	387083	dictionary	other	institution		Ministry of Railways	रेल मंत्री	0.97	-	yes	keep
+3235795	387083	dictionary	other	group		Government officials	अधिकारियों	0.99	-	yes	drop
+3235796	387083	dictionary	other	institution		Public Works Department	लोक निर्माण विभाग	1.00	-	yes	keep
+3235797	387083	dictionary	other	place		Firozpur	फिरोजपुर	0.98	-	yes	drop
+2041466	386740	llm	topic	topic		International relations	waging a war by the U.S.A. and the U.K. againt Iraq	0.99	-	yes	keep
+2041467	386740	llm	topic	topic		Foreign policy	stand of the Government of India	0.99	-	yes	keep
+2860647	386740	summary_tag	topic	topic		Indo-Iraq Relations	Relations between India and Iraq.	0.56	-	no	keep
+2860649	386740	summary_tag	topic	topic		Non-alignment	A policy of staying independent from military and political blocs.	0.70	-	no	keep
+2860651	386740	summary_tag	topic	institution		Non Aligned Movement (NAM)	Group of nations not allied to major powers.	0.68	-	no	keep
+2860652	386740	summary_tag	topic	person		Rajiv Gandhi	Former Prime Minister of India	0.01	-	no	drop
+2860654	386740	summary_tag	topic	institution		Non-Aligned Movement	A group of countries that stay independent of major power blocs.	0.61	-	no	keep
+2860657	386740	summary_tag	topic	topic		Foreign Relations	The state of diplomatic contact between India and other countries.	0.98	-	yes	keep
+2860659	386740	summary_tag	topic	place		Middle East	Region west of India that includes the Gulf countries and nearby nations.	0.39	-	no	drop
+2860660	386740	summary_tag	topic	law		Rule 193	Lok Sabha procedural rule allowing members to raise discussions on matters of urgent public importance without formal voting.	0.07	-	no	drop
+2860663	386740	summary_tag	topic	institution		Ministry Of External Affairs	Indian government ministry that manages relations with other countries.	0.39	-	no	drop
+2860664	386740	summary_tag	topic	law		Bilateral Agreements	Treaties between India and other nations	0.03	-	no	drop
+2860666	386740	summary_tag	topic	institution		Standing Committee on External Affairs	Parliamentary body that examines policies, legislation, and budgets related to India's foreign affairs.	0.04	-	no	drop
+2860669	386740	summary_tag	topic	law		Nehru-Liaquat Pact	Bilateral treaty between India and Pakistan regarding the rights and protection of religious minorities.	0.02	-	no	drop
+3236641	386740	dictionary	other	place		Malaysia	Malaysia	0.95	-	yes	drop
+3236642	386740	dictionary	other	institution		United Nations	United Nations	0.98	-	yes	keep
+3236643	386740	dictionary	other	group		Ministers	Ministers	0.99	-	yes	drop
+3236644	386740	dictionary	other	place		Iraq	Iraq	1.00	-	yes	keep
+2040190	386275	llm	topic	topic		Privilege motion against police official	विशेषाधिकार हनन का नोटिस	0.98	-	yes	keep
+2873205	386275	summary_tag	topic	topic		Question of Privilege	A formal complaint that parliament's rights have been breached.	0.98	-	yes	keep
+2873207	386275	summary_tag	topic	place		Darbhanga	District and Lok Sabha constituency in Bihar, India.	0.05	-	no	drop
+2873208	386275	summary_tag	topic	law		Rule 353	Lok Sabha procedural rule regarding advance notice required before making defamatory allegations against individuals.	0.10	-	no	drop
+2873210	386275	summary_tag	topic	law		Rule 374	Lok Sabha procedural rule empowering the Speaker to suspend members who disregard the authority of the Chair.	0.12	-	no	drop
+2873212	386275	summary_tag	topic	institution		Privileges Committee	The Lok Sabha committee that handles breaches of a member's privilege.	0.16	-	no	drop
+2873214	386275	summary_tag	topic	place		Bhagalpur	District and Lok Sabha constituency in Bihar, India.	0.05	-	no	drop
+2873216	386275	summary_tag	topic	place		West Champaran	District and Lok Sabha constituency in Bihar, India. The constituency is listed as Paschim Champaran.	0.05	-	no	drop
+2873218	386275	summary_tag	topic	place		Gopalganj	District and Lok Sabha constituency in Bihar, India.	0.04	-	no	drop
+2873221	386275	summary_tag	topic	topic		MP(s) Conduct	Behavior and ethics of parliament members	0.68	-	no	drop
+2873222	386275	summary_tag	topic	place		Patna Sahib	Lok Sabha constituency in Bihar, India.	0.03	-	no	drop
+2873225	386275	summary_tag	topic	place		Aurangabad (Bihar)	District and Lok Sabha constituency in Bihar, India.	0.05	-	no	drop
+2873227	386275	summary_tag	topic	place		Muzaffarpur	District and Lok Sabha constituency in Bihar, India.	0.04	-	no	drop
+2040191	386275	llm	other	person		D. P. Ojha	श्री डी.पी. ओझा	1.00	-	yes	keep
+2040192	386275	llm	other	place		Bihar	बिहार	1.00	-	yes	keep
+3237759	386275	dictionary	other	group		Police	पुलिस	0.96	-	yes	keep
+3237760	386275	dictionary	other	institution		Supreme Court	कोर्ट	0.15	-	no	drop
+2039550	386102	llm	topic	topic		Military action against Iraq	इराक पर अमरीका द्वारा जो हमला हुआ	0.98	-	yes	keep
+2039551	386102	llm	topic	topic		Indian foreign policy and national security	विदेश नीति	0.92	-	yes	keep
+2875772	386102	summary_tag	topic	topic		Indo-Iraq Relations	Relations between India and Iraq.	0.48	-	no	keep
+2875774	386102	summary_tag	topic	person		Rajiv Gandhi	Former Prime Minister of India	0.02	-	no	drop
+2875776	386102	summary_tag	topic	place		India	Sovereign nation in South Asia	0.85	-	yes	drop
+2875778	386102	summary_tag	topic	law		Constitution (One Hundred and Thirty-First Amendment) Bill	Proposed amendment to the Constitution of India introduced in parliament.	0.01	-	no	drop
+2875781	386102	summary_tag	topic	institution		United Progressive Alliance	Coalition of Indian political parties formed in 2004 and led by the Indian National Congress.	0.04	-	no	drop
+2875782	386102	summary_tag	topic	institution		INDIA Alliance	Coalition of Indian opposition political parties formed to contest national elections against the ruling alliance.	0.04	-	no	drop
+2875785	386102	summary_tag	topic	place		Iraq	Middle Eastern country.	0.98	-	yes	keep
+2875786	386102	summary_tag	topic	topic		Operation Ganga	Government evacuation that brought Indian citizens home from Ukraine.	0.01	-	no	drop
+2875788	386102	summary_tag	topic	law		Nehru-Liaquat Pact	Bilateral treaty between India and Pakistan regarding the rights and protection of religious minorities.	0.01	-	no	drop
+2875791	386102	summary_tag	topic	institution		Standing Committee on External Affairs	Parliamentary body that examines policies, legislation, and budgets related to India's foreign affairs.	0.03	-	no	drop
+2875793	386102	summary_tag	topic	place		New Delhi	District and Lok Sabha constituency in Delhi, India.	0.07	-	no	drop
+2875795	386102	summary_tag	topic	institution		Standing Committee on Human Resource Development	Parliamentary body that examined policies, legislation, and budgets related to education and human resource development in India.	0.01	-	no	drop
+2039552	386102	llm	other	place		Iraq	इराक	1.00	-	yes	keep
+2039553	386102	llm	other	place		United States	अमरीका	1.00	-	yes	keep
+2039554	386102	llm	other	place		Pakistan	पाकिस्तान	0.99	-	yes	keep
+2039555	386102	llm	other	place		Jammu and Kashmir	जम्मू-काश्मीर	0.92	-	yes	keep
+2039556	386102	llm	other	institution		United Nations	संयुक्त राषठ्र संघ	0.97	-	yes	keep
+3238106	386102	dictionary	other	group		Opposition	विपक्ष	1.00	-	yes	drop
+3238107	386102	dictionary	other	institution		Aaj Tak	आज तक	0.02	-	no	drop
+3238108	386102	dictionary	other	person		Vijay Kumar Malhotra	विजय कुमार मल्होत्रा	0.67	-	no	drop
+3017318	384066	llm	topic	topic		Disallowing of adjournment notices	This proviso does not apply here.	0.95	-	yes	keep
+3034807	384066	summary_tag	topic	topic		Adjournment Motions	A procedure to stop normal business and discuss an urgent matter.	0.84	-	yes	keep
+3034808	384066	summary_tag	topic	law		Rule 353	Lok Sabha procedural rule regarding advance notice required before making defamatory allegations against individuals.	0.44	-	no	drop
+3034809	384066	summary_tag	topic	topic		Rule 184	A specific rule that allows a parliamentary discussion with a vote.	0.45	-	no	drop
+3034810	384066	summary_tag	topic	law		Rule 193	Lok Sabha procedural rule allowing members to raise discussions on matters of urgent public importance without formal voting.	0.51	-	no	drop
+3034811	384066	summary_tag	topic	law		Rule 56	Parliamentary procedure rule	0.41	-	no	drop
+3034812	384066	summary_tag	topic	topic		Demands For Grants	A parliamentary process for approving government spending plans.	0.01	-	no	drop
+3034813	384066	summary_tag	topic	topic		Parliamentary Zero Hour	A period in a parliament session for raising urgent matters.	0.05	-	no	drop
+3034814	384066	summary_tag	topic	topic		Speaker's Impartiality	Principle requiring the presiding officer of the Lok Sabha to act fairly and without political bias.	0.53	-	no	drop
+3034815	384066	summary_tag	topic	law		Rule 374	Lok Sabha procedural rule empowering the Speaker to suspend members who disregard the authority of the Chair.	0.43	-	no	drop
+3034816	384066	summary_tag	topic	topic		Observation	A formal note made by parliament on a matter.	0.44	-	no	drop
+3034817	384066	summary_tag	topic	topic		Parliamentary Disruptions	Interruptions, protests, and adjournments that halt official proceedings in legislative houses.	0.36	-	no	drop
+3034818	384066	summary_tag	topic	topic		Bills Pending	Proposed laws still waiting for a decision by parliament.	0.02	-	no	drop
+2031447	383274	llm	topic	topic		Ram Temple construction and Ayodhya dispute	Ram Janmabhoomi will have the temple	0.98	-	yes	keep
+2031448	383274	llm	topic	topic		Government policy credibility	durability and credibility of the Prime Minister’s statement	0.93	-	yes	keep
+2934977	383274	summary_tag	topic	place		Ayodhya	District and Lok Sabha constituency in Uttar Pradesh, India. The constituency is listed as Faizabad.	0.96	-	yes	keep
+2934980	383274	summary_tag	topic	law		Rule 353	Lok Sabha procedural rule regarding advance notice required before making defamatory allegations against individuals.	0.05	-	no	drop
+2934982	383274	summary_tag	topic	law		Rule 193	Lok Sabha procedural rule allowing members to raise discussions on matters of urgent public importance without formal voting.	0.05	-	no	drop
+2934984	383274	summary_tag	topic	place		Ram Janma-bhumi Babri Masjid	Religious site disputed between communities	0.92	-	yes	keep
+2934986	383274	summary_tag	topic	law		Constitution (One Hundred and Thirty-First Amendment) Bill	Proposed amendment to the Constitution of India introduced in parliament.	0.01	-	no	drop
+2934988	383274	summary_tag	topic	place		Ram Temple	Religious shrine and pilgrimage site in Ayodhya.	0.92	-	yes	keep
+2934991	383274	summary_tag	topic	place		Gorakhpur	District and Lok Sabha constituency in Uttar Pradesh, India.	0.02	-	no	drop
+2934992	383274	summary_tag	topic	topic		Parliamentary Questions	Questions that members ask the government about its work.	0.52	-	no	drop
+2934995	383274	summary_tag	topic	topic		Mann Ki Baat	Monthly radio address delivered by the Prime Minister of India to engage citizens on national matters.	0.02	-	no	drop
+2934996	383274	summary_tag	topic	institution		Liberhan Commission	Commission investigating riots in Ayodhya.	0.03	-	no	drop
+2934998	383274	summary_tag	topic	topic		Parliamentary Zero Hour	A period in a parliament session for raising urgent matters.	0.06	-	no	drop
+2935000	383274	summary_tag	topic	topic		Citizenship Amendment Act Protests	Nationwide public demonstrations and protests against the Citizenship (Amendment) Act of 2019.	0.01	-	no	drop
+2031449	383274	llm	other	place		Ayodhya	Ayodhya	1.00	-	yes	keep
+2031450	383274	llm	other	person		Mahant Ramachandra Das Paramhans	Mahant Ramachandra Das Paramhans	0.97	-	yes	keep
+2031451	383274	llm	other	person		Graham Steins	Graham Steins	0.02	-	no	drop
+2031452	383274	llm	other	institution		Bharatiya Janata Party	BJP	0.50	-	yes	drop
+2031453	383274	llm	other	institution		National Democratic Alliance	NDA	0.59	-	yes	drop
+3212854	383274	dictionary	other	role		Leader of the House	Leader of the House	1.00	-	yes	drop
+3212855	383274	dictionary	other	place		Ram Janmabhoomi	Ram Janmabhoomi	1.00	-	yes	keep
+3212856	383274	dictionary	other	group		Unemployed youth	unemployed youth	0.02	-	no	drop
+3212857	383274	dictionary	other	group		Terrorists	terrorists	0.18	-	no	drop
+3212858	383274	dictionary	other	group		Farmers	farming community	0.02	-	no	drop
+3212859	383274	dictionary	other	place		Gujarat	Gujarat	0.11	-	no	drop
+3212860	383274	dictionary	other	institution		Supreme Court	court	0.56	-	no	drop
+2026229	380875	llm	topic	topic		Minority education rights	minority educational institutions	0.98	-	yes	keep
+2026230	380875	llm	topic	topic		University admissions	admission of the students	0.97	-	yes	keep
+2971414	380875	summary_tag	topic	topic		Religious Minorities	Non-Hindu religious communities	0.93	-	yes	drop
+2971415	380875	summary_tag	topic	institution		Minorities Commission	A government body that protects the rights of minority communities in India.	0.05	-	no	drop
+2971416	380875	summary_tag	topic	topic		Minority Welfare	Socio-economic development, constitutional rights, and protective measures for recognized minority communities in India.	0.92	-	yes	drop
+2971417	380875	summary_tag	topic	topic		Minority Education	Educational access, institutions, and policies for religious and linguistic minority groups in India.	0.98	-	yes	keep
+2971418	380875	summary_tag	topic	law		Minorities Protection	Laws protecting minority community rights	0.58	-	no	drop
+2971419	380875	summary_tag	topic	law		Right to Education	Constitutional right to education.	0.07	-	no	drop
+2971420	380875	summary_tag	topic	law		Constitution (One Hundred and Thirty-First Amendment) Bill	Proposed amendment to the Constitution of India introduced in parliament.	0.02	-	no	drop
+2971421	380875	summary_tag	topic	institution		Ministry of Minority Affairs	Indian union ministry responsible for programmes and policies benefiting religious minority communities.	0.07	-	no	drop
+2971422	380875	summary_tag	topic	institution		Minority Institutions	Schools managed by minority religious groups	0.97	-	yes	keep
+2971423	380875	summary_tag	topic	law		Citizens Amendment Act (CAA)	Law amending citizenship provisions for religious minorities from neighboring countries.	0.01	-	no	drop
+2971424	380875	summary_tag	topic	scheme		Minority Scholarships	Government financial aid programmes supporting students from religious minority communities for schooling and higher education.	0.02	-	no	drop
+2971425	380875	summary_tag	topic	institution		Ranganath Misra Commission	National Commission for Religious and Linguistic Minorities set up in 2004.	0.02	-	no	drop
+2026231	380875	llm	other	institution		University Grants Commission	University Grants Commission	1.00	-	yes	keep
+2026232	380875	llm	other	institution		Aligarh Muslim University	Aligarh Muslim University	0.77	-	yes	keep
+2026233	380875	llm	other	law		Article 30 of the Constitution of India	article 30 of the Constitution	1.00	-	yes	keep
+3217787	380875	dictionary	other	group		Students	students	0.97	-	yes	drop
+2023956	380004	llm	topic	topic		Foreign policy and international relations	विदेश नीति	0.94	-	yes	keep
+2976742	380004	summary_tag	topic	institution		Rajya Sabha	Upper chamber of Indian parliament representing states.	0.79	-	no	drop
+2976743	380004	summary_tag	topic	law		National Investigation Agency (Amendment) Act	Act expanding the National Investigation Agency's jurisdiction to investigate offences committed outside India.	0.01	-	no	drop
+2976744	380004	summary_tag	topic	law		Indian Medical Council (Amendment) Act	Indian act amending medical council legislation to reform governance and regulation of medical education.	0.01	-	no	drop
+2976745	380004	summary_tag	topic	law		The Government of National Capital Territory of Delhi(Amendment)Bill, 2023	Legislative amendment changing governance of Delhi territory.	0.01	-	no	drop
+2976746	380004	summary_tag	topic	law		Arbitration and Conciliation (Amendment) Act	Indian amending legislation updating arbitration and conciliation procedures to ensure speedy dispute resolution and attract investment.	0.01	-	no	drop
+2976747	380004	summary_tag	topic	law		Constitution (One Hundred and Thirty-First Amendment) Bill	Proposed amendment to the Constitution of India introduced in parliament.	0.02	-	no	drop
+2976748	380004	summary_tag	topic	law		Central Universities (Amendment) Act	Act amending legislation that governs the establishment and operation of central universities across India.	0.01	-	no	drop
+2976749	380004	summary_tag	topic	law		Land Acquisition Act, Fair Compensation and Transparency	Proposed legislative amendment to modify consent requirements and procedures for acquiring land in India.	0.01	-	no	drop
+2976750	380004	summary_tag	topic	law		Insurance Laws (Amendment) Act	Indian act amending insurance legislation to permit increased foreign direct investment and update regulations.	0.01	-	no	drop
+2976751	380004	summary_tag	topic	law		New Delhi International Arbitration Centre Act	Act establishing an autonomous institution to facilitate institutional arbitration and conciliation.	0.01	-	no	drop
+2976752	380004	summary_tag	topic	law		Delhi Special Police Establishment (Amendment) Act	An Indian act amending the tenure and appointment provisions for the Central Bureau of Investigation director.	0.01	-	no	drop
+2976753	380004	summary_tag	topic	law		Bilateral Agreements	Treaties between India and other nations	0.03	-	no	drop
+2023957	380004	llm	other	law		Indian Council of World Affairs (Amendment) Bill, 2003	इंडियन काऊंसिल ऑफ वर्ल्ड अफेयर्स	0.99	-	yes	keep
+2023958	380004	llm	other	institution		Supreme Court	सुप्रीम कोर्ट	0.48	-	yes	keep
+2023959	380004	llm	other	institution		Rajya Sabha	राज्य सभा	0.96	-	yes	keep
+3219061	380004	dictionary	other	person		Jawaharlal Nehru	पंडित जवाहर लाल नेहरु	0.02	-	no	drop
+3219062	380004	dictionary	other	institution		Ministry of External Affairs	Ministry of External Affairs	0.95	-	yes	drop
+3219063	380004	dictionary	other	role		Director	Director	0.82	-	yes	drop
+3219064	380004	dictionary	other	scheme		Disha	दिशा	0.07	-	no	drop
+3219065	380004	dictionary	other	place		Asia	एशिया	0.64	-	no	drop
+3219066	380004	dictionary	other	group		Judges	न्यायाधीश	0.37	-	no	drop
