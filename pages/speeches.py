@@ -285,8 +285,8 @@ def facets(conn, conds, f, labels):
 
 def member_groups(conn, conds, sort, page, per_page):
     """Return (rows, number of members): one row for each member with matching speeches."""
-    w, p, _ = where(conds)
-    n_members = conn.execute(text(f"SELECT count(DISTINCT s.person_id) {from_sql(False)} WHERE {w} AND s.person_id IS NOT NULL"), p).scalar()
+    w, p, needs_party = where(conds)
+    n_members = conn.execute(text(f"SELECT count(DISTINCT s.person_id) {from_sql(needs_party)} WHERE {w} AND s.person_id IS NOT NULL"), p).scalar()
     order = GROUP_SORTS[sort]
     p = {**p, "lim": per_page, "off": (page - 1) * per_page}
     got = conn.execute(text(f"""

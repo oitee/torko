@@ -107,3 +107,10 @@ def test_csv(page_conn):  # noqa: F811
     lines = resp.get_data(as_text=True).splitlines()
     assert resp.mimetype == "text/csv" and lines[0].startswith("date,term,session")
     assert len(lines) - 1 == S.speeches(page_conn, {"member": "219"})["total"]
+
+
+def test_group_by_member_with_party_filter(page_conn):  # noqa: F811
+    # The count of members must join the party table when a party filter is on. It failed with a server error before.
+    out = S.speeches(page_conn, {"q": "arrears", "party": "INC", "party_not": "BJP", "group": "member", "per_page": "50"})
+    assert out["members_total"] == len(out["members"]) > 0
+    assert all(m["party"] for m in out["members"])
