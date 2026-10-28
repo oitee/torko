@@ -17,7 +17,7 @@ describe("router", () => {
     ["/speech/1", "Speech"],
     ["/debate/1", "Debate"],
     ["/place/latur", "Place"],
-    ["/search", "Search"],
+    ["/search", "Search the speeches of the Lok Sabha"],
     ["/dev/components", "Components"],
     ["/no/such/page", "Page not found"],
   ])("shows %s as the %s page", (path, heading) => {

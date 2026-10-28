@@ -70,6 +70,8 @@ export default function SearchBox({ initial = "" }) {
   const [selectedIndex, setSelectedIndex] = useState(-1);
 
   const inputRef = useRef(null);
+  // Suggestions open only after the reader types. A page that opens with words in the box shows no list.
+  const typedRef = useRef(false);
   const navigate = useNavigate();
   const listboxId = useId();
 
@@ -83,7 +85,7 @@ export default function SearchBox({ initial = "" }) {
   // Debounced search call with AbortController cancellation.
   useEffect(() => {
     const trimmed = query.trim();
-    if (trimmed.length < 2) {
+    if (trimmed.length < 2 || !typedRef.current) {
       setResults([]);
       setIsOpen(false);
       setSelectedIndex(-1);
@@ -132,6 +134,7 @@ export default function SearchBox({ initial = "" }) {
   }
 
   const handleInputChange = (event) => {
+    typedRef.current = true;
     setQuery(event.target.value);
   };
 
