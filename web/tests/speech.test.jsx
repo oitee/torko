@@ -171,7 +171,7 @@ describe("Speech Page", () => {
     fireEvent.click(retryBtn);
 
     await waitFor(() => {
-      expect(screen.getByText(/Mahua Moitra spoke 1,962 words in this debate\./)).toBeTruthy();
+      expect(screen.getByRole("heading", { level: 1, name: "Viksit Bharat Gurantee Bill" })).toBeTruthy();
     });
   });
 
@@ -187,7 +187,7 @@ describe("Speech Page", () => {
     );
 
     await waitFor(() => {
-      expect(screen.getByText(/Mahua Moitra spoke 1,962 words in this debate\./)).toBeTruthy();
+      expect(screen.getByRole("heading", { level: 1, name: "Viksit Bharat Gurantee Bill" })).toBeTruthy();
     });
 
     // Check tab title
@@ -243,9 +243,7 @@ describe("Speech Page", () => {
 
     await waitFor(() => {
       expect(
-        screen.getByText(
-          /A speaker that Torko could not identify spoke 1,962 words in this debate\./
-        )
+        screen.getByRole("heading", { level: 1, name: "Viksit Bharat Gurantee Bill" })
       ).toBeTruthy();
     });
 

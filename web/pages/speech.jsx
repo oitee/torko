@@ -138,23 +138,15 @@ export default function Speech() {
     { label: "Speech" },
   ];
 
-  // The answer stays short, so that it fits the first screen of a phone. The debate title, which can be very long, goes under it.
-  const wordsText = speech.words ? ` ${formatNumber(speech.words)} words` : "";
-  const answerText = speech.member
-    ? `${speech.member} spoke${wordsText} in this debate.`
-    : `A speaker that Torko could not identify spoke${wordsText} in this debate.`;
+  // The heading is the debate title, as sansad.in gives it. A very long title gets a smaller size, so that it fits a phone.
+  const longTitle = (speech.debate || "").length > 120;
 
   const citationText = formatCitation(speech);
 
   const answerBlock = (
-    <div className="speech-header">
+    <div className={`speech-header ${longTitle ? "speech-header--long-title" : ""}`}>
       <p className="speech-header__kicker">Speech in the debate</p>
-      <PageAnswer>{answerText}</PageAnswer>
-      {speech.debate && (
-        <p className="speech-header__debate">
-          <Link to={`/debate/${speech.debate_id}`}>{speech.debate}</Link>
-        </p>
-      )}
+      <PageAnswer>{speech.debate || "Speech"}</PageAnswer>
 
       <div className="speech-header__member">
         {speech.member ? (

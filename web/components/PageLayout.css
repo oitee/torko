@@ -65,22 +65,29 @@
   }
 }
 
-/* Desktop (1120px and wide): 12 columns, main 8, margin 4, gap 24px, margin on the right. */
+/* Desktop (1120px and wide): the margin has a fixed width of 300px, with a wide gap before it, as in the mockups.
+   The main column takes the rest. */
 @media (min-width: 1120px) {
   .page-layout__grid {
-    grid-template-columns: repeat(12, 1fr);
-    gap: 24px;
+    grid-template-columns: minmax(0, 1fr);
+    column-gap: calc(var(--space-6) * 2);
   }
 
-  .page-layout__main {
-    grid-column: span 12;
+  .page-layout__grid--with-margin {
+    grid-template-columns: minmax(0, 1fr) 300px;
   }
 
-  .page-layout__grid--with-margin .page-layout__main {
-    grid-column: span 8;
-  }
-
+  .page-layout__main,
+  .page-layout__grid--with-margin .page-layout__main,
   .page-layout__margin {
-    grid-column: span 4;
+    grid-column: auto;
+  }
+}
+
+/* On a wide screen, the heading of the page wraps at two thirds of the page, as in the mockups.
+   It then reads as a heading and not as a line of text. A phone keeps the full width. */
+@media (min-width: 1120px) {
+  .page-layout__answer .page-answer {
+    max-width: 67%;
   }
 }

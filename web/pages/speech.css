@@ -189,10 +189,8 @@
   border-top: 3px solid var(--ink);
 }
 
-.speech-header__debate {
-  font-size: var(--size-heading);
-  line-height: var(--lh-heading);
-  font-weight: 600;
-  margin: 0;
-  max-width: 72ch;
+/* A very long debate title takes the title size, not the display size. */
+.speech-header--long-title .page-answer {
+  font-size: var(--size-title);
+  line-height: var(--lh-title);
 }
