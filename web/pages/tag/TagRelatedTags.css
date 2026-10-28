@@ -1,0 +1,30 @@
+/* Related tags section */
+
+.tag-related-tags {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+  border-top: 1px solid var(--ink);
+  padding-top: var(--space-6);
+}
+
+.tag-related-tags__header {
+  display: flex;
+  align-items: baseline;
+}
+
+.tag-related-tags__title {
+  margin: 0;
+  font-family: var(--font-sans);
+  font-size: var(--size-title);
+  line-height: var(--lh-title);
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  color: var(--ink);
+}
+
+.tag-related-tags__chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+}

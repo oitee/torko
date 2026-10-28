@@ -1,0 +1,76 @@
+/* Tag head: kicker, title, description, and four big numbers */
+
+.tag-head {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+}
+
+.tag-head__header {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+.tag-head__kicker {
+  margin: 0;
+  color: var(--meta);
+  font-family: var(--font-mono);
+  font-size: var(--size-count);
+  font-weight: 500;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.tag-head__title {
+  margin: 0;
+  font-family: var(--font-sans);
+  font-size: var(--size-display);
+  line-height: var(--lh-display);
+  font-weight: 600;
+  letter-spacing: -0.025em;
+  color: var(--ink);
+  text-wrap: pretty;
+}
+
+.tag-head__description {
+  margin: 0;
+  font-family: var(--font-sans);
+  font-size: var(--size-body);
+  line-height: var(--lh-body);
+  color: var(--ink-2);
+  max-width: 56ch;
+}
+
+.tag-head__numbers {
+  margin: var(--space-2) 0 0;
+  padding: 0;
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-3) var(--space-10);
+}
+
+.tag-head__stat {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+}
+
+.tag-head__stat-label {
+  margin: 0;
+  font-family: var(--font-sans);
+  font-size: var(--size-count);
+  line-height: var(--lh-count);
+  color: var(--ink-2);
+  order: 2;
+}
+
+.tag-head__stat-value {
+  margin: 0;
+  font-family: var(--font-mono);
+  font-size: clamp(1.5rem, 2.6vw, 2rem);
+  line-height: 1;
+  font-weight: 500;
+  color: var(--ink);
+  order: 1;
+}

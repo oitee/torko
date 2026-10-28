@@ -1,0 +1,38 @@
+/* "From which party" section styles */
+
+.tag-party-chart {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+  border-top: 1px solid var(--ink);
+  padding-top: var(--space-6);
+}
+
+.tag-party-chart__header {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: var(--space-2);
+}
+
+.tag-party-chart__title {
+  margin: 0;
+  font-family: var(--font-sans);
+  font-size: var(--size-title);
+  line-height: var(--lh-title);
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  color: var(--ink);
+}
+
+.tag-party-chart__meta {
+  color: var(--ink-2);
+}
+
+.tag-party-chart__note {
+  margin: 0;
+  font-family: var(--font-sans);
+  font-size: var(--size-count);
+  line-height: var(--lh-count);
+}

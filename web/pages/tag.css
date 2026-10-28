@@ -1,0 +1,30 @@
+/* Tag page layout and main flow */
+
+.tag-page--loading,
+.tag-page--error {
+  padding: var(--space-8) 0;
+}
+
+.tag-main {
+  display: flex;
+  flex-direction: column;
+  gap: clamp(40px, 6vw, 72px);
+  padding-bottom: var(--space-14);
+}
+
+.tag-main--loading,
+.tag-main--error {
+  padding: var(--space-8) 0;
+}
+
+.tag-side-by-side {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 420px), 1fr));
+  gap: clamp(32px, 4vw, 56px);
+  align-items: start;
+}
+
+.tag-section--method {
+  border-top: 1px solid var(--ink);
+  padding-top: var(--space-6);
+}

@@ -1,0 +1,92 @@
+/* Tag term filter row and meta count */
+
+/* The term row continues the sheet band of the head, across the whole window, as in the mockup.
+   It sits right under the head (the page layout puts a gap of space-8 between them), and stays in view when the reader scrolls.
+   A layer behind it paints the band, so that nothing inside the row is cut off. */
+.tag-term-bar {
+  position: sticky;
+  top: 0;
+  z-index: 5;
+  isolation: isolate;
+  margin-top: calc(var(--space-8) * -1);
+  margin-bottom: var(--space-6);
+  padding: var(--space-3) 0;
+}
+
+.tag-term-bar::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  background: var(--sheet);
+  box-shadow: 0 0 0 100vmax var(--sheet), 0 1px 0 100vmax var(--hairline);
+  clip-path: inset(0 -100vmax -1px -100vmax);
+}
+
+.tag-term-bar__row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-2) var(--space-3);
+}
+
+.tag-term-bar__label {
+  font-family: var(--font-sans);
+  font-size: var(--size-count);
+  line-height: var(--lh-count);
+  color: var(--ink-2);
+  margin-right: var(--space-1);
+}
+
+.tag-term-bar__buttons {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px;
+}
+
+.tag-term-button {
+  min-height: 40px;
+  padding: 0 var(--space-3);
+  border: 1px solid var(--hairline);
+  background: var(--sheet);
+  color: var(--ink);
+  font-family: var(--font-sans);
+  font-size: var(--size-count);
+  line-height: var(--lh-count);
+  font-weight: 500;
+  cursor: pointer;
+  transition: background-color 0.15s ease, border-color 0.15s ease, color 0.15s ease;
+}
+
+.tag-term-button:hover {
+  border-color: var(--control);
+  background: var(--ground);
+}
+
+.tag-term-button--selected {
+  border-color: var(--ink);
+  background: var(--ink);
+  color: var(--sheet);
+}
+
+.tag-term-button--selected:hover {
+  background: var(--ink);
+  color: var(--sheet);
+  border-color: var(--ink);
+}
+
+.tag-term-bar__meta {
+  margin: var(--space-2) 0 0;
+  font-family: var(--font-sans);
+  font-size: var(--size-count);
+  line-height: var(--lh-count);
+  color: var(--ink-2);
+}
+
+/* On a phone the row takes several lines, so it scrolls away with the page instead of covering the screen. */
+@media (max-width: 767px) {
+  .tag-term-bar {
+    position: relative;
+  }
+}

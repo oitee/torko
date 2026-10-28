@@ -1,0 +1,134 @@
+/* "When" annual speech chart */
+
+.tag-when-chart {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+  border-top: 1px solid var(--ink);
+  padding-top: var(--space-6);
+}
+
+.tag-when-chart__header {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: var(--space-2) var(--space-6);
+}
+
+.tag-when-chart__title {
+  margin: 0;
+  font-family: var(--font-sans);
+  font-size: var(--size-title);
+  line-height: var(--lh-title);
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  color: var(--ink);
+}
+
+.tag-when-chart__readout {
+  color: var(--ink-2);
+}
+
+.tag-when-chart__box {
+  background: var(--sheet);
+  border: 1px solid var(--hairline);
+  padding: var(--space-5);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+
+.tag-when-chart__visual {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+.tag-when-chart__plot {
+  height: 240px;
+  display: grid;
+  gap: 3px;
+  align-items: end;
+  border-bottom: 1px solid var(--ink);
+  padding-bottom: 0;
+}
+
+.tag-when-chart__col {
+  display: flex;
+  flex-direction: column-reverse;
+  min-height: 0;
+  cursor: default;
+  transition: opacity 0.15s ease, outline 0.1s ease;
+}
+
+.tag-when-chart__col:focus-visible {
+  outline: 2px solid var(--action);
+  outline-offset: 1px;
+}
+
+.tag-when-chart__col--hovered {
+  outline: 2px solid var(--ink);
+  outline-offset: 1px;
+}
+
+.tag-when-chart__col--faded {
+  opacity: 0.22;
+}
+
+.tag-when-chart__bar {
+  width: 100%;
+  height: 100%;
+  background-color: var(--ink-2);
+  min-height: 0;
+}
+
+.tag-when-chart__axis {
+  display: grid;
+  gap: 3px;
+  font-size: var(--size-count);
+  color: var(--ink-2);
+  margin-top: var(--space-1);
+}
+
+.tag-when-chart__axis-min {
+  white-space: nowrap;
+}
+
+.tag-when-chart__axis-max {
+  white-space: nowrap;
+  justify-self: end;
+}
+
+.tag-when-chart__table {
+  width: 100%;
+  border-collapse: collapse;
+  font-family: var(--font-mono);
+  font-size: var(--size-count);
+  line-height: var(--lh-count);
+}
+
+.tag-when-chart__table caption {
+  text-align: left;
+  font-family: var(--font-sans);
+  font-weight: 600;
+  margin-bottom: var(--space-2);
+}
+
+.tag-when-chart__table th,
+.tag-when-chart__table td {
+  padding: var(--space-2);
+  border-bottom: 1px solid var(--hairline);
+  text-align: left;
+}
+
+.tag-when-chart__table th:last-child,
+.tag-when-chart__table td:last-child {
+  text-align: right;
+}
+
+.tag-when-chart__toggle {
+  display: flex;
+  align-items: center;
+  padding-top: var(--space-2);
+}
