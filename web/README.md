@@ -25,6 +25,38 @@ This folder holds the new public site of Torko. The old dashboard in `static/` w
 
 `web/node_modules/` (installed packages) and `web/dist/` (build output) are not in git.
 
+## Run it
+
+You need Node.js 22. Install the packages once:
+
+```bash
+cd web && npm install
+```
+
+During development, run Flask and Vite at the same time. Flask sends the data on port 5050. Vite shows the site on port 5173 and sends each `/api/` call on to Flask.
+
+```bash
+python3 server.py
+```
+
+```bash
+cd web && npm run dev
+```
+
+Open http://localhost:5173.
+
+Run the tests:
+
+```bash
+cd web && npm test
+```
+
+Build the site into `web/dist/`:
+
+```bash
+cd web && npm run build
+```
+
 ## Status
 
-The folders exist. The build setup, the shared components, and the pages are not written yet.
+The setup works: the router, the seven empty pages, a "Page not found" page, the design tokens, and a first form of the header with the theme button. The shared components and the real pages are not written yet. Flask does not send the built site yet (task W1).

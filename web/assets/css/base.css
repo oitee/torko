@@ -1,0 +1,125 @@
+/* Rules for plain elements. Components keep their own rules in their own CSS file. */
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html {
+  -webkit-text-size-adjust: 100%;
+}
+
+body {
+  margin: 0;
+  background: var(--ground);
+  color: var(--ink);
+  font-family: var(--font-sans);
+  font-size: var(--size-body);
+  line-height: var(--lh-body);
+}
+
+h1 {
+  font-size: var(--size-display);
+  line-height: var(--lh-display);
+  font-weight: 600;
+  margin: var(--space-8) 0 var(--space-4);
+}
+
+h2 {
+  font-size: var(--size-title);
+  line-height: var(--lh-title);
+  font-weight: 600;
+}
+
+h3 {
+  font-size: var(--size-heading);
+  line-height: var(--lh-heading);
+  font-weight: 600;
+}
+
+a {
+  color: var(--action);
+  text-underline-offset: 3px;
+}
+
+a:hover {
+  color: var(--action-hover);
+}
+
+:focus-visible {
+  outline: 2px solid var(--action);
+  outline-offset: 2px;
+}
+
+button {
+  font: inherit;
+}
+
+[lang="hi"] {
+  font-family: var(--font-hi);
+  line-height: var(--lh-hi);
+}
+
+[lang="ur"] {
+  font-family: var(--font-ur);
+  line-height: var(--lh-ur);
+}
+
+.container {
+  max-width: var(--page-max);
+  margin: 0 auto;
+  padding: 0 var(--page-pad);
+}
+
+.meta {
+  color: var(--meta);
+}
+
+.mono {
+  font-family: var(--font-mono);
+  font-size: var(--size-count);
+  line-height: var(--lh-count);
+}
+
+/* First form of the header and footer. The SiteHeader component replaces the header rules. */
+.site-header {
+  background: var(--header-bg);
+  color: var(--header-ink);
+  height: var(--header-height);
+}
+
+.site-header__row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  height: 100%;
+}
+
+.site-header__logo {
+  color: var(--header-ink);
+  font-weight: 600;
+  font-size: var(--size-heading);
+  text-decoration: none;
+}
+
+.site-header__theme {
+  background: none;
+  border: 0;
+  color: var(--header-ink);
+  font-size: var(--size-label);
+  min-height: var(--control-height);
+  cursor: pointer;
+}
+
+.site-header :focus-visible {
+  outline-color: var(--header-action);
+}
+
+.site-footer {
+  border-top: 1px solid var(--hairline);
+  color: var(--meta);
+  font-size: var(--size-label);
+  margin-top: var(--space-14);
+  padding: var(--space-6) 0;
+}
