@@ -1,0 +1,24 @@
+/* TLDR component styles. All values come from tokens.css. */
+
+.tldr {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+}
+
+.tldr__label {
+  font-family: var(--font-sans);
+  font-size: var(--size-label);
+  line-height: var(--lh-label);
+  font-weight: 500;
+  color: var(--ink);
+}
+
+.tldr__text {
+  margin: 0;
+  font-family: var(--font-sans);
+  font-size: var(--size-body);
+  line-height: var(--lh-body);
+  font-weight: 400;
+  color: var(--ink);
+}

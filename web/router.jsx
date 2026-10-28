@@ -8,6 +8,7 @@ import Debate from "./pages/debate.jsx";
 import Place from "./pages/place.jsx";
 import Search from "./pages/search.jsx";
 import NotFound from "./pages/not_found.jsx";
+import DevComponents from "./pages/dev_components.jsx";
 
 // Each address of the site and the page that it shows. Flask sends index.html for every one of them.
 export const routes = [
@@ -21,6 +22,8 @@ export const routes = [
       { path: "/debate/:id", element: <Debate /> },
       { path: "/place/:slug", element: <Place /> },
       { path: "/search", element: <Search /> },
+      // The components page exists only in development. The live site has no such address.
+      ...(import.meta.env.DEV ? [{ path: "/dev/components", element: <DevComponents /> }] : []),
       { path: "*", element: <NotFound /> },
     ],
   },

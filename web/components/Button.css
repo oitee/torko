@@ -1,0 +1,54 @@
+/* Button component styles. All values come from tokens.css. */
+
+.button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  box-sizing: border-box;
+  min-height: var(--control-height);
+  min-width: var(--control-height);
+  border-radius: var(--radius);
+  font-family: var(--font-sans);
+  font-size: var(--size-label);
+  line-height: var(--lh-label);
+  font-weight: 500;
+  cursor: pointer;
+  text-decoration: none;
+}
+
+.button--primary {
+  background: var(--action);
+  color: var(--sheet);
+  border: 0;
+  padding: 0 var(--space-4);
+}
+
+.button--primary:hover {
+  background: var(--action-hover);
+  color: var(--sheet);
+}
+
+.button--secondary {
+  background: var(--sheet);
+  color: var(--ink);
+  border: 1px solid var(--control);
+  padding: 0 var(--space-4);
+}
+
+.button--secondary:hover {
+  background: var(--ground);
+  color: var(--ink);
+}
+
+.button--text {
+  background: transparent;
+  color: var(--action);
+  border: 0;
+  padding: 0 var(--space-2);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+.button--text:hover {
+  color: var(--action-hover);
+}

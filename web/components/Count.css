@@ -1,0 +1,18 @@
+/* Count component styles. All values come from tokens.css. */
+
+.count {
+  font-family: var(--font-mono);
+  font-size: var(--size-count);
+  line-height: var(--lh-count);
+  color: inherit;
+}
+
+.count--link {
+  color: var(--action);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+.count--link:hover {
+  color: var(--action-hover);
+}

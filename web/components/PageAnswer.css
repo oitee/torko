@@ -1,0 +1,18 @@
+/* PageAnswer component styles. All values come from tokens.css. */
+
+.page-answer {
+  font-family: var(--font-sans);
+  font-size: var(--size-display);
+  line-height: var(--lh-display);
+  font-weight: 600;
+  color: var(--ink);
+  max-width: 72ch;
+  margin: var(--space-8) 0 var(--space-4);
+  text-wrap: pretty;
+}
+
+/* A count inside the answer takes the size of the answer. It keeps the mono font. */
+.page-answer .count {
+  font-size: inherit;
+  line-height: inherit;
+}

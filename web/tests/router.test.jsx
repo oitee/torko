@@ -18,6 +18,7 @@ describe("router", () => {
     ["/debate/1", "Debate"],
     ["/place/latur", "Place"],
     ["/search", "Search"],
+    ["/dev/components", "Components"],
     ["/no/such/page", "Page not found"],
   ])("shows %s as the %s page", (path, heading) => {
     at(path);

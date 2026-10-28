@@ -1,0 +1,78 @@
+/* Breadcrumb component styles. All values come from tokens.css. */
+
+.breadcrumb {
+  font-family: var(--font-sans);
+  font-size: var(--size-label);
+  line-height: var(--lh-label);
+}
+
+.breadcrumb__list {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.breadcrumb__item {
+  display: inline-flex;
+  align-items: center;
+  white-space: nowrap;
+}
+
+.breadcrumb__link {
+  color: var(--action);
+  text-decoration: none;
+}
+
+.breadcrumb__link:hover {
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+.breadcrumb__text {
+  color: var(--ink);
+}
+
+.breadcrumb__separator {
+  color: var(--meta);
+  margin-left: var(--space-2);
+  margin-right: var(--space-2);
+}
+
+.breadcrumb__current {
+  color: var(--meta);
+}
+
+.breadcrumb__ellipsis {
+  color: var(--meta);
+}
+
+.breadcrumb__item--collapsed {
+  display: none;
+}
+
+.breadcrumb__item--current {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+@media (max-width: 767px) {
+  .breadcrumb__item--middle {
+    display: none;
+  }
+
+  .breadcrumb__item--collapsed {
+    display: inline-flex;
+    align-items: center;
+  }
+
+  .breadcrumb__item--current .breadcrumb__current {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+}

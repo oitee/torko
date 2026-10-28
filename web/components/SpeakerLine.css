@@ -1,0 +1,30 @@
+/* SpeakerLine component styles. All values come from tokens.css. */
+
+.speaker-line {
+  font-family: var(--font-sans);
+  font-size: var(--size-body);
+  line-height: var(--lh-body);
+  color: var(--ink);
+}
+
+.speaker-line__link {
+  color: var(--action);
+  text-decoration: none;
+}
+
+.speaker-line__link:hover {
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+.speaker-line__name {
+  color: var(--ink);
+}
+
+.speaker-line__meta {
+  color: var(--meta);
+}
+
+.speaker-line--unidentified {
+  color: var(--ink-2);
+}
