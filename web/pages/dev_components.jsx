@@ -7,6 +7,12 @@ import TLDR from "../components/TLDR.jsx";
 import PageAnswer from "../components/PageAnswer.jsx";
 import { EmptyState, ErrorState, Loading } from "../components/States.jsx";
 import Chip from "../components/Chip.jsx";
+import ChipRow from "../components/ChipRow.jsx";
+import SpeechRow from "../components/SpeechRow.jsx";
+import SpeechList from "../components/SpeechList.jsx";
+import TurnBox from "../components/TurnBox.jsx";
+import Margin from "../components/Margin.jsx";
+import HowTorkoCounts from "../components/HowTorkoCounts.jsx";
 
 // The development page displays each shared component in every form.
 // It serves as a visual reference for design and testing.
@@ -44,9 +50,110 @@ export default function DevComponents() {
     printed: "DIVISION AYES 19",
   };
 
+  const threeTags = [
+    { name: "Arrears", slug: "arrears" },
+    { name: "West Bengal", slug: "west-bengal" },
+    { name: "Rural employment", slug: "rural-employment" },
+  ];
+
+  const twelveTags = [
+    { name: "Arrears", slug: "arrears" },
+    { name: "West Bengal", slug: "west-bengal" },
+    { name: "Rural employment", slug: "rural-employment" },
+    { name: "Agriculture", slug: "agriculture" },
+    { name: "Farmers", slug: "farmers" },
+    { name: "MGNREGA", slug: "mgnrega" },
+    { name: "Finance", slug: "finance" },
+    { name: "Panchayat", slug: "panchayat" },
+    { name: "Budget", slug: "budget" },
+    { name: "Wages", slug: "wages" },
+    { name: "Labour", slug: "labour" },
+    { name: "Social Welfare", slug: "social-welfare" },
+  ];
+
+  const speechWithMember = {
+    id: 178379,
+    date: "2025-12-17",
+    term: 18,
+    kind_label: "Bill",
+    debate: "Viksit Bharat Gurantee for Rojgar and Ajevika Mission (Gramin):VB-G RAM G Bill",
+    member: "Mahua Moitra",
+    member_id: 1052,
+    party: "AITC",
+    seat: "Krishnanagar",
+    summary: "Opposes the VB-GRAM G Bill and the replacement of MGNREGA, arguing it shifts financial burdens to states and destroys the legal guarantee of rural employment.",
+    // An invented sentence. Example data never puts invented words in the mouth of a real member.
+    excerpt: "An invented example sentence of a speech.",
+    words: 1916,
+    tags: threeTags,
+  };
+
+  const speechWithoutMember = {
+    id: 178380,
+    date: "2025-12-17",
+    term: 18,
+    kind_label: "Bill",
+    debate: "Viksit Bharat Gurantee for Rojgar and Ajevika Mission (Gramin):VB-G RAM G Bill",
+    member: null,
+    member_id: null,
+    party: null,
+    seat: null,
+    summary: null,
+    excerpt: null,
+    words: 14,
+    tags: [],
+  };
+
+  const turnMemberOneParaHindi = {
+    seq: 1,
+    kind: "member",
+    member: "Om Birla",
+    member_id: 225,
+    text: "क्या आप सभी पीछे वाले सदस्य आज दादा के नेतृत्व में हैं? दादा से सीखिए, इस उम्र में, तबीयत खराब होने के बाद भी सदन में आते हैं और पूरे समय बैठते हैं।\n\n? (व्यवधान)",
+    words: 37,
+  };
+
+  const turnMemberFourParas = {
+    seq: 14,
+    kind: "member",
+    // An invented text, so the speaker is an invented member with no page.
+    member: "Example Member",
+    member_id: null,
+    text: "First invented paragraph of an example turn.\n\nSecond invented paragraph.\n\nThird invented paragraph. It is hidden until the reader clicks Read more.\n\nFourth invented paragraph.",
+    words: 85,
+  };
+
+  const turnPresiding = {
+    seq: 5,
+    kind: "presiding",
+    text: "अगर सदन में तीन सौ सदस्य रहेंगे तो दस घंटे चर्चा करा दूंगा।\n\n? (व्यवधान)",
+    words: 15,
+  };
+
+  const turnCrowd = {
+    seq: 25,
+    kind: "crowd",
+    text: "Yes.",
+    words: 1,
+  };
+
+  const turnUnattributed = {
+    seq: 0,
+    kind: "unattributed",
+    text: "VB-G RAM G Bill",
+    words: 4,
+  };
+
   return (
     <div className="container" style={{ paddingBottom: "var(--space-14)" }}>
       <PageAnswer>Components</PageAnswer>
+
+      <section style={{ marginTop: "var(--space-8)" }}>
+        <h2>SiteHeader</h2>
+        <p className="meta">
+          The SiteHeader is displayed at the top of every page.
+        </p>
+      </section>
 
       <section style={{ marginTop: "var(--space-8)" }}>
         <h2>PageAnswer</h2>
@@ -133,7 +240,12 @@ export default function DevComponents() {
         <TLDR text="The member urges the government to release pending rural development funds." />
 
         <h3>TLDR: with no text (empty)</h3>
-        <div style={{ border: "1px dashed var(--hairline)", padding: "var(--space-2)" }}>
+        <div
+          style={{
+            border: "1px dashed var(--hairline)",
+            padding: "var(--space-2)",
+          }}
+        >
           <span className="meta">TLDR with no text renders nothing.</span>
           <TLDR text="" />
         </div>
@@ -183,6 +295,61 @@ export default function DevComponents() {
         ) : (
           <p className="meta">Chip was removed.</p>
         )}
+      </section>
+
+      <section style={{ marginTop: "var(--space-8)" }}>
+        <h2>ChipRow</h2>
+        <h3>ChipRow: with 3 tags</h3>
+        <ChipRow tags={threeTags} />
+
+        <h3>ChipRow: with 12 tags (collapses at 8)</h3>
+        <ChipRow tags={twelveTags} />
+      </section>
+
+      <section style={{ marginTop: "var(--space-8)" }}>
+        <h2>SpeechRow</h2>
+        <h3>SpeechRow: with a member</h3>
+        <SpeechRow speech={speechWithMember} />
+
+        <h3>SpeechRow: with no member</h3>
+        <SpeechRow speech={speechWithoutMember} />
+      </section>
+
+      <section style={{ marginTop: "var(--space-8)" }}>
+        <h2>TurnBox</h2>
+        <h3>TurnBox: member (1 paragraph in Hindi)</h3>
+        <TurnBox turn={turnMemberOneParaHindi} meta="Speech 1 of 52" />
+
+        <h3>TurnBox: member (4 paragraphs with Read more)</h3>
+        <TurnBox
+          turn={turnMemberFourParas}
+          meta="Speech 14 of 52"
+          summary="Opposes the replacement of MGNREGA."
+        />
+
+        <h3>TurnBox: presiding (The Chair)</h3>
+        <TurnBox turn={turnPresiding} meta="Interruption" />
+
+        <h3>TurnBox: crowd (Several members)</h3>
+        <TurnBox turn={turnCrowd} />
+
+        <h3>TurnBox: unattributed</h3>
+        <TurnBox turn={turnUnattributed} />
+      </section>
+
+      <section style={{ marginTop: "var(--space-8)" }}>
+        <h2>Margin and HowTorkoCounts</h2>
+        <h3>Margin: with a short note</h3>
+        <Margin>
+          <HowTorkoCounts>
+            A turn under 50 words is counted as a short remark.
+          </HowTorkoCounts>
+        </Margin>
+      </section>
+
+      <section style={{ marginTop: "var(--space-8)" }}>
+        <h2>SpeechList (real API data)</h2>
+        <SpeechList filters={{ tag: "arrears" }} />
       </section>
     </div>
   );

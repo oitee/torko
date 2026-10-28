@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
-import { Link, Outlet } from "react-router-dom";
+import { Outlet } from "react-router-dom";
+import SiteHeader from "./SiteHeader.jsx";
 
 const THEMES = ["system", "light", "dark"];
 const THEME_KEY = "torko-theme";
@@ -12,8 +13,8 @@ function readTheme() {
   }
 }
 
-// The frame of every page: header, page content, footer. The theme is "system" until the reader picks one.
-// The header here is a first form. The SiteHeader component replaces it.
+// The frame of every page: header, page content, footer.
+// The theme is "system" until the reader picks one.
 export default function Layout() {
   const [theme, setTheme] = useState(readTheme);
 
@@ -31,14 +32,7 @@ export default function Layout() {
   const next = THEMES[(THEMES.indexOf(theme) + 1) % THEMES.length];
   return (
     <>
-      <header className="site-header">
-        <div className="container site-header__row">
-          <Link to="/" className="site-header__logo">torko</Link>
-          <button type="button" className="site-header__theme" onClick={() => setTheme(next)}>
-            Theme: {theme[0].toUpperCase() + theme.slice(1)}
-          </button>
-        </div>
-      </header>
+      <SiteHeader theme={theme} onThemeChange={() => setTheme(next)} />
       <div className="container">
         <Outlet />
       </div>

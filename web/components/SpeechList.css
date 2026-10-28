@@ -1,0 +1,44 @@
+/* SpeechList component styles. All values come from tokens.css. */
+
+.speech-list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+  width: 100%;
+}
+
+.speech-list__count {
+  font-family: var(--font-mono);
+  font-size: var(--size-count);
+  line-height: var(--lh-count);
+  color: var(--meta);
+}
+
+.speech-list__items {
+  display: flex;
+  flex-direction: column;
+}
+
+.speech-list__pagination {
+  display: flex;
+  align-items: center;
+  gap: var(--space-4);
+  padding: var(--space-4) 0;
+}
+
+.speech-list__page-link {
+  display: inline-flex;
+  align-items: center;
+  color: var(--action);
+  font-family: var(--font-sans);
+  font-size: var(--size-label);
+  line-height: var(--lh-label);
+  font-weight: 500;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  min-height: var(--control-height);
+}
+
+.speech-list__page-link:hover {
+  color: var(--action-hover);
+}

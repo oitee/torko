@@ -1,0 +1,66 @@
+/* SiteHeader component styles. All values come from tokens.css. */
+
+.site-header {
+  background: var(--header-bg);
+  color: var(--header-ink);
+  height: var(--header-height);
+  box-sizing: border-box;
+}
+
+.site-header__row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  height: 100%;
+}
+
+.site-header__nav {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  height: 100%;
+}
+
+.site-header__link {
+  display: inline-flex;
+  align-items: center;
+  height: 100%;
+  min-height: var(--control-height);
+  padding: 0 var(--space-3);
+  color: var(--header-ink);
+  font-family: var(--font-sans);
+  font-size: var(--size-label);
+  line-height: var(--lh-label);
+  font-weight: 500;
+  text-decoration: none;
+  box-sizing: border-box;
+}
+
+.site-header__link:hover {
+  color: var(--header-ink);
+  text-decoration: none;
+}
+
+.site-header__link--active {
+  box-shadow: inset 0 -2px 0 var(--header-action);
+}
+
+.site-header__theme {
+  display: inline-flex;
+  align-items: center;
+  background: none;
+  border: 0;
+  color: var(--header-ink);
+  font-family: var(--font-sans);
+  font-size: var(--size-label);
+  line-height: var(--lh-label);
+  font-weight: 500;
+  min-height: var(--control-height);
+  padding: 0 var(--space-2);
+  cursor: pointer;
+}
+
+.site-header :focus-visible {
+  outline: 2px solid var(--header-action);
+  outline-offset: 2px;
+}

@@ -1,0 +1,26 @@
+/* HowTorkoCounts component styles. All values come from tokens.css. */
+
+.how-torko-counts {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  border-top: 1px solid var(--hairline);
+  padding-top: var(--space-3);
+  box-sizing: border-box;
+}
+
+.how-torko-counts__heading {
+  margin: 0;
+  font-family: var(--font-sans);
+  font-size: var(--size-label);
+  line-height: var(--lh-label);
+  font-weight: 500;
+  color: var(--ink);
+}
+
+.how-torko-counts__note {
+  font-family: var(--font-sans);
+  font-size: var(--size-body);
+  line-height: var(--lh-body);
+  color: var(--meta);
+}

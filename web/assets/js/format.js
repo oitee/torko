@@ -134,3 +134,24 @@ export function shareOf(n, total) {
   const percent = ratio.toFixed(1);
   return `${percent}% (${formatNumber(count)} of ${formatNumber(sum)})`;
 }
+
+// Detect Devanagari or Arabic script in text.
+// Returns "hi" for Devanagari, "ur" for Arabic script, or undefined.
+// The first script letter in the text wins when both are present.
+export function scriptLang(text) {
+  if (!text || typeof text !== "string") {
+    return undefined;
+  }
+  const match = text.match(/[\u0900-\u097F\u0600-\u06FF]/);
+  if (!match) {
+    return undefined;
+  }
+  const code = match[0].charCodeAt(0);
+  if (code >= 0x0900 && code <= 0x097F) {
+    return "hi";
+  }
+  if (code >= 0x0600 && code <= 0x06FF) {
+    return "ur";
+  }
+  return undefined;
+}

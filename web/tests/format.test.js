@@ -9,6 +9,7 @@ import {
   shareOf,
   termLong,
   termShort,
+  scriptLang,
 } from "../assets/js/format.js";
 
 describe("formatNumber", () => {
@@ -115,5 +116,33 @@ describe("constants", () => {
     expect(SPEAKER_NOT_IDENTIFIED_LINE).toBe(
       "Speaker not identified. Torko could not match this name to one member."
     );
+  });
+});
+
+describe("scriptLang", () => {
+  it("returns hi for Devanagari text", () => {
+    expect(scriptLang("माननीय अध्यक्ष")).toBe("hi");
+    expect(scriptLang("Speaker माननीय")).toBe("hi");
+  });
+
+  it("returns ur for Arabic script text", () => {
+    expect(scriptLang("شکریہ جناب اسپیکر")).toBe("ur");
+    expect(scriptLang("Speaker شکریہ")).toBe("ur");
+  });
+
+  it("returns the language of the first script character when both exist", () => {
+    expect(scriptLang("माननीय and شکریہ")).toBe("hi");
+    expect(scriptLang("شکریہ and माननीय")).toBe("ur");
+  });
+
+  it("returns undefined for text with neither script", () => {
+    expect(scriptLang("Plain English speech")).toBeUndefined();
+    expect(scriptLang("12345 !?")).toBeUndefined();
+  });
+
+  it("returns undefined for empty or missing input", () => {
+    expect(scriptLang("")).toBeUndefined();
+    expect(scriptLang(null)).toBeUndefined();
+    expect(scriptLang(undefined)).toBeUndefined();
   });
 });

@@ -1,0 +1,45 @@
+/* Margin component styles. All values come from tokens.css. */
+
+.margin {
+  display: flex;
+  flex-direction: column;
+}
+
+.margin__toggle {
+  display: none;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  min-height: var(--control-height);
+  padding: 0 var(--space-3);
+  background: var(--sheet);
+  border: 1px solid var(--hairline);
+  border-radius: var(--radius);
+  color: var(--ink);
+  font-family: var(--font-sans);
+  font-size: var(--size-label);
+  line-height: var(--lh-label);
+  font-weight: 500;
+  cursor: pointer;
+}
+
+.margin__content {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+}
+
+@media (max-width: 767px) {
+  .margin__toggle {
+    display: flex;
+  }
+
+  .margin__content {
+    display: none;
+    margin-top: var(--space-3);
+  }
+
+  .margin__content--open {
+    display: flex;
+  }
+}

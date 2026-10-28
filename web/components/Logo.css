@@ -1,0 +1,17 @@
+/* Logo component styles. All values come from tokens.css. */
+
+.logo {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  text-decoration: none;
+  color: inherit;
+}
+
+.logo__word {
+  font-family: var(--font-sans);
+  font-weight: 600;
+  font-size: var(--size-heading);
+  line-height: 1;
+  color: inherit;
+}

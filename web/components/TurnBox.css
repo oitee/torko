@@ -1,0 +1,80 @@
+/* TurnBox component styles. All values come from tokens.css. */
+
+.turn-box {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  background: var(--sheet);
+  border: 1px solid var(--hairline);
+  border-radius: var(--radius);
+  padding: var(--space-4);
+  box-sizing: border-box;
+}
+
+.turn-box__header {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+}
+
+.turn-box__speaker {
+  font-family: var(--font-sans);
+  font-size: var(--size-heading);
+  line-height: var(--lh-heading);
+  font-weight: 600;
+}
+
+.turn-box__speaker-link {
+  color: var(--action);
+  text-decoration: none;
+}
+
+.turn-box__speaker-link:hover {
+  color: var(--action-hover);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+.turn-box__speaker-name {
+  color: var(--ink);
+}
+
+.turn-box__speaker-unidentified {
+  color: var(--ink-2);
+}
+
+.turn-box__meta {
+  font-family: var(--font-mono);
+  font-size: var(--size-count);
+  line-height: var(--lh-count);
+  color: var(--meta);
+}
+
+.turn-box__unidentified-line {
+  margin: 0;
+  font-family: var(--font-sans);
+  font-size: var(--size-body);
+  line-height: var(--lh-body);
+  color: var(--ink);
+}
+
+.turn-box__content {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+
+.turn-box__para {
+  margin: 0;
+  font-family: var(--font-sans);
+  font-size: var(--size-speech);
+  line-height: var(--lh-speech);
+  color: var(--ink);
+  max-width: 62ch;
+}
+
+.turn-box__action {
+  display: flex;
+}
