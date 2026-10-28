@@ -50,7 +50,7 @@ describe("getJSON", () => {
     );
   });
 
-  it("expands list values into repeated query keys", async () => {
+  it("sends a list value as one comma list", async () => {
     globalThis.fetch = vi.fn().mockResolvedValue({
       ok: true,
       status: 200,
@@ -60,7 +60,7 @@ describe("getJSON", () => {
     await getJSON("/api/speeches", { term: [16, 17] });
 
     expect(globalThis.fetch).toHaveBeenCalledWith(
-      "/api/speeches?term=16&term=17",
+      "/api/speeches?term=16%2C17",
       expect.anything()
     );
   });

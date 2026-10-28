@@ -17,10 +17,10 @@ function buildUrl(path, params) {
       continue;
     }
     if (Array.isArray(value)) {
-      for (const item of value) {
-        if (item !== null && item !== undefined && item !== "") {
-          searchParams.append(key, String(item));
-        }
+      // The API reads a list as one comma list, for example term=16,17.
+      const items = value.filter((item) => item !== null && item !== undefined && item !== "");
+      if (items.length > 0) {
+        searchParams.append(key, items.join(","));
       }
     } else {
       searchParams.append(key, String(value));
