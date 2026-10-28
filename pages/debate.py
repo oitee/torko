@@ -6,6 +6,8 @@ from sqlalchemy import text
 from pages.common import (KIND_LABELS, PARTY_AT_DATE, SPEECH_TAGS_CTE, clean_layout, slug, speech_kind, speech_rows,
                           tidy_title, tidy_type)
 
+from pages.sessions import session_labels
+
 LAID = re.compile(r"\s*-\s*Laid\s*$", re.I)
 HONORIFICS = {"shri", "smt", "dr", "prof", "col", "kumari", "ms", "mr", "mrs", "adv", "sri", "shrimati",
               "alias", "capt", "lt", "gen", "maj"}
@@ -208,6 +210,8 @@ def debate_page(conn, debate_id, args=None):
         "id": d["id"], "laid": laid, "term": d["loksabha"], "session": d["session"], "dbslno": d["dbslno"],
         "date": d["debate_date"].isoformat() if d["debate_date"] else None,
         "title": tidy_title(title), "type": tidy_type(d["debate_type"]), "source_url": d["source_url"],
+        "kind": speech_kind(d["debate_type"]), "kind_label": KIND_LABELS[speech_kind(d["debate_type"])],
+        "session_label": (session_labels(conn).get((d["loksabha"], d["session"])) or {}).get("label"),
         "official": official, "official_count": len(official), "n_names": len(d["member_names"] or []),
         "turn_list": turn_list, "turn_count": len(turn_list), "turn_kinds": kind_counts(turn_list),
         "turn_kinds_note": "Each count is a number of turns of this debate. The total is turn_count.",

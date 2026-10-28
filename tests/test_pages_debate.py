@@ -74,3 +74,10 @@ def test_debate_rows_with_a_seat_also_give_the_state(page_conn):
     seated = [p for p in r["people"] if p["seat"]] + [s for s in r["speeches"] if s["seat"]]
     assert seated and all("state" in x for x in seated)
     assert any(x["state"] for x in seated)
+
+
+def test_debate_has_its_short_type_and_session_name(page_conn):
+    from pages.debate import debate_page
+    d = debate_page(page_conn, 683)
+    assert d["kind"] == "bill" and d["kind_label"] == "Bill"
+    assert d["session_label"] and "6" not in d["session_label"]
