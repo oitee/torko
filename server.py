@@ -1,3 +1,5 @@
+import pathlib
+
 from flask import Flask, jsonify, request, send_from_directory
 
 import dashboard_db
@@ -124,10 +126,47 @@ def index():
     return send_from_directory(app.static_folder, "index.html")
 
 
+# The new public site: a single-page app that Vite builds into web/dist/.
+# Flask sends the one file index.html for every page address, and the browser picks the page.
+WEB_DIST = pathlib.Path(__file__).resolve().parent / "web" / "dist"
+SITE_PAGES = ["/tag/<slug>", "/member/<int:member_id>", "/speech/<int:speech_id>", "/debate/<int:debate_id>",
+              "/place/<slug>", "/search"]
+
+
+def site_index(status=200):
+    """index.html of the built site, with the given status. A 404 when the site is not built."""
+    if not (WEB_DIST / "index.html").is_file():
+        return "The site is not built. Run: cd web && npm run build", 404
+    resp = send_from_directory(WEB_DIST, "index.html", max_age=0)
+    resp.status_code = status
+    return resp
+
+
+def site_page(**_):
+    return site_index()
+
+
+for rule in SITE_PAGES:
+    app.add_url_rule(rule, endpoint="site_" + rule.strip("/").split("/")[0], view_func=site_page)
+
+
+@app.route("/assets/<path:name>")
+def site_assets(name):
+    """The built JavaScript and CSS. Each file name holds a hash of its content, so a browser can keep it for a year."""
+    return send_from_directory(WEB_DIST / "assets", name, max_age=365 * 24 * 3600)
+
+
+@app.errorhandler(404)
+def not_found(error):
+    """An address with no page gets the site with status 404, so that search engines do not store it.
+    The site shows its own "Page not found". An API address keeps the plain 404."""
+    if request.path.startswith("/api/") or not (WEB_DIST / "index.html").is_file():
+        return error
+    return site_index(404)
+
+
 @app.route("/analysis")
 def analysis():
-    import pathlib
-
     base = pathlib.Path(app.static_folder).parent
     template = (base / "static" / "analysis.html").read_text()
     data = (base / "fixtures" / "analysis.json").read_text()
