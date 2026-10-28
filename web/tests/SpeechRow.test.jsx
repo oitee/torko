@@ -30,14 +30,15 @@ describe("SpeechRow", () => {
       </MemoryRouter>
     );
 
-    expect(
-      screen.getByText("2025-12-17 · 18th LS · Bill · 1,916 words")
-    ).toBeTruthy();
+    expect(screen.getByText("2025-12-17")).toBeTruthy();
+    expect(screen.getByText("Bill")).toBeTruthy();
+    expect(screen.getByText("18th LS · 1,916 words")).toBeTruthy();
 
     const debateLink = screen.getByRole("link", { name: "VB-G RAM G Bill" });
     expect(debateLink.getAttribute("href")).toBe("/speech/178379");
 
-    expect(screen.getByText("Opposes the VB-GRAM G Bill.")).toBeTruthy();
+    expect(screen.getByText("TLDR")).toBeTruthy();
+    expect(screen.getByText(/Opposes the VB-GRAM G Bill\./)).toBeTruthy();
     expect(screen.getByRole("link", { name: "Mahua Moitra" })).toBeTruthy();
 
     const excerpt = screen.getByText("“माननीय अध्यक्ष जी”");
@@ -72,6 +73,17 @@ describe("SpeechRow", () => {
 
     expect(screen.getByText("Speaker not identified")).toBeTruthy();
     expect(screen.queryByText(/“/)).toBeNull();
+  });
+
+  it("names the place of the speech in its debate", () => {
+    render(
+      <MemoryRouter>
+        <SpeechRow speech={{ ...sampleSpeech, position: 25, of: 54 }} />
+      </MemoryRouter>
+    );
+    expect(
+      screen.getByText("18th LS · speech 25 of 54 in the debate · 1,916 words")
+    ).toBeTruthy();
   });
 
   it("returns null when speech prop is missing", () => {
