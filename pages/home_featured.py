@@ -11,7 +11,7 @@ import re
 
 from sqlalchemy import text
 
-from pages.common import resolve_tag, slug
+from pages.common import resolve_tag, slug, tidy_title
 from pages.trends import trends_page
 
 FEATURED_FILE = pathlib.Path(__file__).resolve().parent.parent / "data" / "home" / "featured.json"
@@ -74,7 +74,7 @@ def featured_quote(conn, item):
     if not contains([r[1] for r in own_turns(conn, s)], item["text"]):
         return None, "quote: the text does not occur word for word in the member's own turns"
     return {"speech_id": s["id"], "text": item["text"], "member": s["member"], "member_id": s["person_id"],
-            "date": s["debate_date"].isoformat() if s["debate_date"] else None, "debate": s["title"],
+            "date": s["debate_date"].isoformat() if s["debate_date"] else None, "debate": tidy_title(s["title"]),
             "term": s["loksabha"], "source_url": s["source_url"]}, None
 
 

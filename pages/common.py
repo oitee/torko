@@ -3,6 +3,7 @@
 The page modules in this package use them, and so do the export scripts of the design prototype.
 Every connection of engine() is read-only, so no page query can change the database.
 """
+import html
 import re
 import time
 
@@ -241,8 +242,13 @@ def speech_tag_map(conn, speech_ids):
 
 
 def tidy_title(t):
+    """A debate title as plain text. The source keeps HTML in some titles, for example 5<sup>th</sup> or <span ...>.
+    A line break becomes a space, every other tag goes away, and HTML codes such as &amp; become their letters."""
     if not t:
         return t
+    t = re.sub(r"<br\s*/?>", " ", t, flags=re.I)
+    t = re.sub(r"</?[a-zA-Z][^<>]*>", "", t)
+    t = html.unescape(t)
     t = re.sub(r"\s+", " ", t).strip()
     return t[:1] + t[1:].lower() if t.isupper() else t
 
