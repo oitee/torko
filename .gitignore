@@ -43,3 +43,9 @@ tags/subject_groups/results/*
 tags/subject_groups/eval/
 
 docs/api/
+
+design/
+
+# frontend build output and installed packages
+web/node_modules/
+web/dist/

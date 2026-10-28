@@ -194,6 +194,8 @@ The plan has these steps. Each step has a folder under `tags/` with its own READ
 
 **2. Semantic search.** Today, search matches exact words. The next step after tags is search by meaning. A query such as "water scarcity in rural districts" will also find speeches that use other words for the same idea. Each speech of 100 words or more will be converted into an embedding. There are 97,043 such speeches. PostgreSQL will store the embeddings with the `pgvector` extension. One query will combine meaning, exact words, and filters such as party and year. Each result will link to the official source.
 
+**3. A public site.** A new site in `web/` will replace the old dashboard. It has seven pages: Home, Tag, Member, Speech, Debate, Place, and Search. The site is a single-page app: one HTML file holds all pages, and JavaScript in the browser shows the page for each address. The site uses React, a JavaScript library for interfaces, and Vite, a build tool. Flask serves the built files and the data under `/api/`. The old dashboard in `static/` will be deprecated.
+
 **Ideas we may explore after these steps.** We may pick the following based on what the first two steps show.
 
 - **Connections between topics and members.** Torko already records which member spoke in which debate, and who interrupted whom. Speech-level tags will add a new layer to these links. Then Torko can answer questions such as "Which members raised both coastal erosion and cyclone relief?"
