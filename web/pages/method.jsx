@@ -132,8 +132,8 @@ export default function Method() {
             example={<SpeechExample example={examples.speech} />}
           >
             <p>
-              Other members often interrupt a speech with a few words. Torko joins the turns of a member into one
-              speech when only interruptions of 25 words or fewer come between them.
+              The chair and other members often interrupt a speech. Torko joins the turns of a member into one speech
+              when only the chair, or other members with 25 words or fewer, speak between them.
             </p>
           </MethodStep>
 
