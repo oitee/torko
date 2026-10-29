@@ -39,7 +39,7 @@ describe("Method page", () => {
     expect(spy).toHaveBeenCalledWith("/api/method");
   });
 
-  it("shows the four steps in order", async () => {
+  it("shows the five steps in order", async () => {
     vi.spyOn(api, "getJSON").mockResolvedValue(methodAnswer);
     renderMethod();
     await screen.findByText("Read the debates");
@@ -47,7 +47,8 @@ describe("Method page", () => {
       "Read the debates",
       "Find who spoke",
       "Join turns into speeches",
-      "Give each speech its subjects",
+      "Find the subjects of each speech",
+      "Link subjects to tags",
       "What Torko gets wrong",
       "Sources",
     ]);
@@ -75,6 +76,28 @@ describe("Method page", () => {
     const { container } = renderMethod();
     await screen.findByText("Read the debates");
     expect(container.textContent).toContain("Of the 200,000 speeches");
+  });
+
+  it("keeps the three verbs of the answer apart from the rest of the sentence", async () => {
+    vi.spyOn(api, "getJSON").mockResolvedValue(methodAnswer);
+    const { container } = renderMethod();
+    await screen.findByText("Read the debates");
+    const verbs = [...container.querySelectorAll("h1 .method-answer__verb")].map((v) => v.textContent);
+    expect(verbs).toEqual(["reads", "finds", "tags"]);
+  });
+
+  it("shows the old-font example from the API", async () => {
+    vi.spyOn(api, "getJSON").mockResolvedValue(methodAnswer);
+    renderMethod();
+    expect(await screen.findByText(methodAnswer.examples.legacy.source_text)).toBeTruthy();
+    expect(screen.getByText(methodAnswer.examples.legacy.text).getAttribute("lang")).toBe("hi");
+  });
+
+  it("leaves out an example that the API does not send", async () => {
+    vi.spyOn(api, "getJSON").mockResolvedValue({ ...methodAnswer, examples: {} });
+    renderMethod();
+    await screen.findByText("Read the debates");
+    expect(screen.queryByText("In the source page")).toBeNull();
   });
 
   it("links to the sources and the code", async () => {

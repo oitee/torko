@@ -1,18 +1,47 @@
-/* One step of the Method page. */
+/* One node of the flow on the Method page. A line runs down the rail from each node to the next. */
 
 .method-step {
   display: grid;
-  grid-template-columns: var(--space-8) minmax(0, 1fr);
-  gap: var(--space-4);
-  border-top: 1px solid var(--ink);
-  padding-top: var(--space-6);
+  grid-template-columns: 40px minmax(0, 1fr);
+  gap: var(--space-5);
 }
 
+.method-step__rail {
+  position: relative;
+  display: flex;
+  justify-content: center;
+}
+
+/* The line to the next step. The last step has none. */
+.method-step__rail::after {
+  content: "";
+  position: absolute;
+  top: 40px;
+  bottom: calc(-1 * var(--space-10));
+  left: 50%;
+  width: 1px;
+  background: var(--control);
+}
+
+.method-step--last .method-step__rail::after {
+  display: none;
+}
+
+/* The node: a circle, as the seats of the mark are. Ink border, mono number. */
 .method-step__n {
+  position: relative;
+  z-index: 1;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  border: 1px solid var(--ink);
+  border-radius: 50%;
+  background: var(--ground);
   font-family: var(--font-mono);
-  font-size: var(--size-heading);
-  line-height: var(--lh-heading);
-  color: var(--meta);
+  font-size: var(--size-label);
+  color: var(--ink);
 }
 
 .method-step__body {
@@ -21,6 +50,7 @@
   gap: var(--space-3);
   min-width: 0;
   max-width: 72ch;
+  padding-top: var(--space-1);
 }
 
 .method-step__title {
@@ -41,4 +71,29 @@
   font-size: var(--size-count);
   line-height: var(--lh-count);
   color: var(--ink);
+}
+
+.method-step__example {
+  margin-top: var(--space-2);
+}
+
+/* A light reveal: each step fades in once when it comes into view. No movement when the reader asks for less. */
+@media (prefers-reduced-motion: no-preference) {
+  .method-step {
+    opacity: 0;
+    transform: translateY(12px);
+    transition: opacity 0.5s ease, transform 0.5s ease;
+  }
+
+  .method-step--seen {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+/* On a phone the rail keeps its width, and the gap next to it is smaller. */
+@media (max-width: 560px) {
+  .method-step {
+    gap: var(--space-3);
+  }
 }

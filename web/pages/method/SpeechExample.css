@@ -1,0 +1,62 @@
+/* The turns of one speech, with the bracket of the speech on the left. */
+
+.speech-example {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+.speech-example__turns {
+  list-style: none;
+  margin: 0;
+  padding: 0 0 0 var(--space-4);
+  border-left: 2px solid var(--ink);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+
+.speech-example__turn p {
+  margin: 0;
+}
+
+/* An interruption sits further in, in a quieter colour. */
+.speech-example__turn--other {
+  margin-left: var(--space-6);
+  padding-left: var(--space-3);
+  border-left: 1px solid var(--control);
+}
+
+.speech-example__who {
+  font-size: var(--size-label);
+  line-height: var(--lh-label);
+  font-weight: 600;
+  color: var(--ink);
+}
+
+.speech-example__turn--other .speech-example__who {
+  font-weight: 500;
+  color: var(--ink-2);
+}
+
+.speech-example__words {
+  font-family: var(--font-mono);
+  font-size: var(--size-count);
+  font-weight: 400;
+  color: var(--meta);
+}
+
+.speech-example__text {
+  font-size: var(--size-body);
+  line-height: var(--lh-body);
+  color: var(--ink);
+}
+
+.speech-example__turn--other .speech-example__text {
+  color: var(--ink-2);
+}
+
+.speech-example__result {
+  margin: 0;
+  color: var(--ink);
+}

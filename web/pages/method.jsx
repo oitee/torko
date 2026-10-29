@@ -7,12 +7,30 @@ import { countOf, formatDateLong, formatNumber } from "../assets/js/format.js";
 import MethodStep from "./method/MethodStep.jsx";
 import MethodLabels from "./method/MethodLabels.jsx";
 import MethodLimits from "./method/MethodLimits.jsx";
+import LegacyExample from "./method/LegacyExample.jsx";
+import SpeechExample from "./method/SpeechExample.jsx";
+import SubjectsExample from "./method/SubjectsExample.jsx";
+import SubjectGroupExample from "./method/SubjectGroupExample.jsx";
 import "./method.css";
 
 const CODE_URL = "https://github.com/oitee/torko";
 
-// The Method page: how Torko works, in four steps, then what it gets wrong, then the sources.
-// It is a broad outline, not a full account of each step. Every figure comes from /api/method.
+// The answer of the page. The three verbs are the three jobs of Torko, so they keep the full ink colour,
+// and the rest of the sentence is grey. Green is not used, because green marks only actions.
+function Answer() {
+  return (
+    <PageAnswer>
+      <span className="method-answer">
+        Torko <span className="method-answer__verb">reads</span> the Lok Sabha debates,{" "}
+        <span className="method-answer__verb">finds</span> who spoke each turn, and{" "}
+        <span className="method-answer__verb">tags</span> each speech with its subjects.
+      </span>
+    </PageAnswer>
+  );
+}
+
+// The Method page: how Torko works, as a flow of five steps, each with a real example.
+// Then what Torko gets wrong, then the sources. Every figure and example comes from /api/method.
 export default function Method() {
   const [data, setData] = useState(null);
   const [error, setError] = useState(null);
@@ -30,13 +48,9 @@ export default function Method() {
     document.title = "How Torko works · Torko";
   }, []);
 
-  const answer = (
-    <PageAnswer>Torko reads the Lok Sabha debates, finds who spoke each turn, and tags each speech with its subjects.</PageAnswer>
-  );
-
   if (error) {
     return (
-      <PageLayout answer={answer}>
+      <PageLayout answer={<Answer />}>
         <ErrorState error={error} onRetry={load} />
       </PageLayout>
     );
@@ -44,18 +58,20 @@ export default function Method() {
 
   if (!data) {
     return (
-      <PageLayout answer={answer}>
+      <PageLayout answer={<Answer />}>
         <Loading lines={6} />
       </PageLayout>
     );
   }
 
   const { corpus = {}, turns = {}, speeches = {} } = data;
+  const examples = data.examples || {};
   // The turns of one person: all turns except those of the chair and of many members at once.
   const oneSpeaker = turns.total != null && turns.chair_or_crowd != null ? turns.total - turns.chair_or_crowd : null;
+  const minWords = speeches.min_words ?? 50;
 
   return (
-    <PageLayout answer={answer}>
+    <PageLayout answer={<Answer />}>
       <div className="method-page">
         <ol className="method-page__steps">
           <MethodStep
@@ -69,11 +85,12 @@ export default function Method() {
                 </>
               )
             }
+            example={<LegacyExample example={examples.legacy} />}
           >
             <p>
-              Torko copies each debate page from sansad.in and keeps the original page. It reads the text of each
-              turn from that page. Debates before about 2009 store Hindi in an old font. Torko converts that text to
-              readable Hindi.
+              Torko reads each debate page on sansad.in. It splits each debate into turns. A turn is the text under
+              one printed name. Debates before about 2009 store Hindi in an old font, and the text shows as random
+              Latin letters. Torko converts that text to readable Hindi.
             </p>
           </MethodStep>
 
@@ -89,14 +106,14 @@ export default function Method() {
                 </>
               )
             }
+            example={<MethodLabels example={data.example} />}
           >
             <p>
-              sansad.in prints the number of a member only on the first turn of that member in a debate. Later turns
-              have only a printed name, and the source prints the name of one member in many forms. Torko matches
-              each printed name to one member. A member keeps one identity in all terms.
+              sansad.in prints the name of each speaker as plain text, with no fixed pattern. Some turns carry the
+              number of the member, but most turns carry only a printed name. Torko reads each printed name and
+              matches it to one member. A member keeps one identity in all terms.
             </p>
             <p>When two members can match one name, Torko gives no name. A missing name is better than a wrong name.</p>
-            <MethodLabels example={data.example} />
           </MethodStep>
 
           <MethodStep
@@ -112,35 +129,45 @@ export default function Method() {
                 </>
               )
             }
+            example={<SpeechExample example={examples.speech} />}
           >
             <p>
-              A speech is one contribution of one member. Other members often interrupt a speech for a few words.
-              Torko joins the turns of a member into one speech when only short interruptions of 25 words or fewer
-              come between them.
+              Other members often interrupt a speech with a few words. Torko joins the turns of a member into one
+              speech when only interruptions of 25 words or fewer come between them.
             </p>
           </MethodStep>
 
           <MethodStep
             n={4}
-            title="Give each speech its subjects"
+            title="Find the subjects of each speech"
             figure={
               speeches.eligible != null && (
                 <>
-                  Of the {formatNumber(speeches.eligible)} speeches of a member with {speeches.min_words} words or
-                  more, {formatNumber(speeches.with_tldr)} have a TLDR and {formatNumber(speeches.with_tag)} have at
-                  least one tag
-                  {corpus.tags != null && <> · {formatNumber(corpus.tags)} tags</>}
+                  Of the {formatNumber(speeches.eligible)} speeches of a member with {minWords} words or more,{" "}
+                  {formatNumber(speeches.with_tldr)} have a TLDR and {formatNumber(speeches.with_tag)} have at least
+                  one tag
                 </>
               )
             }
+            example={<SubjectsExample example={examples.subjects} />}
           >
             <p>
-              A language model reads each speech of {speeches.min_words ?? 50} words or more. It writes a TLDR and lists
-              the subjects of the speech. A second model checks each subject against the speech. Torko keeps a
-              subject only when that model is confident.
+              A language model reads each speech of {minWords} words or more. It writes a TLDR and names the subjects
+              of the speech. A second model checks each subject against the speech. Torko keeps a subject only when
+              that model is confident.
             </p>
+          </MethodStep>
+
+          <MethodStep
+            n={5}
+            title="Link subjects to tags"
+            figure={corpus.tags != null && <>{formatNumber(corpus.tags)} tags</>}
+            example={<SubjectGroupExample example={examples.subject_group} />}
+            last
+          >
             <p>
-              Torko then links each subject to a tag in its own list of tags. A broad tag holds its more specific
+              Different speeches name one subject in different words. Torko joins these names into one specific
+              subject, and links the subject to a tag in its own list of tags. A broad tag holds its specific
               subjects. For example, the tag Arrears holds the wage arrears of workers and the arrears of sugarcane
               farmers.
             </p>

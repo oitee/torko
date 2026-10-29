@@ -1,0 +1,84 @@
+/* One speech with its subjects marked, and the list of subjects with the result of the check. */
+
+.subjects-example {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+.subjects-example__text {
+  margin: 0;
+  font-size: var(--size-body);
+  line-height: 1.9;
+  color: var(--ink);
+}
+
+/* A mention: a box in ink, not a colour. A subject that the check dropped has a dashed box. */
+.subjects-example__mark {
+  background: transparent;
+  color: inherit;
+  border: 1px solid var(--ink);
+  padding: 1px 3px;
+  box-decoration-break: clone;
+  -webkit-box-decoration-break: clone;
+}
+
+.subjects-example__mark--dropped {
+  border-style: dashed;
+  border-color: var(--control);
+}
+
+.subjects-example__tldr {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+  border-bottom: 1px solid var(--hairline);
+  padding-bottom: var(--space-3);
+  margin-bottom: var(--space-1);
+}
+
+.subjects-example__tldr p {
+  margin: 0;
+}
+
+.subjects-example__tldr-label {
+  font-size: var(--size-label);
+  font-weight: 600;
+  color: var(--ink);
+}
+
+.subjects-example__tldr-text {
+  color: var(--ink);
+}
+
+.subjects-example__items {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+}
+
+.subjects-example__item {
+  display: grid;
+  grid-template-columns: 1.25rem minmax(0, 1fr) auto;
+  gap: var(--space-2);
+  align-items: baseline;
+  font-size: var(--size-body);
+  color: var(--ink);
+}
+
+.subjects-example__item--dropped {
+  color: var(--meta);
+}
+
+.subjects-example__item--dropped .subjects-example__name {
+  text-decoration: line-through;
+}
+
+.subjects-example__state {
+  font-family: var(--font-mono);
+  font-size: var(--size-count);
+  color: var(--meta);
+}

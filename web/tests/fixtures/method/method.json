@@ -20,7 +20,7 @@
       18
     ]
   },
-  "counts_note": "turns.total counts all rows of the table turns. turns.member counts the turns with a member. turns.chair_or_crowd counts the turns with no member and a role of the chair or of many members at once. turns.no_name counts the turns with no member and no role. The three parts add up to turns.total. speeches.total counts all speeches. speeches.with_member counts the speeches with a member. speeches.eligible counts the speeches with a member and min_words words or more. speeches.with_tldr counts the eligible speeches with a TLDR from a model (not a fixed rule text). speeches.with_tag counts the eligible speeches with at least one tag. example.labels lists the most frequent printed labels of one member, with the number of turns of each. unread_text is fixed text from a measurement of the stored pages. No query computes it.",
+  "counts_note": "turns.total counts all rows of the table turns. turns.member counts the turns with a member. turns.chair_or_crowd counts the turns with no member and a role of the chair or of many members at once. turns.no_name counts the turns with no member and no role. The three parts add up to turns.total. speeches.total counts all speeches. speeches.with_member counts the speeches with a member. speeches.eligible counts the speeches with a member and min_words words or more. speeches.with_tldr counts the eligible speeches with a TLDR from a model (not a fixed rule text). speeches.with_tag counts the eligible speeches with at least one tag. example.labels lists the most frequent printed labels of one member, with the number of turns of each. unread_text is fixed text from a measurement of the stored pages. No query computes it. examples.legacy.source_text is fixed text from a stored page. examples.legacy.text is its decoded form. examples.speech.turns lists every turn inside one speech: own is true for the turns of the member. examples.subjects.items lists the subjects that the model named for one speech, with kept from the check. examples.subject_group.names lists the most frequent names joined into one specific subject.",
   "example": {
     "labels": [
       {
@@ -66,6 +66,16 @@
     ],
     "member_id": 368,
     "name": "Adhir Ranjan Chowdhury"
+  },
+  "examples": {
+    "legacy": {
+      "debate": null,
+      "source_text": "àÉcÉänªÉ, àÉé +ÉÉ{ÉBÉEÉ ¤ÉcÖiÉ +ÉÉ£ÉÉ®ÉÒ cÚÆ ÉÊBÉE +ÉÉ{ÉxÉä àÉÖZÉä ABÉE AäºÉä <¶ªÉÖ {É® ¤ÉÉäãÉxÉä BÉEÉ àÉÉèBÉEÉ ÉÊnªÉÉ,",
+      "text": "महोदय, मैं आपका बहुत आभारी हूं कि आपने मुझे एक ऐसे इश्यु पर बोलने का मौका दिया,"
+    },
+    "speech": null,
+    "subject_group": null,
+    "subjects": null
   },
   "speeches": {
     "eligible": 116387,
