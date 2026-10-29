@@ -6,43 +6,34 @@ import ThemeSwitch from "../components/ThemeSwitch.jsx";
 afterEach(cleanup);
 
 describe("ThemeSwitch", () => {
-  it("shows the three themes as one labelled group", () => {
+  it("renders a single button with accessible name describing current and next theme", () => {
     render(<ThemeSwitch theme="system" />);
-    expect(screen.getByRole("group", { name: "Theme" })).toBeTruthy();
-    const group = screen.getByRole("group", { name: "Theme" });
-    expect([...group.querySelectorAll("button")].map((b) => b.getAttribute("aria-label"))).toEqual([
-      "System theme",
-      "Light theme",
-      "Dark theme",
-    ]);
+    const button = screen.getByRole("button", { name: "System theme. Change to light theme" });
+    expect(button).toBeTruthy();
+    expect(button.getAttribute("title")).toBe("System theme. Change to light theme");
   });
 
-  it("marks only the current theme as pressed", () => {
-    render(<ThemeSwitch theme="dark" />);
-    expect(screen.getByRole("button", { name: "Dark theme" }).getAttribute("aria-pressed")).toBe("true");
-    expect(screen.getByRole("button", { name: "Light theme" }).getAttribute("aria-pressed")).toBe("false");
-    expect(screen.getByRole("button", { name: "System theme" }).getAttribute("aria-pressed")).toBe("false");
-  });
-
-  it("gives the chosen theme to onChange", () => {
+  it("cycles from system to light theme on click", () => {
     const onChange = vi.fn();
     render(<ThemeSwitch theme="system" onChange={onChange} />);
-    fireEvent.click(screen.getByRole("button", { name: "Light theme" }));
+    const button = screen.getByRole("button", { name: /System theme/i });
+    fireEvent.click(button);
     expect(onChange).toHaveBeenCalledWith("light");
   });
 
-  it("has one button for a narrow screen that names the current theme and moves to the next", () => {
-    const onChange = vi.fn();
-    render(<ThemeSwitch theme="dark" onChange={onChange} />);
-    const compact = screen.getByRole("button", { name: "Dark theme. Change to system theme" });
-    fireEvent.click(compact);
-    expect(onChange).toHaveBeenCalledWith("system");
-  });
-
-  it("does nothing when the reader picks the current theme again", () => {
+  it("cycles from light to dark theme on click", () => {
     const onChange = vi.fn();
     render(<ThemeSwitch theme="light" onChange={onChange} />);
-    fireEvent.click(screen.getByRole("button", { name: "Light theme" }));
-    expect(onChange).not.toHaveBeenCalled();
+    const button = screen.getByRole("button", { name: "Light theme. Change to dark theme" });
+    fireEvent.click(button);
+    expect(onChange).toHaveBeenCalledWith("dark");
+  });
+
+  it("cycles from dark to system theme on click", () => {
+    const onChange = vi.fn();
+    render(<ThemeSwitch theme="dark" onChange={onChange} />);
+    const button = screen.getByRole("button", { name: "Dark theme. Change to system theme" });
+    fireEvent.click(button);
+    expect(onChange).toHaveBeenCalledWith("system");
   });
 });

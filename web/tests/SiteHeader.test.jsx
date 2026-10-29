@@ -52,11 +52,11 @@ describe("SiteHeader", () => {
       </MemoryRouter>
     );
 
-    expect(screen.getByRole("group", { name: "Theme" })).toBeTruthy();
-    expect(screen.getByRole("button", { name: "Light theme" }).getAttribute("aria-pressed")).toBe("true");
+    const themeButton = screen.getByRole("button", { name: "Light theme. Change to dark theme" });
+    expect(themeButton).toBeTruthy();
     expect(screen.queryByText(/Theme:/)).toBeNull();
 
-    fireEvent.click(screen.getByRole("button", { name: "Dark theme" }));
+    fireEvent.click(themeButton);
     expect(onThemeChange).toHaveBeenCalledWith("dark");
   });
 });

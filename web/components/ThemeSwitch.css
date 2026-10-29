@@ -1,27 +1,11 @@
-/* ThemeSwitch styles. It sits on the ink band of the site header in both themes. */
+/* ThemeSwitch styles. Sits on the ink band of the site header in both themes. */
 
-.theme-switch,
-.theme-switch__group {
+.theme-switch {
   display: inline-flex;
   align-items: center;
 }
 
-/* The one-button form shows only on a narrow screen. The parent class makes these rules win over .theme-switch__option. */
-.theme-switch .theme-switch__compact {
-  display: none;
-}
-
-@media (max-width: 480px) {
-  .theme-switch .theme-switch__compact {
-    display: inline-flex;
-  }
-
-  .theme-switch__group {
-    display: none;
-  }
-}
-
-.theme-switch__option {
+.theme-switch__button {
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -29,14 +13,18 @@
   height: var(--control-height);
   padding: 0;
   background: transparent;
-  border: 1px solid transparent;
+  border: none;
   border-radius: var(--radius);
   color: var(--header-ink);
   cursor: pointer;
+  transition: background-color 0.15s ease, color 0.15s ease;
 }
 
-/* The current theme: a 1px border, as a selected chip has. */
-.theme-switch__option--selected {
-  border-color: var(--header-ink);
-  cursor: default;
+.theme-switch__button:hover {
+  background: rgba(228, 232, 236, 0.1);
+  color: var(--header-ink);
+}
+
+.theme-switch__button:active {
+  background: rgba(228, 232, 236, 0.18);
 }
