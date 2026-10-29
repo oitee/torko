@@ -1,12 +1,11 @@
 import React from "react";
 import { Link, useLocation } from "react-router-dom";
 import Logo from "./Logo.jsx";
+import ThemeSwitch from "./ThemeSwitch.jsx";
 import "./SiteHeader.css";
 
-const THEMES = ["system", "light", "dark"];
-
 // The SiteHeader component renders the top navigation band.
-// It includes the logo, a search link, and the theme switcher.
+// It includes the logo, a search link, and the theme switch.
 export default function SiteHeader({
   theme = "system",
   onThemeChange,
@@ -15,16 +14,13 @@ export default function SiteHeader({
   const location = useLocation();
   const isSearchActive = location.pathname.startsWith("/search");
 
-  const handleToggle = () => {
-    const next = THEMES[(THEMES.indexOf(theme) + 1) % THEMES.length];
+  const handleThemeChange = (next) => {
     if (onThemeChange) {
       onThemeChange(next);
     } else if (setTheme) {
       setTheme(next);
     }
   };
-
-  const themeLabel = `Theme: ${theme.charAt(0).toUpperCase() + theme.slice(1)}`;
 
   return (
     <header className="site-header">
@@ -42,13 +38,7 @@ export default function SiteHeader({
           >
             Search
           </Link>
-          <button
-            type="button"
-            className="site-header__theme"
-            onClick={handleToggle}
-          >
-            {themeLabel}
-          </button>
+          <ThemeSwitch theme={theme} onChange={handleThemeChange} />
         </nav>
       </div>
     </header>

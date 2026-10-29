@@ -32,7 +32,7 @@ describe("SiteHeader", () => {
     expect(searchLink.classList.contains("site-header__link--active")).toBe(true);
   });
 
-  it("shows current theme label and calls onThemeChange on click", () => {
+  it("shows the theme switch with the current theme and passes on the chosen theme", () => {
     const onThemeChange = vi.fn();
     render(
       <MemoryRouter initialEntries={["/"]}>
@@ -40,10 +40,11 @@ describe("SiteHeader", () => {
       </MemoryRouter>
     );
 
-    const button = screen.getByRole("button", { name: "Theme: Light" });
-    expect(button).toBeTruthy();
+    expect(screen.getByRole("group", { name: "Theme" })).toBeTruthy();
+    expect(screen.getByRole("button", { name: "Light theme" }).getAttribute("aria-pressed")).toBe("true");
+    expect(screen.queryByText(/Theme:/)).toBeNull();
 
-    fireEvent.click(button);
+    fireEvent.click(screen.getByRole("button", { name: "Dark theme" }));
     expect(onThemeChange).toHaveBeenCalledWith("dark");
   });
 });

@@ -45,21 +45,6 @@
   box-shadow: inset 0 -2px 0 var(--header-action);
 }
 
-.site-header__theme {
-  display: inline-flex;
-  align-items: center;
-  background: none;
-  border: 0;
-  color: var(--header-ink);
-  font-family: var(--font-sans);
-  font-size: var(--size-label);
-  line-height: var(--lh-label);
-  font-weight: 500;
-  min-height: var(--control-height);
-  padding: 0 var(--space-2);
-  cursor: pointer;
-}
-
 .site-header :focus-visible {
   outline: 2px solid var(--header-action);
   outline-offset: 2px;

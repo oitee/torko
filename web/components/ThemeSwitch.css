@@ -1,0 +1,26 @@
+/* ThemeSwitch styles. It sits on the ink band of the site header in both themes. */
+
+.theme-switch {
+  display: inline-flex;
+  align-items: center;
+}
+
+.theme-switch__option {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: var(--control-height);
+  height: var(--control-height);
+  padding: 0;
+  background: transparent;
+  border: 1px solid transparent;
+  border-radius: var(--radius);
+  color: var(--header-ink);
+  cursor: pointer;
+}
+
+/* The current theme: a 1px border, as a selected chip has. */
+.theme-switch__option--selected {
+  border-color: var(--header-ink);
+  cursor: default;
+}

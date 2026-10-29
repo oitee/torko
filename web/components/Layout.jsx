@@ -29,10 +29,9 @@ export default function Layout() {
     }
   }, [theme]);
 
-  const next = THEMES[(THEMES.indexOf(theme) + 1) % THEMES.length];
   return (
     <>
-      <SiteHeader theme={theme} onThemeChange={() => setTheme(next)} />
+      <SiteHeader theme={theme} onThemeChange={setTheme} />
       <div className="container">
         <Outlet />
       </div>
