@@ -16,11 +16,14 @@ This folder holds the new public site of Torko. The old dashboard in `static/` w
 |---|---|
 | `index.html` | The one HTML file of the site. Flask sends it for every page address. |
 | `router.jsx` | Maps each address, for example `/member/123`, to one page component. |
-| `components/Layout.jsx` | The header, footer and theme, shared by all pages. |
-| `pages/` | One component for each page: home, tag, member, speech, debate, place, search. A `.jsx` file is JavaScript with HTML-like markup for React. |
+| `components/` | The shared parts of the pages, for example `SpeechRow`, `Chart`, `FilterBar`, and `SearchBox`. `Layout.jsx` holds the header, the footer, and the theme. Each component has its own CSS file. |
+| `pages/` | One component for each page: home, tag, member, speech, debate, place, search. A sub-folder, for example `pages/tag/`, holds the parts of one page. A `.jsx` file is JavaScript with HTML-like markup for React. |
 | `assets/css/tokens.css` | The colours, fonts, and spacing of the design, as CSS variables, for the light and the dark theme. |
 | `assets/js/api.js` | One helper that calls `/api/...` and handles errors. |
 | `assets/js/format.js` | Shared text: dates, numbers, "Speaker not identified". |
+| `assets/js/colour.js` | The colour of each party. |
+| `assets/js/site.js` | The public address of the site and the contact email, from `VITE_SITE_URL` and `VITE_CONTACT_EMAIL` in the `.env` file of the repository root. |
+| `tests/` | The tests, one file for each component and each page. They run with Vitest and Testing Library. |
 | `assets/vendor/` | Files from third parties. |
 
 `web/node_modules/` (installed packages) and `web/dist/` (build output) are not in git.
@@ -59,4 +62,8 @@ cd web && npm run build
 
 ## Status
 
-The setup works: the router, the seven empty pages, a "Page not found" page, the design tokens, and a first form of the header with the theme button. The shared components and the real pages are not written yet. Flask does not send the built site yet (task W1).
+Six pages work: Tag, Member, Speech, Debate, Place, and Search. Each page reads its data from `/api/`. The Home page is not built yet. It shows only a placeholder.
+
+Flask sends the built site for the addresses `/tag/...`, `/member/...`, `/speech/...`, `/debate/...`, `/place/...`, and `/search`. The address `/` still opens the older dashboard in `static/`. That changes when the Home page is built.
+
+The address `/dev/components` shows every shared component. It exists only during development.

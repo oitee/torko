@@ -1,6 +1,6 @@
 import { useParams } from "react-router-dom";
 
-// Home page. Not built yet. Mockup: design/mockups/v14/Torko Home v2.dc.html.
+// Home page. Not built yet.
 export default function Home() {
   const params = useParams();
   return (
