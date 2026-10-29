@@ -42,3 +42,29 @@ def test_a_wrong_reference_is_left_out_and_named(page_conn, tmp_path):
     assert out["quote"] is None and out["member"] is None and out["trend"] is None
     assert out["search_ideas"] == []
     assert len(out["omitted"]) == 4
+
+
+def test_the_seat_is_the_seat_of_the_newest_term_that_has_one():
+    from pages.home_featured import latest_seat
+    rows = [(16, "Latur", "Maharashtra"), (18, None, None), (17, "Latur (SC)", "Maharashtra")]
+    assert latest_seat(rows) == ("Latur (SC)", "Maharashtra")
+    assert latest_seat([(18, None, None)]) == (None, None)
+    assert latest_seat([]) == (None, None)
+
+
+def test_each_quote_tag_gets_its_domain_and_its_subjects_one_time():
+    from pages.home_featured import quote_tags
+    tags = [{"name": "Arrears", "slug": "arrears", "type": "topic",
+             "why": [{"subject": "Wage arrears of MGNREGA workers"}, {"subject": "Wage arrears of MGNREGA workers"},
+                     {"subject": None}]},
+            {"name": "Latur", "slug": "latur", "type": "place", "why": []}]
+    assert quote_tags(tags, {"Arrears": "Labour and Employment"}) == [
+        {"name": "Arrears", "slug": "arrears", "type": "topic", "domain": "Labour and Employment",
+         "subjects": ["Wage arrears of MGNREGA workers"]},
+        {"name": "Latur", "slug": "latur", "type": "place", "domain": None, "subjects": []}]
+
+
+def test_the_real_member_has_a_seat_and_the_real_quote_has_tags(page_conn):
+    out = home_featured(page_conn)
+    assert out["member"]["seat"] and out["member"]["state"]
+    assert out["quote"]["tags"] and all(t["slug"] for t in out["quote"]["tags"])

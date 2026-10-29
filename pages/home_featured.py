@@ -12,12 +12,17 @@ import re
 from sqlalchemy import text
 
 from pages.common import resolve_tag, slug, tidy_title
+from pages.member import seat_tags
+from pages.speech import speech_page
 from pages.trends import trends_page
 
 FEATURED_FILE = pathlib.Path(__file__).resolve().parent.parent / "data" / "home" / "featured.json"
 
 COUNTS_NOTE = (
     "member.speeches counts all speeches of the member. member.terms lists the Lok Sabha numbers of those speeches. "
+    "member.seat and member.state are the seat of the newest term in which the member has a seat. "
+    "quote.tags are the tags of the quoted speech, in the order of the Speech page. "
+    "quote.tags[].subjects lists the specific subjects under the tag in that speech, each one time. "
     "trend.years counts the speeches with the tag in each calendar year, and tagged counts all speeches with a kept tag in that year."
 )
 
@@ -53,6 +58,31 @@ def own_turns(conn, s):
         {"d": s["debate_id"], "a": s["seq_start"], "b": s["seq_end"], "p": s["person_id"]}).all()
 
 
+def latest_seat(rows):
+    """rows: (term, seat, state). Return (seat, state) of the newest term that has a seat, or (None, None)."""
+    with_seat = [r for r in rows if r[1]]
+    if not with_seat:
+        return None, None
+    term, seat, state = max(with_seat, key=lambda r: r[0])
+    return seat, state
+
+
+def quote_tags(tags, domains):
+    """The chips of the quote: each tag of the Speech page with its domain and its specific subjects.
+
+    tags: the tags list of the Speech page. domains: {tag name: domain or None}.
+    """
+    out = []
+    for t in tags:
+        subjects = []
+        for w in t.get("why", []):
+            if w.get("subject") and w["subject"] not in subjects:
+                subjects.append(w["subject"])
+        out.append({"name": t["name"], "slug": t["slug"], "type": t["type"], "domain": domains.get(t["name"]),
+                    "subjects": subjects})
+    return out
+
+
 def featured_member(conn, item):
     s = speech_row(conn, item["speech_id"])
     if s is None or s["person_id"] != item["member_id"]:
@@ -63,8 +93,14 @@ def featured_member(conn, item):
     n, terms = conn.execute(text("""
         SELECT count(*), array_agg(DISTINCT d.loksabha ORDER BY d.loksabha)
         FROM speeches s JOIN debates d ON d.id = s.debate_id WHERE s.person_id = :p"""), {"p": s["person_id"]}).one()
+    rows = conn.execute(text("""
+        SELECT sp.lok_sabha_term, sp.constituency, st.name FROM speakers sp LEFT JOIN states st ON st.id = sp.state_id
+        WHERE sp.person_id = :p"""), {"p": s["person_id"]}).all()
+    seat, state = latest_seat(rows)
+    seat_id = seat_tags(conn, {(seat, state)}).get((seat, state)) if seat else None
+    seat_slug = slug(conn.execute(text("SELECT tag FROM tags WHERE id = :i"), {"i": seat_id}).scalar()) if seat_id else None
     return {"member_id": s["person_id"], "name": s["member"], "printed": item["printed"], "speech_id": s["id"],
-            "speeches": n, "terms": list(terms or [])}, None
+            "speeches": n, "terms": list(terms or []), "seat": seat, "state": state, "seat_slug": seat_slug}, None
 
 
 def featured_quote(conn, item):
@@ -73,9 +109,12 @@ def featured_quote(conn, item):
         return None, "quote: the speech does not exist or has no member"
     if not contains([r[1] for r in own_turns(conn, s)], item["text"]):
         return None, "quote: the text does not occur word for word in the member's own turns"
+    tags = (speech_page(conn, s["id"]) or {}).get("tags", [])
+    domains = dict(conn.execute(text("SELECT tag, domain FROM tags WHERE tag = ANY(:n)"),
+                                {"n": [t["name"] for t in tags]}).all()) if tags else {}
     return {"speech_id": s["id"], "text": item["text"], "member": s["member"], "member_id": s["person_id"],
             "date": s["debate_date"].isoformat() if s["debate_date"] else None, "debate": tidy_title(s["title"]),
-            "term": s["loksabha"], "source_url": s["source_url"]}, None
+            "term": s["loksabha"], "source_url": s["source_url"], "tags": quote_tags(tags, domains)}, None
 
 
 def featured_trend(conn, item):
