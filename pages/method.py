@@ -25,16 +25,17 @@ UNREAD_TEXT = {
     "source": "Measurement of the stored debate pages. The figure is fixed text. No query computes it.",
 }
 
-# The example of old-font Hindi: the start of one turn, as the stored page of debate 32612 of the 14th Lok Sabha
-# holds it. The route decodes it with the same code as the reader, so the page shows what the reader really makes.
+# The example of old-font Hindi: the start of one turn, as the stored page of debate 32612 (debates.id) holds it.
+# The debate is of the 14th Lok Sabha, 10 August 2005. The route decodes it with the same code as the reader, so the page shows what the reader really makes.
 LEGACY_EXAMPLE = {
-    "term": 14, "dbslno": 32612,
+    "debate_id": 32612,
     "text": 'àÉcÉänªÉ, àÉé +ÉÉ{ÉBÉEÉ ¤ÉcÖiÉ +ÉÉ£ÉÉ®ÉÒ cÚÆ ÉÊBÉE +ÉÉ{ÉxÉä àÉÖZÉä ABÉE AäºÉä <¶ªÉÖ {É® ¤ÉÉäãÉxÉä BÉEÉ àÉÉèBÉEÉ ÉÊnªÉÉ,',
 }
 
 # The examples of steps 3, 4 and 5. Each is a reference into the database. The route reads every name, date
 # and text live. None leaves the example out, and the answer then has null for it.
-SPEECH_EXAMPLE = None       # speeches.id of a short speech with a few short interruptions
+# Demands for Kanniyakumari: the chair asks the member twice to conclude, and the member goes on. One speech.
+SPEECH_EXAMPLE = 340542     # speeches.id of a short speech with a few short interruptions
 # Fishermen of Kancheepuram: the check keeps most subjects and drops two, so the example shows both results.
 SUBJECTS_EXAMPLE = 296815  # speeches.id of a short speech with subjects that the check kept and dropped
 # Wage and salary arrears: 23 names under the tag Arrears, the example that the text of step 5 gives.
@@ -115,9 +116,9 @@ def legacy_example(conn):
         SELECT d.debate_date, d.title, d.source_url, p.id AS member_id, p.name AS member
         FROM debates d LEFT JOIN turns t ON t.debate_id = d.id AND t.text LIKE :frag
         LEFT JOIN persons p ON p.id = t.person_id
-        WHERE d.loksabha = :t AND d.dbslno = :n
+        WHERE d.id = :d
         ORDER BY t.seq LIMIT 1"""),
-        {"t": LEGACY_EXAMPLE["term"], "n": LEGACY_EXAMPLE["dbslno"], "frag": "%" + decoded[:40] + "%"}).mappings().first()
+        {"d": LEGACY_EXAMPLE["debate_id"], "frag": "%" + decoded[:40] + "%"}).mappings().first()
     out = {"source_text": LEGACY_EXAMPLE["text"], "text": decoded, "debate": None}
     if row:
         out["debate"] = {"date": str(row["debate_date"]) if row["debate_date"] else None, "title": tidy_title(row["title"]),
