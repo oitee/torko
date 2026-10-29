@@ -126,3 +126,20 @@
     --party-bsp: #3b5ebb;
   }
 }
+
+/* An ink band: a dark part of a page in both themes, for example the top of the Home page.
+   Inside the band, every colour token takes its dark value. The band itself has the colour of the site header. */
+.ink-band {
+  color-scheme: dark;
+  --action: #5fbf86;
+  --action-hover: #8ad3a7;
+  --ground: #0e1216;
+  --sheet: #171c22;
+  --ink: #e4e8ec;
+  --ink-2: #b9c2cc;
+  --meta: #8e99a6;
+  --control: #5f6b78;
+  --hairline: #262d35;
+  background: var(--header-bg);
+  color: var(--ink);
+}
