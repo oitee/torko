@@ -28,16 +28,8 @@
 }
 
 .home-figures__label {
-  display: flex;
-  flex-direction: column;
-  gap: var(--space-1);
   font-size: var(--size-label);
   line-height: var(--lh-label);
   color: var(--ink-2);
 }
 
-.home-figures__source {
-  font-size: var(--size-count);
-  line-height: var(--lh-count);
-  color: var(--meta);
-}

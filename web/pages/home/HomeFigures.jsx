@@ -42,7 +42,6 @@ export default function HomeFigures({ corpus }) {
       key: "error",
       value: err.text,
       label: err.counts ? `of ${err.counts}` : "",
-      source: err.source,
     },
   ].filter(Boolean);
 
@@ -52,10 +51,7 @@ export default function HomeFigures({ corpus }) {
     <dl className="home-figures">
       {rows.map((row) => (
         <div key={row.key} className="home-figures__item" data-testid={`figure-${row.key}`}>
-          <dt className="home-figures__label">
-            {row.label}
-            {row.source && <span className="home-figures__source">Source: {row.source}</span>}
-          </dt>
+          <dt className="home-figures__label">{row.label}</dt>
           <dd className="home-figures__value">{row.value}</dd>
         </div>
       ))}

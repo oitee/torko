@@ -52,7 +52,7 @@ describe("Home page", () => {
     expect(paths).toContain("/api/home/featured");
   });
 
-  it("shows every site figure from corpus, with the error rate and its source", async () => {
+  it("shows every site figure from corpus, with the error rate and no source line", async () => {
     mockAnswers();
     renderHome();
     expect(await screen.findByText("64,921")).toBeTruthy();
@@ -60,7 +60,7 @@ describe("Home page", () => {
     expect(screen.getByText("7,027")).toBeTruthy();
     expect(screen.getByText("about 0.24%")).toBeTruthy();
     expect(screen.getByText(/in 6 terms \(13th–18th Lok Sabha\)/)).toBeTruthy();
-    expect(screen.getByText(`Source: ${homeAnswer.corpus.error_rate.source}`)).toBeTruthy();
+    expect(screen.queryByText(/No query computes it/)).toBeNull();
     expect(screen.getByText("20 Oct 1999")).toBeTruthy();
     expect(screen.getByText("18 Apr 2026")).toBeTruthy();
   });
