@@ -74,6 +74,38 @@ describe("search rows", () => {
     expect(screen.getByText("120 words")).toBeTruthy();
   });
 
+  it("shows the TLDR and the marked words together in a word search", () => {
+    const { container } = render(
+      <MemoryRouter>
+        <ul>
+          <SearchSpeechRow
+            speech={{ id: 2, date: "2025-02-01", term: 18, debate: "Budget", words: 900,
+              summary: "Criticises the Budget for its lack of jobs.",
+              excerpt: "This is a Budget that seems more like a Bollywood film.", marks: [[40, 49]] }}
+          />
+        </ul>
+      </MemoryRouter>
+    );
+    expect(screen.getByText("Criticises the Budget for its lack of jobs.")).toBeTruthy();
+    expect(screen.getByText("Bollywood").tagName).toBe("MARK");
+    // The TLDR comes before the excerpt, under the debate name.
+    const tldr = container.querySelector(".search-row__tldr");
+    const excerpt = container.querySelector(".search-row__excerpt");
+    expect(tldr.compareDocumentPosition(excerpt) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
+  });
+
+  it("shows the TLDR alone in a search with no words, such as a tag", () => {
+    const { container } = render(
+      <MemoryRouter>
+        <ul>
+          <SearchSpeechRow speech={{ id: 3, date: "2025-02-01", term: 18, debate: "Finance Bill", summary: "Supports the Finance Bill." }} />
+        </ul>
+      </MemoryRouter>
+    );
+    expect(screen.getByText("Supports the Finance Bill.")).toBeTruthy();
+    expect(container.querySelector(".search-row__excerpt")).toBeNull();
+  });
+
   it("links tags and places, and a subject to its parent tag", () => {
     render(
       <MemoryRouter>

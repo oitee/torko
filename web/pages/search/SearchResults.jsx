@@ -26,8 +26,8 @@ export function SearchSpeechRow({ speech }) {
         {speech.debate || "Speech"}
       </Link>
       <SpeakerLine speech={speech} />
-      {/* With no words to find, the TLDR tells the reader what the speech is about. */}
-      {parts.length === 0 && speech.summary && (
+      {/* The TLDR says what the speech is about. The excerpt below it shows where the words occur. */}
+      {speech.summary && (
         <div className="search-row__tldr">
           <TLDR text={speech.summary} />
         </div>
