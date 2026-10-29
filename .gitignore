@@ -16,7 +16,7 @@ CLAUDE.local.md
 .obsidian/
 
 # generated dashboard fixture (server reads Postgres now)
-fixtures/
+/fixtures/
 
 # seed tag list: files that scripts/build_seed_tags.py rebuilds
 tags/*/results/chunks/
