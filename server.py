@@ -123,15 +123,10 @@ def api_search():
     return jsonify({"query": q, "results": results})
 
 
-@app.route("/")
-def index():
-    return send_from_directory(app.static_folder, "index.html")
-
-
 # The new public site: a single-page app that Vite builds into web/dist/.
 # Flask sends the one file index.html for every page address, and the browser picks the page.
 WEB_DIST = pathlib.Path(__file__).resolve().parent / "web" / "dist"
-SITE_PAGES = ["/tag/<slug>", "/member/<int:member_id>", "/speech/<int:speech_id>", "/debate/<int:debate_id>",
+SITE_PAGES = ["/", "/tag/<slug>", "/member/<int:member_id>", "/speech/<int:speech_id>", "/debate/<int:debate_id>",
               "/place/<slug>", "/search"]
 
 
@@ -149,7 +144,7 @@ def site_page(**_):
 
 
 for rule in SITE_PAGES:
-    app.add_url_rule(rule, endpoint="site_" + rule.strip("/").split("/")[0], view_func=site_page)
+    app.add_url_rule(rule, endpoint="site_" + (rule.strip("/").split("/")[0] or "home"), view_func=site_page)
 
 
 @app.route("/assets/<path:name>")

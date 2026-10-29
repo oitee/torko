@@ -62,8 +62,10 @@ cd web && npm run build
 
 ## Status
 
-Six pages work: Tag, Member, Speech, Debate, Place, and Search. Each page reads its data from `/api/`. The Home page is not built yet. It shows only a placeholder.
+Seven pages work: Home, Tag, Member, Speech, Debate, Place, and Search. Each page reads its data from `/api/`. The Home page reads `/api/home` and `/api/home/featured`.
 
-Flask sends the built site for the addresses `/tag/...`, `/member/...`, `/speech/...`, `/debate/...`, `/place/...`, and `/search`. The address `/` still opens the older dashboard in `static/`. That changes when the Home page is built.
+Flask sends the built site for the addresses `/`, `/tag/...`, `/member/...`, `/speech/...`, `/debate/...`, `/place/...`, and `/search`. The address `/` opens the Home page. The files of the older dashboard in `static/` stay at their file names, for example `/dashboard.html`.
+
+Before deployment, the Method, Your MP, and Data and API pages must exist. The Home page leaves out its links to them until then. A TODO in `pages/home.jsx` lists these links.
 
 The address `/dev/components` shows every shared component. It exists only during development.
