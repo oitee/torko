@@ -1,4 +1,4 @@
-"""Save the API answers that the Home page reads, as JSON files for the site tests.
+"""Save the API answers that the Home page and the Method page read, as JSON files for the site tests.
 
 The tests of the site run with no server and no database. They read these files instead.
 Run it again when the shape of an API answer changes. It calls the Flask app directly, so no server must run.
@@ -16,18 +16,19 @@ sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 
 from server import app
 
-OUT = Path(__file__).resolve().parent.parent / "web" / "tests" / "fixtures" / "home"
+OUT = Path(__file__).resolve().parent.parent / "web" / "tests" / "fixtures"
 
 CALLS = {
-    "home.json": "/api/home",
-    "home_featured.json": "/api/home/featured",
+    "home/home.json": "/api/home",
+    "home/home_featured.json": "/api/home/featured",
+    "method/method.json": "/api/method",
 }
 
 
 def main() -> None:
-    OUT.mkdir(parents=True, exist_ok=True)
     client = app.test_client()
     for name, url in CALLS.items():
+        (OUT / name).parent.mkdir(parents=True, exist_ok=True)
         resp = client.get(url)
         if resp.status_code != 200:
             sys.exit(f"{url} answered {resp.status_code}")
