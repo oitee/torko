@@ -5,7 +5,7 @@ Each file is one answer of the Torko API, saved from the real database. The site
 | File | API address | Use on the Home page |
 |---|---|---|
 | `home.json` | `/api/home` | The site figures (`corpus`: debates, members, tags, terms, first and last date, error rate), the newest session, its typical subjects, and the chamber. |
-| `home_featured.json` | `/api/home/featured` | The hand-checked sample: one member, one quote, one trend, and the search ideas. |
+| `home_featured.json` | `/api/home/featured` | The hand-checked sample: one member (with the seat and the state), one quote (with the tags of its speech), one trend, and the search ideas. |
 
 Each answer holds a `counts_note` or a `note` that says what each count is counted over.
 

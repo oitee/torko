@@ -1,11 +1,14 @@
 {
-  "counts_note": "member.speeches counts all speeches of the member. member.terms lists the Lok Sabha numbers of those speeches. trend.years counts the speeches with the tag in each calendar year, and tagged counts all speeches with a kept tag in that year.",
+  "counts_note": "member.speeches counts all speeches of the member. member.terms lists the Lok Sabha numbers of those speeches. member.seat and member.state are the seat of the newest term in which the member has a seat. quote.tags are the tags of the quoted speech, in the order of the Speech page. quote.tags[].subjects lists the specific subjects under the tag in that speech, each one time. trend.years counts the speeches with the tag in each calendar year, and tagged counts all speeches with a kept tag in that year.",
   "member": {
     "member_id": 1052,
     "name": "Mahua Moitra",
     "printed": "SUSHRI MAHUA MOITRA (KRISHNANAGAR)",
+    "seat": "Krishnanagar",
+    "seat_slug": "krishnanagar",
     "speech_id": 178379,
     "speeches": 66,
+    "state": "West Bengal",
     "terms": [
       17,
       18
@@ -19,6 +22,109 @@
     "member_id": 1052,
     "source_url": "https://sansad.in/ls/debates/view-debate?ls=18&session=6&dbslno=4809",
     "speech_id": 178379,
+    "tags": [
+      {
+        "domain": "Elections and Governance",
+        "name": "All India Trinamool Congress",
+        "slug": "all-india-trinamool-congress",
+        "subjects": [
+          "Trinamool Congress"
+        ],
+        "type": "institution"
+      },
+      {
+        "domain": "Economy, Finance and Taxation",
+        "name": "Arrears",
+        "slug": "arrears",
+        "subjects": [],
+        "type": "topic"
+      },
+      {
+        "domain": "Elections and Governance",
+        "name": "Centrally Sponsored Schemes",
+        "slug": "centrally-sponsored-schemes",
+        "subjects": [],
+        "type": "topic"
+      },
+      {
+        "domain": "Rural Development",
+        "name": "Mahatma Gandhi National Rural Employment Guarantee Act (MNREGA)",
+        "slug": "mahatma-gandhi-national-rural-employment-guarantee-act-mnrega",
+        "subjects": [
+          "Mahatma Gandhi National Rural Employment Guarantee Act"
+        ],
+        "type": "scheme"
+      },
+      {
+        "domain": "Elections and Governance",
+        "name": "Nomenclature",
+        "slug": "nomenclature",
+        "subjects": [],
+        "type": "topic"
+      },
+      {
+        "domain": "Law, Justice and Constitution",
+        "name": "Supreme Court",
+        "slug": "supreme-court",
+        "subjects": [
+          "Supreme Court of India"
+        ],
+        "type": "institution"
+      },
+      {
+        "domain": "Rural Development",
+        "name": "The Viksit Bharat – Guarantee for Rozgar and Ajeevika Mission (Gramin) VB – G RAM G Bill",
+        "slug": "the-viksit-bharat-guarantee-for-rozgar-and-ajeevika-mission-gramin-vb-g-ram-g-bill",
+        "subjects": [
+          "Viksit Bharat Rozgar and Ajeevika Mission Bill"
+        ],
+        "type": "scheme"
+      },
+      {
+        "domain": null,
+        "name": "West Bengal",
+        "slug": "west-bengal",
+        "subjects": [],
+        "type": "place"
+      },
+      {
+        "domain": null,
+        "name": "Delhi",
+        "slug": "delhi",
+        "subjects": [],
+        "type": "place"
+      },
+      {
+        "domain": "Home Affairs and Law and Order",
+        "name": "Delhi Police",
+        "slug": "delhi-police",
+        "subjects": [],
+        "type": "institution"
+      },
+      {
+        "domain": "Law, Justice and Constitution",
+        "name": "Gujarat High Court",
+        "slug": "gujarat-high-court",
+        "subjects": [
+          "Gujarat High Court"
+        ],
+        "type": "institution"
+      },
+      {
+        "domain": null,
+        "name": "Mahatma Gandhi",
+        "slug": "mahatma-gandhi",
+        "subjects": [],
+        "type": "person"
+      },
+      {
+        "domain": "Labour and Employment",
+        "name": "Employment Guarantee",
+        "slug": "employment-guarantee",
+        "subjects": [],
+        "type": "topic"
+      }
+    ],
     "term": 18,
     "text": "The MGNREGA, which was a demand-driven employment program, has been now replaced by an allocation-based scheme which the Central Government can alter at whim."
   },
