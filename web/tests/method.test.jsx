@@ -118,12 +118,25 @@ describe("Method page", () => {
     expect(await screen.findByText("Read the debates")).toBeTruthy();
   });
 
-  it("uses no word that the writing rules ban", async () => {
+  it("uses no word that the writing rules ban, in its own text", async () => {
     vi.spyOn(api, "getJSON").mockResolvedValue(methodAnswer);
     const { container } = renderMethod();
     await screen.findByText("Read the debates");
-    const text = container.textContent;
+    // The examples quote the record: speeches, names, titles and TLDRs. The rules apply to Torko's own text only,
+    // so every text of the examples is taken out before the check.
+    let text = container.textContent;
+    for (const quoted of stringsIn(methodAnswer.examples).sort((a, b) => b.length - a.length)) {
+      text = text.split(quoted).join(" ");
+    }
     expect(text).not.toMatch(/\b(AI|LLM|entity|item|Unattributed)\b/);
     expect(text).not.toMatch(/[;—]/);
   });
 });
+
+// Every string inside a value, at any depth.
+function stringsIn(value) {
+  if (typeof value === "string") return value ? [value] : [];
+  if (Array.isArray(value)) return value.flatMap(stringsIn);
+  if (value && typeof value === "object") return Object.values(value).flatMap(stringsIn);
+  return [];
+}

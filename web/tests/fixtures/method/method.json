@@ -69,19 +69,168 @@
   },
   "examples": {
     "legacy": {
-      "source_text": "+ÉvªÉFÉ àÉcÉänªÉ, MÉßc àÉÆjÉÉÒ VÉÉÒ xÉä BÉEcÉ lÉÉ ÉÊBÉE ZÉÉ¤ÉÖ+ÉÉ BÉEä àÉÉàÉãÉä àÉå 3 iÉÉ®ÉÒJÉ BÉEÉä ¤ÉªÉÉxÉ nåMÉä*",
-      "text": "अध्यक्ष महोदय, गृह मंत्री जी ने कहा था कि झाबुआ के मामले में 3 तारीख को बयान देंगे।",
       "debate": {
         "date": "2004-02-04",
-        "title": "Regarding rape of a minor girl in Jhabua, Madhya Pradesh leading to communal tension in the area.",
-        "source_url": "https://sansad.in/ls/debates/view-debate?ls=13&session=14&dbslno=7704",
+        "member": "Kantilal Bhuria",
         "member_id": 218,
-        "member": "Kantilal Bhuria"
-      }
+        "source_url": "https://sansad.in/ls/debates/view-debate?ls=13&session=14&dbslno=7704",
+        "title": "Regarding rape of a minor girl in Jhabua, Madhya Pradesh leading to communal tension in the area."
+      },
+      "source_text": "+ÉvªÉFÉ àÉcÉänªÉ, MÉßc àÉÆjÉÉÒ VÉÉÒ xÉä BÉEcÉ lÉÉ ÉÊBÉE ZÉÉ¤ÉÖ+ÉÉ BÉEä àÉÉàÉãÉä àÉå 3 iÉÉ®ÉÒJÉ BÉEÉä ¤ÉªÉÉxÉ nåMÉä*",
+      "text": "अध्यक्ष महोदय, गृह मंत्री जी ने कहा था कि झाबुआ के मामले में 3 तारीख को बयान देंगे।"
     },
-    "speech": null,
-    "subject_group": null,
-    "subjects": null
+    "speech": {
+      "date": "2019-12-11",
+      "debate": "Regarding the introduction of trains in Kanniyakumari and construction of ROBs and RUBs.",
+      "member": "H. Vasanthakumar",
+      "member_id": 2060,
+      "speech_id": 340542,
+      "turns": [
+        {
+          "member_id": 2060,
+          "own": true,
+          "seq": 1,
+          "speaker": "H. Vasanthakumar",
+          "text": "Respected Chairperson, Sir, you know better about Kanniyakumari. Crores of foreign tourists as well as Indian tourists are coming here. So, I submit the following demands of the people of the constituency: to upgrade the Kanniyakumari and Nagercoil stations to world-class standard; to introduce a new train between Chennai and Kanniyakumari in the night time; to construct ROBs and RUBs …",
+          "words": 130
+        },
+        {
+          "member_id": null,
+          "own": false,
+          "seq": 2,
+          "speaker": "The Chair",
+          "text": "Yes, Shri Vasanthakumar, please conclude by placing your demands.",
+          "words": 9
+        },
+        {
+          "member_id": 2060,
+          "own": true,
+          "seq": 3,
+          "speaker": "H. Vasanthakumar",
+          "text": "It is only a demand for trains and ROBs. There is a long-time demand for running Train No. 16639 for four days via Madurai, Salem and Bangarapet.",
+          "words": 27
+        },
+        {
+          "member_id": null,
+          "own": false,
+          "seq": 4,
+          "speaker": "The Chair",
+          "text": "Please conclude now.",
+          "words": 3
+        },
+        {
+          "member_id": 2060,
+          "own": true,
+          "seq": 5,
+          "speaker": "H. Vasanthakumar",
+          "text": "Sir, I am concluding. The Central Government should adequately inspect the train services and make our people happy by introducing more trains to satisfy the foreign and Indian tourists.",
+          "words": 29
+        }
+      ],
+      "words": 186
+    },
+    "subject_group": {
+      "label": "Wage and salary arrears",
+      "n_names": 23,
+      "names": [
+        "Wage arrears",
+        "Workers' unpaid wages",
+        "Employee salary arrears",
+        "Unpaid wages",
+        "Employee wage arrears",
+        "Pending wage arrears",
+        "Workers' wage arrears",
+        "Employee dues and unpaid salaries"
+      ],
+      "speeches": 44,
+      "subject_id": 23204,
+      "tag": "Arrears",
+      "tag_slug": "arrears"
+    },
+    "subjects": {
+      "date": "2024-08-05",
+      "debate": "General Budget - Demands for Grants - Ministry of Fisheries, Animal Husbandry and Dairying",
+      "items": [
+        {
+          "kept": true,
+          "mention": "fishermen",
+          "name": "Fishermen welfare",
+          "subject": null,
+          "tag": "Fishermen Welfare",
+          "tag_slug": "fishermen-welfare"
+        },
+        {
+          "kept": true,
+          "mention": "Sea erosion",
+          "name": "Sea erosion protection",
+          "subject": "Coastal erosion protection",
+          "tag": "Sea Walls",
+          "tag_slug": "sea-walls"
+        },
+        {
+          "kept": true,
+          "mention": "subsidised prices",
+          "name": "Subsidized fuel and equipment",
+          "subject": null,
+          "tag": "Subsidy",
+          "tag_slug": "subsidy"
+        },
+        {
+          "kept": true,
+          "mention": "Kancheepuram",
+          "name": "Kancheepuram",
+          "subject": null,
+          "tag": "Kanchipuram",
+          "tag_slug": "kanchipuram"
+        },
+        {
+          "kept": true,
+          "mention": "Tamil Nadu",
+          "name": "Tamil Nadu",
+          "subject": null,
+          "tag": "Tamil Nadu",
+          "tag_slug": "tamil-nadu"
+        },
+        {
+          "kept": false,
+          "mention": "Ministry of Fisheries, Animal Husbandry and Dairying",
+          "name": "Ministry of Fisheries, Animal Husbandry and Dairying",
+          "subject": null,
+          "tag": null,
+          "tag_slug": null
+        },
+        {
+          "kept": true,
+          "mention": "Mamallapuram",
+          "name": "Mamallapuram",
+          "subject": null,
+          "tag": null,
+          "tag_slug": null
+        },
+        {
+          "kept": true,
+          "mention": "Kanathur",
+          "name": "Kanathur",
+          "subject": null,
+          "tag": null,
+          "tag_slug": null
+        },
+        {
+          "kept": false,
+          "mention": "Kovalam",
+          "name": "Kovalam",
+          "subject": null,
+          "tag": null,
+          "tag_slug": null
+        }
+      ],
+      "member": "Selvam G",
+      "member_id": 486,
+      "speech_id": 296815,
+      "summary": "Urges the Union Government to provide subsidized fuel, boats, and nets to fishermen and construct seawalls to prevent sea erosion in Kancheepuram.",
+      "text": "In order to improve the livelihood of fishermen living in Kancheepuram parliamentary constituency, Union Government should distribute petrol and diesel to them at subsidised prices. Sea erosion should be prevented in order to protect the houses of fishermen of Tamil Nadu. Boats, motor and nets should be provided to our fishermen on subsidised prices. In my Kancheepuram constituency, fishermen are living in the villages like Kanathur, Kovalam, Devaneri Kuppam, Kokilamedu and Idaikkazhinaadu in dangerous situations due to sea erosion in these areas. Seawalls should be constructed along these coastal areas in order to prevent sea erosion. I urge that a warehouse with fish processing facility should be set - up in Mamallapuram area for the welfare of our fishermen. Thank you",
+      "words": 121
+    }
   },
   "speeches": {
     "eligible": 116387,
