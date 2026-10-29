@@ -24,3 +24,28 @@ def test_method_page_on_database(page_conn):  # noqa: F811
     labels = out["example"]["labels"]
     assert 0 < len(labels) <= method.EXAMPLE_LABELS
     assert [r["n"] for r in labels] == sorted((r["n"] for r in labels), reverse=True)
+
+
+def test_words_keeps_the_first_words_and_marks_a_cut():
+    assert method.words("a b c d", 2) == "a b …"
+    assert method.words("a b", 5) == "a b"
+    assert method.words(None, 3) == ""
+
+
+def test_the_old_font_example_decodes_to_readable_hindi():
+    from legacy_hindi import decode_legacy_hindi
+    out = decode_legacy_hindi(method.LEGACY_EXAMPLE["text"])
+    assert out.startswith("महोदय, मैं आपका बहुत आभारी हूं कि आपने मुझे")
+    assert "É" not in out
+
+
+def test_examples_on_database(page_conn):  # noqa: F811
+    ex = method.method_page(page_conn, {})["examples"]
+    assert ex["legacy"]["text"] and ex["legacy"]["debate"] is not None
+    if ex["speech"]:
+        own = [t for t in ex["speech"]["turns"] if t["own"]]
+        assert own and len(own) < len(ex["speech"]["turns"])
+    if ex["subjects"]:
+        assert any(i["kept"] for i in ex["subjects"]["items"])
+    if ex["subject_group"]:
+        assert len(ex["subject_group"]["names"]) >= 2
