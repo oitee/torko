@@ -37,27 +37,44 @@ function ThemeIcon({ value }) {
 
 // The ThemeSwitch component shows the three themes side by side, so the reader sees every choice at once.
 // The current theme has a border. Green is not used, because green marks only actions.
+// On a narrow screen the header has no room for three buttons. There, one button shows the current theme,
+// and each press moves to the next theme. CSS shows one of the two forms.
 export default function ThemeSwitch({ theme = "system", onChange }) {
+  const index = Math.max(0, THEME_OPTIONS.findIndex((o) => o.value === theme));
+  const current = THEME_OPTIONS[index];
+  const next = THEME_OPTIONS[(index + 1) % THEME_OPTIONS.length];
+
   return (
-    <div className="theme-switch" role="group" aria-label="Theme">
-      {THEME_OPTIONS.map((option) => {
-        const selected = option.value === theme;
-        return (
-          <button
-            key={option.value}
-            type="button"
-            className={selected ? "theme-switch__option theme-switch__option--selected" : "theme-switch__option"}
-            aria-label={option.label}
-            aria-pressed={selected}
-            title={option.label}
-            onClick={() => {
-              if (!selected && onChange) onChange(option.value);
-            }}
-          >
-            <ThemeIcon value={option.value} />
-          </button>
-        );
-      })}
+    <div className="theme-switch">
+      <button
+        type="button"
+        className="theme-switch__option theme-switch__compact"
+        aria-label={`${current.label}. Change to ${next.label.toLowerCase()}`}
+        title={`${current.label}. Change to ${next.label.toLowerCase()}`}
+        onClick={() => onChange && onChange(next.value)}
+      >
+        <ThemeIcon value={current.value} />
+      </button>
+      <div className="theme-switch__group" role="group" aria-label="Theme">
+        {THEME_OPTIONS.map((option) => {
+          const selected = option.value === theme;
+          return (
+            <button
+              key={option.value}
+              type="button"
+              className={selected ? "theme-switch__option theme-switch__option--selected" : "theme-switch__option"}
+              aria-label={option.label}
+              aria-pressed={selected}
+              title={option.label}
+              onClick={() => {
+                if (!selected && onChange) onChange(option.value);
+              }}
+            >
+              <ThemeIcon value={option.value} />
+            </button>
+          );
+        })}
+      </div>
     </div>
   );
 }

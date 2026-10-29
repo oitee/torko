@@ -9,7 +9,8 @@ describe("ThemeSwitch", () => {
   it("shows the three themes as one labelled group", () => {
     render(<ThemeSwitch theme="system" />);
     expect(screen.getByRole("group", { name: "Theme" })).toBeTruthy();
-    expect(screen.getAllByRole("button").map((b) => b.getAttribute("aria-label"))).toEqual([
+    const group = screen.getByRole("group", { name: "Theme" });
+    expect([...group.querySelectorAll("button")].map((b) => b.getAttribute("aria-label"))).toEqual([
       "System theme",
       "Light theme",
       "Dark theme",
@@ -28,6 +29,14 @@ describe("ThemeSwitch", () => {
     render(<ThemeSwitch theme="system" onChange={onChange} />);
     fireEvent.click(screen.getByRole("button", { name: "Light theme" }));
     expect(onChange).toHaveBeenCalledWith("light");
+  });
+
+  it("has one button for a narrow screen that names the current theme and moves to the next", () => {
+    const onChange = vi.fn();
+    render(<ThemeSwitch theme="dark" onChange={onChange} />);
+    const compact = screen.getByRole("button", { name: "Dark theme. Change to system theme" });
+    fireEvent.click(compact);
+    expect(onChange).toHaveBeenCalledWith("system");
   });
 
   it("does nothing when the reader picks the current theme again", () => {

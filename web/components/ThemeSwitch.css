@@ -1,8 +1,24 @@
 /* ThemeSwitch styles. It sits on the ink band of the site header in both themes. */
 
-.theme-switch {
+.theme-switch,
+.theme-switch__group {
   display: inline-flex;
   align-items: center;
+}
+
+/* The one-button form shows only on a narrow screen. The parent class makes these rules win over .theme-switch__option. */
+.theme-switch .theme-switch__compact {
+  display: none;
+}
+
+@media (max-width: 480px) {
+  .theme-switch .theme-switch__compact {
+    display: inline-flex;
+  }
+
+  .theme-switch__group {
+    display: none;
+  }
 }
 
 .theme-switch__option {
