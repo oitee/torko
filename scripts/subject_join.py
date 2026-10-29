@@ -6,7 +6,7 @@ Candidate pairs: for each unit, its 5 nearest units by centre, when the cosine d
 
 Subcommands:
   candidates  Build the units and the candidate pairs. Write results/join_candidates_v1.tsv and a cache file.
-  jobs        Write task files for an LLM judge (approach C) to a folder outside the repository. With --cache, a pair
+  jobs        Write batch files for an LLM judge (approach C) to a folder outside the repository. With --cache, a pair
               that an earlier run answered (data/joins_v1.tsv, data/cannot_links_v1.tsv) gets no job.
   approach-a  Join the units of every pair with a centre distance below t, for several t. Score each t
               with the labelled name pairs of tags/subject_groups/eval/.
@@ -15,10 +15,10 @@ Subcommands:
   export-joins  Write the same answers to data/joins_v1.tsv, keyed by the entity name IDs of each unit, so that a later
               build does not depend on the pair IDs of one candidate run.
   subjects    Join the units of every pair in data/joins_v1.tsv. Write results/subjects_v1.tsv with one row per subject.
-  label-jobs  Write task files for an LLM that writes a clean label for each subject with 2 or more names. A subject
+  label-jobs  Write batch files for an LLM that writes a clean label for each subject with 2 or more names. A subject
               whose exact set of names has a stored label gets no job. The job subjects go to
               results/label_subjects_v1.tsv.
-  chain-jobs  Write task files for an LLM that judges every pair of units inside a chain of 3 or more units
+  chain-jobs  Write batch files for an LLM that judges every pair of units inside a chain of 3 or more units
               that no earlier answer judged directly (the chain guard).
   chain-ingest  Read the chain answers. Write data/cannot_links_v1.tsv: every pair of units inside one joined subject
               that an answer (the join run or the chain run) called different. `subjects` never joins across such a pair.

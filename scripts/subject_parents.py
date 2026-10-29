@@ -13,22 +13,22 @@ when it has no parent and the tag set grew. --force decides every subject again.
 Each answer goes into the table subject_parents by subject key, and the parent goes into subjects.parent_tag_id.
 It needs TYPESAFE_API_KEY and numpy.
 
---jobs FOLDER takes the subjects with no parent that no agent run answered, and writes the same questions as job files for an agent run, and calls no model. Each option has a
-letter. An agent answers one JSON line per subject: the letter or NONE, and the confidence high or low.
+--jobs FOLDER takes the subjects with no parent that no batch run answered, and writes the same questions as job files for an offline LLM batch run, and calls no model. Each option has a
+letter. The LLM answers one JSON line per subject: the letter or NONE, and the confidence high or low.
 The job files show no examples. --jobs needs no job for a subject when stage 5 already answers it: the subject has
 exactly one linked tag, and that tag is also nearer to the centre of the names than every near tag. That tag is
 the parent (the strict rule). Such subjects go to rule.jsonl. --skip-answered FOLDER leaves out the subjects with
 an answer in an earlier job folder.
 --ingest FOLDER [FOLDER ...] reads those answers and rule.jsonl. A subject gets a parent only for a high answer.
-The agent gives no probability, so parent_p holds 1.0 for a high answer and 0.5 for a low answer, and decided_by
-names the agent run or the rule.
+The batch run gives no probability, so parent_p holds 1.0 for a high answer and 0.5 for a low answer, and decided_by
+names the batch run or the rule.
 
     source .venv/bin/activate && set -a && source .env && set +a
     python3 scripts/subject_parents.py --dry-run
     python3 scripts/subject_parents.py --labels "Pradhan Mantri Shram Yogi Maandhan" "Wage arrears" --review
     python3 scripts/subject_parents.py
-    python3 scripts/subject_parents.py --jobs ~/Downloads/subject_parents_v3 --skip-answered ~/Downloads/subject_parents_v2
-    python3 scripts/subject_parents.py --ingest ~/Downloads/subject_parents_v2 ~/Downloads/subject_parents_v3
+    python3 scripts/subject_parents.py --jobs <folder_v3> --skip-answered <folder_v2>
+    python3 scripts/subject_parents.py --ingest <folder_v2> <folder_v3>
 """
 from __future__ import annotations
 
@@ -60,21 +60,21 @@ N_EXAMPLES = 3
 NONE_TEXT = "no option covers the whole subject, or each option is only one part of the subject"
 RESULTS = Path(__file__).resolve().parent.parent / "tags" / "subject_groups" / "results"
 JOB_BYTES = 30000
-AGENT_P = {"high": 1.0, "low": 0.5}
+BATCH_P = {"high": 1.0, "low": 0.5}
 
 
 def decided_by(model: str) -> str:
     return f"{model} {QUESTIONS_VERSION}"
 
 
-AGENT_PREFIXES = ("agent ", "rule ")
+BATCH_PREFIXES = ("batch ", "rule ")
 
 
 def needs_decision(row: dict | None, version: str, tag_set: int, force: bool = False) -> bool:
-    """An answer of an agent run or of the strict rule stays, except with force."""
+    """An answer of a batch run or of the strict rule stays, except with force."""
     if force or row is None:
         return True
-    if row["decided_by"].startswith(AGENT_PREFIXES):
+    if row["decided_by"].startswith(BATCH_PREFIXES):
         return False
     if row["decided_by"] != version:
         return True
@@ -205,9 +205,9 @@ def job_block(state: str, label: str, options: list[tuple[str, str, str]]) -> st
     return "\n".join(lines)
 
 
-def needs_agent(row: dict | None) -> bool:
-    """For --jobs: a subject with no parent that no agent run and no strict rule answered yet."""
-    return row is None or (row["parent_tag_id"] is None and not row["decided_by"].startswith(AGENT_PREFIXES))
+def needs_batch(row: dict | None) -> bool:
+    """For --jobs: a subject with no parent that no batch run and no strict rule answered yet."""
+    return row is None or (row["parent_tag_id"] is None and not row["decided_by"].startswith(BATCH_PREFIXES))
 
 
 def strict_rule(cands: list[dict]) -> int | None:
@@ -223,7 +223,7 @@ def strict_rule(cands: list[dict]) -> int | None:
 
 def read_answers(folder: Path) -> tuple[dict, dict]:
     """Returns (job subject ID -> subjects.jsonl row, job subject ID -> answer) of one job folder.
-    The answers are the agent outputs, then rule.jsonl."""
+    The answers are the batch outputs, then rule.jsonl."""
     subjects = {}
     for line in (folder / "subjects.jsonl").read_text(encoding="utf-8").splitlines():
         obj = json.loads(line)
@@ -243,18 +243,18 @@ def read_answers(folder: Path) -> tuple[dict, dict]:
     return subjects, answers
 
 
-def agent_decision(answer: dict, codes: dict[str, int]) -> tuple[int | None, float, list[str]]:
+def batch_decision(answer: dict, codes: dict[str, int]) -> tuple[int | None, float, list[str]]:
     """answer: one output line. codes: letter -> tag ID. Returns (parent tag ID or None, parent_p, warnings).
     A low answer or an unknown letter gives no parent."""
     code = str(answer.get("parent", "")).strip().upper()
     conf = str(answer.get("confidence", "")).strip().lower()
     warnings = []
-    if conf not in AGENT_P:
+    if conf not in BATCH_P:
         warnings.append(f"unknown confidence {conf!r}")
     if code != NONE and code not in codes:
         warnings.append(f"unknown option {code!r}")
         return None, 0.0, warnings
-    p = AGENT_P.get(conf, 0.0)
+    p = BATCH_P.get(conf, 0.0)
     if code == NONE or conf != "high":
         return None, p, warnings
     return codes[code], p, warnings
@@ -273,7 +273,7 @@ def write_review(rows: list[dict]) -> Path:
     return path
 
 
-def write_agent_jobs(folder: Path, jobs: list, states: dict, tags: dict, tag_set: int) -> None:
+def write_batch_jobs(folder: Path, jobs: list, states: dict, tags: dict, tag_set: int) -> None:
     """Write folder/jobs/jNNNN.txt and folder/subjects.jsonl, the map from job subject ID to subject key and options."""
     from scripts.subject_join import write_jobs
     folder.mkdir(parents=True, exist_ok=True)
@@ -299,7 +299,7 @@ def write_agent_jobs(folder: Path, jobs: list, states: dict, tags: dict, tag_set
           f"in {folder}")
 
 
-def ingest(folders: list[Path], agent: str) -> None:
+def ingest(folders: list[Path], batch_model: str) -> None:
     """A later folder wins when two folders answer the same subject key."""
     from db import get_engine
     rows = {}
@@ -311,9 +311,9 @@ def ingest(folders: list[Path], agent: str) -> None:
     counts = Counter()
     with get_engine().begin() as conn:
         for sub, ans in rows.values():
-            version = f"rule linked+nearest {QUESTIONS_VERSION}" if ans.get("by") == "rule" else f"agent {agent} {QUESTIONS_VERSION}"
-            counts[ans.get("by", "agent")] += 1
-            tid, p, warnings = agent_decision(ans, {o["code"]: o["tag_id"] for o in sub["options"]})
+            version = f"rule linked+nearest {QUESTIONS_VERSION}" if ans.get("by") == "rule" else f"batch {batch_model} {QUESTIONS_VERSION}"
+            counts[ans.get("by", "batch")] += 1
+            tid, p, warnings = batch_decision(ans, {o["code"]: o["tag_id"] for o in sub["options"]})
             counts["parent" if tid else "none"] += 1
             counts["warning"] += bool(warnings)
             conn.execute(text("""
@@ -327,7 +327,7 @@ def ingest(folders: list[Path], agent: str) -> None:
             """), {"k": sub["key"], "t": tid, "p": p, "o": json.dumps(sub["options"], ensure_ascii=False),
                    "raw": json.dumps(ans, ensure_ascii=False), "w": warnings, "by": version, "tsv": sub["tag_set"]})
         synced = conn.execute(text(SYNC_PARENTS)).rowcount
-    print(f"subjects {len(rows)} (agent {counts['agent']}, rule {counts['rule']}): parent {counts['parent']}, none {counts['none']}, "
+    print(f"subjects {len(rows)} (batch {counts['batch']}, rule {counts['rule']}): parent {counts['parent']}, none {counts['none']}, "
           f"with a warning {counts['warning']}. subjects.parent_tag_id changed for {synced} subjects.")
 
 
@@ -344,14 +344,14 @@ def main() -> None:
     ap.add_argument("--force", action="store_true")
     ap.add_argument("--dry-run", action="store_true", help="print the counts and a token estimate, call no model")
     ap.add_argument("--review", action="store_true", help="also write a review file of the decided subjects")
-    ap.add_argument("--jobs", type=Path, help="write job files for an agent run into this folder, call no model")
-    ap.add_argument("--ingest", type=Path, nargs="+", help="read the answers of agent runs from these folders")
+    ap.add_argument("--jobs", type=Path, help="write job files for an offline LLM batch run into this folder, call no model")
+    ap.add_argument("--ingest", type=Path, nargs="+", help="read the answers of batch runs from these folders")
     ap.add_argument("--skip-answered", type=Path, nargs="*", default=[],
                     help="with --jobs: leave out the subjects with an answer in these job folders")
-    ap.add_argument("--agent", default="gemini-flash", help="the agent model, for decided_by of --ingest")
+    ap.add_argument("--batch-model", default="gemini-flash", help="the model of the batch run, for decided_by of --ingest")
     args = ap.parse_args()
     if args.ingest:
-        ingest(args.ingest, args.agent)
+        ingest(args.ingest, args.batch_model)
         return
     version = decided_by(args.model)
     engine = get_engine()
@@ -360,7 +360,7 @@ def main() -> None:
         done = {r.subject_key: dict(r._mapping) for r in conn.execute(text(
             "SELECT subject_key, parent_tag_id, decided_by, tag_set_version FROM subject_parents"))}
         if args.jobs:
-            todo = [s for s in subjects if needs_agent(done.get(s["key"]))]
+            todo = [s for s in subjects if needs_batch(done.get(s["key"]))]
         else:
             todo = [s for s in subjects if needs_decision(done.get(s["key"]), version, tag_set, args.force)]
         if args.labels:
@@ -394,7 +394,7 @@ def main() -> None:
         for folder in args.skip_answered:
             subs, answers = read_answers(folder)
             answered |= {subs[pid]["key"] for pid in answers}
-        write_agent_jobs(args.jobs, [(s, c) for s, c in jobs if s["key"] not in answered], states, tags, tag_set)
+        write_batch_jobs(args.jobs, [(s, c) for s, c in jobs if s["key"] not in answered], states, tags, tag_set)
         return
     if args.dry_run:
         chars = sum(len(states[s["id"]]) + sum(len(option_text(tags[c["tag_id"]])) + 40 for c in cands) + 400

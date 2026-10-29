@@ -56,13 +56,13 @@ def test_letters_go_past_z():
 
 
 def test_only_a_high_answer_with_a_known_letter_gives_a_parent():
-    from scripts.subject_parents import agent_decision
+    from scripts.subject_parents import batch_decision
     codes = {"A": 5, "B": 9}
-    assert agent_decision({"parent": "b", "confidence": "high"}, codes) == (9, 1.0, [])
-    assert agent_decision({"parent": "B", "confidence": "low"}, codes) == (None, 0.5, [])
-    assert agent_decision({"parent": "NONE", "confidence": "high"}, codes) == (None, 1.0, [])
-    assert agent_decision({"parent": "C", "confidence": "high"}, codes)[0] is None
-    assert agent_decision({"parent": "A", "confidence": "sure"}, codes)[0] is None
+    assert batch_decision({"parent": "b", "confidence": "high"}, codes) == (9, 1.0, [])
+    assert batch_decision({"parent": "B", "confidence": "low"}, codes) == (None, 0.5, [])
+    assert batch_decision({"parent": "NONE", "confidence": "high"}, codes) == (None, 1.0, [])
+    assert batch_decision({"parent": "C", "confidence": "high"}, codes)[0] is None
+    assert batch_decision({"parent": "A", "confidence": "sure"}, codes)[0] is None
 
 
 def test_the_job_block_lists_lettered_options_and_none():
@@ -95,13 +95,13 @@ def test_read_answers_adds_rule_answers_and_skips_unknown_ids(tmp_path):
     assert set(answers) == {"P00001", "P00002"} and answers["P00002"]["by"] == "rule"
 
 
-def test_agent_and_rule_answers_stay_and_jev_none_goes_to_the_agent():
-    from scripts.subject_parents import needs_agent
+def test_batch_and_rule_answers_stay_and_a_model_none_goes_to_the_batch():
+    from scripts.subject_parents import needs_batch
     v = "jev p1"
-    assert not needs_decision({"decided_by": "agent gemini-flash p1", "parent_tag_id": None, "tag_set_version": 1}, v, 10)
+    assert not needs_decision({"decided_by": "batch gemini-flash p1", "parent_tag_id": None, "tag_set_version": 1}, v, 10)
     assert not needs_decision({"decided_by": "rule linked+nearest p1", "parent_tag_id": 3, "tag_set_version": 1}, v, 10)
-    assert needs_decision({"decided_by": "agent gemini-flash p1", "parent_tag_id": None, "tag_set_version": 1}, v, 10, force=True)
-    assert needs_agent(None)
-    assert needs_agent({"decided_by": v, "parent_tag_id": None})
-    assert not needs_agent({"decided_by": v, "parent_tag_id": 3})
-    assert not needs_agent({"decided_by": "agent gemini-flash p1", "parent_tag_id": None})
+    assert needs_decision({"decided_by": "batch gemini-flash p1", "parent_tag_id": None, "tag_set_version": 1}, v, 10, force=True)
+    assert needs_batch(None)
+    assert needs_batch({"decided_by": v, "parent_tag_id": None})
+    assert not needs_batch({"decided_by": v, "parent_tag_id": 3})
+    assert not needs_batch({"decided_by": "batch gemini-flash p1", "parent_tag_id": None})
