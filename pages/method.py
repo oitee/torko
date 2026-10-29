@@ -35,8 +35,10 @@ LEGACY_EXAMPLE = {
 # The examples of steps 3, 4 and 5. Each is a reference into the database. The route reads every name, date
 # and text live. None leaves the example out, and the answer then has null for it.
 SPEECH_EXAMPLE = None       # speeches.id of a short speech with a few short interruptions
-SUBJECTS_EXAMPLE = None     # speeches.id of a short speech with subjects that the check kept and dropped
-SUBJECT_GROUP_EXAMPLE = None  # subjects.id of a specific subject with several names
+# Fishermen of Kancheepuram: the check keeps most subjects and drops two, so the example shows both results.
+SUBJECTS_EXAMPLE = 296815  # speeches.id of a short speech with subjects that the check kept and dropped
+# Wage and salary arrears: 23 names under the tag Arrears, the example that the text of step 5 gives.
+SUBJECT_GROUP_EXAMPLE = 23204  # subjects.id of a specific subject with several names
 SPEECH_TEXT_WORDS = 60      # the words of each turn that the speech example sends
 GROUP_NAMES = 8             # the names of the subject group that the example sends
 
