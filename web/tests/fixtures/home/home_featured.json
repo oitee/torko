@@ -1,0 +1,194 @@
+{
+  "counts_note": "member.speeches counts all speeches of the member. member.terms lists the Lok Sabha numbers of those speeches. trend.years counts the speeches with the tag in each calendar year, and tagged counts all speeches with a kept tag in that year.",
+  "member": {
+    "member_id": 1052,
+    "name": "Mahua Moitra",
+    "printed": "SUSHRI MAHUA MOITRA (KRISHNANAGAR)",
+    "speech_id": 178379,
+    "speeches": 66,
+    "terms": [
+      17,
+      18
+    ]
+  },
+  "omitted": [],
+  "quote": {
+    "date": "2025-12-17",
+    "debate": "Viksit Bharat Gurantee for Rojgar and Ajevika Mission (Gramin):VB-G RAM G Bill",
+    "member": "Mahua Moitra",
+    "member_id": 1052,
+    "source_url": "https://sansad.in/ls/debates/view-debate?ls=18&session=6&dbslno=4809",
+    "speech_id": 178379,
+    "term": 18,
+    "text": "The MGNREGA, which was a demand-driven employment program, has been now replaced by an allocation-based scheme which the Central Government can alter at whim."
+  },
+  "search_ideas": [
+    {
+      "name": "Latur",
+      "slug": "latur",
+      "type": "place"
+    },
+    {
+      "name": "Mahatma Gandhi National Rural Employment Guarantee Act (MNREGA)",
+      "slug": "mahatma-gandhi-national-rural-employment-guarantee-act-mnrega",
+      "type": "scheme"
+    },
+    {
+      "name": "Arrears",
+      "slug": "arrears",
+      "type": "topic"
+    },
+    {
+      "name": "Gaya",
+      "slug": "gaya",
+      "type": "place"
+    }
+  ],
+  "trend": {
+    "name": "Arrears",
+    "slug": "arrears",
+    "total": 205,
+    "years": [
+      {
+        "n": 5,
+        "tagged": 1616,
+        "year": 1999
+      },
+      {
+        "n": 8,
+        "tagged": 3546,
+        "year": 2000
+      },
+      {
+        "n": 4,
+        "tagged": 3267,
+        "year": 2001
+      },
+      {
+        "n": 8,
+        "tagged": 4490,
+        "year": 2002
+      },
+      {
+        "n": 5,
+        "tagged": 5342,
+        "year": 2003
+      },
+      {
+        "n": 4,
+        "tagged": 2052,
+        "year": 2004
+      },
+      {
+        "n": 2,
+        "tagged": 3620,
+        "year": 2005
+      },
+      {
+        "n": 5,
+        "tagged": 4081,
+        "year": 2006
+      },
+      {
+        "n": 1,
+        "tagged": 3152,
+        "year": 2007
+      },
+      {
+        "n": 5,
+        "tagged": 2571,
+        "year": 2008
+      },
+      {
+        "n": 2,
+        "tagged": 3452,
+        "year": 2009
+      },
+      {
+        "n": 0,
+        "tagged": 3556,
+        "year": 2010
+      },
+      {
+        "n": 5,
+        "tagged": 3980,
+        "year": 2011
+      },
+      {
+        "n": 5,
+        "tagged": 3654,
+        "year": 2012
+      },
+      {
+        "n": 4,
+        "tagged": 2746,
+        "year": 2013
+      },
+      {
+        "n": 21,
+        "tagged": 4973,
+        "year": 2014
+      },
+      {
+        "n": 17,
+        "tagged": 6615,
+        "year": 2015
+      },
+      {
+        "n": 15,
+        "tagged": 5270,
+        "year": 2016
+      },
+      {
+        "n": 8,
+        "tagged": 3839,
+        "year": 2017
+      },
+      {
+        "n": 7,
+        "tagged": 3112,
+        "year": 2018
+      },
+      {
+        "n": 18,
+        "tagged": 8243,
+        "year": 2019
+      },
+      {
+        "n": 12,
+        "tagged": 3394,
+        "year": 2020
+      },
+      {
+        "n": 8,
+        "tagged": 4723,
+        "year": 2021
+      },
+      {
+        "n": 9,
+        "tagged": 3473,
+        "year": 2022
+      },
+      {
+        "n": 8,
+        "tagged": 3164,
+        "year": 2023
+      },
+      {
+        "n": 3,
+        "tagged": 4164,
+        "year": 2024
+      },
+      {
+        "n": 16,
+        "tagged": 5501,
+        "year": 2025
+      },
+      {
+        "n": 0,
+        "tagged": 1141,
+        "year": 2026
+      }
+    ]
+  }
+}
