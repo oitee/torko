@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { Link } from "react-router-dom";
 import Button from "../../components/Button.jsx";
+import { CONTACT_EMAIL, SITE_URL } from "../../assets/js/site.js";
 import SourceChip, { SOURCE_CONFIG } from "./SourceChip.jsx";
 import "./SpeechTags.css";
 
@@ -47,7 +48,7 @@ export default function SpeechTags({
     if (typeof window !== "undefined" && window.location?.href) {
       return window.location.href;
     }
-    return `https://torko.otee.dev/speech/${speechId}`;
+    return `${SITE_URL}/speech/${speechId}`;
   };
 
   return (
@@ -190,7 +191,7 @@ export default function SpeechTags({
 
           <div className="speech-tags__why-footer">
             <a
-              href={`mailto:hello@otee.dev?subject=${encodeURIComponent(
+              href={`mailto:${CONTACT_EMAIL}?subject=${encodeURIComponent(
                 `Wrong tag: ${openTag.name} (speech ${speechId})`
               )}&body=${encodeURIComponent(getPageUrl())}`}
               className="speech-tags__report-link"

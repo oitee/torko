@@ -1,3 +1,4 @@
+import os
 import pathlib
 
 from flask import Flask, jsonify, request, send_from_directory
@@ -218,4 +219,5 @@ def api_distribution():
 
 
 if __name__ == "__main__":
-    app.run(debug=True, port=5050)
+    # FLASK_DEBUG=false turns off the debug mode. The default is true, for local work.
+    app.run(debug=os.environ.get("FLASK_DEBUG", "true").lower() == "true", port=5050)

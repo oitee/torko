@@ -203,6 +203,10 @@ set -a && source .env && set +a && python3 server.py
 
 Open http://localhost:5050/search. The server does not send the new Home page yet. The address `/` still opens the older dashboard.
 
+The server runs in Flask debug mode by default. The debug mode lets a visitor run code on your machine. On any server that other people can reach, set `FLASK_DEBUG=false` in `.env`.
+
+The site reads two more values from `.env` when Vite builds it. `VITE_SITE_URL` is the public address of the site. `VITE_CONTACT_EMAIL` is the address for the "Report a wrong tag" link. Change both values when you run your own copy.
+
 For development, run the server and Vite at the same time. Vite reloads a page when a file changes. See [`web/README.md`](web/README.md).
 
 ```bash
