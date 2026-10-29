@@ -11,7 +11,7 @@ afterEach(cleanup);
 
 describe("router", () => {
   it.each([
-    ["/", "Home"],
+    ["/", "Search what members said in the Lok Sabha."],
     ["/tag/arrears", "Tag"],
     ["/member/123", "Member"],
     ["/speech/1", "Speech"],

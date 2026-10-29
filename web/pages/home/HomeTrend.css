@@ -1,0 +1,119 @@
+/* The share of one tag in each year, as vertical bars. */
+
+.home-trend {
+  background: var(--sheet);
+  border: 1px solid var(--hairline);
+  padding: var(--space-5);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  min-width: 0;
+}
+
+.home-trend__head {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: var(--space-1) var(--space-4);
+}
+
+.home-trend__head p {
+  margin: 0;
+}
+
+.home-trend__title {
+  font-size: var(--size-label);
+  line-height: var(--lh-label);
+  font-weight: 600;
+  color: var(--ink);
+}
+
+.home-trend__readout {
+  font-family: var(--font-mono);
+  font-size: var(--size-count);
+  line-height: var(--lh-count);
+  color: var(--ink-2);
+}
+
+.home-trend__visual {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+.home-trend__plot {
+  height: 160px;
+  display: grid;
+  gap: 2px;
+  align-items: end;
+  border-bottom: 1px solid var(--ink);
+}
+
+/* Ink-2 bars pass 3:1 on the sheet. No bar is green: green is only for actions. */
+.home-trend__col {
+  background: var(--ink-2);
+  min-height: 0;
+}
+
+.home-trend__col--active {
+  background: var(--ink);
+  outline: 2px solid var(--ink);
+  outline-offset: 1px;
+}
+
+.home-trend__col:focus-visible {
+  outline: 2px solid var(--action);
+  outline-offset: 1px;
+}
+
+.home-trend__axis {
+  display: flex;
+  justify-content: space-between;
+  font-family: var(--font-mono);
+  font-size: var(--size-count);
+  line-height: var(--lh-count);
+  color: var(--ink-2);
+}
+
+.home-trend__table {
+  width: 100%;
+  border-collapse: collapse;
+  font-family: var(--font-mono);
+  font-size: var(--size-count);
+  line-height: var(--lh-count);
+}
+
+.home-trend__table caption {
+  text-align: left;
+  font-family: var(--font-sans);
+  font-weight: 600;
+  margin-bottom: var(--space-2);
+}
+
+.home-trend__table th,
+.home-trend__table td {
+  padding: var(--space-2);
+  border-bottom: 1px solid var(--hairline);
+  text-align: left;
+}
+
+.home-trend__table th:last-child,
+.home-trend__table td:last-child {
+  text-align: right;
+}
+
+.home-trend__foot {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  align-items: center;
+  gap: var(--space-2) var(--space-4);
+}
+
+.home-trend__total {
+  margin: 0;
+  font-size: var(--size-count);
+  line-height: var(--lh-count);
+  color: var(--meta);
+}

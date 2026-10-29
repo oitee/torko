@@ -1,0 +1,68 @@
+/* Home page layout. The parts keep their own rules in pages/home/. */
+
+.home-main {
+  display: flex;
+  flex-direction: column;
+  gap: clamp(40px, 6vw, 72px);
+  padding-top: clamp(40px, 6vw, 72px);
+}
+
+.home-main__title {
+  margin: 0;
+  font-size: var(--size-title);
+  line-height: var(--lh-title);
+  font-weight: 600;
+  color: var(--ink);
+  margin-bottom: calc(-1 * clamp(16px, 3vw, 40px));
+}
+
+/* One part of "What you can do": text on one side, an example on the other. */
+.home-feature {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 420px), 1fr));
+  gap: clamp(24px, 4vw, 56px);
+  align-items: start;
+  border-top: 1px solid var(--ink);
+  padding-top: var(--space-6);
+}
+
+.home-feature__text {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  min-width: 0;
+}
+
+.home-feature__title {
+  margin: 0;
+  font-size: var(--size-heading);
+  line-height: var(--lh-heading);
+  font-weight: 600;
+  color: var(--ink);
+}
+
+.home-feature__body {
+  margin: 0;
+  font-size: var(--size-body);
+  line-height: var(--lh-body);
+  color: var(--ink-2);
+  max-width: 60ch;
+}
+
+/* The text button keeps its 44px hit area. The negative margin lines its text up with the paragraph. */
+.home-feature__action {
+  margin-left: calc(-1 * var(--space-2));
+}
+
+/* Text for screen readers only, for example the table of a chart. */
+.home-page .sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}

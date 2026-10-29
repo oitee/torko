@@ -88,6 +88,11 @@ function ordinalSuffix(n) {
   return "th";
 }
 
+// Format a number as an English ordinal (e.g. 17th).
+export function ordinal(n) {
+  return `${n}${ordinalSuffix(n)}`;
+}
+
 // Format a Lok Sabha term in full (e.g. 17th Lok Sabha).
 export function termLong(n) {
   return `${n}${ordinalSuffix(n)} Lok Sabha`;

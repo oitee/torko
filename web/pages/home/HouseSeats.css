@@ -1,0 +1,53 @@
+/* The seats of the House, on the ink band of the Home page. */
+
+.house-seats {
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-3);
+}
+
+.house-seats__svg {
+  display: block;
+  width: 100%;
+  max-width: 440px;
+}
+
+/* On a phone the picture stays small, so the figures come soon after the search. */
+@media (max-width: 560px) {
+  .house-seats__svg {
+    max-width: 240px;
+  }
+}
+
+/* Control grey passes 3:1 on the band, the floor for chart marks. */
+.house-seats__seat {
+  fill: var(--control);
+}
+
+/* The followed seat is green, as in the mark of the site. */
+.house-seats__seat--marked {
+  fill: var(--action);
+}
+
+.house-seats__caption {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  font-size: var(--size-count);
+  line-height: var(--lh-count);
+  color: var(--ink-2);
+}
+
+.house-seats__key {
+  flex: none;
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: var(--action);
+}
+
+.house-seats__num {
+  font-family: var(--font-mono);
+}

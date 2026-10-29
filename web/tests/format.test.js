@@ -6,6 +6,7 @@ import {
   formatDateISO,
   formatDateLong,
   formatNumber,
+  ordinal,
   shareOf,
   termLong,
   termShort,
@@ -76,6 +77,16 @@ describe("termShort", () => {
   it("formats short term names", () => {
     expect(termShort(17)).toBe("17th LS");
     expect(termShort(1)).toBe("1st LS");
+  });
+});
+
+describe("ordinal", () => {
+  it("adds the English ordinal ending", () => {
+    expect(ordinal(1)).toBe("1st");
+    expect(ordinal(2)).toBe("2nd");
+    expect(ordinal(3)).toBe("3rd");
+    expect(ordinal(13)).toBe("13th");
+    expect(ordinal(18)).toBe("18th");
   });
 });
 

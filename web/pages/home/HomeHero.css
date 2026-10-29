@@ -1,0 +1,74 @@
+/* The ink band at the top of the Home page. The colours come from .ink-band in tokens.css. */
+
+/* The band fills the full width of the window, but the page sits inside the .container of Layout.
+   A box shadow of the band colour, clipped to the band height, paints the band out to the window edges.
+   It adds no width, so the page never scrolls sideways. It is a background, not a shadow for depth. */
+.home-hero {
+  box-shadow: 0 0 0 100vmax var(--header-bg);
+  clip-path: inset(0 -100vmax);
+  border-top: 1px solid var(--hairline);
+  padding-top: clamp(32px, 6vw, 80px);
+}
+
+.home-hero__grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 420px), 1fr));
+  gap: clamp(32px, 4vw, 56px);
+  align-items: center;
+  padding-bottom: clamp(32px, 5vw, 64px);
+}
+
+.home-hero__text {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-5);
+  min-width: 0;
+}
+
+.home-hero__title {
+  margin: 0;
+  font-size: var(--size-display);
+  line-height: var(--lh-display);
+  font-weight: 600;
+  color: var(--ink);
+  max-width: 18ch;
+}
+
+.home-hero__lede {
+  margin: 0;
+  font-size: var(--size-speech);
+  line-height: var(--lh-speech);
+  color: var(--ink-2);
+  max-width: 56ch;
+}
+
+.home-hero__date {
+  font-family: var(--font-mono);
+}
+
+.home-hero__search {
+  max-width: 640px;
+}
+
+.home-hero__ideas {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+.home-hero__ideas-label {
+  font-size: var(--size-label);
+  color: var(--ink-2);
+  margin-right: var(--space-1);
+}
+
+/* A long tag name wraps inside its chip, so the row never pushes the page wider. */
+.home-hero__ideas .chip {
+  max-width: 100%;
+}
+
+.home-hero__state {
+  padding: var(--space-5) 0;
+  border-top: 1px solid var(--hairline);
+}

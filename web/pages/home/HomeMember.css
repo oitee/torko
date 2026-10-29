@@ -1,0 +1,85 @@
+/* The printed label and the member that Torko finds for it. */
+
+.home-member {
+  background: var(--sheet);
+  border: 1px solid var(--hairline);
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto minmax(0, 1.3fr);
+  align-items: center;
+}
+
+.home-member__side {
+  padding: var(--space-5);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  min-width: 0;
+}
+
+.home-member__side--found {
+  border-left: 1px solid var(--hairline);
+}
+
+.home-member__side p {
+  margin: 0;
+}
+
+.home-member__label {
+  font-size: var(--size-count);
+  line-height: var(--lh-count);
+  font-weight: 500;
+  color: var(--meta);
+}
+
+.home-member__printed {
+  font-family: var(--font-mono);
+  font-size: var(--size-body);
+  line-height: var(--lh-body);
+  font-weight: 500;
+  color: var(--ink);
+  overflow-wrap: anywhere;
+}
+
+.home-member__arrow {
+  font-family: var(--font-mono);
+  font-size: var(--size-heading);
+  color: var(--meta);
+  padding: 0 var(--space-1);
+}
+
+.home-member__name {
+  font-size: var(--size-heading);
+  line-height: var(--lh-heading);
+  font-weight: 600;
+  color: var(--ink);
+}
+
+.home-member__seat {
+  font-size: var(--size-body);
+  color: var(--ink-2);
+}
+
+.home-member__counts {
+  font-family: var(--font-mono);
+  font-size: var(--size-count);
+  line-height: var(--lh-count);
+  color: var(--ink-2);
+}
+
+/* On a phone the two sides stack, and the arrow points down. */
+@media (max-width: 560px) {
+  .home-member {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .home-member__arrow {
+    padding: 0 var(--space-5);
+    transform: rotate(90deg);
+    justify-self: start;
+  }
+
+  .home-member__side--found {
+    border-left: 0;
+    border-top: 1px solid var(--hairline);
+  }
+}
