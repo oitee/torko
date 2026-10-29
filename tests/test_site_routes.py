@@ -16,7 +16,7 @@ def client(tmp_path, monkeypatch):
 
 
 @pytest.mark.parametrize("path", ["/", "/tag/arrears", "/member/1052", "/speech/178379", "/debate/683", "/place/latur",
-                                  "/search", "/search?q=arrears"])
+                                  "/search", "/search?q=arrears", "/method"])
 def test_each_page_address_gets_the_site(client, path):
     resp = client.get(path)
     assert resp.status_code == 200

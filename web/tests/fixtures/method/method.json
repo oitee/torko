@@ -1,0 +1,95 @@
+{
+  "corpus": {
+    "debates": 64921,
+    "error_rate": {
+      "counts": "named turns with the wrong member name",
+      "source": "Manual review of a sample of named turns. The figure is fixed text. No query computes it.",
+      "text": "about 0.24%",
+      "value": 0.0024
+    },
+    "first": "1999-10-20",
+    "last": "2026-04-18",
+    "members": 2062,
+    "tags": 7027,
+    "terms": [
+      13,
+      14,
+      15,
+      16,
+      17,
+      18
+    ]
+  },
+  "counts_note": "turns.total counts all rows of the table turns. turns.member counts the turns with a member. turns.chair_or_crowd counts the turns with no member and a role of the chair or of many members at once. turns.no_name counts the turns with no member and no role. The three parts add up to turns.total. speeches.total counts all speeches. speeches.with_member counts the speeches with a member. speeches.eligible counts the speeches with a member and min_words words or more. speeches.with_tldr counts the eligible speeches with a TLDR from a model (not a fixed rule text). speeches.with_tag counts the eligible speeches with at least one tag. example.labels lists the most frequent printed labels of one member, with the number of turns of each. unread_text is fixed text from a measurement of the stored pages. No query computes it.",
+  "example": {
+    "labels": [
+      {
+        "label": "श्री अधीर रंजन चौधरी",
+        "n": 981
+      },
+      {
+        "label": "SHRI ADHIR RANJAN CHOWDHURY",
+        "n": 440
+      },
+      {
+        "label": "SHRI ADHIR RANJAN CHOWDHURY (BAHARAMPUR)",
+        "n": 354
+      },
+      {
+        "label": "श्री अधीर रंजन चौधरी ( बहरामपुर )",
+        "n": 319
+      },
+      {
+        "label": "SHRI ADHIR CHOWDHURY",
+        "n": 219
+      },
+      {
+        "label": "SHRI ADHIR CHOWDHURY (BAHARAMPUR)",
+        "n": 97
+      },
+      {
+        "label": "SHRI ADHIR CHOWDHURY (BERHAMPORE, WEST BENGAL)",
+        "n": 89
+      },
+      {
+        "label": "SHRI ADHIR CHOWDHARY",
+        "n": 87
+      },
+      {
+        "label": "SHRI ADHIR CHOWDHARY (BERHAMPORE, WEST BENGAL)",
+        "n": 73
+      },
+      {
+        "label": "श्रीअधीररंजनचौधरी",
+        "n": 21
+      }
+    ],
+    "member_id": 368,
+    "name": "Adhir Ranjan Chowdhury"
+  },
+  "speeches": {
+    "eligible": 116387,
+    "min_words": 50,
+    "total": 173225,
+    "with_member": 137781,
+    "with_tag": 107481,
+    "with_tldr": 109726
+  },
+  "turns": {
+    "chair_or_crowd": 172482,
+    "member": 248051,
+    "no_name": 106168,
+    "total": 526701
+  },
+  "unread_text": {
+    "counts": "of the source text",
+    "first_term": {
+      "term": 13,
+      "text": "32.5%"
+    },
+    "recent_terms": "about 3%",
+    "source": "Measurement of the stored debate pages. The figure is fixed text. No query computes it.",
+    "text": "about 13.6%",
+    "value": 0.136
+  }
+}

@@ -1,0 +1,59 @@
+/* The printed names of one member, as a small table. */
+
+.method-labels {
+  margin: 0;
+  background: var(--sheet);
+  border: 1px solid var(--hairline);
+  padding: var(--space-4) var(--space-5);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+
+.method-labels__caption {
+  font-size: var(--size-label);
+  line-height: var(--lh-label);
+  color: var(--ink-2);
+}
+
+.method-labels__table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.method-labels__table th {
+  text-align: left;
+  font-size: var(--size-count);
+  line-height: var(--lh-count);
+  font-weight: 500;
+  color: var(--meta);
+  padding: 0 0 var(--space-2);
+  border-bottom: 1px solid var(--hairline);
+}
+
+.method-labels__table td {
+  padding: var(--space-2) 0;
+  border-bottom: 1px solid var(--hairline);
+  font-family: var(--font-mono);
+  font-size: var(--size-count);
+  line-height: var(--lh-count);
+  color: var(--ink);
+  overflow-wrap: anywhere;
+}
+
+.method-labels__table td[lang="hi"] {
+  font-family: var(--font-hi);
+  font-size: var(--size-body);
+  line-height: var(--lh-hi);
+}
+
+.method-labels__table th:last-child,
+.method-labels__table td:last-child {
+  text-align: right;
+  padding-left: var(--space-4);
+  white-space: nowrap;
+}
+
+.method-labels__table tr:last-child td {
+  border-bottom: 0;
+}

@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { getJSON } from "../assets/js/api.js";
+import Button from "../components/Button.jsx";
 import { ErrorState, Loading } from "../components/States.jsx";
 import HomeHero from "./home/HomeHero.jsx";
 import HomeMember from "./home/HomeMember.jsx";
@@ -7,9 +8,9 @@ import HomeQuote from "./home/HomeQuote.jsx";
 import HomeTrend from "./home/HomeTrend.jsx";
 import "./home.css";
 
-// TODO before deployment: build the Method page, the Your MP page and the Data and API page.
+// TODO before deployment: build the Your MP page and the Data and API page.
 // Then add the parts of this page that need them:
-// the "How Torko works" link, and the "Start here" list of tasks ("Find your MP", "Download the data").
+// the "Start here" list of tasks ("Find your MP", "Download the data").
 // The header shows only the pages that exist, so it gets the same links then.
 
 // Load one API answer. A page can retry it.
@@ -64,6 +65,23 @@ export default function Home() {
             <HomeTrend trend={f.trend} />
           </>
         )}
+
+        <section className="home-feature" aria-labelledby="home-method-title">
+          <div className="home-feature__text">
+            <h3 id="home-method-title" className="home-feature__title">
+              How Torko works
+            </h3>
+            <p className="home-feature__body">
+              Read how Torko finds the member who spoke each turn and the subjects of each speech. The page also
+              says what Torko gets wrong.
+            </p>
+            <div className="home-feature__action">
+              <Button variant="text" href="/method">
+                Read how Torko works
+              </Button>
+            </div>
+          </div>
+        </section>
       </section>
     </main>
   );

@@ -35,7 +35,7 @@ A closer look shows four problems.
 - **Places.** Each district and each Lok Sabha constituency has a page. The page shows when members spoke about the place, and who spoke.
 - **Sources.** Each speech links to its official source page on sansad.in.
 
-The site has seven pages: Home, Tag, Member, Speech, Debate, Place, and Search.
+The site has eight pages: Home, Tag, Member, Speech, Debate, Place, Search, and Method. The Method page explains how Torko works and what it gets wrong.
 
 ## Terms used in this project
 

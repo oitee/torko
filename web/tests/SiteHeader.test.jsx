@@ -18,6 +18,18 @@ describe("SiteHeader", () => {
     const searchLink = screen.getByRole("link", { name: "Search" });
     expect(searchLink.getAttribute("href")).toBe("/search");
     expect(searchLink.getAttribute("aria-current")).toBeNull();
+    expect(screen.getByRole("link", { name: "Method" }).getAttribute("href")).toBe("/method");
+  });
+
+  it("marks the Method link active on /method", () => {
+    render(
+      <MemoryRouter initialEntries={["/method"]}>
+        <SiteHeader theme="system" />
+      </MemoryRouter>
+    );
+
+    expect(screen.getByRole("link", { name: "Method" }).getAttribute("aria-current")).toBe("page");
+    expect(screen.getByRole("link", { name: "Search" }).getAttribute("aria-current")).toBeNull();
   });
 
   it("marks Search link active when on /search", () => {

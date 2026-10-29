@@ -1,0 +1,44 @@
+/* One step of the Method page. */
+
+.method-step {
+  display: grid;
+  grid-template-columns: var(--space-8) minmax(0, 1fr);
+  gap: var(--space-4);
+  border-top: 1px solid var(--ink);
+  padding-top: var(--space-6);
+}
+
+.method-step__n {
+  font-family: var(--font-mono);
+  font-size: var(--size-heading);
+  line-height: var(--lh-heading);
+  color: var(--meta);
+}
+
+.method-step__body {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  min-width: 0;
+  max-width: 72ch;
+}
+
+.method-step__title {
+  margin: 0;
+  font-size: var(--size-title);
+  line-height: var(--lh-title);
+  font-weight: 600;
+  color: var(--ink);
+}
+
+.method-step__body p {
+  margin: 0;
+  color: var(--ink-2);
+}
+
+.method-step__body .method-step__figure {
+  font-family: var(--font-mono);
+  font-size: var(--size-count);
+  line-height: var(--lh-count);
+  color: var(--ink);
+}

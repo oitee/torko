@@ -111,12 +111,18 @@ describe("Home page", () => {
     mockAnswers();
     renderHome();
     await screen.findByText("SUSHRI MAHUA MOITRA (KRISHNANAGAR)");
-    expect(screen.queryByText(/How Torko works/)).toBeNull();
     expect(screen.queryByText(/Start here/i)).toBeNull();
     const hrefs = screen.getAllByRole("link").map((a) => a.getAttribute("href"));
     for (const href of hrefs) {
-      expect(href).toMatch(/^\/(member|place|speech|tag|search)/);
+      expect(href).toMatch(/^\/(member|place|speech|tag|search|method)/);
     }
+  });
+
+  it("links to the Method page, also when the featured answer fails", async () => {
+    mockAnswers({ "/api/home/featured": { status: 500, message: "The server could not answer. Try again." } });
+    renderHome();
+    await screen.findByText("The server could not answer. Try again.");
+    expect(screen.getByRole("link", { name: "Read how Torko works" }).getAttribute("href")).toBe("/method");
   });
 
   it("uses no word that the writing rules ban", async () => {

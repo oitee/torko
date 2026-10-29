@@ -1,0 +1,32 @@
+/* The limits of the method, as a plain list. */
+
+.method-limits {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  border-top: 1px solid var(--ink);
+  padding-top: var(--space-6);
+}
+
+.method-limits__title {
+  margin: 0;
+  font-size: var(--size-title);
+  line-height: var(--lh-title);
+  font-weight: 600;
+  color: var(--ink);
+}
+
+.method-limits__list {
+  max-width: 72ch;
+  margin: 0;
+  padding-left: var(--space-5);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  color: var(--ink-2);
+}
+
+.method-limits__num {
+  font-family: var(--font-mono);
+  color: var(--ink);
+}
