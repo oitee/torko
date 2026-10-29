@@ -35,7 +35,7 @@ def test_words_keeps_the_first_words_and_marks_a_cut():
 def test_the_old_font_example_decodes_to_readable_hindi():
     from legacy_hindi import decode_legacy_hindi
     out = decode_legacy_hindi(method.LEGACY_EXAMPLE["text"])
-    assert out.startswith("महोदय, मैं आपका बहुत आभारी हूं कि आपने मुझे")
+    assert out == "अध्यक्ष महोदय, गृह मंत्री जी ने कहा था कि झाबुआ के मामले में 3 तारीख को बयान देंगे।"
     assert "É" not in out
 
 

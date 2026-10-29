@@ -25,11 +25,11 @@ UNREAD_TEXT = {
     "source": "Measurement of the stored debate pages. The figure is fixed text. No query computes it.",
 }
 
-# The example of old-font Hindi: the start of one turn, as the stored page of debate 32612 (debates.id) holds it.
-# The debate is of the 14th Lok Sabha, 10 August 2005. The route decodes it with the same code as the reader, so the page shows what the reader really makes.
+# The example of old-font Hindi: the start of one turn, as the stored page of debate 2439 (debates.id) holds it.
+# The debate is of the 13th Lok Sabha, session 14.
 LEGACY_EXAMPLE = {
-    "debate_id": 32612,
-    "text": 'àÉcÉänªÉ, àÉé +ÉÉ{ÉBÉEÉ ¤ÉcÖiÉ +ÉÉ£ÉÉ®ÉÒ cÚÆ ÉÊBÉE +ÉÉ{ÉxÉä àÉÖZÉä ABÉE AäºÉä <¶ªÉÖ {É® ¤ÉÉäãÉxÉä BÉEÉ àÉÉèBÉEÉ ÉÊnªÉÉ,',
+    "debate_id": 2439,
+    "text": '+ÉvªÉFÉ àÉcÉänªÉ, MÉßc àÉÆjÉÉÒ VÉÉÒ xÉä BÉEcÉ lÉÉ ÉÊBÉE ZÉÉ¤ÉÖ+ÉÉ BÉEä àÉÉàÉãÉä àÉå 3 iÉÉ®ÉÒJÉ BÉEÉä ¤ÉªÉÉxÉ nåMÉä*',
 }
 
 # The examples of steps 3, 4 and 5. Each is a reference into the database. The route reads every name, date

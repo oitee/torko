@@ -69,9 +69,15 @@
   },
   "examples": {
     "legacy": {
-      "debate": null,
-      "source_text": "àÉcÉänªÉ, àÉé +ÉÉ{ÉBÉEÉ ¤ÉcÖiÉ +ÉÉ£ÉÉ®ÉÒ cÚÆ ÉÊBÉE +ÉÉ{ÉxÉä àÉÖZÉä ABÉE AäºÉä <¶ªÉÖ {É® ¤ÉÉäãÉxÉä BÉEÉ àÉÉèBÉEÉ ÉÊnªÉÉ,",
-      "text": "महोदय, मैं आपका बहुत आभारी हूं कि आपने मुझे एक ऐसे इश्यु पर बोलने का मौका दिया,"
+      "source_text": "+ÉvªÉFÉ àÉcÉänªÉ, MÉßc àÉÆjÉÉÒ VÉÉÒ xÉä BÉEcÉ lÉÉ ÉÊBÉE ZÉÉ¤ÉÖ+ÉÉ BÉEä àÉÉàÉãÉä àÉå 3 iÉÉ®ÉÒJÉ BÉEÉä ¤ÉªÉÉxÉ nåMÉä*",
+      "text": "अध्यक्ष महोदय, गृह मंत्री जी ने कहा था कि झाबुआ के मामले में 3 तारीख को बयान देंगे।",
+      "debate": {
+        "date": "2004-02-04",
+        "title": "Regarding rape of a minor girl in Jhabua, Madhya Pradesh leading to communal tension in the area.",
+        "source_url": "https://sansad.in/ls/debates/view-debate?ls=13&session=14&dbslno=7704",
+        "member_id": 218,
+        "member": "Kantilal Bhuria"
+      }
     },
     "speech": null,
     "subject_group": null,

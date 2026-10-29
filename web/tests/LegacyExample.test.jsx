@@ -23,7 +23,7 @@ describe("LegacyExample", () => {
     expect(screen.getByText(legacy.source_text)).toBeTruthy();
     const hindi = screen.getByText(legacy.text);
     expect(hindi.getAttribute("lang")).toBe("hi");
-    expect(legacy.text.startsWith("महोदय, मैं आपका बहुत आभारी हूं")).toBe(true);
+    expect(legacy.text.startsWith("अध्यक्ष महोदय, गृह मंत्री जी ने कहा था")).toBe(true);
   });
 
   it("names the member, the date and the source page when the API knows the debate", () => {
