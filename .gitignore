@@ -23,7 +23,8 @@ fixtures/
 # seed tag list: files that scripts/build_seed_tags.py rebuilds
 tags/*/results/chunks/
 tags/*/results/merge_in/
-tags/*/atlas/tags.json
+# local browser view of the seed tag list, for manual review only
+tags/*/atlas/
 
 # one-off loader of the extraction folders, not part of the repo
 db_load/
@@ -49,3 +50,5 @@ design/
 # frontend build output and installed packages
 web/node_modules/
 web/dist/
+.vite/
+web/.vite/

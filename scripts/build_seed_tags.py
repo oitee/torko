@@ -229,6 +229,7 @@ def main() -> None:
     (results / "assembly_log.txt").write_text("".join(l + "\n" for l in log), encoding="utf-8")
     (results / "seed_tags_v1.tsv").write_text(
         "\t".join(COLUMNS) + "\n" + "".join(to_row(g) + "\n" for g in final), encoding="utf-8")
+    # The atlas is a local browser view of the list, for manual review
     (ROOT / "atlas" / "tags.json").write_text(
         json.dumps(atlas_json(final), separators=(",", ":"), ensure_ascii=False), encoding="utf-8")
 

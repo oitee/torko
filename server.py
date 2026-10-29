@@ -9,6 +9,7 @@ import tag_search
 from debate_fetch import fetch_debate, split_by_speaker, speaker_distribution
 from debate_fetch_legacy import looks_legacy, split_by_speaker_legacy
 
+# TODO: static/ is the older work-in-progress dashboard, kept for testing. Remove it when the site in web/ is complete.
 app = Flask(__name__, static_folder="static", static_url_path="")
 
 MAX_PAGE_SIZE = 100

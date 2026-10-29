@@ -10,19 +10,19 @@ The two model steps, classify and merge, ran as offline LLM batch runs. The buil
 
 ## How to run
 
-The build script calls no model. It reads `data/` and writes `results/` and `atlas/tags.json`. It checks that each keyword appears one time and that the debate counts balance.
+The build script calls no model. It reads `data/` and writes `results/`. It also writes `atlas/tags.json` for a local review page. It checks that each keyword appears one time and that the debate counts balance.
 
 ```bash
 python3 scripts/build_seed_tags.py
 ```
 
-To see the list in a browser, serve the `atlas/` folder (for example with `python3 -m http.server` in that folder) and open `index.html`.
-
 ## The rule for this folder
 
 `data/` holds the files that no script can make again: model outputs and human decisions. Never edit a file in `data/` after its step ran. The only exception is `review.tsv`, where you add lines.
 
-`results/` and `atlas/` hold files that the script makes. Do not edit them. Git ignores `results/chunks/`, `results/merge_in/`, and `atlas/tags.json`.
+`results/` holds files that the script makes. Do not edit them. Git ignores `results/chunks/` and `results/merge_in/`.
+
+The `atlas/` folder is a local page for a manual review of the list
 
 ## Files
 
@@ -39,7 +39,6 @@ To see the list in a browser, serve the `atlas/` folder (for example with `pytho
 | `results/seed_tags_v1.tsv` | The tag list. |
 | `results/assembly_log.txt` | Each repair that the assembly step made. |
 | `results/chunks/`, `results/merge_in/` | The exact inputs of the two model steps. |
-| `atlas/index.html` | A browser view of the tag list. |
 
 ## Type rules
 
