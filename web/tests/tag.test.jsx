@@ -19,10 +19,16 @@ const mockTagData = {
   first: "1999-10-28",
   last: "2025-12-17",
   sessions: [
-    { term: 13, year: 1999, n: 5 },
-    { term: 16, year: 2014, n: 20 },
-    { term: 17, year: 2019, n: 41 },
-    { term: 17, year: 2020, n: 15 },
+    { term: 13, session: 1, n: 5 },
+    { term: 16, session: 1, n: 20 },
+    { term: 17, session: 1, n: 41 },
+    { term: 17, session: 3, n: 15 },
+  ],
+  years: [
+    { year: 1999, n: 5, tagged: 1616 },
+    { year: 2014, n: 20, tagged: 3100 },
+    { year: 2019, n: 41, tagged: 5200 },
+    { year: 2020, n: 15, tagged: 4400 },
   ],
   parties: [
     { party: "BJP", n: 72, colour: "#FF9933" },

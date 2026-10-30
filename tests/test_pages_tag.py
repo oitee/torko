@@ -7,14 +7,18 @@ def test_shape_tag_keeps_keys_and_adds_named_counts():
     t = {"tag": "Onions", "type": "crop", "domain": "agri", "description": "d", "aliases": ["x"]}
     out = tag.shape_tag(
         t, {"llm": 3, "dictionary": 1},
-        [{"term": 18, "session": 1, "n": 2, "first": datetime.date(2024, 6, 1)}],
+        [{"term": 18, "session": 1, "n": 2}],
         [{"party": "BJP", "n": 1, "party_total": 4}],
         [{"mid": 9, "name": "A", "n": 3, "last": datetime.date(2024, 7, 1), "party": "BJP", "seat": "X", "state": "Y",
           "first": datetime.date(2024, 6, 1), "terms": [18]}],
         [{"id": 1, "label": "l", "n_speeches": 5, "n_debates": 2}],
-        [{"tag": "Farmers", "type": "group", "n": 2}], [], [])
+        [{"tag": "Farmers", "type": "group", "n": 2}], [], [],
+        years={2024: 2, 2026: 1}, tagged_by_year={2023: 50, 2024: 90, 2025: 80, 2026: 40})
     assert out["total"] == 4 and out["slug"] == "onions" and out["counts_note"]
-    assert out["sessions"][0]["speeches_tagged"] == 2 and out["sessions"][0]["year"] == 2024
+    assert out["sessions"][0]["speeches_tagged"] == 2 and "year" not in out["sessions"][0]
+    # A year inside the span with no speech of the tag has n = 0. A year outside the span is left out.
+    assert out["years"] == [{"year": 2024, "n": 2, "tagged": 90}, {"year": 2025, "n": 0, "tagged": 80},
+                            {"year": 2026, "n": 1, "tagged": 40}]
     assert out["parties"][0]["per100"] == 25.0 and out["parties"][0]["party_speeches_with_tags"] == 4
     assert out["members"][0]["last"] == "2024-07-01"
     assert out["related"][0]["slug"] == "farmers"
@@ -88,3 +92,15 @@ def test_tag_page_header_term_and_quote_on_database(page_conn):  # noqa: F811
     term_total = sum(s["n"] for s in out["sessions"] if s["term"] == 17)
     assert sum(p["n"] for p in one["parties"]) <= term_total
     assert all(r["term"] == 17 for r in one["recent"])
+
+
+def test_tag_years_follow_the_debate_date(page_conn):  # noqa: F811
+    from sqlalchemy import text
+    out = tag.tag_page(page_conn, "farmers", {})
+    from pages.common import tag_speeches
+    ids = [r[0] for r in tag_speeches(page_conn, 37)]
+    by_year = dict(page_conn.execute(text("""
+        SELECT extract(year FROM d.debate_date)::int, count(*) FROM speeches s JOIN debates d ON d.id = s.debate_id
+        WHERE s.id = ANY(:s) AND d.debate_date IS NOT NULL GROUP BY 1"""), {"s": ids}).all())
+    assert {y["year"]: y["n"] for y in out["years"] if y["n"]} == by_year
+    assert all(y["tagged"] >= y["n"] for y in out["years"])

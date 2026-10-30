@@ -122,9 +122,18 @@
   text-align: left;
 }
 
-.tag-when-chart__table th:last-child,
-.tag-when-chart__table td:last-child {
+.tag-when-chart__table th:not(:first-child),
+.tag-when-chart__table td:not(:first-child) {
   text-align: right;
+}
+
+.tag-when-chart__note {
+  margin: 0;
+  font-family: var(--font-sans);
+  font-size: var(--size-count);
+  line-height: var(--lh-count);
+  color: var(--meta);
+  max-width: 72ch;
 }
 
 .tag-when-chart__toggle {

@@ -125,7 +125,7 @@ export default function Tag() {
       ) : (
         <div className="tag-main">
           <TagWhenChart
-            sessions={tag.sessions}
+            years={tag.years}
             selectedTerm={term}
           />
 

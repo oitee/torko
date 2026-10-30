@@ -10,10 +10,14 @@ from sqlalchemy import text
 from pages.common import (PARTY_AT_DATE, SPEECH_TAGS_CTE, corpus_party_totals, party_colours, resolve_slug, resolve_tag, slug, tag_speeches,
                           speech_rows, speech_tags_cte)
 from pages.quotes import clean, good, good_hi, score, sentences
+from pages.trends import year_tagged
 
 COUNTS_NOTE = (
     "total and by_source count speeches that carry this tag (each speech once). "
     "sessions.speeches_tagged counts those speeches in one session. "
+    "years has one row for each calendar year with a tagged speech. years.n counts the speeches of the year that carry this tag, "
+    "by the date of the debate of each speech, each speech once. years.tagged is the denominator: the speeches of the year that "
+    "have at least one kept item of any tag. A session that crosses New Year is split between two years. "
     "parties.speeches_tagged counts tagged speeches of the party, and party_speeches_with_tags counts all speeches "
     "of the party that have at least one kept tag, so per100 is the tagged share of that party's tagged speeches. "
     "members.speeches_tagged counts tagged speeches of the member (members with 3 or more). "
@@ -24,7 +28,7 @@ COUNTS_NOTE = (
     "because a speech with no member has no tags. n_subjects counts all subjects under this tag, while subjects lists at most 40. "
     "first and last are the dates of the first and the last tagged speech. "
     "With the argument term, parties, members, recent and longest count only the speeches of that term. n_members, first and last, "
-    "total, by_source, sessions, subjects and related stay for all terms. "
+    "total, by_source, sessions, years, subjects and related stay for all terms. "
     "members.first and members.last are the dates of the first and the last tagged speech of the member in the chosen terms, "
     "and members.terms are the terms with such a speech. "
     "recent.quote is one sentence from the own turns of the member in that speech, or null. It is English when the speech has a good "
@@ -38,13 +42,17 @@ def find_tag_id(conn, wanted):
     return row["id"] if row else None
 
 
-def shape_tag(t, by_source, sessions, parties, members, subjects, related, recent, longest, header=None, peaks=None):
+def shape_tag(t, by_source, sessions, parties, members, subjects, related, recent, longest, header=None, peaks=None,
+              years=None, tagged_by_year=None):
     """Put the query results in the output shape of the tag page.
 
     header has n_members, n_subjects, first and last. peaks maps a subject id to its peak year.
+    years is {year: speeches with this tag}. tagged_by_year is {year: speeches with any kept tag}.
     """
     header = header or {}
     peaks = peaks or {}
+    years = years or {}
+    tagged_by_year = tagged_by_year or {}
     return {
         "name": t["tag"], "slug": slug(t["tag"]), "type": t["type"], "domain": t["domain"],
         "description": t["description"], "aliases": t["aliases"],
@@ -53,8 +61,9 @@ def shape_tag(t, by_source, sessions, parties, members, subjects, related, recen
         "first": header["first"].isoformat() if header.get("first") else None,
         "last": header["last"].isoformat() if header.get("last") else None,
         "by_source": by_source, "counts_note": COUNTS_NOTE,
-        "sessions": [{"term": r["term"], "session": r["session"], "n": r["n"], "speeches_tagged": r["n"],
-                      "year": r["first"].year if r["first"] else None} for r in sessions],
+        "sessions": [{"term": r["term"], "session": r["session"], "n": r["n"], "speeches_tagged": r["n"]} for r in sessions],
+        "years": [{"year": y, "n": years.get(y, 0), "tagged": tagged_by_year.get(y, 0)}
+                  for y in sorted(set(years) | {y for y in tagged_by_year if years and min(years) <= y <= max(years)})],
         "parties": [{"party": r["party"], "colour": r.get("colour"), "n": r["n"], "speeches_tagged": r["n"],
                      "per100": round(100 * r["n"] / r["party_total"], 2),
                      "party_total": r["party_total"], "party_speeches_with_tags": r["party_total"]} for r in parties],
@@ -140,9 +149,13 @@ def tag_data(c, tag_id, term=None):
     for src in srcs:
         by_source[src] = by_source.get(src, 0) + 1
     sessions = c.execute(text(base + """
-        SELECT d.loksabha AS term, d.session, count(ts.speech_id) AS n, min(d.debate_date) AS first
+        SELECT d.loksabha AS term, d.session, count(ts.speech_id) AS n
         FROM debates d LEFT JOIN speeches s ON s.debate_id = d.id LEFT JOIN ts ON ts.speech_id = s.id
         GROUP BY 1, 2 ORDER BY 1, 2"""), p).mappings().all()
+    # A session can hold debates with dates far from it, so each speech counts in the year of its own debate.
+    years = dict(c.execute(text(base + """
+        SELECT extract(year FROM d.debate_date)::int, count(*) FROM ts JOIN speeches s ON s.id = ts.speech_id
+        JOIN debates d ON d.id = s.debate_id WHERE d.debate_date IS NOT NULL GROUP BY 1"""), p).all())
     tagged_party = c.execute(text(base + f"""
         SELECT pa.party, count(*) AS n FROM ts JOIN speeches s ON s.id = ts.speech_id JOIN debates d ON d.id = s.debate_id
         {PARTY_AT_DATE} WHERE pa.party IS NOT NULL AND {in_term} GROUP BY 1 ORDER BY n DESC, pa.party LIMIT 10"""), p).all()
@@ -193,7 +206,8 @@ def tag_data(c, tag_id, term=None):
         peaks = {k: peak_year(v) for k, v in peaks.items()}
     recent = add_quotes_and_subjects(c, speech_rows(c, recent_ids), tag_id)
     longest = add_quotes_and_subjects(c, speech_rows(c, long_ids), tag_id)
-    return shape_tag(t, by_source, sessions, parties, members, subjects, related, recent, longest, header, peaks)
+    return shape_tag(t, by_source, sessions, parties, members, subjects, related, recent, longest, header, peaks,
+                     years, year_tagged(c))
 
 
 def tag_page(conn, slug, args):

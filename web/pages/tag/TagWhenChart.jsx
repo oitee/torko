@@ -12,50 +12,50 @@ const TERM_RANGES = {
   18: [2024, 2029],
 };
 
-// TagWhenChart draws the annual distribution of speeches as single bars.
-export default function TagWhenChart({ sessions = [], selectedTerm = "" }) {
+// The rate of each year: speeches with the tag per 1,000 tagged speeches of that year.
+// A year with no tagged speech has no rate.
+export function yearRates(years) {
+  const list = Array.isArray(years) ? years : [];
+  return list
+    .map((y) => {
+      const n = Number(y.n) || 0;
+      const tagged = Number(y.tagged) || 0;
+      return { year: Number(y.year), n, tagged, per1000: tagged > 0 ? (1000 * n) / tagged : null };
+    })
+    .filter((y) => !Number.isNaN(y.year))
+    .sort((a, b) => a.year - b.year);
+}
+
+// The rate with one decimal, for example "4.2".
+export function formatRate(per1000) {
+  return per1000 === null || per1000 === undefined ? "–" : per1000.toFixed(1);
+}
+
+// One sentence for a year, for example "2014: 4.2 in every 1,000 tagged speeches (12 speeches)".
+export function yearReadout(d) {
+  if (d.tagged === 0) return `${d.year}: no tagged speeches`;
+  if (d.n === 0) return `${d.year}: no speech with this tag`;
+  const count = d.n === 1 ? "1 speech" : `${formatNumber(d.n)} speeches`;
+  return `${d.year}: ${formatRate(d.per1000)} in every 1,000 tagged speeches (${count})`;
+}
+
+// TagWhenChart draws one bar for each year. The height is the rate per 1,000 tagged speeches of the year,
+// so a year does not look bigger only because it has more speeches. Each speech counts in the year of its debate.
+export default function TagWhenChart({ years = [], selectedTerm = "" }) {
   const [showTable, setShowTable] = useState(false);
   const [hoverData, setHoverData] = useState(null);
 
-  const safeSessions = Array.isArray(sessions) ? sessions : [];
-  const yearsInSessions = safeSessions
-    .map((s) => Number(s.year))
-    .filter((y) => !Number.isNaN(y) && y > 1900);
-
-  if (yearsInSessions.length === 0) {
+  const data = yearRates(years);
+  if (data.length === 0) {
     return null;
   }
 
-  const minYear = Math.min(...yearsInSessions);
-  const maxYear = Math.max(...yearsInSessions);
-  const totalYears = maxYear - minYear + 1;
-
-  // Build year buckets from minYear through maxYear
-  const yearData = [];
-  for (let y = minYear; y <= maxYear; y++) {
-    const matching = safeSessions.filter((s) => Number(s.year) === y);
-    const n = matching.reduce((sum, s) => sum + (Number(s.n) || 0), 0);
-    const terms = new Set(matching.map((s) => Number(s.term)));
-
-    let inTerm = true;
-    if (selectedTerm && selectedTerm !== "all") {
-      const termNum = Number(selectedTerm);
-      const range = TERM_RANGES[termNum];
-      inTerm =
-        terms.has(termNum) ||
-        (Boolean(range) && y >= range[0] && y <= range[1]);
-    }
-
-    yearData.push({ year: y, n, inTerm });
-  }
-
-  const maxN = Math.max(1, ...yearData.map((d) => d.n));
-
-  const readoutText = hoverData
-    ? `${hoverData.year} · ${formatNumber(hoverData.n)} ${
-        hoverData.n === 1 ? "speech" : "speeches"
-      }`
-    : "Hover a year for the count";
+  const minYear = data[0].year;
+  const maxYear = data[data.length - 1].year;
+  const range = selectedTerm && selectedTerm !== "all" ? TERM_RANGES[Number(selectedTerm)] : null;
+  const yearData = data.map((d) => ({ ...d, inTerm: !range || (d.year >= range[0] && d.year <= range[1]) }));
+  const maxRate = Math.max(0, ...yearData.map((d) => d.per1000 || 0));
+  const grid = { gridTemplateColumns: `repeat(${yearData.length}, minmax(0, 1fr))` };
 
   return (
     <section className="tag-when-chart" aria-labelledby="when-heading">
@@ -63,37 +63,32 @@ export default function TagWhenChart({ sessions = [], selectedTerm = "" }) {
         <h2 id="when-heading" className="tag-when-chart__title">
           When
         </h2>
-        <span className="tag-when-chart__readout mono">{readoutText}</span>
+        <span className="tag-when-chart__readout mono" aria-live="polite">
+          {hoverData ? yearReadout(hoverData) : "Point at a year"}
+        </span>
       </div>
 
       <div className="tag-when-chart__box">
-        {/* Visual Chart */}
         <div
           className={`tag-when-chart__visual ${showTable ? "sr-only" : ""}`}
           aria-hidden={showTable ? "true" : undefined}
         >
-          <div
-            className="tag-when-chart__plot"
-            style={{
-              gridTemplateColumns: `repeat(${totalYears}, minmax(0, 1fr))`,
-            }}
-            onMouseLeave={() => setHoverData(null)}
-          >
-            {yearData.map((d, index) => {
-              const heightPercent = maxN > 0 ? (d.n / maxN) * 100 : 0;
+          <div className="tag-when-chart__plot" style={grid} onMouseLeave={() => setHoverData(null)}>
+            {yearData.map((d) => {
+              const heightPercent = maxRate > 0 ? ((d.per1000 || 0) / maxRate) * 100 : 0;
               const isHovered = hoverData?.year === d.year;
 
               return (
                 <div
                   key={d.year}
-                  className={`tag-when-chart__col ${
-                    !d.inTerm ? "tag-when-chart__col--faded" : ""
-                  } ${isHovered ? "tag-when-chart__col--hovered" : ""}`}
+                  className={`tag-when-chart__col ${!d.inTerm ? "tag-when-chart__col--faded" : ""} ${
+                    isHovered ? "tag-when-chart__col--hovered" : ""
+                  }`}
                   style={{ height: `${heightPercent}%` }}
                   onMouseEnter={() => setHoverData(d)}
                   tabIndex={0}
                   role="img"
-                  aria-label={`${d.year}: ${d.n} speeches`}
+                  aria-label={yearReadout(d)}
                   onFocus={() => setHoverData(d)}
                   onBlur={() => setHoverData(null)}
                   data-testid={`year-col-${d.year}`}
@@ -104,33 +99,24 @@ export default function TagWhenChart({ sessions = [], selectedTerm = "" }) {
             })}
           </div>
 
-          <div
-            className="tag-when-chart__axis mono"
-            style={{
-              gridTemplateColumns: `repeat(${totalYears}, minmax(0, 1fr))`,
-            }}
-          >
+          <div className="tag-when-chart__axis mono" style={grid}>
             <span style={{ gridColumn: 1 }} className="tag-when-chart__axis-min">
               {minYear}
             </span>
-            <span
-              style={{ gridColumn: totalYears }}
-              className="tag-when-chart__axis-max"
-            >
+            <span style={{ gridColumn: yearData.length }} className="tag-when-chart__axis-max">
               {maxYear}
             </span>
           </div>
         </div>
 
-        {/* Accessible Data Table */}
-        <table
-          className={`tag-when-chart__table ${showTable ? "" : "sr-only"}`}
-        >
-          <caption>Speeches per year</caption>
+        <table className={`tag-when-chart__table ${showTable ? "" : "sr-only"}`}>
+          <caption>Speeches with this tag per 1,000 tagged speeches, by year</caption>
           <thead>
             <tr>
               <th scope="col">Year</th>
-              <th scope="col">Speeches</th>
+              <th scope="col">With this tag</th>
+              <th scope="col">Tagged speeches</th>
+              <th scope="col">Per 1,000</th>
             </tr>
           </thead>
           <tbody>
@@ -138,10 +124,17 @@ export default function TagWhenChart({ sessions = [], selectedTerm = "" }) {
               <tr key={d.year}>
                 <td>{d.year}</td>
                 <td>{formatNumber(d.n)}</td>
+                <td>{formatNumber(d.tagged)}</td>
+                <td>{formatRate(d.per1000)}</td>
               </tr>
             ))}
           </tbody>
         </table>
+
+        <p className="tag-when-chart__note">
+          Each bar is one year. Its height is the number of speeches with this tag in every 1,000 tagged speeches of
+          that year. A tagged speech is a speech with at least one tag of any kind.
+        </p>
 
         <div className="tag-when-chart__toggle">
           <Button variant="text" onClick={() => setShowTable((prev) => !prev)}>
