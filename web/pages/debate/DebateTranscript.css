@@ -326,11 +326,6 @@
   position: relative;
 }
 
-.debate-transcript__speech-row--bracket {
-  padding-left: var(--space-4);
-  border-left: 2px solid var(--ink);
-}
-
 .debate-transcript__phone-card-wrap {
   display: none;
 }
@@ -340,6 +335,24 @@
   flex-direction: column;
   gap: var(--space-5);
   min-width: 0;
+  position: relative;
+  align-self: start;
+}
+
+.debate-transcript__speech-row--bracket .debate-transcript__turns-col {
+  padding-left: var(--space-5);
+}
+
+/* Bracket enclosing all turns of a speech */
+.debate-transcript__bracket {
+  position: absolute;
+  left: 0;
+  top: 0.25rem;
+  bottom: 0.25rem;
+  width: 0.625rem;
+  border: 2px solid var(--ink);
+  border-right: 0;
+  pointer-events: none;
 }
 
 /* Card column (sticky on desktop) */
@@ -565,9 +578,12 @@
     gap: var(--space-4);
   }
 
-  .debate-transcript__speech-row--bracket {
-    border-left: 2px solid var(--ink);
-    padding-left: var(--space-3);
+  .debate-transcript__speech-row--bracket .debate-transcript__turns-col {
+    padding-left: var(--space-4);
+  }
+
+  .debate-transcript__bracket {
+    width: 0.5rem;
   }
 
   .debate-transcript__card-col {

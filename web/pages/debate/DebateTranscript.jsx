@@ -584,6 +584,12 @@ export default function DebateTranscript({
 
                 {/* Turns Column */}
                 <div className="debate-transcript__turns-col">
+                  {isSpeech && (
+                    <div
+                      aria-hidden="true"
+                      className="debate-transcript__bracket"
+                    />
+                  )}
                   {block.turns.map((turn) => {
                     const isIntr = turn.role_in_debate === "interruption";
                     const isMuted =
