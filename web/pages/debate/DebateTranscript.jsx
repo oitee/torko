@@ -64,10 +64,16 @@ export default function DebateTranscript({
   useEffect(() => {
     const bar = filterBarRef.current;
     const section = sectionRef.current;
-    if (!bar || !section || typeof ResizeObserver === "undefined") return undefined;
-    const observer = new ResizeObserver(() => {
+    if (!bar || !section) return undefined;
+
+    const updateHeight = () => {
       section.style.setProperty("--filter-bar-height", `${bar.offsetHeight}px`);
-    });
+    };
+
+    updateHeight();
+
+    if (typeof ResizeObserver === "undefined") return undefined;
+    const observer = new ResizeObserver(updateHeight);
     observer.observe(bar);
     return () => observer.disconnect();
   }, []);
