@@ -6,6 +6,7 @@ import Member from "./pages/member.jsx";
 import Speech from "./pages/speech.jsx";
 import Debate from "./pages/debate.jsx";
 import MyMp from "./pages/my_mp.jsx";
+import Party from "./pages/party.jsx";
 import Place from "./pages/place.jsx";
 import Search from "./pages/search.jsx";
 import Method from "./pages/method.jsx";
@@ -24,6 +25,7 @@ export const routes = [
       { path: "/debate/:id", element: <Debate /> },
       { path: "/place/:slug", element: <Place /> },
       { path: "/my-mp", element: <MyMp /> },
+      { path: "/party/:code", element: <Party /> },
       { path: "/search", element: <Search /> },
       { path: "/method", element: <Method /> },
       // The components page exists only in development. The live site has no such address.

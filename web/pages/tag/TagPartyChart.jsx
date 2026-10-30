@@ -13,6 +13,7 @@ export default function TagPartyChart({ parties = [], selectedTerm = "" }) {
     label: p.party,
     n: p.n,
     colour: p.colour,
+    href: p.party ? `/party/${encodeURIComponent(p.party)}` : undefined,
   }));
 
   return (

@@ -18,6 +18,7 @@ describe("router", () => {
     ["/debate/1", "Debate"],
     ["/place/latur", "Place"],
     ["/my-mp", "Find your MP"],
+    ["/party/BJP", "Party"],
     ["/search", "Search the speeches of the Lok Sabha"],
     ["/method", "Torko reads the Lok Sabha debates, finds who spoke each turn, and tags each speech with its subjects."],
     ["/dev/components", "Components"],
