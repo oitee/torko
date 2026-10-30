@@ -19,17 +19,7 @@ describe("SiteHeader", () => {
     expect(searchLink.getAttribute("href")).toBe("/search");
     expect(searchLink.getAttribute("aria-current")).toBeNull();
     expect(screen.getByRole("link", { name: "Method" }).getAttribute("href")).toBe("/method");
-    expect(screen.getByRole("link", { name: "Your MP" }).getAttribute("href")).toBe("/my-mp");
-  });
-
-  it("marks the Your MP link active on /my-mp", () => {
-    render(
-      <MemoryRouter initialEntries={["/my-mp"]}>
-        <SiteHeader theme="system" />
-      </MemoryRouter>
-    );
-
-    expect(screen.getByRole("link", { name: "Your MP" }).getAttribute("aria-current")).toBe("page");
+    expect(screen.queryByRole("link", { name: "Your MP" })).toBeNull();
   });
 
   it("marks the Method link active on /method", () => {

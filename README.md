@@ -246,6 +246,8 @@ Add the `--summary-only` flag to hide the per-turn previews.
 
 - **Questions in plain language.** A user types a question. A small LLM converts it into filters for a known query and shows those filters to the user. The database, not the LLM, produces every result.
 
+- **Your MP from any place.** A reader types a seat, a state, a town, a PIN code or a region such as "central India". Torko lists the MPs who represent it, and what each one speaks about. This needs new data: a table from PIN codes and districts to Lok Sabha seats.
+
 - **Topics over time.** Charts that show how often parliament discussed a topic in each session, and which members led the discussion.
 
 - **Better source data.** Read the text that Torko misses today, find the changes of party in earlier terms that no source records, and record who chaired each sitting.

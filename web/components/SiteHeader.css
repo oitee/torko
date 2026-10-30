@@ -50,14 +50,3 @@
   outline: 2px solid var(--header-action);
   outline-offset: 2px;
 }
-
-/* Four items fit in one line at 375px only with less space around each link. */
-@media (max-width: 480px) {
-  .site-header__nav {
-    gap: 0;
-  }
-
-  .site-header__link {
-    padding: 0 var(--space-2);
-  }
-}
