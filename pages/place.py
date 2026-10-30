@@ -25,7 +25,9 @@ COUNTS_NOTE = (
     "total, sessions[].n, members[].n, related[].n and associated[].n count speeches that carry a kept tag of the place, "
     "each speech once. associated[].all counts all speeches that carry the associated tag. "
     "parties[].per100 is the party's speeches on the place per 100 of all speeches of that party that have any kept item "
-    "(party_total). n_members counts distinct members with at least one such speech."
+    "(party_total). n_members counts distinct members with at least one such speech. "
+    "sessions[].year is the year of the first day of the main sitting block of the session. Debates with a date far from "
+    "the session do not move it."
 )
 
 # The tags of the speeches in :ids only. It is fast for one tag.
@@ -89,8 +91,11 @@ def place_page(conn, slug, args):
     by_session = {(r["term"], r["session"]): r["n"] for r in conn.execute(text("""
         SELECT d.loksabha AS term, d.session, count(*) AS n FROM speeches s JOIN debates d ON d.id = s.debate_id
         WHERE s.id = ANY(:ids) GROUP BY 1, 2"""), p).mappings()}
-    sessions = conn.execute(text("""
-        SELECT loksabha AS term, session, min(debate_date) AS first FROM debates GROUP BY 1, 2 ORDER BY 1, 2""")).mappings().all()
+    # The year of a session is the year of the first day of its main sitting block.
+    # The earliest debate date is wrong for this: some sessions hold debates with dates years before the session.
+    # pages.trends imports this module, so the import is here.
+    from pages.trends import session_coverage
+    sessions = session_coverage(conn)
     span = conn.execute(text("""
         SELECT min(d.debate_date), max(d.debate_date), count(DISTINCT s.debate_id)
         FROM speeches s JOIN debates d ON d.id = s.debate_id WHERE s.id = ANY(:ids)"""), p).one()
@@ -152,7 +157,7 @@ def place_page(conn, slug, args):
             "recent": "by debate date, latest first, then by word count; at most 8",
         },
         "sessions": [{"term": r["term"], "session": r["session"], "n": by_session.get((r["term"], r["session"]), 0),
-                      "year": r["first"].year if r["first"] else None} for r in sessions],
+                      "year": int(r["first"][:4]) if r["first"] else None} for r in sessions],
         "holders": [{"term": r["term"], "id": r["mid"], "name": r["name"], "party": r["party"],
                      "seat": r["seat"], "state": r["state"], "since": str(r["since"]),
                      "first_spoke": spoke.get((r["mid"], r["term"]), (None, None))[0],
