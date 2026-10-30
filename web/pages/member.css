@@ -17,12 +17,6 @@
   gap: var(--space-3);
 }
 
-.member-head__kicker {
-  color: var(--meta);
-  font-size: var(--size-count);
-  font-weight: 500;
-}
-
 .member-head__name {
   margin: 0;
   font-family: var(--font-sans);

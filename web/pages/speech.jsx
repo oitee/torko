@@ -145,7 +145,6 @@ export default function Speech() {
 
   const answerBlock = (
     <div className={`speech-header ${longTitle ? "speech-header--long-title" : ""}`}>
-      <p className="speech-header__kicker">Speech in the debate</p>
       <PageAnswer>{speech.debate || "Speech"}</PageAnswer>
 
       <div className="speech-header__member">

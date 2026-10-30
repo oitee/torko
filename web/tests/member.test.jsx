@@ -194,13 +194,13 @@ describe("Member Page", () => {
   });
 
   describe("Rendering and structure", () => {
-    it("renders member head, kicker, heading, party line, and big numbers", async () => {
+    it("renders member head, heading, party line, and big numbers", async () => {
       renderMemberPage();
 
       const heading = await screen.findByRole("heading", { level: 1, name: "Mahua Moitra" });
       expect(heading).toBeTruthy();
 
-      expect(screen.getByText("Member of the Lok Sabha")).toBeTruthy();
+      expect(screen.queryByText("Member of the Lok Sabha")).toBeNull();
       expect(screen.getByText(/AITC since 2019/)).toBeTruthy();
 
       // Answer sentence

@@ -13,7 +13,7 @@ describe("TagHead component", () => {
     expect(formatSpan(null, null)).toBeNull();
   });
 
-  it("renders kicker, tag name, description, and four summary counts", () => {
+  it("renders tag name, description, and four summary counts", () => {
     const mockTag = {
       name: "Rural employment",
       description: "Speeches on work schemes in villages.",
@@ -26,7 +26,7 @@ describe("TagHead component", () => {
 
     render(<TagHead tag={mockTag} />);
 
-    expect(screen.getByText("Tag")).toBeTruthy();
+    expect(screen.queryByText("Tag")).toBeNull();
     expect(screen.getByRole("heading", { level: 1 }).textContent).toBe("Rural employment");
     expect(screen.getByText("Speeches on work schemes in villages.")).toBeTruthy();
     expect(screen.getByText("2,773")).toBeTruthy();

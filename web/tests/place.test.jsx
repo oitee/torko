@@ -255,8 +255,8 @@ describe("Place page integration", () => {
     expect(screen.getByText("Places")).toBeTruthy();
     expect(screen.getAllByText("Maharashtra").length).toBeGreaterThan(0);
 
-    // Kicker & Description
-    expect(screen.getByText("Seat and district")).toBeTruthy();
+    // Heading & Description
+    expect(screen.getByRole("heading", { level: 1, name: "Latur" })).toBeTruthy();
     expect(
       screen.getByText(
         "District and Lok Sabha constituency in Maharashtra, India."
@@ -334,7 +334,7 @@ describe("Place page integration", () => {
     });
 
     expect(document.title).toBe("West Bengal · Torko");
-    expect(screen.getByText("State")).toBeTruthy();
+    expect(screen.getByRole("heading", { level: 1, name: "West Bengal" })).toBeTruthy();
 
     // Should NOT have "MPs for this seat" section
     expect(

@@ -12,7 +12,7 @@ export function formatSpan(first, last) {
   return y1 || y2 || null;
 }
 
-// TagHead renders the tag title, kicker, description, and four summary counts.
+// TagHead renders the tag title, description, and four summary counts.
 export default function TagHead({ tag }) {
   if (!tag) return null;
 
@@ -36,7 +36,6 @@ export default function TagHead({ tag }) {
   return (
     <div className="tag-head">
       <div className="tag-head__header">
-        <p className="tag-head__kicker">Tag</p>
         <h1 className="tag-head__title">{tag.name}</h1>
         {tag.description && (
           <p className="tag-head__description">{tag.description}</p>

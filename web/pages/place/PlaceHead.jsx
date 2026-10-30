@@ -70,7 +70,7 @@ export function getKindLabel(subtype) {
   }
 }
 
-// PlaceHead renders breadcrumbs, kicker, title, description, aliases, and four big numbers.
+// PlaceHead renders breadcrumbs, title, description, aliases, and four big numbers.
 export default function PlaceHead({ place }) {
   if (!place) return null;
 
@@ -81,7 +81,6 @@ export default function PlaceHead({ place }) {
     { label: place.name },
   ];
 
-  const kindLabel = getKindLabel(place.subtype);
   const span = formatSpan(place.first, place.last);
   const hasAliases = Array.isArray(place.aliases) && place.aliases.length > 0;
   const hasData = (place.total || 0) > 0;
@@ -91,7 +90,6 @@ export default function PlaceHead({ place }) {
       <Breadcrumb items={breadcrumbItems} />
 
       <div className="place-head__header">
-        <span className="place-head__kicker">{kindLabel}</span>
         <h1 className="place-head__title">{place.name}</h1>
         {place.description && (
           <p className="place-head__description">{place.description}</p>

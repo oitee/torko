@@ -94,7 +94,6 @@ export default function MemberHead({ member }) {
 
   return (
     <div className="member-head">
-      <div className="member-head__kicker mono">Member of the Lok Sabha</div>
       <h1 className="member-head__name">{member.name}</h1>
 
       <div className="member-head__line mono">
