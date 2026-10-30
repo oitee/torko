@@ -114,7 +114,7 @@ describe("Home page", () => {
     expect(screen.queryByText(/Start here/i)).toBeNull();
     const hrefs = screen.getAllByRole("link").map((a) => a.getAttribute("href"));
     for (const href of hrefs) {
-      expect(href).toMatch(/^\/(member|place|speech|tag|search|method)/);
+      expect(href).toMatch(/^\/(member|place|speech|tag|my-mp|search|method)/);
     }
   });
 

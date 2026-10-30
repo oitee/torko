@@ -8,10 +8,9 @@ import HomeQuote from "./home/HomeQuote.jsx";
 import HomeTrend from "./home/HomeTrend.jsx";
 import "./home.css";
 
-// TODO before deployment: build the Your MP page and the Data and API page.
-// Then add the parts of this page that need them:
-// the "Start here" list of tasks ("Find your MP", "Download the data").
-// The header shows only the pages that exist, so it gets the same links then.
+// TODO before deployment: build the Data and API page.
+// Then add the "Start here" list of tasks ("Find your MP", "Download the data").
+// The header shows only the pages that exist, so it gets the Data and API link then.
 
 // Load one API answer. A page can retry it.
 function useAnswer(path) {

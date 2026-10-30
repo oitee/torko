@@ -17,6 +17,7 @@ describe("router", () => {
     ["/speech/1", "Speech"],
     ["/debate/1", "Debate"],
     ["/place/latur", "Place"],
+    ["/my-mp", "Find your MP"],
     ["/search", "Search the speeches of the Lok Sabha"],
     ["/method", "Torko reads the Lok Sabha debates, finds who spoke each turn, and tags each speech with its subjects."],
     ["/dev/components", "Components"],
