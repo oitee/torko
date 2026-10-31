@@ -101,7 +101,7 @@ def _party_side(conn, key):
     party = find_party(conn, key)
     if party is None:
         return None
-    p_cnt, p_sp, _, _, _ = party_counts(conn, party)
+    p_cnt, p_sp, _, _, _, _ = party_counts(conn, party)
     return {"info": {"id": party["code"], "name": party["name"]},
             "sp": {t: n for t, n in p_sp.items() if n}, "cnt": p_cnt}
 

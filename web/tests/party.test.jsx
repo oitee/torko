@@ -33,7 +33,7 @@ const cpim = {
   ],
   places: [{ tag: "Kannur", slug: "kannur", type: "place", n: 84, share: 0.0139, base: 0.0015, lift: 9.25 }],
   top3: [{ tag: "Burn Standard Co", slug: "burn-standard-co", members: [{ id: 12, name: "Sunil Khan", n: 6, terms: [14] }] }],
-  rules: { min_party_tagged: 30, min_n_term: 6, min_n_all: 15, min_n_place: 10, general_share: 0.03, top: 8 },
+  rules: { min_party_tagged: 30, min_n_term: 6, min_n_all: 15, min_n_place: 10, min_members: 3, min_members_place: 2, general_share: 0.03, top: 8 },
 };
 
 function renderParty(path = "/party/CPI(M)") {
@@ -77,6 +77,9 @@ describe("party helpers", () => {
     expect(termSentence(cpim.terms[2], "CPI(M)")).toBe("18th Lok Sabha, 2024–: no tagged CPI(M) speeches.");
     expect(subjectSentence(cpim.places[0], "CPI(M)")).toBe(
       "Kannur: 14 in every 1,000 tagged CPI(M) speeches, 1.5 for all parties. 84 speeches."
+    );
+    expect(subjectSentence({ ...cpim.places[0], members: 15 }, "CPI(M)")).toBe(
+      "Kannur: 14 in every 1,000 tagged CPI(M) speeches, 1.5 for all parties. 84 speeches by 15 members."
     );
   });
 
@@ -132,6 +135,17 @@ describe("Party page", () => {
 
     fireEvent.focus(screen.getByTestId("party-share-17"));
     expect(screen.getByText("17th Lok Sabha, 2019–2024: 0.9% of tagged speeches (210 of 22,888). 4 members spoke.")).toBeTruthy();
+  });
+
+  it("states the rule that orders the subjects", async () => {
+    vi.spyOn(api, "getJSON").mockResolvedValueOnce(cpim);
+    renderParty();
+    await screen.findByRole("heading", { level: 1, name: "Communist Party of India (Marxist)" });
+
+    const text = document.body.textContent;
+    expect(text).toContain("The list orders the subjects by the extra speeches above that number.");
+    expect(text).toContain("A subject needs at least 3 members");
+    expect(text).not.toContain("the first rate divided by the second");
   });
 
   it("shows Page not found for an unknown party", async () => {

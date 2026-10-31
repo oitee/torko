@@ -130,7 +130,7 @@ export default function Party() {
             rows={party.places}
             code={pcode}
             hrefBase="/place/"
-            empty={`No place has ${formatNumber(rules.min_n_place)} or more tagged ${pcode} speeches.`}
+            empty={`No place has ${formatNumber(rules.min_n_place)} or more tagged ${pcode} speeches from ${formatNumber(rules.min_members_place)} or more members.`}
           />
 
           {party.top3?.some((t) => t.members.length > 0) && (
@@ -169,9 +169,12 @@ export default function Party() {
             <HowTorkoCounts>
               The party of a speech is the party of the member on the date of the debate. A tagged speech is a speech with
               at least one tag of any kind. For each subject, Torko compares two rates: the speeches with the subject in
-              every 1,000 tagged speeches of the party, and the same rate for all parties. The list orders the subjects
-              by the first rate divided by the second. A subject needs at least {formatNumber(rules.min_n_term)} speeches
-              of the party in one term, or {formatNumber(rules.min_n_all)} in all terms. Torko leaves out subjects that
+              every 1,000 tagged speeches of the party, and the same rate for all parties. From the rate of all parties,
+              Torko finds how many speeches the party would give on the subject. The list orders the subjects by the
+              extra speeches above that number. A subject needs at least {formatNumber(rules.min_members)} members of the
+              party, and {formatNumber(rules.min_n_term)} speeches of the party in one term or{" "}
+              {formatNumber(rules.min_n_all)} in all terms. A place needs {formatNumber(rules.min_members_place)} members.
+              Torko leaves out subjects that
               are in more than {Math.round((rules.general_share || 0) * 100)}% of all tagged speeches, procedure
               subjects, and the names of parties.
             </HowTorkoCounts>

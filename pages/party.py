@@ -18,6 +18,8 @@ MIN_PARTY_TAGGED = 30   # a party-term with fewer tagged speeches shows no typic
 MIN_N_TERM = 6          # least tagged speeches of the party on a subject, in one term
 MIN_N_ALL = 15          # the same, over all terms (subjects and places)
 MIN_N_PLACE = 10        # the same for places
+MIN_MEMBERS = 3         # least members of the party who spoke on a subject, so one member cannot make a subject typical
+MIN_MEMBERS_PLACE = 2   # the same for places. A seat often has one member per term
 GENERAL_SHARE = 0.03    # a subject on more than 3% of all tagged speeches of the term is general
 TOP = 8
 PROCEDURE = "Parliament and Procedure"
@@ -76,10 +78,12 @@ def _party_cte():
 def party_counts(conn, party):
     """Return the party's counts per term, and its members with three or more speeches on a tag.
 
-    The result is (p_cnt, p_sp, p_people, speakers, member_tag). Each of the first four is a dict keyed by term:
+    The result is (p_cnt, p_sp, p_people, speakers, member_tag, tag_members). Each of the first four is a dict keyed by term:
     p_cnt holds a Counter of tag id to tagged speeches of the party, p_sp the number of tagged speeches,
     p_people the number of members with a tagged speech, and speakers the number of members with any speech.
     member_tag maps a tag id to a list of (person id, tagged speeches with the tag, terms), most speeches first.
+    tag_members maps a term to a Counter of tag id to the members of the party who spoke on the tag in that term.
+    The key "all" holds the same count over all terms.
     """
     conn.execute(text("SET LOCAL jit = off"))
     rows = conn.execute(text(f"""
@@ -91,38 +95,55 @@ def party_counts(conn, party):
         UNION ALL SELECT 'sp', term, NULL, count(DISTINCT sp), NULL, NULL FROM pr GROUP BY term
         UNION ALL SELECT 'people', term, NULL, count(DISTINCT pid), NULL, NULL FROM pr GROUP BY term
         UNION ALL SELECT 'speaking', term, NULL, count(DISTINCT person_id), NULL, NULL FROM party_speeches GROUP BY term
+        UNION ALL SELECT 'tagm', term, tag_id, count(DISTINCT pid), NULL, NULL FROM pr GROUP BY term, tag_id
+        UNION ALL SELECT 'tagm_all', NULL, tag_id, count(DISTINCT pid), NULL, NULL FROM pr GROUP BY tag_id
         UNION ALL SELECT 'member', NULL, tag_id, count(*), pid, array_agg(DISTINCT term) FROM pr
                   GROUP BY tag_id, pid HAVING count(*) >= 3"""),
         {"pid": party["id"], "code": party["code"]}).all()
     p_cnt, p_sp, p_people, speakers = defaultdict(Counter), {}, {}, {}
     member_tag = defaultdict(list)
+    tag_members = defaultdict(Counter)
     for k, term, tid, n, pid, terms in rows:
         if k == "tag":
             p_cnt[term][tid] = n
+        elif k == "tagm":
+            tag_members[term][tid] = n
+        elif k == "tagm_all":
+            tag_members["all"][tid] = n
         elif k == "member":
             member_tag[tid].append((pid, n, sorted(terms)))
         else:
             {"sp": p_sp, "people": p_people, "speaking": speakers}[k][term] = n
     for v in member_tag.values():
         v.sort(key=lambda x: (-x[1], x[0]))
-    return p_cnt, p_sp, p_people, speakers, member_tag
+    return p_cnt, p_sp, p_people, speakers, member_tag, tag_members
 
 
-def lift_rows(party_cnt, party_n, all_cnt, all_n, tags, min_n, kinds, skip=frozenset()):
-    """Return the tags of one party, ordered by lift (high first), then by count (high first), then by name.
+def rank_rows(party_cnt, party_n, all_cnt, all_n, tags, min_n, kinds, skip=frozenset(), members=None, min_members=0):
+    """Return the tags that one party raises more than the House, ordered by extra speeches (most first),
+    then by count (high first), then by name.
 
-    lift = (n / party_n) / (all / all_n). n counts the party's tagged speeches with the tag.
-    party_n counts the party's tagged speeches. all and all_n are the same counts over all parties.
+    n counts the party's tagged speeches with the tag. party_n counts the party's tagged speeches.
+    base = all / all_n is the share of the tag over all parties. expected = party_n * base is the number of speeches
+    the party would give at the rate of all parties. extra = n - expected. Only tags with extra > 0 are kept.
+    lift = (n / party_n) / base. Lift alone puts small tags of one member first, and for a big party it has a low
+    ceiling (1 / the party's share of the House), so many tags tie. Extra speeches weigh the size of the gap.
+    members: tag id to the members of the party who spoke on the tag. A tag needs min_members of them.
     """
+    members = members or {}
     out = []
     for tid, n in party_cnt.items():
         t = tags[tid]
-        if n < min_n or tid in skip or t["type"] not in kinds:
+        if n < min_n or tid in skip or t["type"] not in kinds or members.get(tid, 0) < min_members:
             continue
         share, base = n / party_n, all_cnt[tid] / all_n
-        out.append({"tag": t["tag"], "slug": slug(t["tag"]), "type": t["type"], "n": n,
-                    "share": round(share, 4), "base": round(base, 4), "lift": round(share / base, 2)})
-    out.sort(key=lambda r: (-r["lift"], -r["n"], r["tag"]))
+        extra = n - party_n * base
+        if extra <= 0:
+            continue
+        out.append({"tag": t["tag"], "slug": slug(t["tag"]), "type": t["type"], "n": n, "members": members.get(tid, 0),
+                    "share": round(share, 4), "base": round(base, 4), "lift": round(share / base, 2),
+                    "extra": round(extra, 1)})
+    out.sort(key=lambda r: (-r["extra"], -r["n"], r["tag"]))
     return out
 
 
@@ -136,7 +157,7 @@ def party_page(conn, code, args=None):
         return None
     code = party["code"]
     tags, by_term_all, all_n, hidden = corpus(conn)
-    p_cnt, p_sp, p_people, speakers, member_tag = party_counts(conn, party)
+    p_cnt, p_sp, p_people, speakers, member_tag, tag_members = party_counts(conn, party)
 
     terms = []
     for term in sorted(TERMS):
@@ -146,8 +167,8 @@ def party_page(conn, code, args=None):
                "share_of_tagged": round(pn / all_n[term], 4) if all_n.get(term) else None, "typical": []}
         if pn >= MIN_PARTY_TAGGED:
             general = general_tags(by_term_all[term], all_n[term])
-            row["typical"] = lift_rows(p_cnt[term], pn, by_term_all[term], all_n[term], tags,
-                                       MIN_N_TERM, SUBJECT_KINDS, general | hidden)[:TOP]
+            row["typical"] = rank_rows(p_cnt[term], pn, by_term_all[term], all_n[term], tags,
+                                       MIN_N_TERM, SUBJECT_KINDS, general | hidden, tag_members[term], MIN_MEMBERS)[:TOP]
         terms.append(row)
 
     tot_all, tot_party = Counter(), Counter()
@@ -158,9 +179,10 @@ def party_page(conn, code, args=None):
     n_party = sum(p_sp.get(t, 0) for t in all_n)
     typ_all, places = [], []
     if n_party:
-        typ_all = lift_rows(tot_party, n_party, tot_all, n_all, tags, MIN_N_ALL, SUBJECT_KINDS,
-                            general_tags(tot_all, n_all) | hidden)[:TOP]
-        places = lift_rows(tot_party, n_party, tot_all, n_all, tags, MIN_N_PLACE, {"place"})[:TOP]
+        typ_all = rank_rows(tot_party, n_party, tot_all, n_all, tags, MIN_N_ALL, SUBJECT_KINDS,
+                            general_tags(tot_all, n_all) | hidden, tag_members["all"], MIN_MEMBERS)[:TOP]
+        places = rank_rows(tot_party, n_party, tot_all, n_all, tags, MIN_N_PLACE, {"place"},
+                           members=tag_members["all"], min_members=MIN_MEMBERS_PLACE)[:TOP]
 
     # The members of the party who spoke most on its top 3 subjects of all terms.
     name_to_id = {v["tag"]: k for k, v in tags.items()}
@@ -178,7 +200,8 @@ def party_page(conn, code, args=None):
         "code": code, "name": party["name"], "colour": party["colour"], "total_tagged": n_party, "all_tagged": n_all,
         "terms": terms, "typical_all": typ_all, "places": places, "top3": top3,
         "rules": {"min_party_tagged": MIN_PARTY_TAGGED, "min_n_term": MIN_N_TERM, "min_n_all": MIN_N_ALL,
-                  "min_n_place": MIN_N_PLACE, "general_share": GENERAL_SHARE, "top": TOP},
+                  "min_n_place": MIN_N_PLACE, "min_members": MIN_MEMBERS, "min_members_place": MIN_MEMBERS_PLACE,
+                  "general_share": GENERAL_SHARE, "top": TOP},
         "counts_note": (
             "total_tagged counts the tagged speeches of the party over all terms, and all_tagged counts the tagged "
             "speeches of all parties over all terms. In terms[], tagged counts the party's tagged speeches in the term, "
@@ -187,6 +210,9 @@ def party_page(conn, code, args=None):
             "members_tagged counts the members with at least one tagged speech. In typical, typical_all and places, "
             "n counts the party's tagged speeches with the tag, share is n divided by the party's tagged speeches "
             "(of the term, or of all terms), base is the same share over all parties, and lift is share divided by base. "
+            "extra is n minus the speeches the party would give at the rate of all parties (party tagged speeches times base). "
+            "members counts the members of the party who spoke on the tag. The lists keep tags with extra above 0 and "
+            "order them by extra, most first. "
             "In top3, n counts the member's tagged speeches with the tag, all in the party's time. "
             "The party of a speech is the party of the member at the date of the debate."),
     }

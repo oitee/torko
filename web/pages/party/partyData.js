@@ -61,7 +61,8 @@ export function headNumbers(party) {
 // "Malaria: 2.1 in every 1,000 tagged BJP speeches, 0.6 for all parties. 10 speeches."
 export function subjectSentence(row, code) {
   const count = row.n === 1 ? "1 speech" : `${formatNumber(row.n)} speeches`;
+  const by = row.members ? ` by ${row.members === 1 ? "1 member" : `${formatNumber(row.members)} members`}` : "";
   return `${row.tag}: ${perThousand(row.share)} in every 1,000 tagged ${code} speeches, ${perThousand(
     row.base
-  )} for all parties. ${count}.`;
+  )} for all parties. ${count}${by}.`;
 }
