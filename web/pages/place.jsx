@@ -5,7 +5,7 @@ import { useAnswer, useApi } from "../assets/js/useApi.js";
 import PageLayout from "../components/PageLayout.jsx";
 import { ErrorState, Loading } from "../components/States.jsx";
 import PlaceHead from "./place/PlaceHead.jsx";
-import PlaceWhen from "./place/PlaceWhen.jsx";
+import TagWhenChart from "./tag/TagWhenChart.jsx";
 import PlaceHolders from "./place/PlaceHolders.jsx";
 import PlaceMembers from "./place/PlaceMembers.jsx";
 import PlaceParties from "./place/PlaceParties.jsx";
@@ -50,29 +50,6 @@ export default function Place() {
     getJSON("/api/speeches", { ...speechesFilters, facets: 1, per_page: 1 }, { signal })
   );
 
-  // Session selection from When chart
-  const selectedSession = searchParams.get("session") || null;
-  const handleToggleSession = (s) => {
-    const sessionVal = `${s.term}-${s.session}`;
-    const next = new URLSearchParams(searchParams);
-    if (selectedSession === sessionVal) {
-      next.delete("session");
-      next.delete("term");
-    } else {
-      next.set("term", String(s.term));
-      next.set("session", sessionVal);
-    }
-    next.delete("page");
-    setSearchParams(next);
-    // The list is far below the chart, so the page moves to it after a pick.
-    if (selectedSession !== sessionVal) {
-      setTimeout(() => {
-        const el = document.getElementById("speeches");
-        if (el) el.scrollIntoView({ behavior: "smooth" });
-      }, 50);
-    }
-  };
-
   if (loading && !place) {
     return (
       <main className="place-page place-page--loading">
@@ -108,12 +85,7 @@ export default function Place() {
           </p>
         ) : (
           <>
-            <PlaceWhen
-              sessions={place.sessions}
-              totalSpeeches={place.total}
-              selectedSession={selectedSession}
-              onToggleSession={handleToggleSession}
-            />
+            <TagWhenChart years={place.years} />
 
             {place.holders && place.holders.length > 0 && (
               <PlaceHolders holders={place.holders} />

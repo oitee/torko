@@ -1,5 +1,5 @@
 import React from "react";
-import { cleanup, fireEvent, render, screen } from "@testing-library/react";
+import { waitFor, cleanup, fireEvent, render, screen } from "@testing-library/react";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { MemoryRouter, Route, Routes } from "react-router-dom";
 import Party from "../pages/party.jsx";
@@ -100,7 +100,7 @@ describe("Party page", () => {
 
     expect(await screen.findByRole("heading", { level: 1, name: "Communist Party of India (Marxist)" })).toBeTruthy();
     expect(api.getJSON).toHaveBeenCalledWith("/api/party/CPI(M)", undefined, { signal: expect.any(AbortSignal) });
-    expect(document.title).toBe("Communist Party of India (Marxist) · Torko");
+    await waitFor(() => expect(document.title).toBe("Communist Party of India (Marxist) · Torko"));
     expect(screen.getByRole("heading", { name: "Share of the House, by term" })).toBeTruthy();
     expect(screen.getByRole("heading", { name: "Subjects the party raises more than the House" })).toBeTruthy();
     expect(screen.getByRole("heading", { name: "Places the party raises more than the House" })).toBeTruthy();

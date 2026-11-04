@@ -8,9 +8,8 @@ import re
 from sqlalchemy import text
 
 from pages.common import (PARTY_AT_DATE, SPEECH_TAGS_CTE, corpus_party_totals, party_colours, resolve_slug, resolve_tag, slug, tag_speeches,
-                          speech_rows, speech_tags_cte)
+                          speech_rows, speech_tags_cte, year_rows, year_tagged)
 from pages.quotes import clean, good, good_hi, score, sentences
-from pages.trends import year_tagged
 
 COUNTS_NOTE = (
     "total and by_source count speeches that carry this tag (each speech once). "
@@ -62,8 +61,7 @@ def shape_tag(t, by_source, sessions, parties, members, subjects, related, recen
         "last": header["last"].isoformat() if header.get("last") else None,
         "by_source": by_source, "counts_note": COUNTS_NOTE,
         "sessions": [{"term": r["term"], "session": r["session"], "n": r["n"], "speeches_tagged": r["n"]} for r in sessions],
-        "years": [{"year": y, "n": years.get(y, 0), "tagged": tagged_by_year.get(y, 0)}
-                  for y in sorted(set(years) | {y for y in tagged_by_year if years and min(years) <= y <= max(years)})],
+        "years": year_rows(years, tagged_by_year),
         "parties": [{"party": r["party"], "colour": r.get("colour"), "n": r["n"], "speeches_tagged": r["n"],
                      "per100": round(100 * r["n"] / r["party_total"], 2),
                      "party_total": r["party_total"], "party_speeches_with_tags": r["party_total"]} for r in parties],

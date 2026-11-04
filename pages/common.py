@@ -281,3 +281,20 @@ ORDER BY speech_id, CASE source WHEN 'llm' THEN 0 WHEN 'dictionary' THEN 1 ELSE 
 def tag_speeches(conn, tag_id):
     """(speech_id, best source) for each speech of the tag, sorted by speech_id."""
     return [(r[0], r[1]) for r in conn.execute(text(TAG_SPEECHES_SQL), {"id": tag_id})]
+
+
+def year_tagged(conn):
+    """Per calendar year of the debate date: the speeches with at least one kept item of any tag."""
+    return cached("year_tagged", lambda: {int(y): n for y, n in conn.execute(text("""
+        SELECT extract(year FROM d.debate_date), count(*) FROM debates d JOIN speeches s ON s.debate_id = d.id
+        WHERE d.debate_date IS NOT NULL AND EXISTS (SELECT 1 FROM speech_items si WHERE si.speech_id = s.id AND si.kept)
+        GROUP BY 1"""))})
+
+
+def year_rows(years, tagged_by_year):
+    """The rows of a chart by year: each year from the first to the last year in years that has tagged speeches.
+
+    A speech counts in the year of its own debate. years is {year: speeches}. tagged_by_year is {year: speeches with any kept tag}.
+    """
+    return [{"year": y, "n": years.get(y, 0), "tagged": tagged_by_year.get(y, 0)}
+            for y in sorted(set(years) | {y for y in tagged_by_year if years and min(years) <= y <= max(years)})]

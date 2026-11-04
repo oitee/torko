@@ -216,7 +216,7 @@ describe("Member Page", () => {
       expect(screen.getByText("latest")).toBeTruthy();
 
       // Document title
-      expect(document.title).toBe("Mahua Moitra · Torko");
+      await waitFor(() => expect(document.title).toBe("Mahua Moitra · Torko"));
     });
 
     it("renders breadcrumb linking seat to /place/<seat_slug>", async () => {
@@ -345,7 +345,7 @@ describe("Member Page", () => {
         expect(screen.getByText("Page not found")).toBeTruthy();
       });
 
-      expect(document.title).toBe("Page not found · Torko");
+      await waitFor(() => expect(document.title).toBe("Page not found · Torko"));
     });
   });
 });

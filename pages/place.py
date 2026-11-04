@@ -8,7 +8,7 @@ import re
 
 from sqlalchemy import text
 
-from pages.common import slug as to_slug
+from pages.common import slug as to_slug, year_rows, year_tagged
 from pages.common import (PARTY_AT_DATE, SPEECH_TAGS_CTE, cached, corpus_party_totals, resolve_tag, speech_rows,
                           speech_tags_cte, tag_speeches)
 
@@ -22,12 +22,12 @@ MIN_MEMBER_SPEECHES = 3
 PARTY_WORDS = re.compile(r"\b(party|congress|kazhagam|morcha|sena|dal|league)\b", re.I)
 
 COUNTS_NOTE = (
-    "total, sessions[].n, members[].n, related[].n and associated[].n count speeches that carry a kept tag of the place, "
+    "total, years[].n, members[].n, related[].n and associated[].n count speeches that carry a kept tag of the place, "
     "each speech once. associated[].all counts all speeches that carry the associated tag. "
     "parties[].per100 is the party's speeches on the place per 100 of all speeches of that party that have any kept item "
     "(party_total). n_members counts distinct members with at least one such speech. "
-    "sessions[].year is the year of the first day of the main sitting block of the session. Debates with a date far from "
-    "the session do not move it."
+    "years[].n counts the speeches of the year, by the date of the debate of each speech. years[].tagged is the denominator: "
+    "the speeches of the year that have at least one kept item of any tag."
 )
 
 # The tags of the speeches in :ids only. It is fast for one tag.
@@ -88,14 +88,10 @@ def place_page(conn, slug, args):
     p = {"ids": ids, "id": t["id"]}
     total = len(ids)
     
-    by_session = {(r["term"], r["session"]): r["n"] for r in conn.execute(text("""
-        SELECT d.loksabha AS term, d.session, count(*) AS n FROM speeches s JOIN debates d ON d.id = s.debate_id
-        WHERE s.id = ANY(:ids) GROUP BY 1, 2"""), p).mappings()}
-    # The year of a session is the year of the first day of its main sitting block.
-    # The earliest debate date is wrong for this: some sessions hold debates with dates years before the session.
-    # pages.trends imports this module, so the import is here.
-    from pages.trends import session_coverage
-    sessions = session_coverage(conn)
+    # Each speech counts in the year of its own debate. The session number of the source is wrong for some debates.
+    years = dict(conn.execute(text("""
+        SELECT extract(year FROM d.debate_date)::int, count(*) FROM speeches s JOIN debates d ON d.id = s.debate_id
+        WHERE s.id = ANY(:ids) AND d.debate_date IS NOT NULL GROUP BY 1"""), p).all())
     span = conn.execute(text("""
         SELECT min(d.debate_date), max(d.debate_date), count(DISTINCT s.debate_id)
         FROM speeches s JOIN debates d ON d.id = s.debate_id WHERE s.id = ANY(:ids)"""), p).one()
@@ -148,7 +144,7 @@ def place_page(conn, slug, args):
         "debates": span[2], "n_members": n_members,
         "counts_note": COUNTS_NOTE,
         "order_notes": {
-            "sessions": "by Lok Sabha term, then session",
+            "years": "by calendar year",
             "holders": "by term, then start date of the seat record",
             "associated": f"by lift, highest first, then by speeches; only tags with at least {MIN_PLACE} speeches of the place and {MIN_ALL} in all, in at most {GENERAL_SHARE:.0%} of tagged speeches",
             "parties": "by speeches of the place, most first; at most 10",
@@ -156,8 +152,7 @@ def place_page(conn, slug, args):
             "related": "by speeches shared with the place, most first; place and role tags are left out; at most 14",
             "recent": "by debate date, latest first, then by word count; at most 8",
         },
-        "sessions": [{"term": r["term"], "session": r["session"], "n": by_session.get((r["term"], r["session"]), 0),
-                      "year": int(r["first"][:4]) if r["first"] else None} for r in sessions],
+        "years": year_rows(years, year_tagged(conn)),
         "holders": [{"term": r["term"], "id": r["mid"], "name": r["name"], "party": r["party"],
                      "seat": r["seat"], "state": r["state"], "since": str(r["since"]),
                      "first_spoke": spoke.get((r["mid"], r["term"]), (None, None))[0],

@@ -1,7 +1,7 @@
 import React from "react";
 import { Link } from "react-router-dom";
 import { formatMonthYear } from "./PlaceHead.jsx";
-import { termOrdinal } from "./PlaceWhen.jsx";
+import { ordinal } from "../../assets/js/format.js";
 
 const TERM_YEARS = {
   13: "1999–2004",
@@ -45,7 +45,7 @@ export default function PlaceHolders({ holders = [] }) {
       <div className="place-holders__list">
         {terms.map((term) => {
           const items = termMap.get(term) || [];
-          const termLabel = termOrdinal(term);
+          const termLabel = ordinal(term);
           const years = TERM_YEARS[term] || "";
 
           return (

@@ -124,7 +124,7 @@ describe("Tag page integration", () => {
       expect(screen.getByText("Page not found")).toBeTruthy();
     });
 
-    expect(document.title).toBe("Page not found · Torko");
+    await waitFor(() => expect(document.title).toBe("Page not found · Torko"));
   });
 
   it("handles network error with retry button", async () => {

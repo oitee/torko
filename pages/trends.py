@@ -8,7 +8,7 @@ A session with fewer than MIN_TAGGED tagged speeches is marked thin. Its rate is
 from sqlalchemy import text
 
 from pages.common import slug as to_slug
-from pages.common import cached, resolve_tag
+from pages.common import cached, resolve_tag, year_tagged
 from pages.place import speech_ids_for_tag
 
 MIN_TAGGED = 300
@@ -30,7 +30,7 @@ COUNTS_NOTE = (
 def core_range(days):
     """The dates of the main sitting block of a session.
 
-    Some debates carry a date far from their session (for example answers filed late).
+    The source files some debates under the wrong session number. Their dates are right, so they fall far from the session.
     So the range is the biggest block of days with no gap above 35 days,
     with 2% of the debates trimmed from each end. Input: sorted (day, debates) pairs.
     Returns first, last, and the number of debates outside the block.
@@ -78,14 +78,6 @@ def session_coverage(conn):
                         "speeches": sp, "tagged": tg})
         return out
     return cached("session_coverage", load)
-
-
-def year_tagged(conn):
-    """Per calendar year of the debate date: the speeches with at least one kept item of any tag."""
-    return cached("year_tagged", lambda: {int(y): n for y, n in conn.execute(text("""
-        SELECT extract(year FROM d.debate_date), count(*) FROM debates d JOIN speeches s ON s.debate_id = d.id
-        WHERE d.debate_date IS NOT NULL AND EXISTS (SELECT 1 FROM speech_items si WHERE si.speech_id = s.id AND si.kept)
-        GROUP BY 1"""))})
 
 
 def rate_per_1000(n, tagged):

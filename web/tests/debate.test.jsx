@@ -221,7 +221,7 @@ describe("Debate page", () => {
       expect(screen.getByText("Page not found")).toBeTruthy();
     });
 
-    expect(document.title).toBe("Page not found · Torko");
+    await waitFor(() => expect(document.title).toBe("Page not found · Torko"));
   });
 
   it("handles debates with 0 speeches gracefully", async () => {

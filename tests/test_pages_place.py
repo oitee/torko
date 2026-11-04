@@ -21,10 +21,9 @@ def test_state_place(page_conn):
     d = place_page(page_conn, "kerala", {})
     assert d["name"] == "Kerala" and d["subtype"] == "state"
     assert d["total"] > 1000 and d["holders"] == []
-    assert d["sessions"] and sum(s["n"] for s in d["sessions"]) == d["total"]
-    # 16th LS, session 12 holds debates with dates years before it. Its year is still 2017.
-    year = {(s["term"], s["session"]): s["year"] for s in d["sessions"]}
-    assert year[(16, 12)] == 2017 and year[(15, 15)] == 2014
+    assert d["years"] and sum(y["n"] for y in d["years"]) == d["total"]
+    assert all(y["tagged"] >= y["n"] for y in d["years"])
+    assert "sessions" not in d
     assert all(p["per100"] <= 100 for p in d["parties"])
     assert [m["n"] for m in d["members"]] == sorted((m["n"] for m in d["members"]), reverse=True)
     assert len(d["recent"]) == 8 and "counts_note" in d

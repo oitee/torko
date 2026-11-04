@@ -146,7 +146,7 @@ describe("Speech Page", () => {
     await waitFor(() => {
       expect(screen.getByText("Page not found")).toBeTruthy();
     });
-    expect(document.title).toBe("Page not found · Torko");
+    await waitFor(() => expect(document.title).toBe("Page not found · Torko"));
   });
 
   it("renders error state with retry on 500 error", async () => {
@@ -191,7 +191,7 @@ describe("Speech Page", () => {
     });
 
     // Check tab title
-    expect(document.title).toBe("Mahua Moitra · 17 Dec 2025 · Torko");
+    await waitFor(() => expect(document.title).toBe("Mahua Moitra · 17 Dec 2025 · Torko"));
 
     // Check breadcrumb
     expect(screen.getByRole("navigation", { name: "Breadcrumb" })).toBeTruthy();
@@ -247,7 +247,7 @@ describe("Speech Page", () => {
       ).toBeTruthy();
     });
 
-    expect(document.title).toBe("Speech · 17 Dec 2025 · Torko");
+    await waitFor(() => expect(document.title).toBe("Speech · 17 Dec 2025 · Torko"));
     expect(screen.queryByText("TLDR")).toBeNull();
   });
 

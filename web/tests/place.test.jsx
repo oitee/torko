@@ -9,7 +9,6 @@ import {
   getKindLabel,
   getStateFromDescription,
 } from "../pages/place/PlaceHead.jsx";
-import { termOrdinal } from "../pages/place/PlaceWhen.jsx";
 import * as api from "../assets/js/api.js";
 
 afterEach(cleanup);
@@ -26,10 +25,10 @@ const mockLaturData = {
   n_members: 28,
   first: "1999-12-13",
   last: "2026-01-29",
-  sessions: [
-    { term: 13, session: 2, year: 1999, n: 1 },
-    { term: 17, session: 1, year: 2019, n: 10 },
-    { term: 18, session: 1, year: 2024, n: 5 },
+  years: [
+    { year: 1999, n: 1, tagged: 100 },
+    { year: 2019, n: 10, tagged: 200 },
+    { year: 2024, n: 5, tagged: 300 },
   ],
   holders: [
     {
@@ -115,9 +114,7 @@ const mockWestBengalData = {
   n_members: 490,
   first: "1999-10-26",
   last: "2026-04-17",
-  sessions: [
-    { term: 13, session: 1, year: 1999, n: 10 },
-  ],
+  years: [{ year: 1999, n: 10, tagged: 100 }],
   holders: [],
   members: [
     {
@@ -150,7 +147,7 @@ const mockEmptyPlaceData = {
   n_members: 0,
   first: null,
   last: null,
-  sessions: [],
+  years: [],
   holders: [],
   members: [],
   parties: [],
@@ -214,13 +211,6 @@ describe("Place page helper functions", () => {
     expect(getKindLabel("district")).toBe("District");
     expect(getKindLabel("constituency")).toBe("Seat");
   });
-
-  it("formats term numbers into ordinals", () => {
-    expect(termOrdinal(13)).toBe("13th");
-    expect(termOrdinal(1)).toBe("1st");
-    expect(termOrdinal(2)).toBe("2nd");
-    expect(termOrdinal(3)).toBe("3rd");
-  });
 });
 
 describe("Place page integration", () => {
@@ -249,7 +239,7 @@ describe("Place page integration", () => {
     });
 
     // Check document tab title
-    expect(document.title).toBe("Latur · Torko");
+    await waitFor(() => expect(document.title).toBe("Latur · Torko"));
 
     // Breadcrumb
     expect(screen.getByText("Places")).toBeTruthy();
@@ -333,7 +323,7 @@ describe("Place page integration", () => {
       );
     });
 
-    expect(document.title).toBe("West Bengal · Torko");
+    await waitFor(() => expect(document.title).toBe("West Bengal · Torko"));
     expect(screen.getByRole("heading", { level: 1, name: "West Bengal" })).toBeTruthy();
 
     // Should NOT have "MPs for this seat" section
@@ -354,7 +344,7 @@ describe("Place page integration", () => {
       expect(screen.getByRole("alert").textContent).toContain("Page not found");
     });
 
-    expect(document.title).toBe("Page not found · Torko");
+    await waitFor(() => expect(document.title).toBe("Page not found · Torko"));
   });
 
   it("handles network error with retry button", async () => {
