@@ -24,7 +24,7 @@ export default function HomeMember({ member }) {
     <section className="home-feature" aria-labelledby="home-member-title">
       <div className="home-feature__text">
         <h3 id="home-member-title" className="home-feature__title">
-          Read every speech by one member.
+          Read every speech by one member
         </h3>
         <p className="home-feature__body">
           The record prints the name of a member in many forms. Torko matches each printed name to one member. A

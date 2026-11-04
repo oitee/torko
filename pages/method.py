@@ -20,8 +20,8 @@ EXAMPLE_LABELS = 10
 # The share of the source text that the readers do not read. It comes from a measurement of the stored
 # debate pages: text outside the paragraph tags is lost. No query computes it.
 UNREAD_TEXT = {
-    "value": 0.136, "text": "about 13.6%", "counts": "of the source text",
-    "first_term": {"term": 13, "text": "32.5%"}, "recent_terms": "about 3%",
+    "value": 0.136, "text": "13.6%", "is_estimate": True, "counts": "of the source text",
+    "first_term": {"term": 13, "text": "32.5%"}, "recent_terms": {"text": "3%", "is_estimate": True},
     "source": "Measurement of the stored debate pages. The figure is fixed text. No query computes it.",
 }
 

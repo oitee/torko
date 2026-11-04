@@ -2,11 +2,6 @@ import React from "react";
 import { countOf, ordinal } from "../../assets/js/format.js";
 import "./MethodLimits.css";
 
-// The first letter in capitals, for a figure that starts a sentence (e.g. "about 0.24%").
-function capital(s) {
-  return s ? s.charAt(0).toUpperCase() + s.slice(1) : s;
-}
-
 // MethodLimits lists what Torko gets wrong or leaves out. Each figure comes from /api/method.
 // A missing figure hides its line.
 export default function MethodLimits({ data }) {
@@ -22,7 +17,7 @@ export default function MethodLimits({ data }) {
       <ul className="method-limits__list">
         {err?.text && (
           <li>
-            <span className="method-limits__num">{capital(err.text)}</span> of named turns have the wrong member name.
+            <span className="method-limits__num">{err.is_estimate ? `About ${err.text}` : err.text}</span> of named turns have the wrong member name.
           </li>
         )}
         {turns?.no_name != null && turns?.total != null && (
@@ -33,7 +28,7 @@ export default function MethodLimits({ data }) {
         )}
         {unread?.text && (
           <li>
-            Torko does not read <span className="method-limits__num">{unread.text}</span> {unread.counts}.
+            Torko does not read <span className="method-limits__num">{unread.is_estimate ? `about ${unread.text}` : unread.text}</span> {unread.counts}.
             {unread.first_term && (
               <>
                 {" "}
@@ -42,7 +37,9 @@ export default function MethodLimits({ data }) {
                 {unread.recent_terms && (
                   <>
                     {" "}
-                    and <span className="method-limits__num">{unread.recent_terms}</span> in recent terms
+                    and <span className="method-limits__num">
+                      {unread.recent_terms.is_estimate ? `about ${unread.recent_terms.text}` : unread.recent_terms.text}
+                    </span> in recent terms
                   </>
                 )}
                 . So the charts show too little activity in the early years.

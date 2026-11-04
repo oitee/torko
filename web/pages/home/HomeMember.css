@@ -50,7 +50,7 @@
 .home-member__name {
   font-size: var(--size-heading);
   line-height: var(--lh-heading);
-  font-weight: 600;
+  font-weight: 500;
   color: var(--ink);
 }
 

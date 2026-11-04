@@ -25,15 +25,14 @@
 .home-trend__title {
   font-size: var(--size-label);
   line-height: var(--lh-label);
-  font-weight: 600;
+  font-weight: 500;
   color: var(--ink);
 }
 
 .home-trend__readout {
-  font-family: var(--font-mono);
   font-size: var(--size-count);
   line-height: var(--lh-count);
-  color: var(--ink-2);
+  color: var(--meta);
 }
 
 .home-trend__visual {
@@ -50,10 +49,15 @@
   border-bottom: 1px solid var(--ink);
 }
 
-/* Ink-2 bars pass 3:1 on the sheet. No bar is green: green is only for actions. */
+/* Control bars pass 3:1 on the sheet. The highest year is ink, so the eye finds the peak first.
+   No bar is green: green is only for actions. */
 .home-trend__col {
-  background: var(--ink-2);
+  background: var(--control);
   min-height: 0;
+}
+
+.home-trend__col--peak {
+  background: var(--ink);
 }
 
 .home-trend__col--active {
@@ -87,7 +91,7 @@
 .home-trend__table caption {
   text-align: left;
   font-family: var(--font-sans);
-  font-weight: 600;
+  font-weight: 500;
   margin-bottom: var(--space-2);
 }
 

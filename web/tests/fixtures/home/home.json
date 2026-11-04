@@ -2656,7 +2656,8 @@
     "error_rate": {
       "counts": "named turns with the wrong member name",
       "source": "Manual review of a sample of named turns. The figure is fixed text. No query computes it.",
-      "text": "about 0.24%",
+      "text": "0.24%",
+      "is_estimate": true,
       "value": 0.0024
     },
     "first": "1999-10-20",

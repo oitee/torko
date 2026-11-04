@@ -43,7 +43,7 @@
 }
 
 .home-hero__date {
-  font-family: var(--font-mono);
+  white-space: nowrap;
 }
 
 .home-hero__search {

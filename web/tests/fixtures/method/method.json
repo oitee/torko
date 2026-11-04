@@ -4,7 +4,8 @@
     "error_rate": {
       "counts": "named turns with the wrong member name",
       "source": "Manual review of a sample of named turns. The figure is fixed text. No query computes it.",
-      "text": "about 0.24%",
+      "text": "0.24%",
+      "is_estimate": true,
       "value": 0.0024
     },
     "first": "1999-10-20",
@@ -252,9 +253,10 @@
       "term": 13,
       "text": "32.5%"
     },
-    "recent_terms": "about 3%",
+    "recent_terms": { "text": "3%", "is_estimate": true },
     "source": "Measurement of the stored debate pages. The figure is fixed text. No query computes it.",
-    "text": "about 13.6%",
+    "text": "13.6%",
+      "is_estimate": true,
     "value": 0.136
   }
 }

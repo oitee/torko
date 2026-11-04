@@ -8,7 +8,7 @@ def test_routes():
 
 def test_unread_text_is_fixed_text_with_a_source():
     u = method.UNREAD_TEXT
-    assert u["text"] == "about 13.6%" and u["first_term"] == {"term": 13, "text": "32.5%"}
+    assert u["text"] == "13.6%" and u["is_estimate"] is True and u["first_term"] == {"term": 13, "text": "32.5%"}
     assert "No query computes it" in u["source"]
 
 

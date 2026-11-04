@@ -30,6 +30,7 @@ export default function HomeTrend({ trend }) {
   if (data.length === 0) return null;
 
   const maxRate = Math.max(...data.map((d) => d.rate)) || 1;
+  const peak = data.find((d) => d.rate === maxRate);
   const first = data[0].year;
   const last = data[data.length - 1].year;
   const readout = active
@@ -40,7 +41,7 @@ export default function HomeTrend({ trend }) {
     <section className="home-feature" aria-labelledby="home-trend-title">
       <div className="home-feature__text">
         <h3 id="home-trend-title" className="home-feature__title">
-          See when a subject rose and fell.
+          See when a subject rose and fell
         </h3>
         <p className="home-feature__body">
           Each bar is one year. It shows the share of the tagged speeches of that year that carry the tag{" "}
@@ -70,7 +71,9 @@ export default function HomeTrend({ trend }) {
             {data.map((d) => (
               <div
                 key={d.year}
-                className={`home-trend__col${active?.year === d.year ? " home-trend__col--active" : ""}`}
+                className={`home-trend__col${d === peak ? " home-trend__col--peak" : ""}${
+                  active?.year === d.year ? " home-trend__col--active" : ""
+                }`}
                 style={{ height: `${(d.rate / maxRate) * 100}%` }}
                 tabIndex={0}
                 role="img"

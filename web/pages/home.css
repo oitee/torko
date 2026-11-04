@@ -11,7 +11,7 @@
   margin: 0;
   font-size: var(--size-title);
   line-height: var(--lh-title);
-  font-weight: 600;
+  font-weight: 500;
   color: var(--ink);
   margin-bottom: calc(-1 * clamp(16px, 3vw, 40px));
 }
@@ -22,7 +22,7 @@
   grid-template-columns: repeat(auto-fit, minmax(min(100%, 420px), 1fr));
   gap: clamp(24px, 4vw, 56px);
   align-items: start;
-  border-top: 1px solid var(--ink);
+  border-top: 1px solid var(--hairline);
   padding-top: var(--space-6);
 }
 
@@ -44,7 +44,7 @@
   margin: 0;
   font-size: var(--size-heading);
   line-height: var(--lh-heading);
-  font-weight: 600;
+  font-weight: 500;
   color: var(--ink);
 }
 

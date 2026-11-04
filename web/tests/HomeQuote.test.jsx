@@ -48,7 +48,7 @@ describe("HomeQuote", () => {
     renderQuote(quote);
     expect(screen.getByText(`“${quote.text}”`)).toBeTruthy();
     expect(screen.getByRole("link", { name: "Mahua Moitra" }).getAttribute("href")).toBe("/member/1052");
-    expect(screen.getByText("2025-12-17")).toBeTruthy();
+    expect(screen.getByText("17 Dec 2025")).toBeTruthy();
   });
 
   it("shows the chosen tags as links, with the count of all tags of the speech", () => {

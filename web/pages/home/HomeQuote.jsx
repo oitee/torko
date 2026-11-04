@@ -2,7 +2,7 @@ import React from "react";
 import { Link } from "react-router-dom";
 import Button from "../../components/Button.jsx";
 import Chip from "../../components/Chip.jsx";
-import { countOf, formatDateISO } from "../../assets/js/format.js";
+import { countOf, formatDateLong } from "../../assets/js/format.js";
 import "./HomeQuote.css";
 
 // The most chips that the quote shows.
@@ -40,7 +40,7 @@ export default function HomeQuote({ quote }) {
     <section className="home-feature" aria-labelledby="home-quote-title">
       <div className="home-feature__text">
         <h3 id="home-quote-title" className="home-feature__title">
-          Find speeches by subject.
+          Find speeches by subject
         </h3>
         <p className="home-feature__body">
           Torko gives each speech the tags of its subjects. A tag finds a speech also when the speech does not use
@@ -60,7 +60,7 @@ export default function HomeQuote({ quote }) {
             {quote.member}
           </Link>
           <span className="home-quote__meta">
-            <span className="home-quote__date">{formatDateISO(quote.date)}</span>
+            <span className="home-quote__date">{formatDateLong(quote.date)}</span>
             {quote.debate && <> · {quote.debate}</>}
           </span>
         </figcaption>

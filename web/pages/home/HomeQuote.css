@@ -28,7 +28,7 @@
 .home-quote__member {
   font-size: var(--size-label);
   line-height: var(--lh-label);
-  font-weight: 600;
+  font-weight: 500;
   color: var(--ink);
 }
 

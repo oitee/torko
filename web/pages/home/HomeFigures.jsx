@@ -41,7 +41,7 @@ export default function HomeFigures({ corpus }) {
     err?.text && {
       key: "error",
       value: err.text,
-      label: err.counts ? `of ${err.counts}` : "",
+      label: `of ${err.counts}${err.is_estimate ? ", an estimate" : ""}`,
     },
   ].filter(Boolean);
 

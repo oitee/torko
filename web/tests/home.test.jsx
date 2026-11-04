@@ -38,7 +38,7 @@ describe("Home page", () => {
   it("shows the headline and the search box before any answer arrives", () => {
     vi.spyOn(api, "getJSON").mockReturnValue(new Promise(() => {}));
     renderHome();
-    expect(screen.getByRole("heading", { level: 1, name: "Search what members said in the Lok Sabha." })).toBeTruthy();
+    expect(screen.getByRole("heading", { level: 1, name: "Search what members said in the Lok Sabha" })).toBeTruthy();
     expect(screen.getByRole("search")).toBeTruthy();
     expect(screen.getAllByRole("status").length).toBeGreaterThan(0);
   });
@@ -58,7 +58,7 @@ describe("Home page", () => {
     expect(await screen.findByText("64,921")).toBeTruthy();
     expect(screen.getByText("2,062")).toBeTruthy();
     expect(screen.getByText("7,027")).toBeTruthy();
-    expect(screen.getByText("about 0.24%")).toBeTruthy();
+    expect(screen.getByText("0.24%")).toBeTruthy();
     expect(screen.getByText(/in 6 terms \(13th–18th Lok Sabha\)/)).toBeTruthy();
     expect(screen.queryByText(/No query computes it/)).toBeNull();
     expect(screen.getByText("20 Oct 1999")).toBeTruthy();
@@ -132,5 +132,15 @@ describe("Home page", () => {
     const text = container.textContent;
     expect(text).not.toMatch(/\b(AI|LLM|entity|item)\b/);
     expect(text).not.toMatch(/[;—]/);
+  });
+});
+
+describe("ideaLabel", () => {
+  it("shows the short form of a long name that ends in brackets", async () => {
+    const { ideaLabel } = await import("../pages/home/HomeHero.jsx");
+    expect(ideaLabel("Mahatma Gandhi National Rural Employment Guarantee Act (MNREGA)")).toBe("MNREGA");
+    expect(ideaLabel("Minimum Support Prices (MSP)")).toBe("MSP");
+    expect(ideaLabel("Gaya")).toBe("Gaya");
+    expect(ideaLabel("Delhi (NCT)")).toBe("Delhi (NCT)");
   });
 });

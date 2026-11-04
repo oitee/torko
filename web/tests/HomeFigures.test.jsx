@@ -30,8 +30,8 @@ describe("HomeFigures", () => {
     );
     expect(screen.getByTestId("figure-tags").textContent).toContain("7,027");
     const err = screen.getByTestId("figure-error").textContent;
-    expect(err).toContain("about 0.24%");
-    expect(err).toContain("of named turns with the wrong member name");
+    expect(err).toContain("0.24%");
+    expect(err).toContain("of named turns with the wrong member name, an estimate");
     // The source of the error rate is not shown on the page.
     expect(err).not.toContain(homeAnswer.corpus.error_rate.source);
     expect(err).not.toContain("Source");

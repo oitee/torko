@@ -26,12 +26,13 @@ COUNTS_NOTE = (
     "corpus.first and corpus.last are the earliest and the latest debate date. "
     "corpus.members counts the members with at least one speech that names them. "
     "corpus.tags counts the tags with a status other than rejected and merged. "
-    "corpus.error_rate is fixed text from a manual review of a sample of named turns. No query computes it."
+    "corpus.error_rate is fixed text from a manual review of a sample of named turns. No query computes it. "
+    "corpus.error_rate.is_estimate is true because the figure comes from a sample."
 )
 
 # The share of named turns with a wrong name. It comes from a manual review, so the API does not compute it.
 ERROR_RATE = {
-    "value": 0.0024, "text": "about 0.24%", "counts": "named turns with the wrong member name",
+    "value": 0.0024, "text": "0.24%", "is_estimate": True, "counts": "named turns with the wrong member name",
     "source": "Manual review of a sample of named turns. The figure is fixed text. No query computes it.",
 }
 

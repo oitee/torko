@@ -14,10 +14,13 @@ export function ideaHref(idea) {
   return `/search?tag=${encodeURIComponent(idea.slug)}`;
 }
 
-// HomeHero is the ink band at the top of the Home page: the headline, the search box, the search ideas,
-// the seats of the House, and the site figures.
-// The headline and the search box show at once. The parts that need /api/home or /api/home/featured
-// show when their answer arrives, so the search works even when an answer fails.
+// The label of a search idea. A long name that ends in a short form in brackets shows only the short form,
+// so "Mahatma Gandhi National Rural Employment Guarantee Act (MNREGA)" shows as "MNREGA".
+export function ideaLabel(name) {
+  const m = /\(([^()]{2,12})\)$/.exec(name || "");
+  return m && name.length > 24 ? m[1] : name;
+}
+
 export default function HomeHero({ corpus, corpusError, onRetryCorpus, ideas }) {
   const ideaList = Array.isArray(ideas) ? ideas : [];
 
@@ -26,7 +29,7 @@ export default function HomeHero({ corpus, corpusError, onRetryCorpus, ideas }) 
       <div className="home-hero__grid">
         <div className="home-hero__text">
           <h1 id="home-title" className="home-hero__title">
-            Search what members said in the Lok Sabha.
+            Search what members said in the Lok Sabha
           </h1>
           {corpus?.first && corpus?.last && (
             <p className="home-hero__lede">
@@ -43,7 +46,7 @@ export default function HomeHero({ corpus, corpusError, onRetryCorpus, ideas }) 
             <div className="home-hero__ideas">
               <span className="home-hero__ideas-label">Try</span>
               {ideaList.map((idea) => (
-                <Chip key={idea.slug} label={idea.name} href={ideaHref(idea)} />
+                <Chip key={idea.slug} label={ideaLabel(idea.name)} href={ideaHref(idea)} />
               ))}
             </div>
           )}
