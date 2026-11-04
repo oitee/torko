@@ -1,6 +1,7 @@
-import React, { useEffect, useState } from "react";
+import React from "react";
 import { Link, useSearchParams } from "react-router-dom";
 import { getJSON } from "../assets/js/api.js";
+import { useApi } from "../assets/js/useApi.js";
 import { formatNumber } from "../assets/js/format.js";
 import SpeechRow from "./SpeechRow.jsx";
 import { EmptyState, ErrorState, Loading } from "./States.jsx";
@@ -13,39 +14,12 @@ export default function SpeechList({ filters = {}, noun = "speeches" }) {
   const pageParam = parseInt(searchParams.get("page") || "1", 10);
   const page = Number.isInteger(pageParam) && pageParam > 0 ? pageParam : 1;
 
-  const [data, setData] = useState(null);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
-  const [retryKey, setRetryKey] = useState(0);
 
   const filtersKey = JSON.stringify(filters);
 
-  useEffect(() => {
-    const controller = new AbortController();
-    setLoading(true);
-    setError(null);
-
-    getJSON(
-      "/api/speeches",
-      { ...filters, page, per_page: 20 },
-      { signal: controller.signal }
-    )
-      .then((res) => {
-        setData(res);
-        setLoading(false);
-      })
-      .catch((err) => {
-        if (controller.signal.aborted) {
-          return;
-        }
-        setError(err);
-        setLoading(false);
-      });
-
-    return () => {
-      controller.abort();
-    };
-  }, [filtersKey, page, retryKey]);
+  const { data, loading, error, retry } = useApi(`${filtersKey}|${page}`, (signal) =>
+    getJSON("/api/speeches", { ...filters, page, per_page: 20 }, { signal })
+  );
 
   if (loading) {
     return <Loading />;
@@ -55,7 +29,7 @@ export default function SpeechList({ filters = {}, noun = "speeches" }) {
     return (
       <ErrorState
         error={error}
-        onRetry={() => setRetryKey((k) => k + 1)}
+        onRetry={retry}
       />
     );
   }

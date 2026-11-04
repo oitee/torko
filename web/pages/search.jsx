@@ -1,6 +1,7 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect } from "react";
 import { useSearchParams } from "react-router-dom";
 import { getJSON } from "../assets/js/api.js";
+import { useApi } from "../assets/js/useApi.js";
 import { formatNumber, termShort } from "../assets/js/format.js";
 import Breadcrumb from "../components/Breadcrumb.jsx";
 import Chip from "../components/Chip.jsx";
@@ -23,27 +24,6 @@ const SCOPE_NAME_URL = {
   place: (v) => `/api/place/${encodeURIComponent(v)}`,
   member: (v) => `/api/member/${encodeURIComponent(v)}`,
 };
-
-// Run one API call when its key changes. Keep the last answer while the next one loads.
-function useApi(key, load) {
-  const [state, setState] = useState({ data: null, loading: Boolean(key), error: null });
-  const [retry, setRetry] = useState(0);
-  useEffect(() => {
-    if (!key) {
-      setState({ data: null, loading: false, error: null });
-      return undefined;
-    }
-    const controller = new AbortController();
-    setState((s) => ({ ...s, loading: true, error: null }));
-    load(controller.signal)
-      .then((data) => setState({ data, loading: false, error: null }))
-      .catch((error) => {
-        if (!controller.signal.aborted) setState((s) => ({ ...s, loading: false, error }));
-      });
-    return () => controller.abort();
-  }, [key, retry]);
-  return { ...state, retry: () => setRetry((n) => n + 1) };
-}
 
 // The Search page: the speeches that contain the words, the pages whose names match, and filters.
 export default function Search() {

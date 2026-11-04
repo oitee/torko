@@ -1,5 +1,5 @@
-import React, { useEffect, useState } from "react";
-import { getJSON } from "../assets/js/api.js";
+import React, { useEffect } from "react";
+import { useAnswer } from "../assets/js/useApi.js";
 import PageAnswer from "../components/PageAnswer.jsx";
 import PageLayout from "../components/PageLayout.jsx";
 import { ErrorState, Loading } from "../components/States.jsx";
@@ -32,17 +32,7 @@ function Answer() {
 // The Method page: how Torko works, as a flow of five steps, each with a real example.
 // Then what Torko gets wrong, then the sources. Every figure and example comes from /api/method.
 export default function Method() {
-  const [data, setData] = useState(null);
-  const [error, setError] = useState(null);
-
-  const load = () => {
-    setError(null);
-    getJSON("/api/method")
-      .then(setData)
-      .catch(setError);
-  };
-
-  useEffect(load, []);
+  const { data, error, retry } = useAnswer("/api/method");
 
   useEffect(() => {
     document.title = "How Torko works · Torko";
@@ -51,7 +41,7 @@ export default function Method() {
   if (error) {
     return (
       <PageLayout answer={<Answer />}>
-        <ErrorState error={error} onRetry={load} />
+        <ErrorState error={error} onRetry={retry} />
       </PageLayout>
     );
   }

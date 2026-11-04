@@ -1,5 +1,6 @@
-import React, { useEffect, useRef, useState } from "react";
+import React, { useEffect } from "react";
 import { useParams, useSearchParams } from "react-router-dom";
+import { useApi } from "../assets/js/useApi.js";
 import { getJSON } from "../assets/js/api.js";
 import Breadcrumb from "../components/Breadcrumb.jsx";
 import HowTorkoCounts from "../components/HowTorkoCounts.jsx";
@@ -22,40 +23,13 @@ export default function Tag() {
   const [searchParams, setSearchParams] = useSearchParams();
   const term = searchParams.get("term") || "";
 
-  const [tag, setTag] = useState(null);
-  const [loading, setLoading] = useState(true);
-  const [termLoading, setTermLoading] = useState(false);
-  const [error, setError] = useState(null);
-
-  const prevSlugRef = useRef(slug);
-
-  const fetchTag = () => {
-    const isTermOnlyChange = Boolean(tag && prevSlugRef.current === slug);
-    if (isTermOnlyChange) {
-      setTermLoading(true);
-    } else {
-      setLoading(true);
-    }
-    setError(null);
-
-    const params = term ? { term } : undefined;
-    getJSON(`/api/tag/${slug}`, params)
-      .then((data) => {
-        setTag(data);
-        prevSlugRef.current = slug;
-        setLoading(false);
-        setTermLoading(false);
-      })
-      .catch((err) => {
-        setError(err);
-        setLoading(false);
-        setTermLoading(false);
-      });
-  };
-
-  useEffect(() => {
-    fetchTag();
-  }, [slug, term]);
+  // A change of term keeps the page and reloads only the main part. A change of tag reloads the page.
+  const key = `${slug}?${term || ""}`;
+  const { data: tag, dataKey, loading: anyLoading, error, retry } = useApi(key, (signal) =>
+    getJSON(`/api/tag/${slug}`, term ? { term } : undefined, { signal })
+  );
+  const termLoading = anyLoading && Boolean(dataKey?.startsWith(`${slug}?`));
+  const loading = anyLoading && !termLoading;
 
   // Update browser tab title
   useEffect(() => {
@@ -76,7 +50,7 @@ export default function Tag() {
     setSearchParams(nextParams);
   };
 
-  if (loading && !tag) {
+  if (loading) {
     return (
       <main className="tag-page tag-page--loading">
         <h1 className="sr-only">Tag</h1>
@@ -88,7 +62,7 @@ export default function Tag() {
   if (error && !tag) {
     return (
       <main className="tag-page tag-page--error">
-        <ErrorState error={error} onRetry={fetchTag} />
+        <ErrorState error={error} onRetry={retry} />
       </main>
     );
   }

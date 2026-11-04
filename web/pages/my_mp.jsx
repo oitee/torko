@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { useSearchParams } from "react-router-dom";
-import { getJSON } from "../assets/js/api.js";
+import { useAnswer } from "../assets/js/useApi.js";
 import { formatNumber } from "../assets/js/format.js";
 import Breadcrumb from "../components/Breadcrumb.jsx";
 import Button from "../components/Button.jsx";
@@ -17,33 +17,10 @@ export default function MyMp() {
   const [searchParams, setSearchParams] = useSearchParams();
   const q = (searchParams.get("q") || "").trim();
   const [input, setInput] = useState(q);
-  const [result, setResult] = useState(null);
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState(null);
-
-  const fetchSeats = () => {
-    if (!q) {
-      setResult(null);
-      setError(null);
-      setLoading(false);
-      return;
-    }
-    setLoading(true);
-    setError(null);
-    getJSON("/api/my-mp", { q })
-      .then((data) => {
-        setResult(data);
-        setLoading(false);
-      })
-      .catch((err) => {
-        setError(err);
-        setLoading(false);
-      });
-  };
+  const { data: result, loading, error, retry } = useAnswer(q ? "/api/my-mp" : null, q ? { q } : undefined);
 
   useEffect(() => {
     setInput(q);
-    fetchSeats();
   }, [q]);
 
   useEffect(() => {
@@ -95,7 +72,7 @@ export default function MyMp() {
   } else if (loading) {
     body = <Loading lines={4} />;
   } else if (error) {
-    body = <ErrorState error={error} onRetry={fetchSeats} />;
+    body = <ErrorState error={error} onRetry={retry} />;
   } else if (seats.length === 0) {
     body = <EmptyState>No Lok Sabha seat has “{q}” in its name. Check the spelling, or type a part of the name.</EmptyState>;
   } else {

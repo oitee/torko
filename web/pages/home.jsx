@@ -1,5 +1,5 @@
-import React, { useEffect, useState } from "react";
-import { getJSON } from "../assets/js/api.js";
+import React, { useEffect } from "react";
+import { useAnswer } from "../assets/js/useApi.js";
 import Button from "../components/Button.jsx";
 import { ErrorState, Loading } from "../components/States.jsx";
 import HomeHero from "./home/HomeHero.jsx";
@@ -11,21 +11,6 @@ import "./home.css";
 // TODO before deployment: build the Data and API page.
 // Then add the "Start here" list of tasks ("Find your MP", "Download the data").
 // The header shows only the pages that exist, so it gets the Data and API link then.
-
-// Load one API answer. A page can retry it.
-function useAnswer(path) {
-  const [state, setState] = useState({ data: null, error: null, loading: true });
-
-  const load = () => {
-    setState({ data: null, error: null, loading: true });
-    getJSON(path)
-      .then((data) => setState({ data, error: null, loading: false }))
-      .catch((error) => setState({ data: null, error, loading: false }));
-  };
-
-  useEffect(load, [path]);
-  return { ...state, retry: load };
-}
 
 // The Home page. The top band holds the search and the site figures from /api/home.
 // The parts below show what Torko can do, with the hand-checked sample from /api/home/featured.

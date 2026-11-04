@@ -1,6 +1,6 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect } from "react";
 import { useParams, useSearchParams } from "react-router-dom";
-import { getJSON } from "../assets/js/api.js";
+import { useAnswer } from "../assets/js/useApi.js";
 import { formatDateLong } from "../assets/js/format.js";
 import PageLayout from "../components/PageLayout.jsx";
 import { ErrorState, Loading } from "../components/States.jsx";
@@ -17,30 +17,11 @@ export default function Debate() {
   const { id } = useParams();
   const [searchParams, setSearchParams] = useSearchParams();
 
-  const [debate, setDebate] = useState(null);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
+  const { data: debate, loading, error, retry } = useAnswer(`/api/debate/${id}`);
 
   const activeTagSlug = searchParams.get("tag") || null;
   const activeMemberId = searchParams.get("member") || null;
 
-  const fetchDebate = () => {
-    setLoading(true);
-    setError(null);
-    getJSON(`/api/debate/${id}`)
-      .then((data) => {
-        setDebate(data);
-        setLoading(false);
-      })
-      .catch((err) => {
-        setError(err);
-        setLoading(false);
-      });
-  };
-
-  useEffect(() => {
-    fetchDebate();
-  }, [id]);
 
   // Set browser tab title: "<title cut to 60 characters> · <formatDateLong(date)> · Torko"
   useEffect(() => {
@@ -103,7 +84,7 @@ export default function Debate() {
   if (error) {
     return (
       <main className="debate-page debate-page--error">
-        <ErrorState error={error} onRetry={fetchDebate} />
+        <ErrorState error={error} onRetry={retry} />
       </main>
     );
   }

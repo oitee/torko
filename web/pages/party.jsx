@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { Link, useParams } from "react-router-dom";
-import { getJSON } from "../assets/js/api.js";
+import { useAnswer } from "../assets/js/useApi.js";
 import { formatNumber, termShort } from "../assets/js/format.js";
 import Breadcrumb from "../components/Breadcrumb.jsx";
 import Chip from "../components/Chip.jsx";
@@ -16,29 +16,13 @@ import "./party.css";
 // the subjects and places it raises more than all parties do, and the members who lead on its top subjects.
 export default function Party() {
   const { code } = useParams();
-  const [party, setParty] = useState(null);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
+  const { data: party, loading, error, retry } = useAnswer(`/api/party/${encodeURIComponent(code)}`);
   const [term, setTerm] = useState("all");
-
-  const fetchParty = () => {
-    setLoading(true);
-    setError(null);
-    getJSON(`/api/party/${encodeURIComponent(code)}`)
-      .then((data) => {
-        setParty(data);
-        setLoading(false);
-      })
-      .catch((err) => {
-        setError(err);
-        setLoading(false);
-      });
-  };
 
   useEffect(() => {
     setTerm("all");
-    fetchParty();
   }, [code]);
+
 
   useEffect(() => {
     if (party?.name) {
@@ -48,7 +32,7 @@ export default function Party() {
     }
   }, [party, error]);
 
-  if (loading && !party) {
+  if (loading) {
     return (
       <main className="party-page party-page--loading">
         <h1 className="sr-only">Party</h1>
@@ -60,7 +44,7 @@ export default function Party() {
   if (error || !party) {
     return (
       <main className="party-page party-page--error">
-        <ErrorState error={error} onRetry={fetchParty} />
+        <ErrorState error={error} onRetry={retry} />
       </main>
     );
   }

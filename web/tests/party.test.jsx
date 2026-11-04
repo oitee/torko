@@ -99,7 +99,7 @@ describe("Party page", () => {
     renderParty();
 
     expect(await screen.findByRole("heading", { level: 1, name: "Communist Party of India (Marxist)" })).toBeTruthy();
-    expect(api.getJSON).toHaveBeenCalledWith("/api/party/CPI(M)");
+    expect(api.getJSON).toHaveBeenCalledWith("/api/party/CPI(M)", undefined, { signal: expect.any(AbortSignal) });
     expect(document.title).toBe("Communist Party of India (Marxist) · Torko");
     expect(screen.getByRole("heading", { name: "Share of the House, by term" })).toBeTruthy();
     expect(screen.getByRole("heading", { name: "Subjects the party raises more than the House" })).toBeTruthy();

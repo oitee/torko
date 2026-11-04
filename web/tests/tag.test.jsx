@@ -96,7 +96,7 @@ describe("Tag page integration", () => {
       expect(heading.textContent).toBe("Arrears");
     });
 
-    expect(document.title).toBe("Arrears · Torko");
+    await waitFor(() => expect(document.title).toBe("Arrears · Torko"));
     expect(screen.getByText("Topics")).toBeTruthy();
     expect(screen.getByText("Economy, Finance and Taxation")).toBeTruthy();
     expect(screen.getByText("Outstanding payments due.")).toBeTruthy();
@@ -164,7 +164,7 @@ describe("Tag page integration", () => {
     fireEvent.click(term17Btn);
 
     await waitFor(() => {
-      expect(api.getJSON).toHaveBeenCalledWith("/api/tag/arrears", { term: "17" });
+      expect(api.getJSON).toHaveBeenCalledWith("/api/tag/arrears", { term: "17" }, { signal: expect.any(AbortSignal) });
     });
 
     // Head stays on screen

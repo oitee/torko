@@ -1,6 +1,6 @@
 import React, { useEffect, useRef, useState } from "react";
 import { Link, useParams } from "react-router-dom";
-import { getJSON } from "../assets/js/api.js";
+import { useAnswer } from "../assets/js/useApi.js";
 import {
   SPEAKER_NOT_IDENTIFIED,
   formatDateISO,
@@ -44,9 +44,7 @@ export function formatCitation(speech) {
 
 export default function Speech() {
   const { id } = useParams();
-  const [speech, setSpeech] = useState(null);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
+  const { data: speech, loading, error, retry } = useAnswer(`/api/speech/${id}`);
 
   // Active marks highlighted in the speech text from "Show the words".
   const [activeMarks, setActiveMarks] = useState(null);
@@ -57,23 +55,6 @@ export default function Speech() {
   const [copied, setCopied] = useState(false);
   const citeButtonRef = useRef(null);
 
-  const fetchSpeech = () => {
-    setLoading(true);
-    setError(null);
-    getJSON(`/api/speech/${id}`)
-      .then((data) => {
-        setSpeech(data);
-        setLoading(false);
-      })
-      .catch((err) => {
-        setError(err);
-        setLoading(false);
-      });
-  };
-
-  useEffect(() => {
-    fetchSpeech();
-  }, [id]);
 
   // Update browser tab title
   useEffect(() => {
@@ -119,7 +100,7 @@ export default function Speech() {
   if (error) {
     return (
       <main className="speech-page speech-page--error">
-        <ErrorState error={error} onRetry={fetchSpeech} />
+        <ErrorState error={error} onRetry={retry} />
       </main>
     );
   }

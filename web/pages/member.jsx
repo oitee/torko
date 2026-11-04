@@ -1,6 +1,7 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect } from "react";
 import { Link, useParams, useSearchParams } from "react-router-dom";
 import { getJSON } from "../assets/js/api.js";
+import { useAnswer, useApi } from "../assets/js/useApi.js";
 import Breadcrumb from "../components/Breadcrumb.jsx";
 import FilterBar from "../components/FilterBar.jsx";
 import PageLayout from "../components/PageLayout.jsx";
@@ -18,13 +19,8 @@ export default function Member() {
   const { id } = useParams();
   const [searchParams, setSearchParams] = useSearchParams();
 
-  const [member, setMember] = useState(null);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
+  const { data: member, loading, error, retry } = useAnswer(`/api/member/${id}`);
 
-  const [speechesData, setSpeechesData] = useState(null);
-  const [speechesLoading, setSpeechesLoading] = useState(false);
-  const [speechesError, setSpeechesError] = useState(null);
 
   // Address search parameters for speeches
   const urlFilters = {};
@@ -36,24 +32,6 @@ export default function Member() {
   }
   const hideShort = searchParams.get("min_words") === "50";
 
-  // Fetch member profile
-  const fetchMember = () => {
-    setLoading(true);
-    setError(null);
-    getJSON(`/api/member/${id}`)
-      .then((data) => {
-        setMember(data);
-        setLoading(false);
-      })
-      .catch((err) => {
-        setError(err);
-        setLoading(false);
-      });
-  };
-
-  useEffect(() => {
-    fetchMember();
-  }, [id]);
 
   // Update browser tab title
   useEffect(() => {
@@ -66,31 +44,9 @@ export default function Member() {
 
   // Fetch /api/speeches facets & counts for FilterBar and margin
   const filtersKey = JSON.stringify(urlFilters);
-  useEffect(() => {
-    if (!id || error) return;
-    const controller = new AbortController();
-    setSpeechesLoading(true);
-    setSpeechesError(null);
-
-    getJSON(
-      "/api/speeches",
-      { member: id, facets: 1, per_page: 1, ...urlFilters },
-      { signal: controller.signal }
-    )
-      .then((res) => {
-        setSpeechesData(res);
-        setSpeechesLoading(false);
-      })
-      .catch((err) => {
-        if (controller.signal.aborted) return;
-        setSpeechesError(err);
-        setSpeechesLoading(false);
-      });
-
-    return () => {
-      controller.abort();
-    };
-  }, [id, filtersKey, error]);
+  const { data: speechesData } = useApi(id && !error ? `${id}|${filtersKey}` : null, (signal) =>
+    getJSON("/api/speeches", { member: id, facets: 1, per_page: 1, ...urlFilters }, { signal })
+  );
 
   const handleToggleHideShort = () => {
     const next = new URLSearchParams(searchParams);
@@ -135,7 +91,7 @@ export default function Member() {
   if (error) {
     return (
       <main className="member-page member-page--error">
-        <ErrorState error={error} onRetry={fetchMember} />
+        <ErrorState error={error} onRetry={retry} />
       </main>
     );
   }

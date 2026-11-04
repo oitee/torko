@@ -36,7 +36,7 @@ describe("Method page", () => {
     const spy = vi.spyOn(api, "getJSON").mockResolvedValue(methodAnswer);
     renderMethod();
     await screen.findByText("Read the debates");
-    expect(spy).toHaveBeenCalledWith("/api/method");
+    expect(spy).toHaveBeenCalledWith("/api/method", undefined, { signal: expect.any(AbortSignal) });
   });
 
   it("shows the five steps in order", async () => {
