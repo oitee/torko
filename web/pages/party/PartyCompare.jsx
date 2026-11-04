@@ -5,7 +5,7 @@ import { perThousand, subjectSentence, timesText } from "./partyData.js";
 
 // PartyCompare draws one row for each subject: a dot for the party and a ring for all parties, on one scale.
 // The scale is speeches with the subject in every 1,000 tagged speeches. The line between the two marks is the gap.
-// rows: { tag, slug, n, share, base, lift }. hrefBase is "/tag/" or "/place/".
+// rows: { tag, slug, n, share, base, lift, extra }, in the order of extra. hrefBase is "/tag/" or "/place/".
 export default function PartyCompare({ id, title, meta, rows = [], code, hrefBase, empty, controls }) {
   const [active, setActive] = useState(null);
   const list = Array.isArray(rows) ? rows : [];
@@ -52,6 +52,7 @@ export default function PartyCompare({ id, title, meta, rows = [], code, hrefBas
               </span>
               <span className="party-compare__num">times</span>
               <span className="party-compare__num">speeches</span>
+              <span className="party-compare__num">extra</span>
             </div>
 
             <ul className="party-compare" onMouseLeave={() => setActive(null)}>
@@ -85,8 +86,9 @@ export default function PartyCompare({ id, title, meta, rows = [], code, hrefBas
                         data-testid={`party-dot-${r.slug}`}
                       />
                     </span>
-                    <span className="party-compare__num party-compare__num--lead mono">{timesText(r.lift).replace(" times", "×")}</span>
+                    <span className="party-compare__num mono">{timesText(r.lift).replace(" times", "×")}</span>
                     <span className="party-compare__num mono">{formatNumber(r.n)}</span>
+                    <span className="party-compare__num party-compare__num--lead mono">{formatNumber(Math.round(r.extra))}</span>
                   </li>
                 );
               })}

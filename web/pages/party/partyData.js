@@ -64,5 +64,5 @@ export function subjectSentence(row, code) {
   const by = row.members ? ` by ${row.members === 1 ? "1 member" : `${formatNumber(row.members)} members`}` : "";
   return `${row.tag}: ${perThousand(row.share)} in every 1,000 tagged ${code} speeches, ${perThousand(
     row.base
-  )} for all parties. ${count}${by}.`;
+  )} for all parties. ${count}${by}, ${formatNumber(Math.round(row.extra))} above the rate of all parties.`;
 }

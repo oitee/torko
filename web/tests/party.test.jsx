@@ -22,16 +22,16 @@ const cpim = {
   all_tagged: 107949,
   terms: [
     term(13, "1999–2004", 35, 1858, 18348, 0.1013, [
-      { tag: "Haldia Port", slug: "haldia-port", type: "institution", n: 6, share: 0.0032, base: 0.0003, lift: 9.88 },
+      { tag: "Haldia Port", slug: "haldia-port", type: "institution", n: 6, share: 0.0032, base: 0.0003, lift: 9.88, extra: 5.4 },
     ]),
     term(17, "2019–2024", 4, 210, 22888, 0.0092),
     term(18, "2024–", 0, 0, 9895, 0),
   ],
   typical_all: [
-    { tag: "Burn Standard Co", slug: "burn-standard-co", type: "institution", n: 18, share: 0.003, base: 0.0002, lift: 12.35 },
-    { tag: "Government of Kerala", slug: "government-of-kerala", type: "institution", n: 78, share: 0.0129, base: 0.0014, lift: 9.28 },
+    { tag: "Burn Standard Co", slug: "burn-standard-co", type: "institution", n: 18, share: 0.003, base: 0.0002, lift: 12.35, extra: 16.8 },
+    { tag: "Government of Kerala", slug: "government-of-kerala", type: "institution", n: 78, share: 0.0129, base: 0.0014, lift: 9.28, extra: 69.5 },
   ],
-  places: [{ tag: "Kannur", slug: "kannur", type: "place", n: 84, share: 0.0139, base: 0.0015, lift: 9.25 }],
+  places: [{ tag: "Kannur", slug: "kannur", type: "place", n: 84, share: 0.0139, base: 0.0015, lift: 9.25, extra: 74.9 }],
   top3: [{ tag: "Burn Standard Co", slug: "burn-standard-co", members: [{ id: 12, name: "Sunil Khan", n: 6, terms: [14] }] }],
   rules: { min_party_tagged: 30, min_n_term: 6, min_n_all: 15, min_n_place: 10, min_members: 3, min_members_place: 2, general_share: 0.03, top: 8 },
 };
@@ -76,10 +76,10 @@ describe("party helpers", () => {
     );
     expect(termSentence(cpim.terms[2], "CPI(M)")).toBe("18th Lok Sabha, 2024–: no tagged CPI(M) speeches.");
     expect(subjectSentence(cpim.places[0], "CPI(M)")).toBe(
-      "Kannur: 14 in every 1,000 tagged CPI(M) speeches, 1.5 for all parties. 84 speeches."
+      "Kannur: 14 in every 1,000 tagged CPI(M) speeches, 1.5 for all parties. 84 speeches, 75 above the rate of all parties."
     );
     expect(subjectSentence({ ...cpim.places[0], members: 15 }, "CPI(M)")).toBe(
-      "Kannur: 14 in every 1,000 tagged CPI(M) speeches, 1.5 for all parties. 84 speeches by 15 members."
+      "Kannur: 14 in every 1,000 tagged CPI(M) speeches, 1.5 for all parties. 84 speeches by 15 members, 75 above the rate of all parties."
     );
   });
 
@@ -135,6 +135,15 @@ describe("Party page", () => {
 
     fireEvent.focus(screen.getByTestId("party-share-17"));
     expect(screen.getByText("17th Lok Sabha, 2019–2024: 0.9% of tagged speeches (210 of 22,888). 4 members spoke.")).toBeTruthy();
+  });
+
+  it("shows the extra speeches of each row, the number that orders the list", async () => {
+    vi.spyOn(api, "getJSON").mockResolvedValueOnce(cpim);
+    renderParty();
+    await screen.findByRole("heading", { level: 1, name: "Communist Party of India (Marxist)" });
+
+    const row = screen.getByRole("link", { name: /^Kannur:/ }).closest("li");
+    expect(row.textContent).toContain("75");
   });
 
   it("states the rule that orders the subjects", async () => {
