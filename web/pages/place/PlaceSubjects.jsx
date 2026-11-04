@@ -19,7 +19,7 @@ export default function PlaceSubjects({
       className="place-section place-subjects"
       aria-labelledby="subjects-heading"
     >
-      <div className="place-section__header">
+      <div className="section-header">
         <h2 id="subjects-heading" className="place-section__title">
           What comes up here
         </h2>

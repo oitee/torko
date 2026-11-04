@@ -90,9 +90,9 @@ export default function PlaceHead({ place }) {
       <Breadcrumb items={breadcrumbItems} />
 
       <div className="place-head__header">
-        <h1 className="place-head__title">{place.name}</h1>
+        <h1 className="head-title">{place.name}</h1>
         {place.description && (
-          <p className="place-head__description">{place.description}</p>
+          <p className="head-description">{place.description}</p>
         )}
         {hasAliases && (
           <span className="place-head__aliases">
@@ -102,22 +102,22 @@ export default function PlaceHead({ place }) {
       </div>
 
       {hasData && (
-        <dl className="place-head__numbers">
+        <dl className="head-numbers">
           <div className="place-head__stat">
-            <dt className="place-head__stat-label">speeches about this place</dt>
-            <dd className="place-head__stat-value">{formatNumber(place.total)}</dd>
+            <dt className="head-stat-label">speeches about this place</dt>
+            <dd className="head-stat-value">{formatNumber(place.total)}</dd>
           </div>
           <div className="place-head__stat">
-            <dt className="place-head__stat-label">debates</dt>
-            <dd className="place-head__stat-value">{formatNumber(place.debates)}</dd>
+            <dt className="head-stat-label">debates</dt>
+            <dd className="head-stat-value">{formatNumber(place.debates)}</dd>
           </div>
           <div className="place-head__stat">
-            <dt className="place-head__stat-label">members who spoke</dt>
-            <dd className="place-head__stat-value">{formatNumber(place.n_members)}</dd>
+            <dt className="head-stat-label">members who spoke</dt>
+            <dd className="head-stat-value">{formatNumber(place.n_members)}</dd>
           </div>
           <div className="place-head__stat">
-            <dt className="place-head__stat-label">first and latest speech</dt>
-            <dd className="place-head__stat-value">{span}</dd>
+            <dt className="head-stat-label">first and latest speech</dt>
+            <dd className="head-stat-value">{span}</dd>
           </div>
         </dl>
       )}

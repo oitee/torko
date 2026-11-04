@@ -115,15 +115,15 @@ export default function Tag() {
       />
 
       {termLoading ? (
-        <div className="tag-main tag-main--loading">
+        <div className="page-main tag-main--loading">
           <Loading lines={6} />
         </div>
       ) : error ? (
-        <div className="tag-main tag-main--error">
-          <ErrorState error={error} onRetry={fetchTag} />
+        <div className="page-main tag-main--error">
+          <ErrorState error={error} onRetry={retry} />
         </div>
       ) : (
-        <div className="tag-main">
+        <div className="page-main">
           <TagWhenChart
             years={tag.years}
             selectedTerm={term}

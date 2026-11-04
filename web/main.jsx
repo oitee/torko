@@ -4,6 +4,7 @@ import { RouterProvider } from "react-router-dom";
 // The base styles load first, so that the styles of each component and page come later and win.
 import "./assets/css/tokens.css";
 import "./assets/css/base.css";
+import "./assets/css/page.css";
 import { router } from "./router.jsx";
 
 createRoot(document.getElementById("root")).render(

@@ -72,7 +72,7 @@ export default function PlaceWhen({
 
   return (
     <section className="place-section place-when" aria-labelledby="when-heading">
-      <div className="place-section__header">
+      <div className="section-header">
         <h2 id="when-heading" className="place-section__title">
           When
         </h2>

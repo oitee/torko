@@ -59,7 +59,7 @@ export default function MyMp() {
   const head = (
     <div className="my-mp-head">
       <h1 className="my-mp-head__title">Find your MP</h1>
-      <p className="my-mp-head__description">
+      <p className="head-description">
         Type the name of your Lok Sabha seat. Torko shows the member for the seat now, the subjects of most of their
         speeches, and the members before them.
       </p>
@@ -118,7 +118,7 @@ export default function MyMp() {
 
   return (
     <PageLayout breadcrumb={<Breadcrumb items={[{ label: "Your MP" }]} />} answer={head}>
-      <div className="my-mp-main">
+      <div className="page-main">
         {body}
         <section className="my-mp-method">
           <HowTorkoCounts>

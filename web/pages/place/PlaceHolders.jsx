@@ -35,7 +35,7 @@ export default function PlaceHolders({ holders = [] }) {
       className="place-section place-holders"
       aria-labelledby="holders-heading"
     >
-      <div className="place-section__header">
+      <div className="section-header">
         <h2 id="holders-heading" className="place-section__title">
           MPs for this seat
         </h2>

@@ -1,0 +1,72 @@
+/* The patterns that many pages share. A page file holds only what is its own. */
+
+.section-header {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: var(--space-2) var(--space-6);
+}
+
+.page-main {
+  display: flex;
+  flex-direction: column;
+  gap: clamp(40px, 6vw, 72px);
+  padding-bottom: var(--space-14);
+}
+
+.chip-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.head-title {
+  margin: 0;
+  font-family: var(--font-sans);
+  font-size: var(--size-display);
+  line-height: var(--lh-display);
+  font-weight: 600;
+  letter-spacing: -0.025em;
+  color: var(--ink);
+  text-wrap: pretty;
+}
+
+.head-description {
+  margin: 0;
+  font-family: var(--font-sans);
+  font-size: var(--size-body);
+  line-height: var(--lh-body);
+  color: var(--ink-2);
+  max-width: 56ch;
+}
+
+.head-numbers {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-3) var(--space-10);
+  margin: var(--space-2) 0 0;
+  padding: 0;
+}
+
+.head-stat-label {
+  order: 2;
+  margin: 0;
+  font-family: var(--font-sans);
+  font-size: var(--size-count);
+  line-height: var(--lh-count);
+  color: var(--ink-2);
+}
+
+.head-stat-value {
+  order: 1;
+  margin: 0;
+  font-family: var(--font-mono);
+  font-size: clamp(1.5rem, 2.6vw, 2rem);
+  line-height: 1;
+  font-weight: 500;
+  color: var(--ink);
+}

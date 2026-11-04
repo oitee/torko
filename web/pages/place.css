@@ -18,26 +18,6 @@
   gap: var(--space-2);
 }
 
-.place-head__title {
-  margin: 0;
-  font-family: var(--font-sans);
-  font-size: var(--size-display);
-  line-height: var(--lh-display);
-  font-weight: 600;
-  letter-spacing: -0.025em;
-  color: var(--ink);
-  text-wrap: pretty;
-}
-
-.place-head__description {
-  margin: 0;
-  font-family: var(--font-sans);
-  font-size: var(--size-body);
-  line-height: var(--lh-body);
-  color: var(--ink-2);
-  max-width: 56ch;
-}
-
 .place-head__aliases {
   font-family: var(--font-sans);
   font-size: var(--size-count);
@@ -45,37 +25,10 @@
   color: var(--meta);
 }
 
-.place-head__numbers {
-  margin: var(--space-2) 0 0;
-  padding: 0;
-  display: flex;
-  flex-wrap: wrap;
-  gap: var(--space-3) var(--space-10);
-}
-
 .place-head__stat {
   display: flex;
   flex-direction: column;
   gap: var(--space-1);
-}
-
-.place-head__stat-label {
-  margin: 0;
-  font-family: var(--font-sans);
-  font-size: var(--size-count);
-  line-height: var(--lh-count);
-  color: var(--ink-2);
-  order: 2;
-}
-
-.place-head__stat-value {
-  margin: 0;
-  font-family: var(--font-mono);
-  font-size: clamp(1.5rem, 2.6vw, 2rem);
-  line-height: 1;
-  font-weight: 500;
-  color: var(--ink);
-  order: 1;
 }
 
 /* Main body flow */
@@ -103,14 +56,6 @@
   gap: var(--space-4);
   border-top: 1px solid var(--ink);
   padding-top: var(--space-6);
-}
-
-.place-section__header {
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: space-between;
-  align-items: baseline;
-  gap: var(--space-2) var(--space-6);
 }
 
 .place-section__title {
@@ -792,14 +737,6 @@
 }
 
 /* Speeches section */
-.place-speeches__header {
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: space-between;
-  align-items: baseline;
-  gap: var(--space-2) var(--space-6);
-}
-
 .place-speeches__title {
   margin: 0;
   font-family: var(--font-sans);

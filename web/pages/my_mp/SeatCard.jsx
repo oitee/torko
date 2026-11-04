@@ -24,7 +24,7 @@ export default function SeatCard({ seat, latestTerm }) {
 
   return (
     <section className="my-mp-seat" aria-labelledby={headingId}>
-      <div className="my-mp-seat__header">
+      <div className="section-header">
         <h2 id={headingId} className="my-mp-seat__title">
           {seat.seat}
         </h2>
@@ -49,7 +49,7 @@ export default function SeatCard({ seat, latestTerm }) {
               {tags.length > 0 && (
                 <div className="my-mp-member__tags">
                   <h3 className="my-mp-member__tags-title">Subjects of most speeches</h3>
-                  <ul className="my-mp-member__chips">
+                  <ul className="chip-list">
                     {tags.map((t) => (
                       <li key={t.slug}>
                         <Chip label={t.name} count={t.speeches} href={`/tag/${t.slug}`} />

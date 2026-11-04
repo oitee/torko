@@ -23,7 +23,7 @@ export default function PlaceMembers({
       className="place-section place-members"
       aria-labelledby="members-heading"
     >
-      <div className="place-section__header">
+      <div className="section-header">
         <h2 id="members-heading" className="place-section__title">
           Who spoke about it
         </h2>

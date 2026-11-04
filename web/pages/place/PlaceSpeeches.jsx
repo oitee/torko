@@ -37,7 +37,7 @@ export default function PlaceSpeeches({
       className="place-section place-speeches"
       aria-labelledby="speeches-heading"
     >
-      <div className="place-section__header">
+      <div className="section-header">
         <h2 id="speeches-heading" className="place-section__title">
           Speeches
         </h2>

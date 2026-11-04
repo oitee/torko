@@ -44,7 +44,7 @@ export default function PartyShareChart({ terms = [], code }) {
 
   return (
     <section className="party-section" aria-labelledby="party-share-heading">
-      <div className="party-section__header">
+      <div className="section-header">
         <h2 id="party-share-heading" className="party-section__title">
           Share of the House, by term
         </h2>

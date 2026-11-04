@@ -37,7 +37,7 @@ export default function PlaceParties({ parties = [], placeName = "" }) {
       className="place-section place-parties"
       aria-labelledby="parties-heading"
     >
-      <div className="place-section__header">
+      <div className="section-header">
         <h2 id="parties-heading" className="place-section__title">
           Which parties spoke about it
         </h2>

@@ -75,14 +75,14 @@ export default function Party() {
   const head = (
     <div className="party-head">
       <div className="party-head__header">
-        <h1 className="party-head__title">{party.name}</h1>
+        <h1 className="head-title">{party.name}</h1>
         <p className="party-head__code mono">{pcode}</p>
       </div>
-      <dl className="party-head__numbers">
+      <dl className="head-numbers">
         {numbers.map((item) => (
           <div key={item.label} className={`party-head__stat${item.lead ? " party-head__stat--lead" : ""}`}>
-            <dt className="party-head__stat-label">{item.label}</dt>
-            <dd className="party-head__stat-value">{item.value}</dd>
+            <dt className="head-stat-label">{item.label}</dt>
+            <dd className="party-head__stat-value head-stat-value">{item.value}</dd>
           </div>
         ))}
       </dl>
@@ -90,7 +90,7 @@ export default function Party() {
   );
 
   const termControls = (
-    <ul className="party-terms" aria-label="Choose a term">
+    <ul className="chip-list" aria-label="Choose a term">
       <li>
         <Chip label="All terms" selected={term === "all"} onClick={() => setTerm("all")} />
       </li>
@@ -109,7 +109,7 @@ export default function Party() {
   return (
     <div className="party-page" style={partyColourVars(pcode, party.colour)}>
       <PageLayout breadcrumb={<Breadcrumb items={[{ label: "Parties" }, { label: party.name }]} />} answer={head}>
-        <div className="party-main">
+        <div className="page-main">
           <PartyShareChart terms={party.terms} code={pcode} />
 
           <PartyCompare
@@ -135,7 +135,7 @@ export default function Party() {
 
           {party.top3?.some((t) => t.members.length > 0) && (
             <section className="party-section" aria-labelledby="party-leaders-heading">
-              <div className="party-section__header">
+              <div className="section-header">
                 <h2 id="party-leaders-heading" className="party-section__title">
                   Who speaks on these subjects
                 </h2>

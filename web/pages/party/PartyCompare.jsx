@@ -14,7 +14,7 @@ export default function PartyCompare({ id, title, meta, rows = [], code, hrefBas
 
   return (
     <section className="party-section" aria-labelledby={id}>
-      <div className="party-section__header">
+      <div className="section-header">
         <h2 id={id} className="party-section__title">
           {title}
         </h2>

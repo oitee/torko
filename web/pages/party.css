@@ -33,30 +33,11 @@
   gap: var(--space-1);
 }
 
-.party-head__title {
-  margin: 0;
-  font-family: var(--font-sans);
-  font-size: var(--size-display);
-  line-height: var(--lh-display);
-  font-weight: 600;
-  letter-spacing: -0.025em;
-  color: var(--ink);
-  text-wrap: pretty;
-}
-
 .party-head__code {
   margin: 0;
   font-size: var(--size-count);
   line-height: var(--lh-count);
   color: var(--meta);
-}
-
-.party-head__numbers {
-  margin: var(--space-2) 0 0;
-  padding: 0;
-  display: flex;
-  flex-wrap: wrap;
-  gap: var(--space-3) var(--space-10);
 }
 
 .party-head__stat {
@@ -70,33 +51,7 @@
   color: var(--party-colour);
 }
 
-.party-head__stat-label {
-  margin: 0;
-  font-family: var(--font-sans);
-  font-size: var(--size-count);
-  line-height: var(--lh-count);
-  color: var(--ink-2);
-  order: 2;
-}
-
-.party-head__stat-value {
-  margin: 0;
-  font-family: var(--font-mono);
-  font-size: clamp(1.5rem, 2.6vw, 2rem);
-  line-height: 1;
-  font-weight: 500;
-  color: var(--ink);
-  order: 1;
-}
-
 /* Main flow */
-
-.party-main {
-  display: flex;
-  flex-direction: column;
-  gap: clamp(40px, 6vw, 72px);
-  padding-bottom: var(--space-14);
-}
 
 .party-section {
   display: flex;
@@ -105,14 +60,6 @@
   border-top: 1px solid var(--hairline);
   padding-top: var(--space-6);
   min-width: 0;
-}
-
-.party-section__header {
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: space-between;
-  align-items: baseline;
-  gap: var(--space-2) var(--space-6);
 }
 
 .party-section__title {
@@ -446,15 +393,6 @@
 }
 
 /* Term picker */
-
-.party-terms {
-  list-style: none;
-  margin: 0;
-  padding: 0;
-  display: flex;
-  flex-wrap: wrap;
-  gap: var(--space-2);
-}
 
 /* Leaders */
 

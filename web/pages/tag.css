@@ -5,13 +5,6 @@
   padding: var(--space-8) 0;
 }
 
-.tag-main {
-  display: flex;
-  flex-direction: column;
-  gap: clamp(40px, 6vw, 72px);
-  padding-bottom: var(--space-14);
-}
-
 .tag-main--loading,
 .tag-main--error {
   padding: var(--space-8) 0;
