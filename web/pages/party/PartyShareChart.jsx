@@ -52,14 +52,14 @@ export default function PartyShareChart({ terms = [], code }) {
       </div>
 
       <div className="party-box">
-        <p className="party-box__readout mono" aria-live="polite">
+        <p className={`party-box__readout${active ? " mono" : " party-box__readout--hint"}`} aria-live="polite">
           {active ? termSentence(active, code) : "Point at a term"}
         </p>
 
         <div className={showTable ? "sr-only" : "party-share"} aria-hidden={showTable ? "true" : undefined}>
           <div className="party-share__chart" onMouseLeave={() => setActive(null)}>
             <div className="party-share__scale mono" aria-hidden="true">
-              <span>{percent(top)}</span>
+              <span>{`${+(top * 100).toFixed(1)}%`}</span>
               <span>0%</span>
             </div>
             <div className="party-share__plot" style={grid}>

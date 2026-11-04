@@ -80,7 +80,7 @@ export default function Party() {
       </div>
       <dl className="party-head__numbers">
         {numbers.map((item) => (
-          <div key={item.label} className="party-head__stat">
+          <div key={item.label} className={`party-head__stat${item.lead ? " party-head__stat--lead" : ""}`}>
             <dt className="party-head__stat-label">{item.label}</dt>
             <dd className="party-head__stat-value">{item.value}</dd>
           </div>

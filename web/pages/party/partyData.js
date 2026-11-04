@@ -49,7 +49,7 @@ export function headNumbers(party) {
   const most = active.reduce((best, t) => (!best || t.members_speaking > best.members_speaking ? t : best), null);
   return [
     { label: "tagged speeches, all terms", value: formatNumber(party.total_tagged) },
-    { label: "of all tagged speeches in the House", value: percent(share) },
+    { label: "of all tagged speeches in the House", value: percent(share), lead: true },
     { label: active.length === 1 ? "term with speeches" : "terms with speeches", value: String(active.length) },
     most
       ? { label: `members spoke in the ${termLong(most.term)}, the most in one term`, value: formatNumber(most.members_speaking) }

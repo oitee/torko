@@ -39,7 +39,7 @@ export default function PartyCompare({ id, title, meta, rows = [], code, hrefBas
                   All parties
                 </li>
               </ul>
-              <p className="party-box__readout mono" aria-live="polite">
+              <p className={`party-box__readout${active ? " mono" : " party-box__readout--hint"}`} aria-live="polite">
                 {active ? subjectSentence(active, code) : "Point at a row"}
               </p>
             </div>
@@ -85,7 +85,7 @@ export default function PartyCompare({ id, title, meta, rows = [], code, hrefBas
                         data-testid={`party-dot-${r.slug}`}
                       />
                     </span>
-                    <span className="party-compare__num mono">{timesText(r.lift).replace(" times", "×")}</span>
+                    <span className="party-compare__num party-compare__num--lead mono">{timesText(r.lift).replace(" times", "×")}</span>
                     <span className="party-compare__num mono">{formatNumber(r.n)}</span>
                   </li>
                 );
