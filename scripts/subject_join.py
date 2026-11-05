@@ -100,21 +100,29 @@ def join_units(n_units: int, pairs: list, sizes: list, max_joined: int = MAX_JOI
     return list(out.values())
 
 
-def build(args) -> None:
-    import numpy as np
+def build_units(conn) -> dict:
+    """Group the names and keep the units. Return ids, neigh, mat (normalised vectors in the order of ids), sp (name ->
+    speech count), info (name -> (name, type, tag)) and units (lists of name IDs, most speeches first)."""
     from sqlalchemy import text
-    from db import get_engine
-    with get_engine().connect() as conn:
-        names = [r for r in load_names(conn) if r[2] not in EXCLUDED_TYPES and r[4]]
-        ids = sorted(r[0] for r in names)
-        neigh = knn(conn, ids, 15)
-        mat = load_vectors(conn, ids)
-        sp = dict(conn.execute(text("""SELECT entity_name_id, count(DISTINCT speech_id) FROM speech_items
-            WHERE kept AND source IN ('llm', 'dictionary') AND entity_name_id IS NOT NULL GROUP BY 1""")).fetchall())
+    names = [r for r in load_names(conn) if r[2] not in EXCLUDED_TYPES and r[4]]
+    ids = sorted(r[0] for r in names)
+    neigh = knn(conn, ids, 15)
+    mat = load_vectors(conn, ids)
+    sp = dict(conn.execute(text("""SELECT entity_name_id, count(DISTINCT speech_id) FROM speech_items
+        WHERE kept AND source IN ('llm', 'dictionary') AND entity_name_id IS NOT NULL GROUP BY 1""")).fetchall())
     info = {r[0]: (r[1], r[2], r[3]) for r in names}
     groups = group_with_guard(ids, edges_for(neigh, 15, True), D_GROUP, MAX_GROUP)
     units = [sorted(g, key=lambda m: (-sp.get(m, 0), info[m][0])) for g in groups
              if len(g) >= 2 or sum(sp.get(m, 0) for m in g) >= 2]
+    return {"ids": ids, "neigh": neigh, "mat": mat, "sp": sp, "info": info, "units": units}
+
+
+def build(args) -> None:
+    import numpy as np
+    from db import get_engine
+    with get_engine().connect() as conn:
+        b = build_units(conn)
+    ids, neigh, mat, sp, info, units = b["ids"], b["neigh"], b["mat"], b["sp"], b["info"], b["units"]
     pos = {m: i for i, m in enumerate(ids)}
     cen = np.stack([mat[[pos[m] for m in u]].mean(0) for u in units])
     cen /= np.linalg.norm(cen, axis=1, keepdims=True)

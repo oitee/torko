@@ -64,3 +64,22 @@ An LLM review batch classified each candidate as `new` (propose a new tag, with 
 
 `data/new_tag_reviews_v1.tsv` holds the reviewer decisions in git: one row for each reviewed subject, keyed by the entity name IDs that the reviewers saw, with the review round. A rebuild of the subjects cannot make these answers again, so keep this file.
 
+
+## Keeping answers when new speeches add names
+
+The stored answers of the subject steps (joins, cannot-links, labels, tag reviews, and parents) are keyed by a set of entity name IDs. New speeches can add a name to a group, and then the set changes. `scripts/subject_carry.py` copies the answers of a group to its new set of names, when the group only gained close names:
+
+- The new group holds every name of exactly one old group, and each added name was in no old group.
+- Each added name has a cosine distance of 0.10 or less to the centre of the old group. The centre is the normalised mean of the vectors of the old names. On 2026-11-06, 95% of the names in the old groups were at 0.10 or less from the centre of the other names of their group.
+- The group grows by 50% or less.
+
+A group that fails a check goes to the join, label, and parent steps again. A subject keeps its answers when each of its groups keeps them, and the subject grows by 50% or less.
+
+```bash
+python3 scripts/subject_carry.py snapshot --out <old.pkl>        # before the new answers are loaded
+python3 scripts/subject_join.py candidates --cache <new.pkl>     # after the new names are linked
+python3 scripts/subject_carry.py sort --old <old.pkl> --new <new.pkl>           # counts and a sample to read
+python3 scripts/subject_carry.py sort --old <old.pkl> --new <new.pkl> --apply   # copy the answers
+```
+
+`--apply` adds copies and deletes nothing. It saves a backup of each data file first.
