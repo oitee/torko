@@ -4,7 +4,7 @@ This folder holds 30 search questions with known correct speeches. It answers on
 
 `data/questions.tsv` holds the questions: English, Hindi, misspellings, a member with a subject, exact phrases, passing remarks, and questions that use other words than the speeches.
 
-`data/reviews/` holds the marks of two blind LLM reviewers. No person reviewed the marks. A speech is in `data/known.tsv` only when both reviewers mark it yes, or, for an exact phrase, when the text holds the phrase (`data/known_phrase.tsv`).
+`data/reviews/` holds the marks of two blind LLM reviewers. Batch 8 came from a different LLM than batches 1 to 7, and it marks results of a ranking test that the site does not use. `combine` reads all batches, so `data/known.tsv` depends on them. No person reviewed the marks. A speech is in `data/known.tsv` only when both reviewers mark it yes, or, for an exact phrase, when the text holds the phrase (`data/known_phrase.tsv`).
 
 The candidates came from several ways, and no way gave its own order to the reviewers: the nearest summaries, the speeches of a matching tag, word matches on hand-written variants in English and Hindi, and a text scan of the summaries. Each way gave at most 6 random speeches, and the nearest summaries gave 10.
 
