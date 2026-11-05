@@ -54,7 +54,7 @@ export function headingParts({ scope, count, names = {}, members = null }) {
   // With two or more tags, the Members view has its own rule, and it can hold members when no speech has all the tags.
   if (members !== null && (scope.tag || "").includes(",")) {
     const who = members === 1 ? " member raised " : " members raised ";
-    return { lead: members, rest: `${who}${names.tag || scope.tag}` };
+    return { lead: members, rest: `${who}${names.tag || scope.tag.replaceAll(",", " and ")}` };
   }
   let on = "";
   if (scope.tag) on += ` on ${names.tag || scope.tag}`;
