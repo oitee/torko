@@ -1,7 +1,6 @@
 import React, { useEffect } from "react";
-import { useParams, useSearchParams } from "react-router-dom";
-import { getJSON } from "../assets/js/api.js";
-import { useAnswer, useApi } from "../assets/js/useApi.js";
+import { useParams } from "react-router-dom";
+import { useAnswer } from "../assets/js/useApi.js";
 import PageLayout from "../components/PageLayout.jsx";
 import { ErrorState, Loading } from "../components/States.jsx";
 import NotFound from "./not_found.jsx";
@@ -19,23 +18,8 @@ import "./place.css";
 // MP holders, members who spoke about it, parties, associated subjects, and speeches.
 export default function Place() {
   const { slug } = useParams();
-  const [searchParams, setSearchParams] = useSearchParams();
 
   const { data: place, loading, error, retry } = useAnswer(`/api/place/${slug}`);
-
-  // Speeches facet data for FilterBar
-
-  // Address search parameters for filtering speeches
-  const filterParams = {};
-  for (const key of ["term", "party", "kind", "session", "subject", "min_words"]) {
-    const val = searchParams.get(key);
-    if (val) {
-      filterParams[key] = val;
-    }
-  }
-  const speechesFilters = { place: slug, ...filterParams };
-  const filterKey = JSON.stringify(speechesFilters);
-
 
   // Update browser tab title
   useEffect(() => {
@@ -45,11 +29,6 @@ export default function Place() {
       document.title = "Page not found · Torko";
     }
   }, [place, error]);
-
-  // Fetch speeches facets when slug or filters change
-  const { data: speechesData } = useApi(slug ? `${slug}|${filterKey}` : null, (signal) =>
-    getJSON("/api/speeches", { ...speechesFilters, facets: 1, per_page: 1 }, { signal })
-  );
 
   if (loading && !place) {
     return (
@@ -111,12 +90,7 @@ export default function Place() {
               placeName={place.name}
             />
 
-            <PlaceSpeeches
-              facets={speechesData?.facets || {}}
-              total={speechesData?.total ?? place.total}
-              unfilteredTotal={place.total}
-              speechesFilters={speechesFilters}
-            />
+            <PlaceSpeeches speeches={place.recent} slug={slug} total={place.total} />
 
             <PlaceMethod />
           </>

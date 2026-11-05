@@ -1,16 +1,15 @@
 import React, { useEffect } from "react";
-import { Link, useParams, useSearchParams } from "react-router-dom";
+import { Link, useNavigate, useParams } from "react-router-dom";
 import { getJSON } from "../assets/js/api.js";
+import { formatNumber } from "../assets/js/format.js";
 import { useAnswer, useApi } from "../assets/js/useApi.js";
 import Breadcrumb from "../components/Breadcrumb.jsx";
-import FilterBar from "../components/FilterBar.jsx";
 import PageLayout from "../components/PageLayout.jsx";
-import SpeechList from "../components/SpeechList.jsx";
+import SpeechGrid from "../components/SpeechGrid.jsx";
 import { ErrorState, Loading } from "../components/States.jsx";
 import NotFound from "./not_found.jsx";
 import MemberActivity from "./member/MemberActivity.jsx";
 import MemberHead from "./member/MemberHead.jsx";
-import MemberLatest from "./member/MemberLatest.jsx";
 import MemberMargin from "./member/MemberMargin.jsx";
 import MemberPlaces from "./member/MemberPlaces.jsx";
 import MemberSubjects from "./member/MemberSubjects.jsx";
@@ -18,20 +17,9 @@ import "./member.css";
 
 export default function Member() {
   const { id } = useParams();
-  const [searchParams, setSearchParams] = useSearchParams();
+  const navigate = useNavigate();
 
   const { data: member, loading, error, retry } = useAnswer(`/api/member/${id}`);
-
-
-  // Address search parameters for speeches
-  const urlFilters = {};
-  for (const key of ["term", "kind", "subject", "session", "min_words"]) {
-    const val = searchParams.get(key);
-    if (val) {
-      urlFilters[key] = val;
-    }
-  }
-  const hideShort = searchParams.get("min_words") === "50";
 
 
   // Update browser tab title
@@ -43,42 +31,13 @@ export default function Member() {
     }
   }, [member, error]);
 
-  // Fetch /api/speeches facets & counts for FilterBar and margin
-  const filtersKey = JSON.stringify(urlFilters);
-  const { data: speechesData } = useApi(id && !error ? `${id}|${filtersKey}` : null, (signal) =>
-    getJSON("/api/speeches", { member: id, facets: 1, per_page: 1, ...urlFilters }, { signal })
+  // The margin reads the count by debate type.
+  const { data: speechesData } = useApi(id && !error ? `member-facets:${id}` : null, (signal) =>
+    getJSON("/api/speeches", { member: id, facets: 1, per_page: 1 }, { signal })
   );
 
-  const handleToggleHideShort = () => {
-    const next = new URLSearchParams(searchParams);
-    if (hideShort) {
-      next.delete("min_words");
-    } else {
-      next.set("min_words", "50");
-    }
-    next.delete("page");
-    setSearchParams(next);
-  };
-
-  // A pick on the activity chart shows that session in the list. A second pick on it shows all sessions again.
-  const selectedSession = searchParams.get("session") || null;
-  const handleSelectSession = (s) => {
-    const value = `${s.term}-${s.session}`;
-    const next = new URLSearchParams(searchParams);
-    if (selectedSession === value) {
-      next.delete("session");
-    } else {
-      next.set("session", value);
-    }
-    next.delete("page");
-    setSearchParams(next);
-    if (selectedSession !== value) {
-      setTimeout(() => {
-        const el = document.getElementById("speeches");
-        if (el) el.scrollIntoView({ behavior: "smooth" });
-      }, 50);
-    }
-  };
+  // A pick on the activity chart opens the speeches of that session on the Search page.
+  const handleSelectSession = (s) => navigate(`/search?member=${id}&session=${s.term}-${s.session}`);
 
   if (loading) {
     return (
@@ -116,7 +75,6 @@ export default function Member() {
     },
   ];
 
-  const speechListFilters = { member: id, ...urlFilters };
 
   return (
     <div className="member-page">
@@ -126,18 +84,19 @@ export default function Member() {
         margin={<MemberMargin member={member} speechesData={speechesData} />}
       >
         <div className="member-main">
-          {member.recent && member.recent.length > 0 && (
-            <MemberLatest
-              speeches={member.recent}
-              totalSpeeches={member.speeches || 0}
-            />
-          )}
+          <SpeechGrid
+            id="speeches"
+            speeches={member.recent}
+            meta="latest · all terms"
+            href={`/search?member=${id}`}
+            action={`See all ${formatNumber(member.speeches || 0)} speeches`}
+            showSpeaker={false}
+          />
 
           {member.sessions && member.sessions.length > 0 && (
             <MemberActivity
               sessions={member.sessions}
               terms={member.terms || []}
-              selectedSession={selectedSession}
               onSelectSession={handleSelectSession}
             />
           )}
@@ -156,44 +115,6 @@ export default function Member() {
               seat={member.seat}
             />
           )}
-
-          <section
-            className="member-speeches"
-            id="speeches"
-            aria-labelledby="member-speeches-heading"
-          >
-            <div className="member-section-head">
-              <div className="member-section-head__text">
-                <h2 id="member-speeches-heading" className="member-section-title">
-                  All speeches
-                </h2>
-              </div>
-            </div>
-
-            <div className="member-speeches__controls">
-              <FilterBar
-                facets={speechesData?.facets || {}}
-                total={speechesData?.total ?? member.speeches}
-                unfilteredTotal={member.speeches || 0}
-                noun="speeches"
-                groups={["term", "kind", "subject"]}
-              />
-
-              <div className="member-speeches__toggle-row">
-                <label className="member-speeches__toggle-label">
-                  <input
-                    type="checkbox"
-                    checked={hideShort}
-                    onChange={handleToggleHideShort}
-                    className="member-speeches__checkbox"
-                  />
-                  <span>Hide remarks under 50 words</span>
-                </label>
-              </div>
-            </div>
-
-            <SpeechList filters={speechListFilters} noun="speeches" />
-          </section>
         </div>
       </PageLayout>
     </div>

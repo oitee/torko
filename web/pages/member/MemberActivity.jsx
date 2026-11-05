@@ -289,31 +289,6 @@ export default function MemberActivity({
           </div>
         )}
 
-        {(() => {
-          const picked = selectedSession
-            ? sessions.find((x) => `${x.term}-${x.session}` === selectedSession)
-            : null;
-          if (!picked) return null;
-          return (
-            <p className="member-activity__selected" role="status">
-              <span>
-                The list of speeches shows {picked.label}: {formatNumber(picked.n)}{" "}
-                {picked.n === 1 ? "speech" : "speeches"}.
-              </span>{" "}
-              <a href="#speeches" className="member-activity__selected-link">
-                Go to the speeches
-              </a>{" "}
-              <button
-                type="button"
-                className="button button--text"
-                onClick={() => onSelectSession && onSelectSession(picked)}
-              >
-                Show all sessions
-              </button>
-            </p>
-          );
-        })()}
-
         <div className="member-activity__note meta">
           Pick a session to read its speeches. The green line is the median member in that session.
         </div>

@@ -234,17 +234,17 @@ describe("Member Page", () => {
       expect(seatLinks.some((l) => l.getAttribute("href") === "/place/krishnanagar")).toBe(true);
     });
 
-    it("renders latest speeches section with link to #speeches", async () => {
+    it("renders the speech grid with a button to the Search page", async () => {
       renderMemberPage();
 
       await screen.findByRole("heading", { level: 1, name: "Mahua Moitra" });
 
-      expect(screen.getByRole("heading", { name: "Latest speeches" })).toBeTruthy();
-      const allLink = screen.getByRole("link", { name: "All 66 speeches" });
-      expect(allLink.getAttribute("href")).toBe("#speeches");
+      expect(screen.getByRole("heading", { name: "Speeches" })).toBeTruthy();
+      const allLink = screen.getByRole("link", { name: "See all 66 speeches" });
+      expect(allLink.getAttribute("href")).toMatch(/^\/search\?member=/);
 
       expect(
-        screen.getAllByRole("link", { name: "Resolution regarding removal of Speaker from Office" }).length
+        screen.getAllByText("Resolution regarding removal of Speaker from Office").length
       ).toBeGreaterThan(0);
     });
 
@@ -299,29 +299,6 @@ describe("Member Page", () => {
       expect(screen.getByRole("heading", { name: "Places" })).toBeTruthy();
       expect(screen.getByText("own seat")).toBeTruthy();
       expect(screen.getByText(/Krishnanagar is the place named most often/)).toBeTruthy();
-    });
-
-    it("toggles 'Hide remarks under 50 words' checkbox", async () => {
-      renderMemberPage();
-
-      await screen.findByRole("heading", { level: 1, name: "Mahua Moitra" });
-
-      const checkbox = screen.getByRole("checkbox", {
-        name: "Hide remarks under 50 words",
-      });
-      expect(checkbox.checked).toBe(false);
-
-      fireEvent.click(checkbox);
-      expect(checkbox.checked).toBe(true);
-
-      // Verify that api.getJSON was called with min_words=50
-      await waitFor(() => {
-        expect(api.getJSON).toHaveBeenCalledWith(
-          "/api/speeches",
-          expect.objectContaining({ min_words: "50" }),
-          expect.anything()
-        );
-      });
     });
 
     it("renders margin counts including Rule 377 count and HowTorkoCounts note", async () => {
