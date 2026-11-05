@@ -28,7 +28,8 @@ ON CONFLICT (number) DO NOTHING;
 CREATE TABLE IF NOT EXISTS persons (
     id          SERIAL PRIMARY KEY,
     name        TEXT NOT NULL,          -- the name to show
-    sansad_id   INT  UNIQUE             -- mpsno, from the sansad.in member API
+    sansad_id   INT  UNIQUE,            -- mpsno, from the sansad.in member API
+    rajya_sabha_id INT UNIQUE           -- mpsno of the Rajya Sabha list. The two lists reuse the same numbers.
 );
 
 
@@ -90,6 +91,11 @@ CREATE TABLE IF NOT EXISTS states (
 --                       Lok Sabha term. The seat is NULL.
 --   event               a later row of the term, from party_events.tsv. It
 --                       copies the seat of the first row of the term.
+--   added-person        a Lok Sabha member who is on no sansad.in list, from
+--                       data/people_added_seats.tsv.
+--   not-a-member        the person speaks in a term with no Lok Sabha seat. The
+--                       party and the seat are NULL, and the speeches count
+--                       under no party.
 -- match_method    how a wikipedia row was matched: name+seat, name, article,
 --                 seat, or manual.
 --
@@ -110,7 +116,7 @@ CREATE TABLE IF NOT EXISTS speakers (
     constituency    TEXT,
     state_id        INT  REFERENCES states(id),  -- the state of the seat, NULL if not known
     source          TEXT CHECK (source IN ('sansad-last-term', 'wikipedia', 'sansad-term-list', 'manual',
-                                           'last-term-fallback', 'event')),
+                                           'last-term-fallback', 'event', 'added-person', 'not-a-member')),
     match_method    TEXT CHECK (match_method IN ('name+seat', 'name', 'article', 'seat', 'manual')),
     party_id        INT  REFERENCES parties(id),
     effective_from  DATE NOT NULL,
@@ -222,3 +228,27 @@ CREATE TABLE IF NOT EXISTS label_aliases (
 );
 
 CREATE INDEX IF NOT EXISTS label_aliases_person_idx ON label_aliases (person_id);
+
+
+-- label_resolutions: each answer to "who does this label name?". One label can have one answer from
+-- each decider, for example a rule, the decision model, and a person. A person's answer wins at export.
+--
+-- answer         P<persons.id>, RS<Rajya Sabha number>, LS<Lok Sabha list number>, NEW:<name>,
+--                NONE, OFFICE, NOT_A_PERSON, or UNCLEAR.
+-- probability    the probability from the decision model. NULL for a rule or a person.
+-- status         accepted, no_person, or review.
+-- options_hash   the options of the question. A changed list makes the stored answer out of date.
+CREATE TABLE IF NOT EXISTS label_resolutions (
+    loksabha       SMALLINT NOT NULL REFERENCES lok_sabhas(number),
+    speaker_label  TEXT     NOT NULL,
+    decided_by     TEXT     NOT NULL,
+    answer         TEXT     NOT NULL,
+    probability    REAL,
+    status         TEXT     NOT NULL CHECK (status IN ('accepted', 'no_person', 'review')),
+    options_count  INT,
+    options_hash   TEXT,
+    prompt_version TEXT,
+    evidence       JSONB,
+    decided_at     TIMESTAMPTZ NOT NULL DEFAULT now(),
+    PRIMARY KEY (loksabha, speaker_label, decided_by)
+);
