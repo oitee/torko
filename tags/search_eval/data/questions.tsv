@@ -1,0 +1,31 @@
+id	kind	query	rule	member	pool_words
+Q01	concept	stray cattle destroying crops	The speech raises damage to crops by stray or abandoned cattle.		stray cattle|stray animals|abandoned cattle|आवारा पशु|छुट्टा पशु|अन्ना पशु
+Q02	english	farmer suicides	The speech raises the suicides of farmers.		farmers suicide|farmer suicides|किसान आत्महत्या|किसानों आत्महत्या
+Q03	english	sugarcane dues to farmers	The speech raises money that sugar mills owe to sugarcane growers.		sugarcane arrears|cane dues|sugarcane dues|गन्ना बकाया|गन्ना भुगतान
+Q04	english	coastal erosion	The speech raises the erosion of a coast by the sea.		coastal erosion|sea erosion|समुद्री कटाव|तटीय कटाव
+Q05	english	cyclone relief	The speech raises relief or compensation after a cyclone.		cyclone relief|cyclone compensation|चक्रवात राहत|चक्रवात मुआवजा
+Q06	concept	girls leave school because there are no toilets	The speech connects a lack of toilets in schools with girls who stop attending school.		toilets girls school|girls dropout toilets|बालिका शौचालय विद्यालय|लड़कियों शौचालय स्कूल
+Q07	concept	people dying from drinking illegal liquor	The speech raises deaths from illicit, spurious or poisonous liquor.		hooch|spurious liquor|illicit liquor|जहरीली शराब|अवैध शराब
+Q08	concept	exam question papers getting out before the test	The speech raises the leak of a question paper of an examination.		paper leak|question paper leak|NEET leak|पेपर लीक|प्रश्न पत्र लीक
+Q09	concept	elephants killed by trains	The speech raises elephants that trains hit or kill.		elephants train|elephant deaths railway|हाथी ट्रेन|हाथियों रेल
+Q10	hindi	किसानों की कर्ज माफी	The speech raises the waiver of the loans of farmers.		farm loan waiver|loan waiver farmers|कर्ज माफी|ऋण माफी
+Q11	hindi	युवाओं में बेरोजगारी	The speech raises unemployment among young people.		youth unemployment|unemployed youth|बेरोजगारी युवा|बेरोजगार नौजवान
+Q12	hindi	गंगा की सफाई	The speech raises the cleaning or the pollution of the river Ganga.		Ganga cleaning|Namami Gange|Ganga pollution|गंगा सफाई|गंगा प्रदूषण
+Q13	hindi	सूखा राहत	The speech raises relief for people or farmers in a drought.		drought relief|drought assistance|सूखा राहत|सूखे राहत
+Q14	hindi	महिला आरक्षण विधेयक	The speech raises the Bill for the reservation of seats for women in legislatures.		women reservation bill|women's reservation|महिला आरक्षण|नारी शक्ति वंदन
+Q15	misspelling	mehngai	The speech raises rising prices of goods.		price rise|inflation|महंगाई|मंहगाई
+Q16	misspelling	Naxlite violence	The speech raises violence by Naxalite or Maoist groups.		naxalite violence|maoist violence|naxal attack|नक्सली हिंसा|नक्सलवाद
+Q17	misspelling	Artical 370	The speech raises Article 370 of the Constitution, about Jammu and Kashmir.		article 370|अनुच्छेद 370|धारा 370
+Q18	misspelling	demonitisation	The speech raises the withdrawal of 500 and 1000 rupee notes in 2016, or an earlier withdrawal of notes.		demonetisation|demonetization|नोटबंदी|विमुद्रीकरण
+Q19	member	Mallikarjun Kharge railways	The speaker is Mallikarjun Kharge, and the speech raises railways.	Mallikarjun Kharge	railway|railways|रेल
+Q20	member	Sushma Swaraj Pakistan	The speaker is Sushma Swaraj, and the speech raises Pakistan.	Sushma Swaraj	pakistan|पाकिस्तान
+Q21	member	Asaduddin Owaisi Waqf	The speaker is Asaduddin Owaisi, and the speech raises Waqf.	Asaduddin Owaisi	waqf|wakf|वक्फ
+Q22	phrase	"one nation one election"	A turn of the speech holds these exact words in this order.		
+Q23	phrase	"triple talaq"	A turn of the speech holds these exact words in this order.		
+Q24	phrase	"tukde tukde"	A turn of the speech holds these exact words in this order.		
+Q25	passing	Simla Agreement	The speech mentions the Simla Agreement, even in a passing remark.		simla agreement|shimla agreement|शिमला समझौता
+Q26	passing	Kesavananda Bharati	The speech mentions the Kesavananda Bharati case, even in a passing remark.		kesavananda bharati|keshavananda bharati|केशवानंद भारती
+Q27	passing	Bhopal gas tragedy	The speech mentions the Bhopal gas disaster, even in a passing remark.		bhopal gas|भोपाल गैस
+Q28	concept	doctors do not want to work in villages	The speech raises the shortage of doctors in rural areas, or doctors who refuse rural posts.		rural doctors|doctors rural areas shortage|ग्रामीण डॉक्टर|गांवों डॉक्टर
+Q29	concept	flights from small towns cost too much	The speech raises air fares or air links for small towns or regional airports.		regional connectivity|UDAN airfare|air fare small towns|उड़ान योजना|हवाई किराया
+Q30	concept	same pension for soldiers of the same rank	The speech raises One Rank One Pension for retired soldiers.		one rank one pension|OROP|वन रैंक वन पेंशन
