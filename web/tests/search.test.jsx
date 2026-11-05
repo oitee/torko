@@ -3,6 +3,7 @@ import { MemoryRouter } from "react-router-dom";
 import { cleanup, render, screen } from "@testing-library/react";
 import { afterEach, describe, expect, it } from "vitest";
 import { excerptParts, headingParts, pageWindow, readSearch, yearSpan } from "../pages/search/searchParams.js";
+import { FIELDS, addFilterChanges, chipsFrom, draftChanges, draftFrom, pendingCount } from "../pages/search/filterRules.js";
 import { SearchSpeechRow } from "../pages/search/SearchResults.jsx";
 import SearchMatches from "../pages/search/SearchMatches.jsx";
 
@@ -126,5 +127,36 @@ describe("search rows", () => {
     expect(screen.getByRole("link", { name: "Latur" }).getAttribute("href")).toBe("/place/latur");
     expect(screen.queryByRole("link", { name: "Latur Rail Coach Factory" })).toBeNull();
     expect(screen.getByRole("link", { name: "Railway Coach Factories" }).getAttribute("href")).toBe("/search?tag=railway-coach-factories");
+  });
+});
+
+describe("filter rules", () => {
+  it("writes each operator to its own address key, and moves a value out of the opposite list", () => {
+    expect(addFilterChanges({ party: "INC" }, "party", "one_of", { values: ["BJP"] })).toEqual({ party: "INC,BJP" });
+    expect(addFilterChanges({ party: "INC,BJP" }, "party", "not", { values: ["BJP"] })).toEqual({ party: "INC", party_not: "BJP" });
+    expect(addFilterChanges({}, "tag", "one_of", { values: ["a", "b"] })).toEqual({ tag_any: "a,b" });
+    expect(addFilterChanges({ tag_any: "a" }, "tag", "is", { values: ["a"] })).toEqual({ tag_any: null, tag: "a" });
+  });
+
+  it("offers only fields that can show a list", () => {
+    expect(FIELDS.map((f) => f.label)).toEqual(["Member", "Party", "State", "Term", "Session", "Tag", "Subject", "Place", "Debate type"]);
+    expect(chipsFrom({ seat: "Kota", lang_not: "hi" }).map((c) => c.label)).toEqual(["Seat is Kota", "Spoken in is not Hindi"]);
+  });
+
+  it("makes one chip for each field and operator", () => {
+    const labels = chipsFrom({ tag: "a,b", party: "INC", party_not: "BJP,DMK", date_from: "2014-01-01", date_to: "2024-12-31", min_words: "500" }, { slug: { a: "Farmers", b: "Union Budget" } });
+    expect(labels.map((c) => c.label)).toEqual([
+      "Tag has all of Farmers, Union Budget", "Party is INC", "Party is none of BJP, DMK", "Date is between 2014 and 2024", "Words in the speech is at least 500",
+    ]);
+    expect(labels[2].negative).toBe(true);
+    expect(chipsFrom({ party: "A,B,C,D" })[0].label).toBe("Party is one of A, B +2");
+  });
+
+  it("counts the waiting changes, and turns them into address changes", () => {
+    const params = { party: "INC", term: "17" };
+    const draft = { ...draftFrom(params), party: ["BJP"], years: [2014, 2026] };
+    expect(pendingCount(draftFrom(params), params)).toBe(0);
+    expect(pendingCount(draft, params)).toBe(3);
+    expect(draftChanges(draft)).toEqual({ tag: null, party: "BJP", term: "17", date_from: "2014-01-01", date_to: null });
   });
 });

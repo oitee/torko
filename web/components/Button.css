@@ -52,3 +52,10 @@
 .button--text:hover {
   color: var(--action-hover);
 }
+
+.button:disabled {
+  color: var(--meta);
+  background: var(--ground);
+  border-color: var(--hairline);
+  cursor: not-allowed;
+}

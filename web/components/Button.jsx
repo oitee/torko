@@ -11,6 +11,7 @@ export default function Button({
   onClick,
   children,
   className = "",
+  ...rest
 }) {
   const allowedVariants = ["primary", "secondary", "text"];
   const safeVariant = allowedVariants.includes(variant) ? variant : "secondary";
@@ -25,7 +26,7 @@ export default function Button({
   }
 
   return (
-    <button type="button" className={classes} onClick={onClick}>
+    <button type="button" className={classes} onClick={onClick} {...rest}>
       {children}
     </button>
   );

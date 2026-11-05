@@ -6,12 +6,14 @@ import "./Chip.css";
 // The Chip component renders a single tag.
 // It supports counts, links, selected marks, and remove buttons.
 // prefix is an optional element before the name, for example the source glyph on the Speech page.
+// negative marks a filter that leaves speeches out: a dashed ink border, and the words of the label say "not".
 // With onClick (and no href), the chip is a button that the page can select. selected then sets aria-pressed.
 export default function Chip({
   label,
   count,
   href,
   selected = false,
+  negative = false,
   onRemove,
   onClick,
   prefix,
@@ -19,6 +21,7 @@ export default function Chip({
   const classes = [
     "chip",
     selected ? "chip--selected" : "",
+    negative ? "chip--negative" : "",
     onRemove ? "chip--removable" : "",
   ]
     .filter(Boolean)

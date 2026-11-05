@@ -1,19 +1,21 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import { useSearchParams } from "react-router-dom";
 import { getJSON } from "../assets/js/api.js";
 import { useApi } from "../assets/js/useApi.js";
 import { formatNumber, termShort } from "../assets/js/format.js";
+import Button from "../components/Button.jsx";
 import Breadcrumb from "../components/Breadcrumb.jsx";
 import Chip from "../components/Chip.jsx";
-import FilterBar from "../components/FilterBar.jsx";
+import Count from "../components/Count.jsx";
 import HowTorkoCounts from "../components/HowTorkoCounts.jsx";
 import PageLayout from "../components/PageLayout.jsx";
 import SearchBox from "../components/SearchBox.jsx";
 import SearchMatches from "./search/SearchMatches.jsx";
 import SearchResults from "./search/SearchResults.jsx";
 import SearchScopeCard from "./search/SearchScopeCard.jsx";
-import SearchScopePicker from "./search/SearchScopePicker.jsx";
-import { FILTER_KEYS, defaultSort, headingParts, readSearch, selectedTerms } from "./search/searchParams.js";
+import FilterRail from "./search/FilterRail.jsx";
+import { chipsFrom, draftChanges, draftFrom, listOf } from "./search/filterRules.js";
+import { FILTER_KEYS, defaultSort, headingParts, readSearch } from "./search/searchParams.js";
 import "./search.css";
 
 const PER_PAGE = 20;
@@ -29,8 +31,9 @@ const SCOPE_NAME_URL = {
 export default function Search() {
   const [searchParams, setSearchParams] = useSearchParams();
   const { scope, filters, view, sort, page } = readSearch(searchParams);
+  const params = { ...scope, ...filters };
   const q = scope.q || "";
-  const hasFilters = Object.keys(filters).length > 0;
+  const hasFilters = Object.keys(params).some((k) => k !== "q");
 
   const listParams = { ...scope, ...filters, sort, page, per_page: PER_PAGE };
   const listKey = JSON.stringify({ listParams, view });
@@ -48,8 +51,18 @@ export default function Search() {
   const speechData = view === "members" ? facetCall.data : list.data;
 
   // The total with no filter, for "N of total".
-  const baseKey = hasFilters ? JSON.stringify(scope) : null;
-  const base = useApi(listDone ? baseKey : null, (signal) => getJSON("/api/speeches", { ...scope, per_page: 1 }, { signal }));
+  const baseParams = q ? { q } : {};
+  const baseKey = hasFilters ? `base:${q}` : null;
+  const base = useApi(listDone ? baseKey : null, (signal) => getJSON("/api/speeches", { ...baseParams, per_page: 1 }, { signal }));
+
+  // The tag counts are a call of their own, because they take the longest.
+  const tagFacetParams = { ...params, facets: "tag", per_page: 1 };
+  const tagCall = useApi(listDone ? JSON.stringify(tagFacetParams) : null, (signal) => getJSON("/api/speeches", tagFacetParams, { signal }));
+
+  // The ticks and the date sliders of the left panel wait here until Apply. A new address starts them again.
+  const draftKey = JSON.stringify([params.tag, params.party, params.term, params.date_from, params.date_to]);
+  const [draft, setDraft] = useState(() => draftFrom(params));
+  useEffect(() => setDraft(draftFrom(params)), [draftKey]);
 
   // The number of members, for the toggle. It is a separate call, so the speeches do not wait for it.
   const membersParams = { ...scope, ...filters, group: "member", per_page: 1 };
@@ -60,7 +73,7 @@ export default function Search() {
   const matches = useApi(q || null, (signal) => getJSON("/api/search", { q }, { signal }));
   // The tag, place and member each load their own name, so that they can be on at the same time.
   const useScope = (k) =>
-    useApi(scope[k] ? `${k}:${scope[k]}` : null, (signal) => getJSON(SCOPE_NAME_URL[k](scope[k]), undefined, { signal }));
+    useApi(scope[k] ? `${k}:${scope[k]}` : null, (signal) => Promise.all(listOf(scope[k]).map((v) => getJSON(SCOPE_NAME_URL[k](v), undefined, { signal }))));
   const tags = (scope.tag || "").split(",").filter(Boolean);
   // A search can hold two or more tags, so the tag answer is a list with one answer for each tag.
   const tagInfo = useApi(tags.length ? `tags:${scope.tag}` : null, (signal) =>
@@ -69,14 +82,10 @@ export default function Search() {
   const scopeInfo = { place: useScope("place"), member: useScope("member") };
   const scopeNames = {
     tag: tagInfo.data ? tagInfo.data.map((t) => t.name).join(" and ") : null,
-    place: scopeInfo.place.data?.name || null,
-    member: scopeInfo.member.data?.name || null,
-  };
-  const tagNames = Object.fromEntries((tagInfo.data || []).map((t, i) => [tags[i], t.name]));
-  // A tag that the reader picks joins the tags of the search. A place or a member replaces the one before it.
-  const pickScope = (change) => {
-    if (change.tag && !tags.includes(change.tag)) setWith({ tag: [...tags, change.tag].join(",") });
-    else setWith(change);
+    place: scopeInfo.place.data ? scopeInfo.place.data.map((t) => t.name).join(" or ") : null,
+    member: scopeInfo.member.data
+      ? scopeInfo.member.data.map((t) => t.name).join(" or ")
+      : listOf(scope.member).map((v) => list.data?.names?.member?.[v]).filter(Boolean).join(" or ") || null,
   };
 
   const speechTotal = speechData && !(view === "speeches" && list.loading) ? speechData.total : null;
@@ -103,18 +112,17 @@ export default function Search() {
     const next = new URLSearchParams(hrefWith(changes).split("?")[1] || "");
     setSearchParams(next);
   };
-  const resetFilters = () => setWith(Object.fromEntries(FILTER_KEYS.map((k) => [k, null])));
+  // The waiting ticks go with every search that the panel starts: Apply, Add, and the removal of a chip.
+  const commit = (changes = {}) => setWith({ ...draftChanges(draft), ...changes });
+  const resetFilters = () => setWith(Object.fromEntries([...FILTER_KEYS, "tag", "member", "place"].map((k) => [k, null])));
 
-  // Session choices only help when one or two terms are chosen.
-  const terms = selectedTerms(filters);
   const facets = facetCall.data?.facets || {};
-  const groups = ["term", ...(terms.length > 0 && terms.length <= 2 ? ["session"] : []), "party", "kind", "subject"];
-  const barFacets = {
-    ...facets,
-    session: (facets.session || []).filter((s) => terms.includes(s.term)),
-    // An empty group shows nothing, but it lets "Reset filters" clear party_not too.
-    party_not: [],
+  const names = {
+    ...(list.data?.names || {}),
+    kind: Object.fromEntries((facets.kind || []).map((r) => [r.kind, r.label])),
+    session: Object.fromEntries((facets.session || []).map((r) => [`${r.term}-${r.session}`, r.label || `${termShort(r.term)} session ${r.session}`])),
   };
+  const chips = chipsFrom(params, names);
 
   const heading = headingParts({ scope, count: speechTotal, names: scopeNames, members: view === "members" ? membersTotal : null });
   const csvHref = `/api/speeches?${new URLSearchParams(
@@ -130,7 +138,19 @@ export default function Search() {
       <div className="search-head__box">
         <SearchBox key={q} initial={q} />
       </div>
-      <ActiveChips scope={scope} scopeNames={scopeNames} tagNames={tagNames} filters={filters} facets={facets} setWith={setWith} />
+      {chips.length > 0 && (
+        <div className="search-head__active" aria-label="Filters that are on">
+          {chips.map((c) => (
+            <Chip key={c.key} label={c.label} selected={!c.negative} negative={c.negative} onRemove={() => commit(c.remove)} />
+          ))}
+          <Button variant="secondary" onClick={resetFilters}>Reset filters</Button>
+        </div>
+      )}
+      <div className="search-head__summary">
+        {speechTotal !== null && <Count n={speechTotal} total={hasFilters ? unfilteredTotal ?? undefined : undefined} noun="speeches" />}
+        <Button variant="text" onClick={() => navigator.clipboard?.writeText(window.location.href)}>Copy link</Button>
+        <a className="search-rail__csv" href={csvHref} download>Download CSV</a>
+      </div>
     </div>
   );
 
@@ -138,33 +158,24 @@ export default function Search() {
     <PageLayout breadcrumb={<Breadcrumb items={[{ label: "Search" }]} />} answer={answer}>
       <div className="search-body">
         <aside className="search-rail" aria-label="Filters and method">
-          <div className="search-rail__section">
-            <h2 className="search-rail__title">Narrow the speeches</h2>
-            <SearchScopePicker onPick={pickScope} />
-            {speechData ? (
-              <FilterBar
-                facets={barFacets}
-                groups={groups}
-                total={speechTotal ?? speechData.total}
-                unfilteredTotal={unfilteredTotal}
-                noun="speeches"
-              />
-            ) : (
-              <p className="search-rail__wait">The filters show when the speeches load.</p>
-            )}
-            {speechData && (
-              <LeaveOutParty parties={facets.party || []} filters={filters} setWith={setWith} />
-            )}
-            <a className="search-rail__csv" href={csvHref} download>
-              Download these speeches as CSV
-            </a>
-          </div>
+          <FilterRail
+            params={params}
+            facets={facets}
+            tagRows={tagCall.data?.facets?.tag}
+            names={names}
+            chipCount={chips.length}
+            draft={draft}
+            setDraft={setDraft}
+            onApply={() => commit()}
+            onDiscard={() => setDraft(draftFrom(params))}
+            onAdd={commit}
+          />
           <div className="search-rail__section">
             <HowTorkoCounts>
               {q
                 ? "A speech matches when its own turns and the name of the member hold all the words, or when its summary is near the search in meaning. Words that another member says in an interruption do not count. An exact repeat by the same member is left out. "
                 : ""}
-              Each speech counts once. The counts by party leave out the speeches with no identified member.
+              Each speech counts once. The counts by party leave out the speeches with no identified member. A filter of party or state leaves them out too, also with “is not”.
             </HowTorkoCounts>
           </div>
         </aside>
@@ -175,7 +186,9 @@ export default function Search() {
               {tags.map((t, i) => (
                 <SearchScopeCard key={t} kind="tag" value={t} info={tagInfo.data?.[i]} />
               ))}
-              {scope.place && <SearchScopeCard key="place" kind="place" value={scope.place} info={scopeInfo.place.data} />}
+              {listOf(scope.place).map((v, i) => (
+                <SearchScopeCard key={v} kind="place" value={v} info={scopeInfo.place.data?.[i]} />
+              ))}
             </div>
           )}
           {q && matches.data && <SearchMatches results={matches.data.results} query={q} />}
@@ -201,68 +214,5 @@ export default function Search() {
         </div>
       </div>
     </PageLayout>
-  );
-}
-
-// The scope and the filters that are on, as chips that remove themselves.
-function ActiveChips({ scope, scopeNames, tagNames, filters, facets, setWith }) {
-  const chips = [];
-  const tagList = (scope.tag || "").split(",").filter(Boolean);
-  for (const t of tagList) {
-    chips.push({ key: `tag-${t}`, label: `Tag: ${tagNames[t] || t}`, remove: { tag: tagList.filter((x) => x !== t).join(",") || null } });
-  }
-  for (const k of ["place", "member"]) {
-    if (scope[k]) {
-      const what = { tag: "Tag", place: "Place", member: "Member" }[k];
-      chips.push({ key: k, label: `${what}: ${scopeNames[k] || scope[k]}`, remove: { [k]: null } });
-    }
-  }
-  const list = (k) => (filters[k] || "").split(",").filter(Boolean);
-  const removeOne = (k, v) => ({ [k]: list(k).filter((x) => x !== v).join(",") || null });
-  for (const v of list("term")) chips.push({ key: `term-${v}`, label: termShort(v), remove: removeOne("term", v) });
-  for (const v of list("session")) {
-    const [t, n] = v.split("-");
-    const row = (facets.session || []).find((r) => String(r.term) === t && String(r.session) === n);
-    chips.push({ key: `session-${v}`, label: row?.label || `${termShort(t)} session ${n}`, remove: removeOne("session", v) });
-  }
-  for (const v of list("party")) chips.push({ key: `party-${v}`, label: v, remove: removeOne("party", v) });
-  for (const v of list("party_not")) chips.push({ key: `not-${v}`, label: `Not ${v}`, remove: removeOne("party_not", v) });
-  // A kind or a subject shows its name from the facets. Before they load, it shows the value of the address.
-  const nameOf = (rows, key, v) => (rows || []).find((r) => String(r[key]) === v)?.label || v;
-  for (const v of list("kind")) chips.push({ key: `kind-${v}`, label: nameOf(facets.kind, "kind", v), remove: removeOne("kind", v) });
-  for (const v of list("subject")) chips.push({ key: `subject-${v}`, label: nameOf(facets.subject, "id", v), remove: removeOne("subject", v) });
-
-  if (chips.length === 0) return null;
-  return (
-    <div className="search-head__active" aria-label="Filters that are on">
-      <span className="search-head__active-label">Only</span>
-      {chips.map((c) => (
-        <Chip key={c.key} label={c.label} selected onRemove={() => setWith(c.remove)} />
-      ))}
-    </div>
-  );
-}
-
-// "Leave out a party": one select. Each choice adds the party to party_not. The chip in the head removes it.
-function LeaveOutParty({ parties, filters, setWith }) {
-  const out = (filters.party_not || "").split(",").filter(Boolean);
-  const left = parties.filter((p) => !out.includes(p.party));
-  if (left.length === 0) return null;
-  return (
-    <label className="search-leave">
-      <span className="search-leave__label">Leave out a party</span>
-      <select
-        className="search-sort__select search-leave__select"
-        value=""
-        onChange={(e) => e.target.value && setWith({ party_not: [...out, e.target.value].join(",") })}
-      >
-        <option value="">Choose a party</option>
-        {left.map((p) => (
-          <option key={p.party} value={p.party}>
-            {`${p.party} · ${formatNumber(p.n)} speeches`}
-          </option>
-        ))}
-      </select>
-    </label>
   );
 }

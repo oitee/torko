@@ -29,7 +29,7 @@ A closer look shows four problems.
 ## What Torko does
 
 - **Search.** Search 26+ years (1999 to 2026) of debates. The default order is best match. It joins speeches that hold all your words and speeches whose one-sentence summary is near your search in meaning, so a search in English can find a speech in Hindi. Put text in quote marks for an exact phrase. A speech with no summary, such as a speech with no identified member, is found only by its words. On a test set of 30 questions marked by two LLM reviewers, not by a person, the best-match order reaches 0.79 recall at 10, and the older newest-first word search reaches 0.45. You can also ask for two or more tags. A speech then needs all the tags, and the Members view lists each member who raised each tag in any speeches. A search also finds the tags, the places, and the members that match the words.
-- **Filters.** Filter by party, by parliament term, by year, and by debate category.
+- **Filters.** The Search page has a left panel with Tag, Date, Term and Party. "Add filter" reaches 9 fields, each with a list of values to choose from, and with "is", "is not", "is one of" and "is none of" for lists. Ticks wait for Apply. Applied filters show as chips under the search box.
 - **Members.** Open a member of parliament and read every speech by that member, with the subjects that the member raised most.
 - **Tags.** Each speech of 99 or more words has a one-sentence summary and its own subject tags. A tag page shows when parliament discussed the subject, which parties and members spoke about it, and the more specific subjects under it.
 - **Places.** Each district and each Lok Sabha constituency has a page. The page shows when members spoke about the place, and who spoke.
