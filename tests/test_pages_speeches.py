@@ -114,3 +114,11 @@ def test_group_by_member_with_party_filter(page_conn):  # noqa: F811
     out = S.speeches(page_conn, {"q": "arrears", "party": "INC", "party_not": "BJP", "group": "member", "per_page": "50"})
     assert out["members_total"] == len(out["members"]) > 0
     assert all(m["party"] for m in out["members"])
+
+
+def test_small_words_are_not_marked_unless_the_query_holds_nothing_else():
+    from pages.speeches import highlight_words, make_excerpt
+    assert highlight_words("farmers in Punjab") == ["farmers", "punjab"]
+    assert highlight_words("in") == ["in"]
+    excerpt, marks = make_excerpt("Farmers in Punjab protest.", highlight_words("farmers in Punjab"))
+    assert [excerpt[a:b] for a, b in marks] == ["Farmers", "Punjab"]

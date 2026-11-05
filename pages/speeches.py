@@ -16,6 +16,7 @@ from sqlalchemy import text
 from pages.common import (KIND_LABELS, KINDS, PARTY_AT_DATE, clean_layout, party_colours, resolve_tag, slug, speech_kind,
                           speech_rows, speech_tags_cte, tag_speeches)
 from pages.sessions import session_labels
+from tag_search import STOP
 
 MAX_PER_PAGE = 50
 DEFAULT_PER_PAGE = 20
@@ -178,6 +179,12 @@ def query_words(q):
     return [w for w in re.findall(r"\w+", (q or "").lower())]
 
 
+def highlight_words(q):
+    """The words of q to mark in an excerpt: small words such as "in" go, unless q holds nothing else."""
+    words = query_words(q)
+    return [w for w in words if w not in STOP] or words
+
+
 def make_excerpt(raw, words, limit=EXCERPT_CHARS):
     """Return (excerpt, marks): the first sentence of the cleaned text that has a word, and [start, end] of each match in it.
 
@@ -231,7 +238,7 @@ def rows_for(conn, ids):
 
 def add_excerpts(conn, rows, q):
     """Add excerpt and marks to each row: the first own turn of the speech that matches q."""
-    words = query_words(q)
+    words = highlight_words(q)
     found = {}
     for sid, txt in conn.execute(text("""
         SELECT t.speech_id, t.text FROM turns t JOIN speeches s ON s.id = t.speech_id
