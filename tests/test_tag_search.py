@@ -95,3 +95,18 @@ def test_members_match_by_name_and_a_subject_has_its_parent_slug():
 def test_a_tag_result_has_slug_type_and_domain():
     r = search("arrears", [{"tag": "Tax Arrears", "aliases": [], "n_speeches": 1, "type": "topic", "domain": "Economy"}], [])[0]
     assert (r["kind"], r["slug"], r["type"], r["domain"]) == ("tag", "tax-arrears", "topic", "Economy")
+
+
+def test_a_tag_keeps_its_own_count_because_its_subjects_hold_the_same_speeches():
+    # Farmers: the suggestion said 30,524 while the tag page said 15,225, because subject counts were added to the total.
+    tags = [{"tag": "Farmers", "aliases": [], "n_speeches": 15225}]
+    subjects = [{"subject_id": "S1", "label": "Farmers' income", "names": [], "parent_tag": "Farmers", "n_speeches": 9000},
+                {"subject_id": "S2", "label": "Farmers' suicides", "names": [], "parent_tag": "Farmers", "n_speeches": 6299}]
+    assert search("farmers", tags, subjects)[0]["n_speeches"] == 15225
+
+
+def test_a_tag_found_through_its_subjects_keeps_its_own_count():
+    tags = [{"tag": "Rural Employment Act (MNREGA)", "aliases": [], "n_speeches": 5}]
+    subjects = [{"subject_id": "S1", "label": "MGNREGA wages", "names": [], "parent_tag": "Rural Employment Act (MNREGA)", "n_speeches": 4},
+                {"subject_id": "S2", "label": "MGNREGA funds", "names": [], "parent_tag": "Rural Employment Act (MNREGA)", "n_speeches": 3}]
+    assert search("MGNREGA", tags, subjects)[0]["n_speeches"] == 5

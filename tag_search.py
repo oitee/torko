@@ -19,7 +19,7 @@ from collections import defaultdict
 
 from sqlalchemy import text
 
-from pages.common import slug
+from pages.common import SPEECH_TAGS_CTE, slug
 
 STOP = frozenset({"of", "the", "and", "for", "in", "to", "a", "an", "on", "by", "with"})
 
@@ -91,7 +91,7 @@ def search(query: str, tags: list, subjects: list, limit: int = 10, members: lis
             exact = any(" ".join(sorted(words(x))) == q for x in texts)
             kids = sorted(children.get(t["tag"], []), key=lambda s: -s["n_speeches"])
             out.append({**tag_fields(t), "name": t["tag"], "exact": exact,
-                        "n_speeches": t["n_speeches"] + sum(s["n_speeches"] for s in kids), "subjects": kids})
+                        "n_speeches": t["n_speeches"], "subjects": kids})
     for s in subjects:
         if matches(query, s["label"]) or any(matches(query, n) for n in s["names"]):
             exact = " ".join(sorted(words(s["label"]))) == q
@@ -109,7 +109,7 @@ def search(query: str, tags: list, subjects: list, limit: int = 10, members: lis
             kids = sorted(children[best], key=lambda s: -s["n_speeches"])
             parent = next((t for t in tags if t["tag"] == best), {"tag": best})
             out.append({**tag_fields(parent), "name": best, "exact": True, "via_subjects": True,
-                        "n_speeches": sum(s["n_speeches"] for s in kids), "subjects": kids})
+                        "n_speeches": parent.get("n_speeches", 0), "subjects": kids})
     covered = {k["subject_id"] for r in out if r["kind"] in ("tag", "place") and r["exact"] for k in r["subjects"]}
     out = [r for r in out if not (r["kind"] == "subject" and r["subject_id"] in covered)]
     found = []
@@ -133,13 +133,14 @@ def load_index(conn) -> tuple[list, list]:
     subjects = [{"subject_id": sid, "label": label, "names": names[sid], "parent_tag": tag or "", "n_speeches": n}
                 for sid, label, tag, n in conn.execute(text("""SELECT s.id, s.label, t.tag, s.n_speeches
             FROM subjects s LEFT JOIN tags t ON t.id = s.parent_tag_id"""))]
-    rows = conn.execute(text("""
-        SELECT t.tag, t.aliases, count(DISTINCT si.speech_id) n, t.type, t.domain, t.description
-        FROM tags t LEFT JOIN entity_names en ON en.tag_id = t.id AND en.link_status = 'linked'
-        LEFT JOIN speech_items si ON si.entity_name_id = en.id AND si.kept
-        WHERE t.status NOT IN ('rejected', 'merged') GROUP BY t.id""")).fetchall()
-    tags = [{"tag": t, "aliases": list(a or []), "n_speeches": n} for t, a, n, ty, dom, desc in rows]
-    tags = [{**t, "type": ty, "domain": dom, "description": desc} for t, (_, _, _, ty, dom, desc) in zip(tags, rows)]
+    # n_speeches is the rule of the tag page: each speech once. A speech under a subject is also a speech of its tag.
+    rows = conn.execute(text(f"""
+        WITH {SPEECH_TAGS_CTE}, counts AS (SELECT tag_id, count(*) n FROM speech_tags GROUP BY tag_id)
+        SELECT t.tag, t.aliases, COALESCE(c.n, 0) n, t.type, t.domain, t.description
+        FROM tags t LEFT JOIN counts c ON c.tag_id = t.id
+        WHERE t.status NOT IN ('rejected', 'merged')""")).fetchall()
+    tags = [{"tag": t, "aliases": list(a or []), "n_speeches": n, "type": ty, "domain": dom, "description": desc}
+            for t, a, n, ty, dom, desc in rows]
     return tags, subjects
 
 
