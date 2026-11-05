@@ -133,6 +133,7 @@ def test_chain_ingest_keeps_the_old_cannot_links(tmp_path, monkeypatch):
     monkeypatch.setattr(sj, "JOINS", data / "joins.tsv")
     monkeypatch.setattr(sj, "CANNOT", data / "cannot.tsv")
     monkeypatch.setattr(sj, "DIFFERENTS", data / "differents.tsv")
+    monkeypatch.setattr(sj, "CHAIN_SAMES", data / "chain_sames.tsv")
     units = [[1], [2], [3]]
     cache = tmp_path / "units.pkl"
     cache.write_bytes(pickle.dumps({"units": units}))
@@ -147,6 +148,44 @@ def test_chain_ingest_keeps_the_old_cannot_links(tmp_path, monkeypatch):
     sj.chain_ingest(argparse.Namespace(cache=cache, folder=folder))
     lines = (data / "cannot.tsv").read_text().splitlines()
     assert lines == ["name_ids_a\tname_ids_b\tsource\tconfidence", "1\t3\tchain\tlow", "7\t8\tchain\thigh"]
+
+
+def test_chain_ingest_stores_the_same_answers_and_keeps_old_ones(tmp_path, monkeypatch):
+    import argparse
+    import json
+    import pickle
+    import scripts.subject_join as sj
+    results, data = tmp_path / "results", tmp_path / "data"
+    results.mkdir()
+    data.mkdir()
+    monkeypatch.setattr(sj, "RESULTS", results)
+    monkeypatch.setattr(sj, "JOINS", data / "joins.tsv")
+    monkeypatch.setattr(sj, "CANNOT", data / "cannot.tsv")
+    monkeypatch.setattr(sj, "CHAIN_SAMES", data / "chain_sames.tsv")
+    cache = tmp_path / "units.pkl"
+    cache.write_bytes(pickle.dumps({"units": [[1], [2], [3]]}))
+    (data / "joins.tsv").write_text("name_ids_a\tname_ids_b\tcentre_distance\tconfidence\n1\t2\t0.1\thigh\n2\t3\t0.1\thigh\n")
+    (data / "chain_sames.tsv").write_text("name_ids_a\tname_ids_b\tsource\tconfidence\n7\t8\tchain\thigh\n")
+    (results / "join_candidates_v1.tsv").write_text("pair_id\tunit_a\tunit_b\nP1\t0\t1\nP2\t1\t2\n")
+    (results / "join_llm_v1.tsv").write_text("pair_id\tdecision\tconfidence\nP1\tsame\thigh\nP2\tsame\thigh\n")
+    (results / "chain_pairs_v1.tsv").write_text("pair_id\tunit_a\tunit_b\nC1\t0\t2\n")
+    folder = tmp_path / "chains"
+    (folder / "out").mkdir(parents=True)
+    (folder / "out" / "j0001.out.jsonl").write_text(json.dumps({"pair": "C1", "decision": "same", "confidence": "high"}) + "\n")
+    sj.chain_ingest(argparse.Namespace(cache=cache, folder=folder))
+    lines = (data / "chain_sames.tsv").read_text().splitlines()
+    assert lines == ["name_ids_a\tname_ids_b\tsource\tconfidence", "1\t3\tchain\thigh", "7\t8\tchain\thigh"]
+
+
+def test_chain_answered_reads_cannot_links_and_chain_sames(tmp_path):
+    from scripts.subject_join import chain_answered
+    cannot = tmp_path / "cannot.tsv"
+    cannot.write_text("name_ids_a\tname_ids_b\tsource\tconfidence\n1\t3 4\tchain\tlow\n")
+    sames = tmp_path / "sames.tsv"
+    sames.write_text("name_ids_a\tname_ids_b\tsource\tconfidence\n2\t3 4\tchain\thigh\n9\t10\tchain\thigh\n")
+    units = [[1], [2], [4, 3]]
+    assert chain_answered(units, cannot, sames) == {frozenset((0, 2)), frozenset((1, 2))}
+    assert chain_answered(units, tmp_path / "none.tsv", tmp_path / "none2.tsv") == set()
 
 
 def test_merge_labels_keeps_old_labels_and_a_new_label_wins():

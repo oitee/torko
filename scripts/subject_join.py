@@ -23,6 +23,7 @@ Subcommands:
               that no earlier answer judged directly (the chain guard).
   chain-ingest  Read the chain answers. Write data/cannot_links_v1.tsv: every pair of units inside one joined subject
               that an answer (the join run or the chain run) called different. `subjects` never joins across such a pair.
+              The same answers of the chain run go to data/chain_sames_v1.tsv. chain-jobs asks no pair in either file.
   labels-ingest  Read the LLM labels. Write data/subject_labels_v1.tsv, keyed by the entity name IDs of each subject.
               --folder holds the label answers for the subjects of results/label_subjects_v1.tsv. --relabels holds a
               TSV (subject_id, label) for subjects of results/subjects_v1.tsv. A stored label stays, unless a new
@@ -335,6 +336,8 @@ def joins_to_pairs(units: list, rows: list) -> tuple[list, int]:
 
 CANNOT = RESULTS.parent / "data" / "cannot_links_v1.tsv"
 DIFFERENTS = RESULTS.parent / "data" / "join_differents_v1.tsv"
+CHAIN_SAMES = RESULTS.parent / "data" / "chain_sames_v1.tsv"
+CHAIN_COLUMNS = ["name_ids_a", "name_ids_b", "source", "confidence"]
 
 
 def known_answers(units: list, joins: Path | None = None, cannot: Path | None = None,
@@ -351,6 +354,17 @@ def known_answers(units: list, joins: Path | None = None, cannot: Path | None = 
         rows = [dict(r, centre_distance="0") for r in csv.DictReader(path.open(), delimiter="\t")]
         for a, b, _ in joins_to_pairs(units, rows)[0]:
             out.setdefault(frozenset((a, b)), decision)
+    return out
+
+
+def chain_answered(units: list, cannot: Path | None = None, sames: Path | None = None) -> set:
+    """Unit pairs that an earlier chain check answered: the cannot-links (different) and data/chain_sames_v1.tsv (same).
+    chain-jobs asks none of them again. Missing files: an empty set."""
+    out = set()
+    for path in (cannot or CANNOT, sames or CHAIN_SAMES):
+        if path.exists():
+            rows = [dict(r, centre_distance="0") for r in csv.DictReader(path.open(), delimiter="\t")]
+            out |= {frozenset((a, b)) for a, b, _ in joins_to_pairs(units, rows)[0]}
     return out
 
 
@@ -493,7 +507,8 @@ def chain_jobs(args) -> None:
     units, info, sp = data["units"], data["info"], data["sp"]
     judged = {(int(r["unit_a"]), int(r["unit_b"])) for r in csv.DictReader((RESULTS / "join_candidates_v1.tsv").open(), delimiter="\t")}
     subs = join_units(len(units), llm_same_pairs(units), [len(u) for u in units])
-    rows, blocks = [], []
+    answered = chain_answered(units)
+    rows, blocks, skipped = [], [], 0
     for s in subs:
         if len(s) < 3:
             continue
@@ -501,6 +516,9 @@ def chain_jobs(args) -> None:
         for x in range(len(s)):
             for y in range(x + 1, len(s)):
                 a, b = s[x], s[y]
+                if frozenset((a, b)) in answered:
+                    skipped += 1
+                    continue
                 if (a, b) in judged:
                     continue
                 pid = f"C{len(rows) + 1:05d}"
@@ -513,6 +531,7 @@ def chain_jobs(args) -> None:
         w.writerows(rows)
     rng = random.Random(13)
     rng.shuffle(blocks)
+    print(f"{skipped} chain pairs have an earlier chain answer and get no job")
     print(f"{write_jobs(args.folder, blocks, 'PAIR', 12000)} job files for {len(blocks)} chain pairs")
 
 
@@ -543,16 +562,21 @@ def chain_ingest(args) -> None:
             rows.append((unit_key(units[a]), unit_key(units[b]), "join", r["confidence"]))
     answers = read_answers(args.folder)
     pairs = list(csv.DictReader((RESULTS / "chain_pairs_v1.tsv").open(), delimiter="\t"))
-    n_same = 0
+    sames = []
     for r in pairs:
         dec = answers.get(r["pair_id"])
         if dec is None:
             continue
-        if dec[0] == "different":
-            rows.append((unit_key(units[int(r["unit_a"])]), unit_key(units[int(r["unit_b"])]), "chain", dec[1]))
-        else:
-            n_same += 1
-    cols = ["name_ids_a", "name_ids_b", "source", "confidence"]
+        row = (unit_key(units[int(r["unit_a"])]), unit_key(units[int(r["unit_b"])]), "chain", dec[1])
+        (rows if dec[0] == "different" else sames).append(row)
+    n_same = len(sames)
+    cols = CHAIN_COLUMNS
+    old_sames = list(csv.DictReader(CHAIN_SAMES.open(), delimiter="\t")) if CHAIN_SAMES.exists() else []
+    merged_sames, _ = merge_pair_rows([dict(zip(cols, r)) for r in sames], old_sames)
+    with CHAIN_SAMES.open("w", newline="") as f:
+        w = csv.DictWriter(f, fieldnames=cols, delimiter="\t", extrasaction="ignore")
+        w.writeheader()
+        w.writerows(merged_sames)
     new_rows = [dict(zip(cols, r)) for r in rows]
     old_rows = list(csv.DictReader(CANNOT.open(), delimiter="\t")) if CANNOT.exists() else []
     merged, kept = merge_pair_rows(new_rows, old_rows)
