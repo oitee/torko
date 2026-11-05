@@ -3,6 +3,7 @@ import { Link } from "react-router-dom";
 import Button from "../../components/Button.jsx";
 import Chip from "../../components/Chip.jsx";
 import { formatNumber, termShort } from "../../assets/js/format.js";
+import PartyLink from "../../components/PartyLink.jsx";
 
 const OLDER_SHOWN = 10;
 
@@ -37,7 +38,7 @@ export default function SeatCard({ seat, latestTerm }) {
         </p>
       ) : (
         current.map((m) => {
-          const line = [m.party, termsText(m.terms)].filter(Boolean).join(" · ");
+          const terms = termsText(m.terms);
           const tags = Array.isArray(m.top_tags) ? m.top_tags : [];
           return (
             <div key={m.id} className="my-mp-member">
@@ -45,7 +46,13 @@ export default function SeatCard({ seat, latestTerm }) {
               <Link to={`/member/${m.id}`} className="my-mp-member__name">
                 {m.member}
               </Link>
-              {line && <p className="my-mp-member__line mono">{line}</p>}
+              {(m.party || terms) && (
+                <p className="my-mp-member__line mono">
+                  <PartyLink code={m.party} />
+                  {m.party && terms && " · "}
+                  {terms}
+                </p>
+              )}
               {tags.length > 0 && (
                 <div className="my-mp-member__tags">
                   <h3 className="my-mp-member__tags-title">Subjects of most speeches</h3>

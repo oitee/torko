@@ -54,7 +54,8 @@ describe("DebateWho", () => {
 
     const anilLink = screen.getByRole("link", { name: "Anil Kumar" });
     expect(anilLink.getAttribute("href")).toBe("/member/101");
-    expect(screen.getByText(/BJP · Patna Sahib · 1,204 words/)).toBeTruthy();
+    expect(screen.getAllByRole("link", { name: "BJP" })[0].getAttribute("href")).toBe("/party/BJP");
+    expect(screen.getByText(/Patna Sahib · 1,204 words/)).toBeTruthy();
 
     const anilBtn = screen.getByRole("button", {
       name: "Stop showing only Anil Kumar",
@@ -81,7 +82,7 @@ describe("DebateWho", () => {
       screen.getByRole("heading", { name: /Listed but did not speak/ })
     ).toBeTruthy();
     expect(screen.getByText("Rajiv Pratap Rudy")).toBeTruthy();
-    expect(screen.getByText("BJP · Saran")).toBeTruthy();
+    expect(screen.getByText(/Saran/)).toBeTruthy();
     expect(
       screen.getByText(/Names on the official list of speakers for this debate/)
     ).toBeTruthy();

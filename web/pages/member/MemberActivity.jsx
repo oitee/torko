@@ -1,6 +1,7 @@
 import React, { useId, useState } from "react";
 import { formatNumber, termLong, termShort } from "../../assets/js/format.js";
 import Button from "../../components/Button.jsx";
+import PartyLink from "../../components/PartyLink.jsx";
 
 export default function MemberActivity({
   sessions = [],
@@ -70,6 +71,7 @@ export default function MemberActivity({
     return {
       term: termNum,
       label,
+      parties: termObj?.parties || [],
       sessions: sessList,
     };
   });
@@ -223,7 +225,7 @@ export default function MemberActivity({
                       </div>
 
                       <div className="member-activity__term-footer mono">
-                        <span className="member-activity__term-title">{group.label}</span>
+                        <span className="member-activity__term-title"><TermParties group={group} /></span>
                       </div>
                     </div>
                   ))}
@@ -236,7 +238,7 @@ export default function MemberActivity({
               {termGroups.map((group) => (
                 <div key={group.term} className="member-activity__narrow-group">
                   <div className="member-activity__narrow-term-head mono">
-                    <span>{group.label}</span>
+                    <span><TermParties group={group} /></span>
                   </div>
                   <div className="member-activity__narrow-rows">
                     {group.sessions.map((s, sIdx) => {
@@ -317,5 +319,22 @@ export default function MemberActivity({
         </div>
       </div>
     </section>
+  );
+}
+
+// The label of a term, with each party as a link. A term with no party shows its long name.
+function TermParties({ group }) {
+  if (group.parties.length === 0) return group.label;
+  return (
+    <>
+      {termShort(group.term)}
+      {" · "}
+      {group.parties.map((code, i) => (
+        <React.Fragment key={code}>
+          {i > 0 && ", "}
+          <PartyLink code={code} />
+        </React.Fragment>
+      ))}
+    </>
   );
 }

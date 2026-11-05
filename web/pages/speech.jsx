@@ -22,6 +22,7 @@ import AroundSpeech from "./speech/AroundSpeech.jsx";
 import SpeechTags from "./speech/SpeechTags.jsx";
 import SpeechText from "./speech/SpeechText.jsx";
 import "./speech.css";
+import PartyLink from "../components/PartyLink.jsx";
 
 // Map speech language code to full English description.
 function languageWord(lang) {
@@ -138,12 +139,13 @@ export default function Speech() {
               {speech.member}
             </Link>
             <span className="speech-header__member-meta">
-              {[
-                ["MP", speech.seat, speech.state].filter(Boolean).join(", "),
-                speech.party ? `${speech.party} on this day` : null,
-              ]
-                .filter(Boolean)
-                .join(" · ")}
+              {["MP", speech.seat, speech.state].filter(Boolean).join(", ")}
+              {speech.party && (
+                <>
+                  {" · "}
+                  <PartyLink code={speech.party} /> on this day
+                </>
+              )}
             </span>
           </>
         ) : (

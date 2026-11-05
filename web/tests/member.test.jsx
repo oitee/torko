@@ -201,7 +201,8 @@ describe("Member Page", () => {
       expect(heading).toBeTruthy();
 
       expect(screen.queryByText("Member of the Lok Sabha")).toBeNull();
-      expect(screen.getByText(/AITC since 2019/)).toBeTruthy();
+      expect(screen.getAllByRole("link", { name: "AITC" })[0].getAttribute("href")).toBe("/party/AITC");
+      expect(screen.getByText(/since 2019/)).toBeTruthy();
 
       // Answer sentence
       expect(

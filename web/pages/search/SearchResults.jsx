@@ -6,6 +6,7 @@ import SpeakerLine from "../../components/SpeakerLine.jsx";
 import TLDR from "../../components/TLDR.jsx";
 import { EmptyState, ErrorState, Loading } from "../../components/States.jsx";
 import { SORTS, defaultSort, excerptParts, isPhrase, pageWindow, yearSpan } from "./searchParams.js";
+import PartyLink from "../../components/PartyLink.jsx";
 
 // One speech that matches: when, which debate, who, and the words in their sentence.
 export function SearchSpeechRow({ speech }) {
@@ -48,14 +49,20 @@ export function SearchSpeechRow({ speech }) {
 
 // One member who spoke the words: who, from where, how often, and when.
 export function SearchMemberRow({ member, href }) {
-  const where = [member.party, member.seat, (member.terms || []).map(termShort).join(", ")].filter(Boolean).join(" · ");
+  const where = [member.seat, (member.terms || []).map(termShort).join(", ")].filter(Boolean).join(" · ");
   return (
     <li className="search-member">
       <div className="search-member__who">
         <Link to={`/member/${member.id}`} className="search-member__name">
           {member.name}
         </Link>
-        {where && <span className="search-member__where">{where}</span>}
+        {(member.party || where) && (
+          <span className="search-member__where">
+            <PartyLink code={member.party} />
+            {member.party && where && " · "}
+            {where}
+          </span>
+        )}
         {member.tag_counts && (
           <span className="search-member__most">
             {member.tag_counts.map((t, i) => (

@@ -24,7 +24,8 @@ describe("SpeakerLine", () => {
 
     const link = screen.getByRole("link", { name: "Mahua Moitra" });
     expect(link.getAttribute("href")).toBe("/member/1052");
-    expect(screen.getByText("· Krishnanagar · AITC", { exact: false })).toBeTruthy();
+    expect(screen.getByText("· Krishnanagar ·", { exact: false })).toBeTruthy();
+    expect(screen.getAllByRole("link", { name: "AITC" })[0].getAttribute("href")).toBe("/party/AITC");
   });
 
   it("leaves out null seat and its dot", () => {
@@ -41,7 +42,7 @@ describe("SpeakerLine", () => {
       </MemoryRouter>
     );
 
-    expect(screen.getByText("· AITC", { exact: false })).toBeTruthy();
+    expect(screen.getAllByRole("link", { name: "AITC" })[0].getAttribute("href")).toBe("/party/AITC");
     expect(screen.queryByText(/Krishnanagar/)).toBeNull();
   });
 

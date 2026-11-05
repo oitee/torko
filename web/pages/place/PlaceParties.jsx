@@ -1,6 +1,7 @@
 import React from "react";
 import { formatNumber } from "../../assets/js/format.js";
 import { partyShades } from "../../assets/js/colour.js";
+import PartyLink from "../../components/PartyLink.jsx";
 
 const KNOWN_PARTY_TOKENS = new Set(["bjp", "inc", "aitc", "tdp", "bsp"]);
 
@@ -86,7 +87,7 @@ export default function PlaceParties({ parties = [], placeName = "" }) {
 
             return (
               <div key={p.party || idx} className="place-parties__row">
-                <span className="place-parties__party-name">{p.party}</span>
+                <span className="place-parties__party-name"><PartyLink code={p.party} /></span>
 
                 <div className="place-parties__track">
                   <div

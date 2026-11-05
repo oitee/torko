@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import { Link } from "react-router-dom";
 import { formatNumber } from "../../assets/js/format.js";
 import "./DebateWho.css";
+import PartyLink from "../../components/PartyLink.jsx";
 
 export default function DebateWho({
   people = [],
@@ -31,13 +32,7 @@ export default function DebateWho({
       <div className="debate-who__list" role="list">
         {shown.map((person, idx) => {
           const isSelected = selectedMemberId === person.id;
-          const metaParts = [];
-          if (person.party) metaParts.push(person.party);
-          if (person.seat) metaParts.push(person.seat);
-          const metaLoc = metaParts.join(" · ");
-          const metaText = metaLoc
-            ? `${metaLoc} · ${formatNumber(person.words)} words`
-            : `${formatNumber(person.words)} words`;
+          const metaText = [person.seat, `${formatNumber(person.words)} words`].filter(Boolean).join(" · ");
 
           // A member with no speech of their own spoke only in remarks inside other speeches.
           const turnsN = person.turns || 0;
@@ -69,7 +64,11 @@ export default function DebateWho({
                 >
                   {person.name}
                 </Link>
-                <span className="debate-who__meta meta">{metaText}</span>
+                <span className="debate-who__meta meta">
+                  <PartyLink code={person.party} />
+                  {person.party && " · "}
+                  {metaText}
+                </span>
               </div>
 
               <button
@@ -122,11 +121,6 @@ export default function DebateWho({
 
           <div className="debate-who__silent-grid">
             {silent.map((s, idx) => {
-              const metaParts = [];
-              if (s.party) metaParts.push(s.party);
-              if (s.seat) metaParts.push(s.seat);
-              const metaText = metaParts.join(" · ");
-
               return (
                 <span key={s.member_id || idx} className="debate-who__silent-item">
                   {s.member_id ? (
@@ -139,9 +133,12 @@ export default function DebateWho({
                   ) : (
                     <span className="debate-who__silent-name">{s.name}</span>
                   )}
-                  {metaText && (
+                  {(s.party || s.seat) && (
                     <span className="debate-who__silent-meta meta">
-                      {" "}{metaText}
+                      {" "}
+                      <PartyLink code={s.party} />
+                      {s.party && s.seat && " · "}
+                      {s.seat}
                     </span>
                   )}
                 </span>

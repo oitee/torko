@@ -2,32 +2,26 @@ import React from "react";
 import { Link } from "react-router-dom";
 import { formatDateLong, formatNumber } from "../../assets/js/format.js";
 import PageAnswer from "../../components/PageAnswer.jsx";
+import PartyLink from "../../components/PartyLink.jsx";
 
 // Build the meta line: "MP, <seat>, <state> · <current_party> since <year> · <earlier_party> <from>–<to>"
-export function formatPartyPath(partyPath) {
-  if (!Array.isArray(partyPath) || partyPath.length === 0) {
-    return "";
-  }
+export function orderedPartyPath(partyPath) {
   // The current party is the one with to == null, or the last item in chronological order.
   const currentIndex = partyPath.findIndex((p) => p.to == null);
   const activeParty =
     currentIndex !== -1
       ? partyPath[currentIndex]
       : partyPath[partyPath.length - 1];
-  const earlierParties = partyPath.filter((p) => p !== activeParty);
+  return [activeParty, ...partyPath.filter((p) => p !== activeParty)];
+}
 
-  const activeStr =
-    activeParty.to == null
-      ? `${activeParty.code} since ${activeParty.from}`
-      : `${activeParty.code} ${activeParty.from}–${activeParty.to}`;
-
-  const earlierStrs = earlierParties.map((p) =>
-    p.to != null
-      ? `${p.code} ${p.from}–${p.to}`
-      : `${p.code} since ${p.from}`
-  );
-
-  return [activeStr, ...earlierStrs].join(" · ");
+export function formatPartyPath(partyPath) {
+  if (!Array.isArray(partyPath) || partyPath.length === 0) {
+    return "";
+  }
+  return orderedPartyPath(partyPath)
+    .map((p) => (p.to == null ? `${p.code} since ${p.from}` : `${p.code} ${p.from}–${p.to}`))
+    .join(" · ");
 }
 
 // Build the plain answer sentence
@@ -113,7 +107,16 @@ export default function MemberHead({ member }) {
           )}
           {member.state && `, ${member.state}`}
         </span>
-        {partyString && <span> · {partyString}</span>}
+        {partyString && (
+          <span>
+            {orderedPartyPath(member.party_path).map((p) => (
+              <React.Fragment key={`${p.code}-${p.from}`}>
+                {" · "}
+                <PartyLink code={p.code} /> {p.to == null ? `since ${p.from}` : `${p.from}–${p.to}`}
+              </React.Fragment>
+            ))}
+          </span>
+        )}
       </div>
 
       <PageAnswer as="p">{answerText}</PageAnswer>

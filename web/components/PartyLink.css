@@ -1,0 +1,16 @@
+/* PartyLink styles. The link keeps the type of the line that holds it. */
+.party-link {
+  color: var(--action);
+  text-decoration: none;
+}
+
+.party-link:hover {
+  color: var(--action-hover);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+.party-link:focus-visible {
+  outline: 2px solid var(--action);
+  outline-offset: 2px;
+}

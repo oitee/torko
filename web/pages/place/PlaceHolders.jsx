@@ -2,6 +2,7 @@ import React from "react";
 import { Link } from "react-router-dom";
 import { formatMonthYear } from "./PlaceHead.jsx";
 import { ordinal } from "../../assets/js/format.js";
+import PartyLink from "../../components/PartyLink.jsx";
 
 const TERM_YEARS = {
   13: "1999–2004",
@@ -78,7 +79,7 @@ export default function PlaceHolders({ holders = [] }) {
 
                       {h.party && (
                         <span className="place-holders__party">
-                          {h.party}
+                          <PartyLink code={h.party} />
                         </span>
                       )}
 

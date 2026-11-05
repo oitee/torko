@@ -75,7 +75,8 @@ describe("Your MP page", () => {
     expect(api.getJSON).toHaveBeenCalledWith("/api/my-mp", { q: "latur" }, { signal: expect.any(AbortSignal) });
     expect(screen.getByText("1 seat has “latur” in its name")).toBeTruthy();
     expect(screen.getByRole("link", { name: "Shivaji Bandappa Kalge" }).getAttribute("href")).toBe("/member/699");
-    expect(screen.getByText("INC · 18th LS")).toBeTruthy();
+    expect(screen.getAllByRole("link", { name: "INC" })[0].getAttribute("href")).toBe("/party/INC");
+    expect(screen.getByText(/· 18th LS/)).toBeTruthy();
     expect(screen.getByRole("link", { name: /Farmers/ }).getAttribute("href")).toBe("/tag/farmers");
     expect(screen.queryByText("null")).toBeNull();
   });
