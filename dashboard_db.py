@@ -487,7 +487,7 @@ def get_speaker_detail(sansad_id: str) -> dict | None:
         },
         "terms": [
             {"loksabha": r.lok_sabha_term, "party": r.party, "constituency": r.constituency,
-             "member": r.source != "last-term-fallback",
+             "member": r.source not in ("last-term-fallback", "not-a-member"),
              "from": r.effective_from.isoformat() if r.source == "event" else None}
             for r in term_rows
         ],

@@ -138,7 +138,8 @@ So Torko gives each speech its own tags and a one-line summary. Torko records wh
 
 1. Torko finds no speaker name for 106,168 turns. The site marks these turns as unattributed.
 2. The party shown for a speech is the member's party on the date of the debate. It comes from the Wikipedia list of members of each term, from sansad.in, and from a manual review. A change of party inside a term shows from its date only when it is a formal event, such as a by-election, a recognised split, or an expulsion. Changes that no source records are not shown. See [`data/party_history`](data/party_history/README.md).
-3. Torko does not read about 13.6% of the source text. The loss is 32.5% in the 13th Lok Sabha and about 3% in recent terms. Charts over time will therefore show too little activity in the early years.
+3. Most people who speak with no Lok Sabha seat in a term, such as ministers from the Rajya Sabha, have no party in that term. So a filter on one party does not show their speeches. An exception remains: 56 older (person, term) pairs still show the party of the person's last Lok Sabha term.
+4. Torko does not read about 13.6% of the source text. The loss is 32.5% in the 13th Lok Sabha and about 3% in recent terms. Charts over time will therefore show too little activity in the early years.
 
    <details>
    <summary>Why?</summary>
