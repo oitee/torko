@@ -20,7 +20,11 @@ COUNTS_NOTE = (
     "parties.speeches_tagged counts tagged speeches of the party, and party_speeches_with_tags counts all speeches "
     "of the party that have at least one kept tag, so per100 is the tagged share of that party's tagged speeches. "
     "members.speeches_tagged counts tagged speeches of the member (members with 3 or more). "
-    "related.speeches_shared counts speeches that carry both tags. "
+    "related.speeches_shared counts speeches that carry both tags, each speech once. "
+    "related.expected is the number of shared speeches that chance gives: (speeches with this tag x speeches with the related tag) "
+    "divided by all tagged speeches, meaning the distinct speeches that carry any live tag. related.lift is speeches_shared divided by expected. "
+    "The list shows the 14 tags with the highest lift, and a tie goes to more shared speeches. "
+    "A related tag needs at least 8 shared speeches, and it is not of type place or role. "
     "subjects.speeches and subjects.debates count the speeches and debates of the subject. "
     "subjects.peak is the year with the most speeches of the subject (a tie goes to the earlier year). "
     "n_members counts the distinct members with at least one tagged speech, in all terms. It does not count speakers with no identified member, "
@@ -71,7 +75,9 @@ def shape_tag(t, by_source, sessions, parties, members, subjects, related, recen
         "subjects": [{"id": r["id"], "label": r["label"], "n": r["n_speeches"], "speeches": r["n_speeches"],
                       "debates": r["n_debates"], "peak": peaks.get(r["id"])} for r in subjects],
         "related": [{"name": r["tag"], "slug": slug(r["tag"]), "type": r["type"], "n": r["n"],
-                     "speeches_shared": r["n"]} for r in related],
+                     "speeches_shared": r["n"], "lift": round(r["lift"], 1) if r.get("lift") is not None else None,
+                     "expected": round(r["expected"], 2) if r.get("expected") is not None else None}
+                    for r in related],
         "recent": recent, "longest": longest,
     }
 
@@ -174,11 +180,12 @@ def tag_data(c, tag_id, term=None):
     subjects = c.execute(text(
         "SELECT id, label, n_speeches, n_debates FROM subjects WHERE parent_tag_id = :id "
         "ORDER BY n_speeches DESC, label LIMIT 40"), p).mappings().all()
-    related = c.execute(text(f"""
-        WITH {LIMITED_SPEECH_TAGS}
-        SELECT t.tag, t.type, count(*) AS n FROM speech_tags o JOIN tags t ON t.id = o.tag_id
-        WHERE o.tag_id <> :id AND t.type NOT IN ('place', 'role')
-        GROUP BY t.id ORDER BY n DESC, t.tag LIMIT 14"""), p).mappings().all()
+    # The table tag_related holds the lift of each pair. scripts/build_tag_related.py builds it.
+    related = c.execute(text("""
+        SELECT t.tag, t.type, r.shared AS n, r.expected, r.lift
+        FROM tag_related r JOIN tags t ON t.id = r.related_tag_id
+        WHERE r.tag_id = :id AND t.status NOT IN ('rejected', 'merged') AND t.type NOT IN ('place', 'role')
+        ORDER BY r.lift DESC, r.shared DESC, t.tag LIMIT 14"""), p).mappings().all()
     recent_ids = [r[0] for r in c.execute(text(base + """
         SELECT ts.speech_id FROM ts JOIN speeches s ON s.id = ts.speech_id JOIN debates d ON d.id = s.debate_id
         WHERE ts.source = 'llm' AND s.person_id IS NOT NULL AND """ + in_term + """ ORDER BY d.debate_date DESC, s.word_count DESC LIMIT 8"""), p).all()]

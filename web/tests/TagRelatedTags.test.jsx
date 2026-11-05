@@ -32,7 +32,17 @@ describe("TagRelatedTags component", () => {
     expect(chip3.getAttribute("href")).toBe("/tag/sugar");
   });
 
-  it("limits related chips to at most 12", () => {
+  it("states the rule of the order", () => {
+    render(
+      <MemoryRouter>
+        <TagRelatedTags related={mockRelated} />
+      </MemoryRouter>
+    );
+    expect(screen.getByText(/more often than chance/)).toBeTruthy();
+    expect(screen.getByText(/At least 8 shared speeches/)).toBeTruthy();
+  });
+
+  it("limits related chips to at most 14", () => {
     const manyTags = Array.from({ length: 20 }, (_, i) => ({
       name: `Tag ${i}`,
       slug: `tag-${i}`,
@@ -46,7 +56,7 @@ describe("TagRelatedTags component", () => {
     );
 
     const chips = screen.getAllByRole("link");
-    expect(chips.length).toBe(12);
+    expect(chips.length).toBe(14);
   });
 
   it("returns null when related is empty", () => {

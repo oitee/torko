@@ -238,3 +238,18 @@ CREATE TABLE IF NOT EXISTS subject_parents (
     tag_set_version  INTEGER  NOT NULL,
     decided_at       TIMESTAMPTZ NOT NULL DEFAULT now()
 );
+
+-- tag_related: the related tags of each tag, ranked by lift. scripts/build_tag_related.py
+-- replaces every row. The query is slow, so the Tag page reads this table.
+-- shared is the number of speeches that carry both tags. expected is the number of shared
+-- speeches that chance alone gives: (speeches with the tag x speeches with the related tag)
+-- divided by all tagged speeches. lift is shared divided by expected. Each speech counts once.
+-- The script keeps the 30 related tags with the highest lift for each tag.
+CREATE TABLE IF NOT EXISTS tag_related (
+    tag_id          INTEGER NOT NULL REFERENCES tags(id) ON DELETE CASCADE,
+    related_tag_id  INTEGER NOT NULL REFERENCES tags(id) ON DELETE CASCADE,
+    shared          INTEGER NOT NULL,
+    expected        REAL    NOT NULL,
+    lift            REAL    NOT NULL,
+    PRIMARY KEY (tag_id, related_tag_id)
+);
