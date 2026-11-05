@@ -4,6 +4,7 @@ import { getJSON } from "../assets/js/api.js";
 import { useAnswer, useApi } from "../assets/js/useApi.js";
 import PageLayout from "../components/PageLayout.jsx";
 import { ErrorState, Loading } from "../components/States.jsx";
+import NotFound from "./not_found.jsx";
 import PlaceHead from "./place/PlaceHead.jsx";
 import TagWhenChart from "./tag/TagWhenChart.jsx";
 import PlaceHolders from "./place/PlaceHolders.jsx";
@@ -58,6 +59,8 @@ export default function Place() {
       </main>
     );
   }
+
+  if (error?.status === 404 && !place) return <NotFound />;
 
   if (error && !place) {
     return (

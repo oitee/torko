@@ -10,21 +10,22 @@ export default function Button({
   href,
   onClick,
   children,
+  className = "",
 }) {
   const allowedVariants = ["primary", "secondary", "text"];
   const safeVariant = allowedVariants.includes(variant) ? variant : "secondary";
-  const className = `button button--${safeVariant}`;
+  const classes = `button button--${safeVariant} ${className}`.trim();
 
   if (href) {
     return (
-      <Link to={href} className={className} onClick={onClick}>
+      <Link to={href} className={classes} onClick={onClick}>
         {children}
       </Link>
     );
   }
 
   return (
-    <button type="button" className={className} onClick={onClick}>
+    <button type="button" className={classes} onClick={onClick}>
       {children}
     </button>
   );

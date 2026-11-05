@@ -218,7 +218,7 @@ describe("Debate page", () => {
     );
 
     await waitFor(() => {
-      expect(screen.getByText("Page not found")).toBeTruthy();
+      expect(screen.getByRole("heading", { level: 1, name: "Page not found." })).toBeTruthy();
     });
 
     await waitFor(() => expect(document.title).toBe("Page not found · Torko"));

@@ -160,6 +160,6 @@ describe("Party page", () => {
   it("shows Page not found for an unknown party", async () => {
     vi.spyOn(api, "getJSON").mockRejectedValueOnce({ status: 404 });
     renderParty("/party/XYZ");
-    expect(await screen.findByText("Page not found")).toBeTruthy();
+    expect(await screen.findByRole("heading", { level: 1, name: "Page not found." })).toBeTruthy();
   });
 });

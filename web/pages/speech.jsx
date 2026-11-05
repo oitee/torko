@@ -16,6 +16,7 @@ import PageAnswer from "../components/PageAnswer.jsx";
 import PageLayout from "../components/PageLayout.jsx";
 import Popover from "../components/Popover.jsx";
 import { ErrorState, Loading } from "../components/States.jsx";
+import NotFound from "./not_found.jsx";
 import TLDR from "../components/TLDR.jsx";
 import AroundSpeech from "./speech/AroundSpeech.jsx";
 import SpeechTags from "./speech/SpeechTags.jsx";
@@ -96,6 +97,8 @@ export default function Speech() {
       </main>
     );
   }
+
+  if (error?.status === 404) return <NotFound />;
 
   if (error) {
     return (

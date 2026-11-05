@@ -1,0 +1,83 @@
+/* The Page not found page. It reuses .ink-band, .home-hero, .search-box, and .button. */
+
+/* The path that the reader asked for. A long path wraps, so the page never scrolls sideways. */
+.not-found__path {
+  font-family: var(--font-mono);
+  font-size: 0.95em;
+  color: var(--ink);
+  background: var(--sheet);
+  border: 1px solid var(--hairline);
+  padding: 1px var(--space-1);
+  overflow-wrap: anywhere;
+}
+
+/* The main action: go to the home page. A .button is made for a button element, so a link needs these rules. */
+.not-found__cta {
+  display: inline-flex;
+  align-items: center;
+  align-self: flex-start;
+  gap: var(--space-2);
+  font-size: var(--size-body);
+  font-weight: 600;
+  text-decoration: none;
+}
+
+.not-found__cta:hover {
+  background: var(--action-hover);
+}
+
+.not-found__cta:focus-visible {
+  outline: 2px solid var(--action);
+  outline-offset: 3px;
+}
+
+/* The second action: search. It is quieter than the main action. */
+.not-found__search {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  max-width: 480px;
+  margin-top: var(--space-3);
+  padding-top: var(--space-5);
+  border-top: 1px solid var(--hairline);
+}
+
+.not-found__search-label {
+  margin: 0;
+  font-size: var(--size-label);
+  line-height: var(--lh-label);
+  color: var(--ink-2);
+}
+
+/* HouseSeats has a caption for the Home page. That text is wrong on this page. */
+.not-found .house-seats__caption {
+  display: none;
+}
+
+/* The marked seat of the House becomes an empty seat. */
+.not-found .house-seats__seat--marked {
+  fill: none;
+  stroke: var(--action);
+  stroke-width: 1;
+  transform-box: fill-box;
+  transform-origin: center;
+  animation: not-found-vacant 2.4s ease-in-out infinite;
+}
+
+@keyframes not-found-vacant {
+  0%,
+  100% {
+    transform: scale(1.15);
+    opacity: 1;
+  }
+  50% {
+    transform: scale(2);
+    opacity: 0.6;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .not-found .house-seats__seat--marked {
+    animation: none;
+  }
+}

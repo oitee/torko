@@ -341,7 +341,7 @@ describe("Place page integration", () => {
     renderPlacePage("/place/no-such-place");
 
     await waitFor(() => {
-      expect(screen.getByRole("alert").textContent).toContain("Page not found");
+      expect(screen.getByRole("heading", { level: 1, name: "Page not found." })).toBeTruthy();
     });
 
     await waitFor(() => expect(document.title).toBe("Page not found · Torko"));

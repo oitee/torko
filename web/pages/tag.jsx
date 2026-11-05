@@ -6,6 +6,7 @@ import Breadcrumb from "../components/Breadcrumb.jsx";
 import HowTorkoCounts from "../components/HowTorkoCounts.jsx";
 import PageLayout from "../components/PageLayout.jsx";
 import { ErrorState, Loading } from "../components/States.jsx";
+import NotFound from "./not_found.jsx";
 import TagHead from "./tag/TagHead.jsx";
 import TagTermBar from "./tag/TagTermBar.jsx";
 import TagWhenChart from "./tag/TagWhenChart.jsx";
@@ -58,6 +59,8 @@ export default function Tag() {
       </main>
     );
   }
+
+  if (error?.status === 404 && !tag) return <NotFound />;
 
   if (error && !tag) {
     return (

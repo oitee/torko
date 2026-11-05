@@ -22,7 +22,7 @@ describe("router", () => {
     ["/search", "Search the speeches of the Lok Sabha"],
     ["/method", "Torko reads the Lok Sabha debates, finds who spoke each turn, and tags each speech with its subjects."],
     ["/dev/components", "Components"],
-    ["/no/such/page", "Page not found"],
+    ["/no/such/page", "Page not found."],
   ])("shows %s as the %s page", (path, heading) => {
     at(path);
     expect(screen.getByRole("heading", { level: 1 }).textContent).toBe(heading);

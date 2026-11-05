@@ -7,6 +7,7 @@ import Chip from "../components/Chip.jsx";
 import HowTorkoCounts from "../components/HowTorkoCounts.jsx";
 import PageLayout from "../components/PageLayout.jsx";
 import { ErrorState, Loading } from "../components/States.jsx";
+import NotFound from "./not_found.jsx";
 import PartyCompare from "./party/PartyCompare.jsx";
 import PartyShareChart from "./party/PartyShareChart.jsx";
 import { activeTerms, headNumbers, partyColourVars } from "./party/partyData.js";
@@ -40,6 +41,8 @@ export default function Party() {
       </main>
     );
   }
+
+  if (error?.status === 404) return <NotFound />;
 
   if (error || !party) {
     return (

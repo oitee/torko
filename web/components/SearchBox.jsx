@@ -64,7 +64,8 @@ function groupSuggestions(results) {
 }
 
 // The SearchBox component renders the main search input with autocomplete suggestions.
-export default function SearchBox({ initial = "" }) {
+// buttonVariant sets the style of the button. labelledBy is the id of a visible label for the input.
+export default function SearchBox({ initial = "", buttonVariant = "primary", labelledBy }) {
   const [query, setQuery] = useState(initial || "");
   const [results, setResults] = useState([]);
   const [isOpen, setIsOpen] = useState(false);
@@ -204,9 +205,10 @@ export default function SearchBox({ initial = "" }) {
           aria-autocomplete="list"
           aria-controls={listboxId}
           aria-activedescendant={activeOptionId}
+          aria-labelledby={labelledBy}
         />
         <div className="search-box__button-wrap">
-          <Button variant="primary" onClick={handleSearchSubmit}>
+          <Button variant={buttonVariant} onClick={handleSearchSubmit}>
             Search
           </Button>
         </div>

@@ -7,6 +7,7 @@ import FilterBar from "../components/FilterBar.jsx";
 import PageLayout from "../components/PageLayout.jsx";
 import SpeechList from "../components/SpeechList.jsx";
 import { ErrorState, Loading } from "../components/States.jsx";
+import NotFound from "./not_found.jsx";
 import MemberActivity from "./member/MemberActivity.jsx";
 import MemberHead from "./member/MemberHead.jsx";
 import MemberLatest from "./member/MemberLatest.jsx";
@@ -87,6 +88,8 @@ export default function Member() {
       </main>
     );
   }
+
+  if (error?.status === 404) return <NotFound />;
 
   if (error) {
     return (

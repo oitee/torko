@@ -4,6 +4,7 @@ import { useAnswer } from "../assets/js/useApi.js";
 import { formatDateLong } from "../assets/js/format.js";
 import PageLayout from "../components/PageLayout.jsx";
 import { ErrorState, Loading } from "../components/States.jsx";
+import NotFound from "./not_found.jsx";
 import DebateDiscussed from "./debate/DebateDiscussed.jsx";
 import DebateGlance from "./debate/DebateGlance.jsx";
 import DebateHead from "./debate/DebateHead.jsx";
@@ -80,6 +81,8 @@ export default function Debate() {
       </main>
     );
   }
+
+  if (error?.status === 404) return <NotFound />;
 
   if (error) {
     return (
