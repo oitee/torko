@@ -10,12 +10,15 @@ import csv
 import io
 import re
 
-from flask import Response
+import dashboard_db
+
+from flask import Response, after_this_request, has_request_context
 from sqlalchemy import text
 
 from pages.common import (KIND_LABELS, KINDS, PARTY_AT_DATE, clean_layout, party_colours, resolve_tag, slug, speech_kind,
                           speech_rows, speech_tags_cte, tag_speeches)
 from pages.sessions import session_labels
+from pages.search_rank import fuse, nearest_speeches, phrase_of, query_vector, save_near, stored_near, word_speeches
 from tag_search import STOP
 
 MAX_PER_PAGE = 50
@@ -29,13 +32,19 @@ COUNTS_NOTE = (
     "A speech with no identified member is in total. It has no tags and no summary, so a tag, subject or place filter "
     "never finds it. Counts by member or party leave out the speeches with no identified member. "
     "A speech with a member but no known party at the date of the debate is also left out of the party counts. "
-    "With q, a speech matches when one of its own turns has every word of q. An interruption by another member does not count. "
+    "With two or more tags in tag, a speech matches when it carries all of them. With group=member and two or more tags, "
+    "a member matches with at least one speech for each tag, in any speeches. total stays the count of speeches of the filter. "
+    "With q, a speech matches when its own turns and the member name hold every word of q, "
+    "or when its summary is near q in meaning. An interruption by another member does not count. "
+    "q in quote marks matches only a turn that holds these exact words in this order. "
+    "An exact repeat of an earlier speech by the same member is left out. "
     "Each facet count uses all the filters except the filter of that facet."
 )
 FACET_NOTE = (
     "facets.term, session, subject, party and kind count speeches. Each one uses every filter except its own. "
     "facets.subject counts only when tag is given, for the 20 subjects of the tag with most matching speeches. "
-    "facets.party leaves out the speeches with no identified member or no known party."
+    "facets.party leaves out the speeches with no identified member or no known party. "
+    "The matches by meaning are the nearest summaries under all the filters, so a facet count can be lower than the count after you choose it."
 )
 
 # The debate type of a speech in the form of the kind table: upper case, single spaces.
@@ -97,14 +106,22 @@ def parse_args(conn, args):
         "party_not": [p.upper() for p in str_list(args.get("party_not"))],
         "min_words": int_arg(args.get("min_words"), 0, 0, 10**7),
         "subject": int_list(args.get("subject")), "q": (args.get("q") or "").strip(),
+        "phrase": phrase_of(args.get("q")),
         "tag_ids": None, "place_ids": None,
     }
-    if args.get("tag"):
-        t = resolve_tag(conn, args["tag"].strip())
-        if not t:
-            return f, "tag"
-        f["tag_id"] = t["id"]
-        f["tag_ids"] = [sid for sid, _ in tag_speeches(conn, t["id"])]
+    slugs = list(dict.fromkeys(str_list(args.get("tag"))))
+    if slugs:
+        sets = []
+        for one in slugs:
+            t = resolve_tag(conn, one)
+            if not t:
+                return f, "tag"
+            sets.append({"name": t["tag"], "slug": slug(t["tag"]), "ids": [sid for sid, _ in tag_speeches(conn, t["id"])]})
+        if len(sets) == 1:
+            f["tag_id"] = t["id"]
+        else:  # Two or more tags: a speech needs all of them. The Members view has its own rule, in speeches().
+            f["tag_sets"] = sets
+        f["tag_ids"] = sorted(set.intersection(*(set(x["ids"]) for x in sets)))
     if args.get("place"):
         t = resolve_tag(conn, args["place"].strip(), "place")
         if not t:
@@ -146,10 +163,13 @@ def conditions(f):
         c["kind"] = ("(" + " OR ".join(parts or ["false"]) + ")", {"kind_types": types, "all_types": ALL_TYPES})
     if f["min_words"]:
         c["min_words"] = ("s.word_count >= :min_words", {"min_words": f["min_words"]})
-    if f["q"]:
+    if f.get("phrase"):
         c["q"] = ("""s.id IN (SELECT t.speech_id FROM turns t JOIN speeches s2 ON s2.id = t.speech_id
-            WHERE to_tsvector('simple', t.text) @@ plainto_tsquery('simple', :q)
-              AND t.person_id IS NOT DISTINCT FROM s2.person_id)""", {"q": f["q"]})
+            WHERE to_tsvector('simple', t.text) @@ phraseto_tsquery('simple', :q)
+              AND t.person_id IS NOT DISTINCT FROM s2.person_id)""", {"q": f["phrase"]})
+    elif f["q"]:
+        c["q"] = ("""s.id IN (SELECT speech_id FROM speech_search
+            WHERE words @@ plainto_tsquery('simple', :q) AND repeat_of IS NULL)""", {"q": f["q"]})
     if f["party"]:
         c["party"] = ("pa.party = ANY(:party)", {"party": f["party"]})
     if f["party_not"]:
@@ -237,20 +257,56 @@ def rows_for(conn, ids):
 
 
 def add_excerpts(conn, rows, q):
-    """Add excerpt and marks to each row: the first own turn of the speech that matches q."""
+    """Add excerpt and marks to each row: the first own turn of the speech that holds a word of q."""
     words = highlight_words(q)
     found = {}
     for sid, txt in conn.execute(text("""
         SELECT t.speech_id, t.text FROM turns t JOIN speeches s ON s.id = t.speech_id
         WHERE t.speech_id = ANY(:ids) AND t.person_id IS NOT DISTINCT FROM s.person_id
-          AND to_tsvector('simple', t.text) @@ plainto_tsquery('simple', :q)
-        ORDER BY t.speech_id, t.seq"""), {"ids": [r["id"] for r in rows], "q": q}):
+        ORDER BY t.speech_id, t.seq"""), {"ids": [r["id"] for r in rows]}):
         if sid not in found:
             ex, marks = make_excerpt(txt, words)
             if ex:
                 found[sid] = (ex, marks)
     for r in rows:
         r["excerpt"], r["marks"] = found.get(r["id"], (None, []))
+
+
+def add_meaning(conn, f, conds):
+    """Widen the q condition with the nearest summaries. Return (their ids, True), or ([], False) when the model call fails."""
+    store = dashboard_db.get_engine()
+    vector = query_vector(store, f["q"])
+    if vector is None:
+        return [], False
+    w, p, party = where(conds, ("q",))
+    no_filter = len(conds) == 1
+    near = stored_near(store, f["q"]) if no_filter else None
+    if near is None:
+        near = nearest_speeches(conn, vector, from_sql(party), w, p)
+        if no_filter:
+            save_near(store, f["q"], near)
+    if near:
+        sql, params = conds["q"]
+        conds["q"] = (f"({sql} OR s.id = ANY(:near_ids))", {**params, "near_ids": near})
+    return near, True
+
+
+def add_match_kind(conn, rows, q, near):
+    """Say why each row is in the list: words, meaning, or both."""
+    with_words = {r[0] for r in conn.execute(text("""SELECT speech_id FROM speech_search
+        WHERE speech_id = ANY(:ids) AND words @@ plainto_tsquery('simple', :q)"""), {"ids": [r["id"] for r in rows], "q": q})}
+    near = set(near)
+    for r in rows:
+        r["match"] = "both" if r["id"] in near and r["id"] in with_words else "meaning" if r["id"] in near else "words"
+
+
+def do_not_store():
+    """Stop nginx from keeping an answer with no matches by meaning: the model call can work again a moment later."""
+    if has_request_context():
+        @after_this_request
+        def _no_store(resp):
+            resp.headers["Cache-Control"] = "no-store"
+            return resp
 
 
 def facets(conn, conds, f, labels):
@@ -290,10 +346,21 @@ def facets(conn, conds, f, labels):
     return out
 
 
-def member_groups(conn, conds, sort, page, per_page):
-    """Return (rows, number of members): one row for each member with matching speeches."""
+def member_groups(conn, conds, sort, page, per_page, tag_sets=None):
+    """Return (rows, number of members): one row for each member with matching speeches.
+
+    With tag_sets, a member must have at least one speech for each tag, in any speeches. Each row counts the speeches of each tag.
+    """
     w, p, needs_party = where(conds)
-    n_members = conn.execute(text(f"SELECT count(DISTINCT s.person_id) {from_sql(needs_party)} WHERE {w} AND s.person_id IS NOT NULL"), p).scalar()
+    p = dict(p)
+    counts, having = "", ""
+    if tag_sets:
+        for i, t in enumerate(tag_sets):
+            p[f"set{i}"] = t["ids"]
+        counts = "".join(f", count(*) FILTER (WHERE s.id = ANY(:set{i})) AS n_set{i}" for i in range(len(tag_sets)))
+        having = "HAVING " + " AND ".join(f"count(*) FILTER (WHERE s.id = ANY(:set{i})) > 0" for i in range(len(tag_sets)))
+    n_members = conn.execute(text(f"""SELECT count(*) FROM (SELECT s.person_id {from_sql(needs_party)}
+        WHERE {w} AND s.person_id IS NOT NULL GROUP BY s.person_id {having}) x"""), p).scalar()
     order = GROUP_SORTS[sort]
     p = {**p, "lim": per_page, "off": (page - 1) * per_page}
     got = conn.execute(text(f"""
@@ -302,9 +369,9 @@ def member_groups(conn, conds, sort, page, per_page):
                (array_agg(pa.seat ORDER BY d.debate_date DESC NULLS LAST))[1] AS seat,
                (array_agg(pa.state ORDER BY d.debate_date DESC NULLS LAST))[1] AS state,
                array_agg(DISTINCT d.loksabha ORDER BY d.loksabha) AS terms,
-               array_agg(s.id) AS sids
+               array_agg(s.id) AS sids{counts}
         {from_sql(True)} JOIN persons pe ON pe.id = s.person_id
-        WHERE {w} GROUP BY pe.id ORDER BY {order} LIMIT :lim OFFSET :off"""), p).mappings().all()
+        WHERE {w} GROUP BY pe.id {having} ORDER BY {order} LIMIT :lim OFFSET :off"""), p).mappings().all()
     top = {}
     for r in got:  # the tag that the matching speeches of the member carry most often
         sids = r["sids"]
@@ -316,7 +383,9 @@ def member_groups(conn, conds, sort, page, per_page):
     rows = [{"id": r["id"], "name": r["name"], "party": r["party"], "seat": r["seat"], "state": r["state"],
              "terms": r["terms"], "n": r["n"], "words": r["words"],
              "first": r["first"].isoformat() if r["first"] else None,
-             "last": r["last"].isoformat() if r["last"] else None, "most_on": top[r["id"]]} for r in got]
+             "last": r["last"].isoformat() if r["last"] else None, "most_on": top[r["id"]],
+             **({"tag_counts": [{"name": t["name"], "slug": t["slug"], "n": r[f"n_set{i}"]} for i, t in enumerate(tag_sets)]}
+                if tag_sets else {})} for r in got]
     return rows, n_members
 
 
@@ -344,34 +413,55 @@ def speeches(conn, args):
     f, bad = parse_args(conn, args)
     if bad:
         return None
+    tag_sets = f.get("tag_sets")
+    if tag_sets and args.get("group") == "member":
+        f["tag_ids"] = sorted(set().union(*(set(x["ids"]) for x in tag_sets)))
     conds = conditions(f)
-    sort = args.get("sort") if args.get("sort") in SORTS else "latest"
+    words_query = f["q"] and not f["phrase"]
+    sort = args.get("sort")
+    if sort not in SORTS and not (sort == "best" and words_query):
+        sort = "best" if words_query else "latest"
     page = int_arg(args.get("page"), 1, 1, 10**6)
     per_page = int_arg(args.get("per_page"), DEFAULT_PER_PAGE, 1, MAX_PER_PAGE)
+    near, by_meaning = [], False
+    if words_query:
+        base_where, base_params, base_party = where(conds, ("q",))
+        near, by_meaning = add_meaning(conn, f, conds)
+        if not by_meaning:
+            do_not_store()
     w, p, party = where(conds)
     total = conn.execute(text(f"SELECT count(*) {from_sql(party)} WHERE {w}"), p).scalar()
 
     if args.get("format") == "csv":
         ids = [r[0] for r in conn.execute(text(
-            f"SELECT s.id {from_sql(party)} WHERE {w} ORDER BY {SORTS[sort]} LIMIT {MAX_CSV_ROWS}"), p)]
+            f"SELECT s.id {from_sql(party)} WHERE {w} ORDER BY {SORTS.get(sort, SORTS['latest'])} LIMIT {MAX_CSV_ROWS}"), p)]
         rows = rows_for(conn, ids)
         if f["q"]:
-            add_excerpts(conn, rows, f["q"])
+            add_excerpts(conn, rows, f["phrase"] or f["q"])
         return csv_response(rows)
 
     out = {"total": total, "page": page, "per_page": per_page, "sort": sort,
            "counts_note": COUNTS_NOTE}
+    if f["q"]:
+        out["by_meaning"] = by_meaning
     if args.get("group") == "member":
-        rows, n_members = member_groups(conn, conds, sort, page, per_page)
+        rows, n_members = member_groups(conn, conds, sort if sort in GROUP_SORTS else "latest", page, per_page, tag_sets)
         out.update({"group": "member", "members_total": n_members, "pages": -(-n_members // per_page), "members": rows})
     else:
-        out["pages"] = -(-total // per_page)
-        ids = [r[0] for r in conn.execute(text(
-            f"SELECT s.id {from_sql(party)} WHERE {w} ORDER BY {SORTS[sort]} LIMIT :lim OFFSET :off"),
-            {**p, "lim": per_page, "off": (page - 1) * per_page})]
+        if sort == "best":
+            ranked = fuse([word_speeches(conn, f["q"], from_sql(base_party), base_where, base_params), near])
+            out["pages"] = -(-len(ranked) // per_page)  # Best match orders only the top of the list. Latest first reaches all of it.
+            ids = ranked[(page - 1) * per_page:page * per_page]
+        else:
+            out["pages"] = -(-total // per_page)
+            ids = [r[0] for r in conn.execute(text(
+                f"SELECT s.id {from_sql(party)} WHERE {w} ORDER BY {SORTS[sort]} LIMIT :lim OFFSET :off"),
+                {**p, "lim": per_page, "off": (page - 1) * per_page})]
         rows = rows_for(conn, ids)
         if f["q"]:
-            add_excerpts(conn, rows, f["q"])
+            add_excerpts(conn, rows, f["phrase"] or f["q"])
+            if words_query:
+                add_match_kind(conn, rows, f["q"], near)
         out["speeches"] = rows
     if args.get("facets") in ("1", "true"):
         out["facets"] = facets(conn, conds, f, session_labels(conn))

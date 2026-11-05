@@ -920,3 +920,10 @@ a.search-pager__num:hover {
     min-height: var(--control-height);
   }
 }
+
+.search-row__why,
+.search-results__rule {
+  margin: var(--space-2) 0 0;
+  color: var(--ink-2);
+  font-size: var(--size-label);
+}

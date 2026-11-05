@@ -12,14 +12,26 @@ The candidates came from several ways, and no way gave its own order to the revi
 
 ```bash
 python3 scripts/search_eval.py pool
+python3 scripts/search_eval.py pool-top
 python3 scripts/search_eval.py combine
 python3 scripts/search_eval.py score --method words
 ```
 
 The score is recall at 10: the known speeches in the top 10 results, over the smaller of 10 and the number of known speeches.
 
+## Scores
+
+| Method | Recall at 10 | Top 10 results with no mark |
+|---|---|---|
+| `words`: every word in one turn, newest first | 0.447 | 0 |
+| `best`: word matches and nearest summaries, joined by rank | 0.790 | 0 |
+
+The first run gave `words` 0.137 and `best` 0.517, because a correct speech that no reviewer saw counted as a miss. `pool-top` then sent the 242 unmarked top 10 results of both methods to the same two reviewers.
+
 ## Limits
 
-The denominator is the known speeches of the pool, not all correct speeches in the corpus. A method can return a correct speech that no reviewer saw, and that speech counts as a miss. `score` prints the number of top 10 results with no mark. A low score on a broad question can come from this.
+The denominator is the known speeches of the pool, not all correct speeches in the corpus. Most questions have more than 10 known speeches, so the score of such a question is the share of correct speeches among the top 10. `score` prints the number of top 10 results with no mark. Run `pool-top` and the reviewers again after a change to a method, or the comparison favours the older method.
+
+The questions were written before the method, but one person wrote all of them, and no person checked the marks.
 
 A rerun of `pool` needs the summary vectors and a model call for each question.

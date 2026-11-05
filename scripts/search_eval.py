@@ -3,6 +3,7 @@
 The steps, from the repo root:
 
     python3 scripts/search_eval.py pool      # find candidates in several ways, and write files for the reviewers
+    python3 scripts/search_eval.py pool-top  # add the top 10 results of each method that no reviewer saw
     python3 scripts/search_eval.py combine   # keep a candidate when two blind reviewers both mark it correct
     python3 scripts/search_eval.py score --method words
 
@@ -203,6 +204,28 @@ def pool(args):
     print("candidates in all", sum(len(r["candidates"]) for r in reviewed), "batches", -(-len(reviewed) // BATCH_QUESTIONS), flush=True)
 
 
+def pool_top(args):
+    """Write a new batch: the top 10 results of each method that no reviewer saw. Then a method cannot lose by finding new speeches."""
+    questions = read_questions()
+    seen = set(read_marks("a"))
+    batch = []
+    with dashboard_db.get_engine().connect() as conn:
+        for q in questions:
+            if phrase_of(q["query"]):
+                continue
+            ids = {i for m in METHODS.values() for i in m(conn, q["query"])[:10] if (q["id"], i) not in seen}
+            if ids:
+                cands = list(describe(conn, ids).values())
+                words = [w for w in q["pool_words"].split("|") if w]
+                for c in cands:
+                    c["text"] = window(c.pop("full_text"), words)
+                batch.append({"id": q["id"], "query": q["query"], "rule": q["rule"], "candidates": cands})
+    BATCHES.mkdir(parents=True, exist_ok=True)
+    number = len(list(BATCHES.glob("batch_*.txt"))) + 1
+    write_batch(BATCHES / f"batch_{number:02d}.txt", batch)
+    print(f"batch {number}: {sum(len(b['candidates']) for b in batch)} speeches, {len(batch)} questions", flush=True)
+
+
 def read_marks(reviewer):
     out = {}
     for path in sorted(REVIEWS.glob(f"{reviewer}_batch_*.tsv")):
@@ -248,11 +271,13 @@ def score(args):
     known = read_known()
     questions = read_questions()
     by_kind, rows = defaultdict(list), []
+    marked = set(read_marks("a"))
     with dashboard_db.get_engine().connect() as conn:
         for q in questions:
             ranked = METHODS[args.method](conn, q["query"])
             r = recall_at_10(ranked, known[q["id"]])
-            rows.append((q["id"], q["kind"], q["query"], len(known[q["id"]]), "-" if r is None else f"{r:.2f}"))
+            no_mark = 0 if phrase_of(q["query"]) else sum((q["id"], i) not in marked for i in ranked[:10])
+            rows.append((q["id"], q["kind"], q["query"], len(known[q["id"]]), "-" if r is None else f"{r:.2f}", no_mark))
             if r is not None:
                 by_kind[q["kind"]].append(r)
     for row in rows:
@@ -260,13 +285,15 @@ def score(args):
     every = [x for v in by_kind.values() for x in v]
     for kind, v in sorted(by_kind.items()):
         print(f"{kind}\t{sum(v) / len(v):.3f}\t{len(v)} questions")
-    print(f"ALL {args.method}\t{sum(every) / len(every):.3f}\t{len(every)} questions", flush=True)
+    print(f"ALL {args.method}\t{sum(every) / len(every):.3f}\t{len(every)} questions\t"
+          f"{sum(r[5] for r in rows)} top 10 results with no mark", flush=True)
 
 
 def main():
     ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     sub = ap.add_subparsers(dest="step", required=True)
     sub.add_parser("pool").set_defaults(fn=pool)
+    sub.add_parser("pool-top").set_defaults(fn=pool_top)
     sub.add_parser("combine").set_defaults(fn=combine)
     s = sub.add_parser("score")
     s.add_argument("--method", default="words", choices=sorted(METHODS))

@@ -5,7 +5,7 @@ import Button from "../../components/Button.jsx";
 import SpeakerLine from "../../components/SpeakerLine.jsx";
 import TLDR from "../../components/TLDR.jsx";
 import { EmptyState, ErrorState, Loading } from "../../components/States.jsx";
-import { SORTS, excerptParts, pageWindow, yearSpan } from "./searchParams.js";
+import { SORTS, defaultSort, excerptParts, isPhrase, pageWindow, yearSpan } from "./searchParams.js";
 
 // One speech that matches: when, which debate, who, and the words in their sentence.
 export function SearchSpeechRow({ speech }) {
@@ -32,6 +32,9 @@ export function SearchSpeechRow({ speech }) {
           <TLDR text={speech.summary} />
         </div>
       )}
+      {speech.match === "meaning" && (
+        <p className="search-row__why">The summary is near your search in meaning. The speech does not use all your words.</p>
+      )}
       {parts.length > 0 && (
         <p className="search-row__excerpt" lang={scriptLang(speech.excerpt)}>
           “{cutStart && "… "}
@@ -53,6 +56,18 @@ export function SearchMemberRow({ member, href }) {
           {member.name}
         </Link>
         {where && <span className="search-member__where">{where}</span>}
+        {member.tag_counts && (
+          <span className="search-member__most">
+            {member.tag_counts.map((t, i) => (
+              <React.Fragment key={t.slug}>
+                {i > 0 && " · "}
+                <Link to={`/search?member=${member.id}&tag=${t.slug}`} className="search-member__tag">
+                  {t.name}: {formatNumber(t.n)}
+                </Link>
+              </React.Fragment>
+            ))}
+          </span>
+        )}
         {member.most_on?.slug && (
           <span className="search-member__most">
             Most on{" "}
@@ -62,9 +77,13 @@ export function SearchMemberRow({ member, href }) {
           </span>
         )}
       </div>
-      <Link to={href} className="search-member__count" aria-label={`${formatNumber(member.n)} speeches by ${member.name}`}>
-        {formatNumber(member.n)}
-      </Link>
+      {member.tag_counts ? (
+        <span className="search-member__count">{formatNumber(member.n)}</span>
+      ) : (
+        <Link to={href} className="search-member__count" aria-label={`${formatNumber(member.n)} speeches by ${member.name}`}>
+          {formatNumber(member.n)}
+        </Link>
+      )}
       <span className="search-member__span">{yearSpan(member.first, member.last)}</span>
     </li>
   );
@@ -104,6 +123,22 @@ function Pager({ page, pages, pageHref }) {
   );
 }
 
+// The rule of the list in plain words, so that a reader knows why a speech is here.
+function SearchRule({ query, sort, view, data }) {
+  if (isPhrase(query)) return <p className="search-results__rule">These speeches hold these exact words in this order.</p>;
+  if (data.by_meaning === false) {
+    return <p className="search-results__rule">Search by meaning is not available now. These speeches hold all your words.</p>;
+  }
+  const shortened = view === "speeches" && sort === "best" && data.pages * data.per_page < data.total;
+  return (
+    <p className="search-results__rule">
+      A speech is here when it holds all your words or its one-sentence summary is near your search in meaning.
+      Put text in quote marks for an exact phrase.
+      {shortened && " Best match orders the top of the list. Choose Latest first to read all of it."}
+    </p>
+  );
+}
+
 // SearchResults shows the toggle between speeches and members, the sort, the rows and the pages.
 export default function SearchResults({
   view,
@@ -121,6 +156,8 @@ export default function SearchResults({
   onSort,
   hasFilters,
   onReset,
+  query,
+  tagCount = 0,
 }) {
   const tabs = [
     { value: "speeches", label: "Speeches", n: speechTotal },
@@ -132,7 +169,7 @@ export default function SearchResults({
     body = (
       <div className="search-results__loading">
         <Loading lines={6} />
-        <p className="search-results__wait">A search for a common word can take ten seconds.</p>
+        <p className="search-results__wait">A new search can take a few seconds.</p>
       </div>
     );
   } else if (error) {
@@ -206,7 +243,7 @@ export default function SearchResults({
         <label className="search-sort">
           <span className="search-sort__label">Sort</span>
           <select className="search-sort__select" value={sort} onChange={(e) => onSort(e.target.value)}>
-            {SORTS.map((s) => (
+            {SORTS.filter((s) => s.value !== "best" || defaultSort(query) === "best").map((s) => (
               <option key={s.value} value={s.value}>
                 {view === "members" && s.value === "longest" ? "Most words first" : s.label}
               </option>
@@ -214,6 +251,14 @@ export default function SearchResults({
           </select>
         </label>
       </div>
+      {tagCount > 1 && (
+        <p className="search-results__rule">
+          {view === "members"
+            ? "Each member here raised each tag, in one speech or in different speeches. The numbers count the speeches for each tag."
+            : "Each speech here carries all these tags. The Members view also lists a member who raised them in different speeches."}
+        </p>
+      )}
+      {query && data && !loading && <SearchRule query={query} sort={sort} view={view} data={data} />}
       {body}
     </section>
   );

@@ -13,7 +13,7 @@ import SearchMatches from "./search/SearchMatches.jsx";
 import SearchResults from "./search/SearchResults.jsx";
 import SearchScopeCard from "./search/SearchScopeCard.jsx";
 import SearchScopePicker from "./search/SearchScopePicker.jsx";
-import { FILTER_KEYS, headingParts, readSearch, selectedTerms } from "./search/searchParams.js";
+import { FILTER_KEYS, defaultSort, headingParts, readSearch, selectedTerms } from "./search/searchParams.js";
 import "./search.css";
 
 const PER_PAGE = 20;
@@ -35,23 +35,25 @@ export default function Search() {
   const listParams = { ...scope, ...filters, sort, page, per_page: PER_PAGE };
   const listKey = JSON.stringify({ listParams, view });
   const list = useApi(listKey, (signal) =>
-    getJSON("/api/speeches", { ...listParams, ...(view === "members" ? { group: "member" } : { facets: 1 }) }, { signal })
+    getJSON("/api/speeches", { ...listParams, ...(view === "members" ? { group: "member" } : {}) }, { signal })
   );
+  // The other calls wait for the list. The list stores the vector and the nearest speeches of a new search for them.
+  const listDone = !list.loading;
 
-  // The facets come with the speech list. The members view asks for them in a small call of its own.
+  // The facets are a call of their own, so the speeches do not wait for them.
   const facetParams = { ...scope, ...filters, facets: 1, per_page: 1 };
-  const facetCall = useApi(view === "members" ? JSON.stringify(facetParams) : null, (signal) =>
+  const facetCall = useApi(listDone ? JSON.stringify(facetParams) : null, (signal) =>
     getJSON("/api/speeches", facetParams, { signal })
   );
   const speechData = view === "members" ? facetCall.data : list.data;
 
   // The total with no filter, for "N of total".
   const baseKey = hasFilters ? JSON.stringify(scope) : null;
-  const base = useApi(baseKey, (signal) => getJSON("/api/speeches", { ...scope, per_page: 1 }, { signal }));
+  const base = useApi(listDone ? baseKey : null, (signal) => getJSON("/api/speeches", { ...scope, per_page: 1 }, { signal }));
 
   // The number of members, for the toggle. It is a separate call, so the speeches do not wait for it.
   const membersParams = { ...scope, ...filters, group: "member", per_page: 1 };
-  const membersCall = useApi(view === "speeches" ? JSON.stringify(membersParams) : null, (signal) =>
+  const membersCall = useApi(view === "speeches" && listDone ? JSON.stringify(membersParams) : null, (signal) =>
     getJSON("/api/speeches", membersParams, { signal })
   );
 
@@ -59,8 +61,23 @@ export default function Search() {
   // The tag, place and member each load their own name, so that they can be on at the same time.
   const useScope = (k) =>
     useApi(scope[k] ? `${k}:${scope[k]}` : null, (signal) => getJSON(SCOPE_NAME_URL[k](scope[k]), undefined, { signal }));
-  const scopeInfo = { tag: useScope("tag"), place: useScope("place"), member: useScope("member") };
-  const scopeNames = Object.fromEntries(Object.entries(scopeInfo).map(([k, v]) => [k, v.data?.name || null]));
+  const tags = (scope.tag || "").split(",").filter(Boolean);
+  // A search can hold two or more tags, so the tag answer is a list with one answer for each tag.
+  const tagInfo = useApi(tags.length ? `tags:${scope.tag}` : null, (signal) =>
+    Promise.all(tags.map((t) => getJSON(SCOPE_NAME_URL.tag(t), undefined, { signal })))
+  );
+  const scopeInfo = { place: useScope("place"), member: useScope("member") };
+  const scopeNames = {
+    tag: tagInfo.data ? tagInfo.data.map((t) => t.name).join(" and ") : null,
+    place: scopeInfo.place.data?.name || null,
+    member: scopeInfo.member.data?.name || null,
+  };
+  const tagNames = Object.fromEntries((tagInfo.data || []).map((t, i) => [tags[i], t.name]));
+  // A tag that the reader picks joins the tags of the search. A place or a member replaces the one before it.
+  const pickScope = (change) => {
+    if (change.tag && !tags.includes(change.tag)) setWith({ tag: [...tags, change.tag].join(",") });
+    else setWith(change);
+  };
 
   const speechTotal = speechData && !(view === "speeches" && list.loading) ? speechData.total : null;
   const membersTotal =
@@ -90,7 +107,7 @@ export default function Search() {
 
   // Session choices only help when one or two terms are chosen.
   const terms = selectedTerms(filters);
-  const facets = speechData?.facets || {};
+  const facets = facetCall.data?.facets || {};
   const groups = ["term", ...(terms.length > 0 && terms.length <= 2 ? ["session"] : []), "party", "kind", "subject"];
   const barFacets = {
     ...facets,
@@ -99,7 +116,7 @@ export default function Search() {
     party_not: [],
   };
 
-  const heading = headingParts({ scope, count: speechTotal, names: scopeNames });
+  const heading = headingParts({ scope, count: speechTotal, names: scopeNames, members: view === "members" ? membersTotal : null });
   const csvHref = `/api/speeches?${new URLSearchParams(
     Object.entries({ ...scope, ...filters, sort, format: "csv" })
   ).toString()}`;
@@ -113,7 +130,7 @@ export default function Search() {
       <div className="search-head__box">
         <SearchBox key={q} initial={q} />
       </div>
-      <ActiveChips scope={scope} scopeNames={scopeNames} filters={filters} facets={facets} setWith={setWith} />
+      <ActiveChips scope={scope} scopeNames={scopeNames} tagNames={tagNames} filters={filters} facets={facets} setWith={setWith} />
     </div>
   );
 
@@ -123,7 +140,7 @@ export default function Search() {
         <aside className="search-rail" aria-label="Filters and method">
           <div className="search-rail__section">
             <h2 className="search-rail__title">Narrow the speeches</h2>
-            <SearchScopePicker onPick={setWith} />
+            <SearchScopePicker onPick={pickScope} />
             {speechData ? (
               <FilterBar
                 facets={barFacets}
@@ -145,7 +162,7 @@ export default function Search() {
           <div className="search-rail__section">
             <HowTorkoCounts>
               {q
-                ? "A speech matches when one of its own turns has every word of the search. Words that another member says in an interruption do not count. "
+                ? "A speech matches when its own turns and the name of the member hold all the words, or when its summary is near the search in meaning. Words that another member says in an interruption do not count. An exact repeat by the same member is left out. "
                 : ""}
               Each speech counts once. The counts by party leave out the speeches with no identified member.
             </HowTorkoCounts>
@@ -153,11 +170,12 @@ export default function Search() {
         </aside>
 
         <div className="search-main">
-          {(scope.tag || scope.place) && (
+          {(tags.length > 0 || scope.place) && (
             <div className="search-scopes">
-              {["tag", "place"].map((k) =>
-                scope[k] ? <SearchScopeCard key={k} kind={k} value={scope[k]} info={scopeInfo[k].data} /> : null
-              )}
+              {tags.map((t, i) => (
+                <SearchScopeCard key={t} kind="tag" value={t} info={tagInfo.data?.[i]} />
+              ))}
+              {scope.place && <SearchScopeCard key="place" kind="place" value={scope.place} info={scopeInfo.place.data} />}
             </div>
           )}
           {q && matches.data && <SearchMatches results={matches.data.results} query={q} />}
@@ -174,7 +192,9 @@ export default function Search() {
             viewHref={(v) => hrefWith({ view: v === "speeches" ? null : v })}
             pageHref={(p) => hrefWith({ page: p > 1 ? p : null })}
             memberHref={(id) => hrefWith({ member: id, view: null, tag: scope.tag, place: scope.place })}
-            onSort={(s) => setWith({ sort: s === "latest" ? null : s })}
+            onSort={(s) => setWith({ sort: s === defaultSort(q) ? null : s })}
+            query={q}
+            tagCount={tags.length}
             hasFilters={hasFilters}
             onReset={resetFilters}
           />
@@ -185,9 +205,13 @@ export default function Search() {
 }
 
 // The scope and the filters that are on, as chips that remove themselves.
-function ActiveChips({ scope, scopeNames, filters, facets, setWith }) {
+function ActiveChips({ scope, scopeNames, tagNames, filters, facets, setWith }) {
   const chips = [];
-  for (const k of ["tag", "place", "member"]) {
+  const tagList = (scope.tag || "").split(",").filter(Boolean);
+  for (const t of tagList) {
+    chips.push({ key: `tag-${t}`, label: `Tag: ${tagNames[t] || t}`, remove: { tag: tagList.filter((x) => x !== t).join(",") || null } });
+  }
+  for (const k of ["place", "member"]) {
     if (scope[k]) {
       const what = { tag: "Tag", place: "Place", member: "Member" }[k];
       chips.push({ key: k, label: `${what}: ${scopeNames[k] || scope[k]}`, remove: { [k]: null } });

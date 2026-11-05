@@ -98,3 +98,12 @@ def embed_texts(texts: list[str], task_type: str) -> list[list[float]]:
         out += embed_batch(texts[start:start + BATCH_SIZE], task_type, key)
         print(f"  embedded {len(out)}/{len(texts)} ({task_type})", flush=True)
     return out
+
+
+def embed_query(query: str, timeout: float = 4) -> list[float]:
+    """Embed one search text, for a reader who waits. One try and a short limit, because the caller can fall back to word search."""
+    body = {"requests": [{"model": f"models/{MODEL}", "content": {"parts": [{"text": query}]},
+                          "taskType": "RETRIEVAL_QUERY", "outputDimensionality": DIMS}]}
+    resp = requests.post(API_URL, json=body, headers={"x-goog-api-key": os.environ["GEMINI_API_KEY"]}, timeout=timeout)
+    resp.raise_for_status()
+    return normalise(resp.json()["embeddings"][0]["values"])

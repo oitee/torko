@@ -4,10 +4,25 @@
 export const SCOPE_KEYS = ["q", "tag", "member", "place"];
 export const FILTER_KEYS = ["term", "session", "party", "party_not", "kind", "subject"];
 export const SORTS = [
+  { value: "best", label: "Best match" },
   { value: "latest", label: "Latest first" },
   { value: "oldest", label: "Oldest first" },
   { value: "longest", label: "Longest first" },
 ];
+
+// Text in quote marks asks for an exact phrase. Best match is the default for any other search text.
+export function isPhrase(q) {
+  return /^\s*["“].+["”]\s*$/.test(q || "");
+}
+
+export function defaultSort(q) {
+  return q && !isPhrase(q) ? "best" : "latest";
+}
+
+function sortOf(value, q) {
+  const allowed = SORTS.some((s) => s.value === value) && (value !== "best" || defaultSort(q) === "best");
+  return allowed ? value : defaultSort(q);
+}
 
 // Read the address into one object. Unknown values fall back to the defaults.
 export function readSearch(searchParams) {
@@ -21,7 +36,7 @@ export function readSearch(searchParams) {
     if (get(k)) filters[k] = get(k);
   }
   const view = get("view") === "members" ? "members" : "speeches";
-  const sort = SORTS.some((s) => s.value === get("sort")) ? get("sort") : "latest";
+  const sort = sortOf(get("sort"), scope.q);
   const pageNum = parseInt(get("page") || "1", 10);
   const page = Number.isInteger(pageNum) && pageNum > 0 ? pageNum : 1;
   return { scope, filters, view, sort, page };
@@ -32,15 +47,15 @@ export function selectedTerms(filters) {
   return (filters.term || "").split(",").map((s) => parseInt(s, 10)).filter(Number.isInteger);
 }
 
-// "the word" for one word, "the words" for more than one.
-function wordsPhrase(q) {
-  return q.split(/\s+/).filter(Boolean).length > 1 ? "the words" : "the word";
-}
-
 // The heading of the page, in parts, so that the page can set the count in mono.
 // count is null while the speeches load. names holds the names of the tag, place and member.
-export function headingParts({ scope, count, names = {} }) {
+export function headingParts({ scope, count, names = {}, members = null }) {
   const q = scope.q || "";
+  // With two or more tags, the Members view has its own rule, and it can hold members when no speech has all the tags.
+  if (members !== null && (scope.tag || "").includes(",")) {
+    const who = members === 1 ? " member raised " : " members raised ";
+    return { lead: members, rest: `${who}${names.tag || scope.tag}` };
+  }
   let on = "";
   if (scope.tag) on += ` on ${names.tag || scope.tag}`;
   if (scope.place) on += ` about ${names.place || scope.place}`;
@@ -49,17 +64,20 @@ export function headingParts({ scope, count, names = {} }) {
   if (!q && !on) {
     return { lead: null, rest: "Search the speeches of the Lok Sabha" };
   }
+  const phrase = isPhrase(q);
+  const shown = phrase ? q.trim().replace(/^["“]|["”]$/g, "") : q;
   if (count === null || count === undefined) {
-    const words = q ? ` with ${wordsPhrase(q)} “${q}”` : "";
+    const words = q ? (phrase ? ` with the exact words “${shown}”` : ` for “${q}”`) : "";
     return { lead: null, rest: `Speeches${on}${words}` };
   }
   if (count === 0) {
-    return { lead: null, rest: q ? `No speech${on} uses ${wordsPhrase(q)} “${q}”` : `No speech${on} matches the filters` };
+    if (!q) return { lead: null, rest: `No speech${on} matches the filters` };
+    return { lead: null, rest: phrase ? `No speech${on} uses the exact words “${shown}”` : `No speech${on} matches “${q}”` };
   }
   const noun = count === 1 ? "speech" : "speeches";
   if (!q) return { lead: count, rest: ` ${noun}${on}` };
-  const verb = count === 1 ? "uses" : "use";
-  return { lead: count, rest: ` ${noun}${on} ${verb} ${wordsPhrase(q)} “${q}”` };
+  if (phrase) return { lead: count, rest: ` ${noun}${on} ${count === 1 ? "uses" : "use"} the exact words “${shown}”` };
+  return { lead: count, rest: ` ${noun}${on} ${count === 1 ? "matches" : "match"} “${q}”` };
 }
 
 // Cut the excerpt to a short window around the first marked word.

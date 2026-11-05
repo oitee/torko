@@ -36,7 +36,7 @@ QUERY = {
         ("party_not", "string", False, "A comma list of party codes to leave out."),
         ("min_words", "integer", False, "The smallest word count of a speech."),
         ("q", "string", False, "Words to find in the member's own turns of the speech. Every word must be in one turn."),
-        ("sort", "string", False, "latest (default), oldest, or longest."),
+        ("sort", "string", False, "best (default with q, not for exact words in quote marks), latest (default with no q), oldest, or longest."),
         ("page", "integer", False, "The page number. The default is 1."),
         ("per_page", "integer", False, "The rows on each page, from 1 to 50. The default is 20."),
         ("facets", "integer", False, "1 adds the counts for each filter value."),

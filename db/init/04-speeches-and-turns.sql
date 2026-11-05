@@ -102,3 +102,24 @@ CREATE INDEX IF NOT EXISTS turns_speech_idx ON turns (speech_id);
 -- A few tokens over 2,047 characters are skipped with a NOTICE. That is harmless.
 CREATE INDEX IF NOT EXISTS turns_text_fts_idx
     ON turns USING GIN (to_tsvector('simple', text));
+
+-- What word search reads, one row for each speech. A stored column makes ranking fast.
+-- words holds the own turns of the speech. repeat_of points to an earlier speech of the same member with the same text.
+CREATE TABLE IF NOT EXISTS speech_search (
+    speech_id  BIGINT PRIMARY KEY REFERENCES speeches(id) ON DELETE CASCADE,
+    words      TSVECTOR NOT NULL,
+    head       TSVECTOR NOT NULL,
+    repeat_of  BIGINT
+);
+CREATE INDEX IF NOT EXISTS speech_search_words_idx ON speech_search USING gin (words);
+CREATE INDEX IF NOT EXISTS speech_search_head_idx ON speech_search USING gin (head);
+
+-- The vector of each search text, so that a repeat of a search needs no model call.
+-- near_ids holds the nearest speeches with no filter. A data load clears it.
+CREATE TABLE IF NOT EXISTS query_vectors (
+    query       TEXT PRIMARY KEY,
+    model       TEXT NOT NULL,
+    embedding   VECTOR(1536) NOT NULL,
+    near_ids    BIGINT[],
+    created_at  TIMESTAMPTZ NOT NULL DEFAULT now()
+);

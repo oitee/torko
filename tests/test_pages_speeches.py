@@ -17,7 +17,7 @@ def test_kind_types():
 
 def test_conditions_and_where_skip_own_filter():
     f = {"member": [1], "member_not": [], "tag_ids": [5], "place_ids": None, "subject": [], "term": [17], "session": [(17, 15)],
-         "kind": [], "min_words": 0, "q": "", "party": ["BJP"], "party_not": []}
+         "kind": [], "min_words": 0, "q": "", "phrase": None, "party": ["BJP"], "party_not": []}
     c = S.conditions(f)
     assert set(c) == {"member", "tag", "term", "session", "party"}
     sql, params, party = S.where(c)
@@ -122,3 +122,21 @@ def test_small_words_are_not_marked_unless_the_query_holds_nothing_else():
     assert highlight_words("in") == ["in"]
     excerpt, marks = make_excerpt("Farmers in Punjab protest.", highlight_words("farmers in Punjab"))
     assert [excerpt[a:b] for a, b in marks] == ["Farmers", "Punjab"]
+
+
+def test_two_tags_need_one_speech_for_a_speech_and_any_speeches_for_a_member(page_conn):  # noqa: F811
+    a, b = "farmers", "sugarcane"
+    each = {t: {r["id"] for r in S.speeches(page_conn, {"tag": t, "per_page": "50"})["speeches"]} for t in (a, b)}
+    assert all(each.values())
+    both = S.speeches(page_conn, {"tag": f"{a},{b}", "per_page": "50"})
+    alone = [S.speeches(page_conn, {"tag": t, "per_page": "1"})["total"] for t in (a, b)]
+    assert 0 < both["total"] <= min(alone)
+    members = S.speeches(page_conn, {"tag": f"{a},{b}", "group": "member", "per_page": "50"})
+    assert members["members_total"] > 0
+    for m in members["members"]:
+        assert [t["slug"] for t in m["tag_counts"]] == [a, b]
+        assert all(t["n"] > 0 for t in m["tag_counts"])
+
+
+def test_an_unknown_tag_among_two_tags_gives_no_answer(page_conn):  # noqa: F811
+    assert S.speeches(page_conn, {"tag": "farmers,no-such-tag-here"}) is None

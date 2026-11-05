@@ -14,20 +14,25 @@ describe("search address", () => {
     expect(out.scope).toEqual({ q: "arrears" });
     expect(out.filters).toEqual({ term: "17", party_not: "BJP" });
     expect(out.view).toBe("members");
-    expect(out.sort).toBe("latest");
+    expect(out.sort).toBe("best");
+    expect(readSearch(new URLSearchParams("tag=arrears&sort=best")).sort).toBe("latest");
+    expect(readSearch(new URLSearchParams('q="triple talaq"')).sort).toBe("latest");
     expect(out.page).toBe(1);
   });
 });
 
 describe("search heading", () => {
   it("puts the count first and agrees in number", () => {
-    expect(headingParts({ scope: { q: "arrears" }, count: 375 })).toEqual({ lead: 375, rest: " speeches use the word “arrears”" });
-    expect(headingParts({ scope: { q: "sugar cane" }, count: 1 }).rest).toBe(" speech uses the words “sugar cane”");
+    expect(headingParts({ scope: { q: "arrears" }, count: 375 })).toEqual({ lead: 375, rest: " speeches match “arrears”" });
+    expect(headingParts({ scope: { q: "sugar cane" }, count: 1 }).rest).toBe(" speech matches “sugar cane”");
+    expect(headingParts({ scope: { q: '"sugar cane"' }, count: 2 }).rest).toBe(" speeches use the exact words “sugar cane”");
     expect(headingParts({ scope: { tag: "arrears" }, count: 205, names: { tag: "Arrears" } }).rest).toBe(" speeches on Arrears");
+    expect(headingParts({ scope: { tag: "a,b" }, count: 4, names: { tag: "Coastal Erosion and Cyclone Relief" } }).rest).toBe(" speeches on Coastal Erosion and Cyclone Relief");
+    expect(headingParts({ scope: { tag: "a,b" }, count: 0, members: 16, names: { tag: "Sea Erosion and Cyclone Relief" } })).toEqual({ lead: 16, rest: " members raised Sea Erosion and Cyclone Relief" });
     expect(headingParts({ scope: { tag: "farmers", member: "1288" }, count: 3, names: { tag: "Farmers", member: "Shivraj V. Patil" } }).rest).toBe(" speeches on Farmers by Shivraj V. Patil");
-    expect(headingParts({ scope: { q: "xqzvwk" }, count: 0 }).rest).toBe("No speech uses the word “xqzvwk”");
+    expect(headingParts({ scope: { q: "xqzvwk" }, count: 0 }).rest).toBe("No speech matches “xqzvwk”");
     expect(headingParts({ scope: {}, count: 10 }).rest).toBe("Search the speeches of the Lok Sabha");
-    expect(headingParts({ scope: { q: "arrears" }, count: null })).toEqual({ lead: null, rest: "Speeches with the word “arrears”" });
+    expect(headingParts({ scope: { q: "arrears" }, count: null })).toEqual({ lead: null, rest: "Speeches for “arrears”" });
   });
 });
 
