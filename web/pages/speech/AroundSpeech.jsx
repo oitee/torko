@@ -35,7 +35,7 @@ function formatPreview(text) {
 // One row: the turn number in the debate, the speaker, and the start of the text.
 function TurnRow({ turn, current = false, label }) {
   return (
-    <li className={`around-speech__row ${current ? "around-speech__row--current" : ""}`} aria-current={current || undefined}>
+    <li className={`around-speech__row ${current ? "around-speech__row--current" : ""} ${turn.speech_id && !current ? "around-speech__row--link" : ""}`} aria-current={current || undefined}>
       <span className="around-speech__seq">{turn.seq}</span>
       <div className="around-speech__body">
         <div className="around-speech__speaker">
@@ -43,7 +43,13 @@ function TurnRow({ turn, current = false, label }) {
           {label && <span className="around-speech__label"> · {label}</span>}
         </div>
         <p className="around-speech__text" lang={scriptLang(turn.text)}>
-          {formatPreview(turn.text)}
+          {turn.speech_id && !current ? (
+            <Link to={`/speech/${turn.speech_id}`} className="around-speech__text-link">
+              {formatPreview(turn.text)}
+            </Link>
+          ) : (
+            formatPreview(turn.text)
+          )}
         </p>
       </div>
     </li>

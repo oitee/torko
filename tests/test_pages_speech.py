@@ -56,6 +56,7 @@ def test_first_speech_of_debate_context(page_conn):
     r = speech_page(page_conn, 221881, {})
     assert r["earlier_speeches"] == 0 and r["later_speeches"] == r["debate_speeches"] - 1
     assert all(t["seq"] < r["turn_list"][0]["seq"] for t in r["before"])
+    assert all("speech_id" in t for t in r["before"] + r["after"])
     assert all(t["seq"] > r["turn_list"][-1]["seq"] for t in r["after"]) and len(r["after"]) <= 2
 
 

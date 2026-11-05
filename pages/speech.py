@@ -39,7 +39,7 @@ def group_reasons(tags, items):
 def turn_dict(t, speech_id):
     return {
         "seq": t["seq"], "label": t["speaker_label"], "text": clean_layout(t["text"]), "words": t["word_count"],
-        "repair": t["text_source"], "own": t["speech_id"] == speech_id,
+        "repair": t["text_source"], "own": t["speech_id"] == speech_id, "speech_id": t["speech_id"],
         "member": t["person"], "member_id": t["mid"], "role": t["role"], "role_kind": t["role_kind"],
         "attributed": t["person"] is not None,
     }

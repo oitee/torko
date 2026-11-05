@@ -77,3 +77,38 @@
 .around-speech__footer {
   padding-top: var(--space-2);
 }
+
+/* A row with its own speech opens that speech. The link of the words covers the whole row, and the member link stays on top. */
+.around-speech__row--link {
+  position: relative;
+  transition: background-color 120ms ease-out;
+}
+
+.around-speech__row--link:hover {
+  background: var(--sheet);
+}
+
+.around-speech__text-link {
+  color: inherit;
+  text-decoration: none;
+}
+
+.around-speech__text-link::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+}
+
+.around-speech__text-link:focus-visible {
+  outline: none;
+}
+
+.around-speech__text-link:focus-visible::after {
+  outline: 2px solid var(--action);
+  outline-offset: -2px;
+}
+
+.around-speech__row--link .around-speech__speaker-link {
+  position: relative;
+  z-index: 1;
+}
