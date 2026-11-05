@@ -140,3 +140,55 @@ def test_two_tags_need_one_speech_for_a_speech_and_any_speeches_for_a_member(pag
 
 def test_an_unknown_tag_among_two_tags_gives_no_answer(page_conn):  # noqa: F811
     assert S.speeches(page_conn, {"tag": "farmers,no-such-tag-here"}) is None
+
+
+def test_new_filters_build_their_conditions():
+    base = {"member": [], "member_not": [], "tag_ids": None, "place_ids": None, "subject": [], "term": [], "session": [],
+            "kind": [], "min_words": 0, "q": "", "phrase": None, "party": [], "party_not": []}
+    c = S.conditions({**base, "term_not": [13], "session_not": [(17, 1)], "kind_not": ["zero_hour"], "tag_any_ids": [1], "tag_not_ids": [2],
+                      "place_not_ids": [3], "subject_not": [4], "max_words": 9, "date_from": "2014-01-01", "date_to": "2015-01-01",
+                      "title": "bill", "title_not": "x", "lang": ["hi"], "lang_not": ["en"], "state": ["Kerala"], "state_not": ["Goa"],
+                      "seat": ["Kota"], "seat_not": ["Pali"]})
+    assert {"term_not", "session_not", "kind_not", "tag_any", "tag_not", "place_not", "subject_not", "max_words", "date_from", "date_to",
+            "title", "title_not", "lang", "lang_not", "state", "state_not", "seat", "seat_not"} == set(c)
+    assert S.where({"state": c["state"]})[2] and S.where({"seat_not": c["seat_not"]})[2]
+    assert not S.where({"lang": c["lang"]})[2]
+
+
+def test_iso_date_and_like_pattern():
+    assert S.iso_date("2014-05-26") == "2014-05-26"
+    assert S.iso_date("2014-13-01") is None and S.iso_date("2014") is None and S.iso_date(None) is None
+    assert S.like_pattern("50%_a") == "%50\\%\\_a%"
+
+
+def test_real_filters_split_the_list(page_conn):
+    term = S.speeches(page_conn, {"term": "17"})["total"]
+    assert S.speeches(page_conn, {"term": "17", "kind": "zero_hour"})["total"] + S.speeches(page_conn, {"term": "17", "kind_not": "zero_hour"})["total"] == term
+    a = S.speeches(page_conn, {"term": "17", "date_to": "2021-12-31"})["total"]
+    b = S.speeches(page_conn, {"term": "17", "date_from": "2022-01-01"})["total"]
+    assert a + b == term and a and b
+    assert S.speeches(page_conn, {"term": "17", "min_words": "1000"})["total"] + S.speeches(page_conn, {"term": "17", "max_words": "999"})["total"] == term
+    first = S.speeches(page_conn, {"term": "17", "tag": "farmers"})["total"]
+    assert S.speeches(page_conn, {"term": "17", "tag_not": "farmers"})["total"] + first == term
+    # Two tags: tag needs both, tag_any needs one, so tag_any holds at least as many as either tag.
+    both = S.speeches(page_conn, {"tag": "farmers,union-budget"})["total"]
+    either = S.speeches(page_conn, {"tag_any": "farmers,union-budget"})["total"]
+    assert both < S.speeches(page_conn, {"tag": "farmers"})["total"] < either
+    assert S.speeches(page_conn, {"tag_not": "no-such-tag-at-all"}) is None
+
+
+def test_real_named_facets_and_names(page_conn):
+    got = S.speeches(page_conn, {"term": "17", "state": "Kerala", "member": "392", "facets": "tag,state,seat,lang", "per_page": "1"})
+    facets = got["facets"]
+    assert {"tag", "state", "seat", "lang"} == set(facets) and "term" not in facets
+    assert got["names"]["member"]["392"]
+    only = S.speeches(page_conn, {"term": "17", "state": "Kerala", "facets": "state", "per_page": "1"})["facets"]["state"]
+    assert len(only) > 1  # The state facet leaves out its own filter.
+    assert S.speeches(page_conn, {"term": "17", "state": "Kerala"})["total"] == next(r["n"] for r in only if r["state"] == "Kerala")
+
+
+def test_real_full_lists_for_the_pop_up(page_conn):
+    got = S.speeches(page_conn, {"term": "17", "facets": "member,place,subject_all,tag_all", "per_page": "1"})["facets"]
+    assert any("Tharoor" in r["name"] for r in got["member"])
+    assert len(got["tag_all"]) > S.FACET_TAGS and got["place"] and got["subject_all"]
+    assert got["member"][0]["n"] >= got["member"][-1]["n"]

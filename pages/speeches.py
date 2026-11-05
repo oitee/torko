@@ -9,13 +9,14 @@ format=csv is internal. No page uses it. It is for reports made by hand, and the
 import csv
 import io
 import re
+from datetime import date
 
 import dashboard_db
 
 from flask import Response, after_this_request, has_request_context
 from sqlalchemy import text
 
-from pages.common import (KIND_LABELS, KINDS, PARTY_AT_DATE, clean_layout, party_colours, resolve_tag, slug, speech_kind,
+from pages.common import (KIND_LABELS, KINDS, PARTY_AT_DATE, cached, clean_layout, party_colours, resolve_tag, slug, speech_kind,
                           speech_rows, speech_tags_cte, tag_speeches)
 from pages.sessions import session_labels
 from pages.search_rank import fuse, nearest_speeches, phrase_of, query_vector, save_near, stored_near, word_speeches
@@ -26,6 +27,7 @@ DEFAULT_PER_PAGE = 20
 MAX_CSV_ROWS = 100000
 EXCERPT_CHARS = 300
 FACET_SUBJECTS = 20
+LANG_LABELS = {"en": "English", "hi": "Hindi", "mixed": "Mixed"}
 
 COUNTS_NOTE = (
     "total counts the speeches that match every filter, each speech once. "
@@ -38,12 +40,17 @@ COUNTS_NOTE = (
     "or when its summary is near q in meaning. An interruption by another member does not count. "
     "q in quote marks matches only a turn that holds these exact words in this order. "
     "An exact repeat of an earlier speech by the same member is left out. "
-    "Each facet count uses all the filters except the filter of that facet."
+    "Each facet count uses all the filters except the filter of that facet. "
+    "party_not, state_not, seat_not and lang_not leave out a speech with no known value. "
+    "tag_not and subject_not keep a speech with no tags."
 )
 FACET_NOTE = (
     "facets.term, session, subject, party and kind count speeches. Each one uses every filter except its own. "
     "facets.subject counts only when tag is given, for the 20 subjects of the tag with most matching speeches. "
     "facets.party leaves out the speeches with no identified member or no known party. "
+    "facets=tag, tag_all, state, seat, lang, member, place or subject_all adds that count: a comma list, with or without 1. "
+    "facets.tag gives the 30 tags with most speeches. facets.tag_all gives every tag with a matching speech. "
+    "Its count keeps the ticked tags, because tags combine with AND. "
     "The matches by meaning are the nearest summaries under all the filters, so a facet count can be lower than the count after you choose it."
 )
 
@@ -61,7 +68,18 @@ GROUP_SORTS = {
     "longest": "words DESC, pe.name",
 }
 # Which filters a facet leaves out of its own count.
-OWN_FILTERS = {"term": {"term"}, "session": {"session"}, "subject": {"subject"}, "party": {"party", "party_not"}, "kind": {"kind"}}
+OWN_FILTERS = {"term": {"term", "term_not"}, "session": {"session", "session_not"}, "subject": {"subject", "subject_not"},
+               "party": {"party", "party_not"}, "kind": {"kind", "kind_not"}, "state": {"state", "state_not"},
+               "seat": {"seat", "seat_not"}, "lang": {"lang", "lang_not"},
+               # Ticked tags combine with AND, so the count of a tag keeps them: it says what the next tick leaves.
+               "tag": {"tag_any", "tag_not"}, "tag_all": {"tag_any", "tag_not"},
+               "member": {"member", "member_not"}, "place": {"place", "place_not"}, "subject_all": {"subject", "subject_not"}}
+# The filters that read the party, seat or state of the member at the date of the debate.
+PARTY_FILTERS = {"party", "party_not", "state", "state_not", "seat", "seat_not"}
+# The facets that a page asks for by name, because each one has a cost. facets=1 gives the other five.
+NAMED_FACETS = {"tag", "tag_all", "state", "seat", "lang", "member", "place", "subject_all"}
+FACET_TAGS = 30
+ISO_DATE = re.compile(r"\d{4}-\d{2}-\d{2}")
 
 
 def int_list(value):
@@ -97,6 +115,35 @@ def kind_types(kinds):
     return types, "other" in kinds
 
 
+def iso_date(value):
+    """Return the date text when it has the form YYYY-MM-DD and is a real date. Else None."""
+    text_value = (value or "").strip()
+    if not ISO_DATE.fullmatch(text_value):
+        return None
+    try:
+        date.fromisoformat(text_value)
+    except ValueError:
+        return None
+    return text_value
+
+
+def like_pattern(value):
+    """Return an ILIKE pattern that finds the text anywhere. A % or _ in the text is an ordinary letter."""
+    return "%" + value.replace("\\", "\\\\").replace("%", "\\%").replace("_", "\\_") + "%"
+
+
+def slug_ids(conn, value, tag_type=None):
+    """Return (names, speech ids of each slug), or None for an unknown slug. names is {slug: name}."""
+    names, sets = {}, []
+    for one in dict.fromkeys(str_list(value)):
+        t = resolve_tag(conn, one, tag_type) if tag_type else resolve_tag(conn, one)
+        if not t:
+            return None
+        names[one] = t["tag"]
+        sets.append({sid for sid, _ in tag_speeches(conn, t["id"])})
+    return names, sets
+
+
 def parse_args(conn, args):
     """Return (filters, error). filters is a dict of the parsed arguments. error is 'tag' or 'place' for an unknown slug."""
     f = {
@@ -106,6 +153,15 @@ def parse_args(conn, args):
         "party_not": [p.upper() for p in str_list(args.get("party_not"))],
         "min_words": int_arg(args.get("min_words"), 0, 0, 10**7),
         "subject": int_list(args.get("subject")), "q": (args.get("q") or "").strip(),
+        "term_not": int_list(args.get("term_not")), "session_not": session_pairs(args.get("session_not")),
+        "kind_not": str_list(args.get("kind_not")), "subject_not": int_list(args.get("subject_not")),
+        "state": str_list(args.get("state")), "state_not": str_list(args.get("state_not")),
+        "seat": str_list(args.get("seat")), "seat_not": str_list(args.get("seat_not")),
+        "lang": str_list(args.get("lang")), "lang_not": str_list(args.get("lang_not")),
+        "max_words": int_arg(args.get("max_words"), 0, 0, 10**7),
+        "date_from": iso_date(args.get("date_from")), "date_to": iso_date(args.get("date_to")),
+        "title": (args.get("title") or "").strip(), "title_not": (args.get("title_not") or "").strip(),
+        "tag_any_ids": None, "tag_not_ids": None, "place_not_ids": None, "slug_names": {},
         "phrase": phrase_of(args.get("q")),
         "tag_ids": None, "place_ids": None,
     }
@@ -122,12 +178,29 @@ def parse_args(conn, args):
         else:  # Two or more tags: a speech needs all of them. The Members view has its own rule, in speeches().
             f["tag_sets"] = sets
         f["tag_ids"] = sorted(set.intersection(*(set(x["ids"]) for x in sets)))
-    if args.get("place"):
-        t = resolve_tag(conn, args["place"].strip(), "place")
-        if not t:
-            return f, "place"
-        f["place_ids"] = [sid for sid, _ in tag_speeches(conn, t["id"])]
+        f["slug_names"].update({x["slug"]: x["name"] for x in sets})
+    # A comma list of places: a speech needs one of them. A list after any_of or none_of works the same way.
+    for key, target, kind, bad in (("place", "place_ids", "place", "place"), ("place_not", "place_not_ids", "place", "place"),
+                                   ("tag_any", "tag_any_ids", None, "tag"), ("tag_not", "tag_not_ids", None, "tag")):
+        if args.get(key):
+            got = slug_ids(conn, args[key], kind)
+            if got is None:
+                return f, bad
+            f["slug_names"].update(got[0])
+            f[target] = sorted(set().union(*got[1]))
     return f, None
+
+
+def filter_names(conn, f):
+    """Return the names of the values in the address, so that a page can show them: {member: {id: name}, subject: ..., slug: ...}."""
+    out = {"slug": f.get("slug_names", {})}
+    members = f["member"] + f["member_not"]
+    subjects = f["subject"] + f["subject_not"]
+    if members:
+        out["member"] = {str(i): n for i, n in conn.execute(text("SELECT id, name FROM persons WHERE id = ANY(:ids)"), {"ids": members})}
+    if subjects:
+        out["subject"] = {str(i): n for i, n in conn.execute(text("SELECT id, label FROM subjects WHERE id = ANY(:ids)"), {"ids": subjects})}
+    return out
 
 
 def conditions(f):
@@ -170,6 +243,51 @@ def conditions(f):
     elif f["q"]:
         c["q"] = ("""s.id IN (SELECT speech_id FROM speech_search
             WHERE words @@ plainto_tsquery('simple', :q) AND repeat_of IS NULL)""", {"q": f["q"]})
+    if f.get("term_not"):
+        c["term_not"] = ("d.loksabha IS NOT NULL AND d.loksabha <> ALL(:term_not)", {"term_not": f["term_not"]})
+    if f.get("session_not"):
+        parts, p = [], {}
+        for i, (term, sess) in enumerate(f["session_not"]):
+            parts.append(f"(d.loksabha = :nt{i} AND d.session = :ns{i})")
+            p[f"nt{i}"], p[f"ns{i}"] = term, sess
+        c["session_not"] = ("NOT (" + " OR ".join(parts) + ")", p)
+    if f.get("kind_not"):
+        types, other = kind_types(f["kind_not"])
+        parts = []
+        if types:
+            parts.append(f"{TYPE_SQL} = ANY(:kind_not_types)")
+        if other:
+            parts.append(f"{TYPE_SQL} <> ALL(:all_types)")
+        c["kind_not"] = ("NOT (" + " OR ".join(parts or ["false"]) + ")", {"kind_not_types": types, "all_types": ALL_TYPES})
+    if f.get("tag_any_ids") is not None:
+        c["tag_any"] = ("s.id = ANY(:tag_any_ids)", {"tag_any_ids": f["tag_any_ids"]})
+    if f.get("tag_not_ids") is not None:  # A speech with no tags has none of the tags, so it stays.
+        c["tag_not"] = ("NOT (s.id = ANY(:tag_not_ids))", {"tag_not_ids": f["tag_not_ids"]})
+    if f.get("place_not_ids") is not None:
+        c["place_not"] = ("NOT (s.id = ANY(:place_not_ids))", {"place_not_ids": f["place_not_ids"]})
+    if f.get("subject_not"):
+        c["subject_not"] = ("""s.id NOT IN (SELECT si.speech_id FROM speech_items si
+            JOIN subject_names sn ON sn.entity_name_id = si.entity_name_id
+            WHERE si.kept AND sn.subject_id = ANY(:subject_not))""", {"subject_not": f["subject_not"]})
+    if f.get("max_words"):
+        c["max_words"] = ("s.word_count <= :max_words", {"max_words": f["max_words"]})
+    if f.get("date_from"):
+        c["date_from"] = ("d.debate_date >= CAST(:date_from AS date)", {"date_from": f["date_from"]})
+    if f.get("date_to"):
+        c["date_to"] = ("d.debate_date <= CAST(:date_to AS date)", {"date_to": f["date_to"]})
+    if f.get("title"):
+        c["title"] = ("d.title ILIKE :title", {"title": like_pattern(f["title"])})
+    if f.get("title_not"):
+        c["title_not"] = ("coalesce(d.title, '') NOT ILIKE :title_not", {"title_not": like_pattern(f["title_not"])})
+    if f.get("lang"):
+        c["lang"] = ("s.id IN (SELECT speech_id FROM speech_extractions WHERE language = ANY(:lang))", {"lang": f["lang"]})
+    if f.get("lang_not"):  # As with party_not: a speech with no known language is left out.
+        c["lang_not"] = ("s.id IN (SELECT speech_id FROM speech_extractions WHERE language <> ALL(:lang_not))", {"lang_not": f["lang_not"]})
+    for key, col in (("state", "pa.state"), ("seat", "pa.seat")):
+        if f.get(key):
+            c[key] = (f"{col} = ANY(:{key})", {key: f[key]})
+        if f.get(f"{key}_not"):  # As with party_not: a speech with no known value is left out.
+            c[f"{key}_not"] = (f"{col} IS NOT NULL AND {col} <> ALL(:{key}_not)", {f"{key}_not": f[f"{key}_not"]})
     if f["party"]:
         c["party"] = ("pa.party = ANY(:party)", {"party": f["party"]})
     if f["party_not"]:
@@ -184,7 +302,7 @@ def where(conds, skip=()):
     params = {}
     for v in use.values():
         params.update(v[1])
-    return sql, params, any(k in use for k in ("party", "party_not"))
+    return sql, params, any(k in use for k in PARTY_FILTERS)
 
 
 def from_sql(needs_party):
@@ -346,6 +464,44 @@ def facets(conn, conds, f, labels):
     return out
 
 
+def named_facets(conn, conds, names):
+    """Return the counts of each named facet in the list, for the values with at least one speech. Each leaves out its own filter."""
+    out = {}
+    for name in names:
+        w, p, party = where(conds, OWN_FILTERS[name])
+        if name in ("state", "seat"):
+            out[name] = [{name: v, "n": n} for v, n in conn.execute(text(
+                f"SELECT pa.{name}, count(*) {from_sql(True)} WHERE {w} AND pa.{name} IS NOT NULL GROUP BY 1 ORDER BY 2 DESC, 1"), p)]
+        elif name == "lang":
+            out[name] = [{"lang": v, "label": LANG_LABELS.get(v, v), "n": n} for v, n in conn.execute(text(
+                f"SELECT e.language, count(*) {from_sql(party)} JOIN speech_extractions e ON e.speech_id = s.id "
+                f"WHERE {w} AND e.language IS NOT NULL GROUP BY 1 ORDER BY 2 DESC, 1"), p)]
+        elif name == "member":
+            out[name] = [{"id": i, "name": v, "n": n} for i, v, n in conn.execute(text(
+                f"SELECT pe.id, pe.name, count(*) {from_sql(party)} JOIN persons pe ON pe.id = s.person_id "
+                f"WHERE {w} GROUP BY 1, 2 ORDER BY 3 DESC, 2"), p)]
+        elif name == "subject_all":
+            def subject_rows(w=w, p=p, party=party):
+                return [{"id": i, "label": v, "n": n} for i, v, n in conn.execute(text(f"""
+                    SELECT su.id, su.label, count(DISTINCT s.id) {from_sql(party)}
+                    JOIN speech_items si ON si.speech_id = s.id AND si.kept
+                    JOIN subject_names sn ON sn.entity_name_id = si.entity_name_id
+                    JOIN subjects su ON su.id = sn.subject_id
+                    WHERE {w} GROUP BY 1, 2 ORDER BY 3 DESC, 2"""), p)]
+            out[name] = cached("facet_subject_all", subject_rows) if w == "true" else subject_rows()
+        else:
+            type_sql = "t.type = 'place'" if name == "place" else "t.type <> 'place'"
+            limit = f"LIMIT {FACET_TAGS}" if name == "tag" else ""
+            def tag_rows(w=w, p=p, party=party, type_sql=type_sql, limit=limit):
+                return [{"tag": t, "slug": slug(t), "n": n} for t, n in conn.execute(text(f"""
+                    WITH {speech_tags_cte(f"si.speech_id IN (SELECT s.id {from_sql(party)} WHERE {w})")}
+                    SELECT t.tag, count(DISTINCT st.speech_id) FROM speech_tags st JOIN tags t ON t.id = st.tag_id
+                    WHERE {type_sql} GROUP BY t.id, t.tag ORDER BY 2 DESC, t.tag {limit}"""), p)]
+            # The count over all speeches takes seconds and is the same for every reader, so it is kept in memory.
+            out[name] = cached(f"facet_{name}_all", tag_rows) if w == "true" else tag_rows()
+    return out
+
+
 def member_groups(conn, conds, sort, page, per_page, tag_sets=None):
     """Return (rows, number of members): one row for each member with matching speeches.
 
@@ -441,7 +597,7 @@ def speeches(conn, args):
         return csv_response(rows)
 
     out = {"total": total, "page": page, "per_page": per_page, "sort": sort,
-           "counts_note": COUNTS_NOTE}
+           "counts_note": COUNTS_NOTE, "names": filter_names(conn, f)}
     if f["q"]:
         out["by_meaning"] = by_meaning
     if args.get("group") == "member":
@@ -463,8 +619,13 @@ def speeches(conn, args):
             if words_query:
                 add_match_kind(conn, rows, f["q"], near)
         out["speeches"] = rows
-    if args.get("facets") in ("1", "true"):
+    asked = str_list(args.get("facets"))
+    if "1" in asked or "true" in asked:
         out["facets"] = facets(conn, conds, f, session_labels(conn))
+        out["facets_note"] = FACET_NOTE
+    named = [n for n in asked if n in NAMED_FACETS]
+    if named:
+        out.setdefault("facets", {}).update(named_facets(conn, conds, named))
         out["facets_note"] = FACET_NOTE
     return out
 
