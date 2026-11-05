@@ -54,6 +54,16 @@ export default function DebateTranscript({
   const [expandedTurns, setExpandedTurns] = useState({});
   const [unfoldedRanges, setUnfoldedRanges] = useState({});
   const [activeSpeechSeq, setActiveSpeechSeq] = useState(null);
+  const railListRef = useRef(null);
+  // The list keeps the current speech in view as the reader moves through the debate. The page itself does not move.
+  useEffect(() => {
+    const list = railListRef.current;
+    const row = list?.querySelector(".debate-transcript__rail-btn--active");
+    if (!row) return;
+    const top = row.offsetTop - list.offsetTop;
+    if (top < list.scrollTop) list.scrollTop = top;
+    else if (top + row.offsetHeight > list.scrollTop + list.clientHeight) list.scrollTop = top + row.offsetHeight - list.clientHeight;
+  }, [activeSpeechSeq]);
   const [phoneSheetOpen, setPhoneSheetOpen] = useState(false);
   const [cardExpandedPhone, setCardExpandedPhone] = useState({});
   const jumpButtonRef = useRef(null);
@@ -446,7 +456,7 @@ export default function DebateTranscript({
                 ? `■ marks the speeches by ${activeMember.name}.`
                 : "Pick a speech to go to it."}
             </p>
-            <ol className="debate-transcript__rail-list">
+            <ol ref={railListRef} className="debate-transcript__rail-list">
               {speeches.map((sp, idx) => {
                 const isCur = String(sp.id) === String(activeSpeechSeq);
                 const matchesFilter =
