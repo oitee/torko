@@ -35,7 +35,7 @@ The script needs numpy. numpy is not in `requirements.txt`, because only this pr
 
 ## Joining small groups
 
-`scripts/subject_join.py` joins small groups that are one subject. A unit is a group, or a single name with 2 or more speeches. `candidates` pairs each unit with its nearest units by the distance of their centres. `jobs` writes task files for an LLM that decides `same` or `different` for each pair. `ingest` reads the answers, and `export-joins` writes the `same` answers to `data/joins_v1.tsv`, keyed by the entity name IDs of each unit. `subjects` joins the units of every pair in that file and writes `results/subjects_v1.tsv`. `approach-a` and `compare` score a fixed distance limit and the LLM answers on labelled candidate pairs.
+`scripts/subject_join.py` joins small groups that are one subject. A unit is a group, or a single name with 2 or more speeches. `candidates` pairs each unit with its nearest units by the distance of their centres. `jobs` writes task files for an LLM that decides `same` or `different` for each pair. `ingest` reads the answers, and `export-joins` writes the `same` answers to `data/joins_v1.tsv` and the `different` answers to `data/join_differents_v1.tsv`, keyed by the entity name IDs of each unit. `jobs --cache` reads both files, so a later run asks no answered pair again. `subjects` joins the units of every pair in that file and writes `results/subjects_v1.tsv`. `approach-a` and `compare` score a fixed distance limit and the LLM answers on labelled candidate pairs.
 
 `label-jobs` and `chain-jobs` write task files for two more LLM steps: a clean label for each subject, and a check of the pairs inside long chains of joins.
 

@@ -1,7 +1,7 @@
 """Keep the stored subject answers of a group that only gained close names (the sort step after new speeches).
 
 The stored answers of the subject steps are keyed by a set of entity name IDs:
-- data/joins_v1.tsv and data/cannot_links_v1.tsv: a pair of units (a unit is a group of names, see subject_join.py).
+- data/joins_v1.tsv, data/join_differents_v1.tsv and data/cannot_links_v1.tsv: a pair of units (a unit is a group of names, see subject_join.py).
 - data/subject_labels_v1.tsv and data/new_tag_reviews_v1.tsv: a subject (one or more joined units).
 - the table subject_parents: a subject key.
 When new speeches add one name to a group, the set of names changes, and the stored answers stop matching.
@@ -41,7 +41,7 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 
-from scripts.subject_join import CANNOT, JOINS, LABELS, RESULTS, unit_key
+from scripts.subject_join import CANNOT, DIFFERENTS, JOINS, LABELS, RESULTS, unit_key
 
 REVIEWS = RESULTS.parent / "data" / "new_tag_reviews_v1.tsv"
 MAX_DIST = 0.10
@@ -221,18 +221,21 @@ def sort(args) -> None:
             print("  add: " + "; ".join(f"{info[m][0]} ({d:.3f})" for m, d in r["added"])[:160])
     jcols, jrows = read_tsv(JOINS)
     ccols, crows = read_tsv(CANNOT)
+    dcols, drows = read_tsv(DIFFERENTS) if DIFFERENTS.exists() else ([], [])
     lcols, lrows = read_tsv(LABELS)
     rcols, rrows = read_tsv(REVIEWS)
-    new_j, new_c = copy_pair_rows(jrows, umap), copy_pair_rows(crows, umap)
+    new_j, new_c, new_d = copy_pair_rows(jrows, umap), copy_pair_rows(crows, umap), copy_pair_rows(drows, umap)
     new_l, new_r = copy_keyed_rows(lrows, smap), copy_keyed_rows(rrows, smap)
     moved = {k: v for k, v in smap.items() if k != v}
-    print(f"\ncopies: joins {len(new_j)}, cannot-links {len(new_c)}, labels {len(new_l)}, tag reviews {len(new_r)}, "
+    print(f"\ncopies: joins {len(new_j)}, differents {len(new_d)}, cannot-links {len(new_c)}, labels {len(new_l)}, tag reviews {len(new_r)}, "
           f"parent rows up to {len(moved)}")
     if not args.apply:
         print("report only. Add --apply to copy the answers.")
         return
     append_tsv(JOINS, jcols, new_j, tag)
     append_tsv(CANNOT, ccols, new_c, tag)
+    if drows:
+        append_tsv(DIFFERENTS, dcols, new_d, tag)
     append_tsv(LABELS, lcols, new_l, tag)
     append_tsv(REVIEWS, rcols, new_r, tag)
     with get_engine().begin() as conn:

@@ -12,8 +12,9 @@ Subcommands:
               with the labelled name pairs of tags/subject_groups/eval/.
   ingest      Read the LLM answers (approach C), validate them, and write results/join_llm_v1.tsv. With --cache, the
               earlier answers of the pairs that got no job are added, with the confidence `reused`.
-  export-joins  Write the same answers to data/joins_v1.tsv, keyed by the entity name IDs of each unit, so that a later
-              build does not depend on the pair IDs of one candidate run.
+  export-joins  Write the same answers to data/joins_v1.tsv and the different answers to data/join_differents_v1.tsv,
+              keyed by the entity name IDs of each unit, so that a later build does not depend on the pair IDs of one
+              candidate run, and `jobs --cache` asks no answered pair again.
   subjects    Join the units of every pair in data/joins_v1.tsv. Write results/subjects_v1.tsv with one row per subject.
   label-jobs  Write batch files for an LLM that writes a clean label for each subject with 2 or more names. A subject
               whose exact set of names has a stored label gets no job. The job subjects go to
@@ -333,14 +334,18 @@ def joins_to_pairs(units: list, rows: list) -> tuple[list, int]:
 
 
 CANNOT = RESULTS.parent / "data" / "cannot_links_v1.tsv"
+DIFFERENTS = RESULTS.parent / "data" / "join_differents_v1.tsv"
 
 
-def known_answers(units: list, joins: Path | None = None, cannot: Path | None = None) -> dict:
+def known_answers(units: list, joins: Path | None = None, cannot: Path | None = None,
+                  differents: Path | None = None) -> dict:
     """Unit pairs that an earlier run answered: frozenset of two unit indexes -> decision.
-    `same` comes from data/joins_v1.tsv and `different` from data/cannot_links_v1.tsv. A `different` answer wins
-    over a `same` answer for the same pair. A row whose unit no longer exists is skipped."""
+    `same` comes from data/joins_v1.tsv. `different` comes from data/cannot_links_v1.tsv and
+    data/join_differents_v1.tsv. A `different` answer wins over a `same` answer for the same pair.
+    A row whose unit no longer exists is skipped."""
     out = {}
-    for path, decision in ((cannot or CANNOT, "different"), (joins or JOINS, "same")):
+    for path, decision in ((cannot or CANNOT, "different"), (differents or DIFFERENTS, "different"),
+                           (joins or JOINS, "same")):
         if not path.exists():
             continue
         rows = [dict(r, centre_distance="0") for r in csv.DictReader(path.open(), delimiter="\t")]
@@ -380,24 +385,41 @@ def merge_pair_rows(new_rows: list, old_rows: list) -> tuple[list, int]:
     return new_rows + kept, len(kept)
 
 
-def export_joins(args) -> None:
-    units = pickle.load(args.cache.open("rb"))["units"]
-    cand = {r["pair_id"]: r for r in csv.DictReader((RESULTS / "join_candidates_v1.tsv").open(), delimiter="\t")}
-    new_rows = []
-    for r in csv.DictReader((RESULTS / "join_llm_v1.tsv").open(), delimiter="\t"):
-        if r["decision"] != "same":
+def answer_rows(units: list, cand: dict, answers: list, decision: str) -> list:
+    """The answers with this decision, keyed by the entity name IDs of each unit.
+    cand: pair_id -> row of join_candidates_v1.tsv. answers: rows of join_llm_v1.tsv."""
+    out = []
+    for r in answers:
+        if r["decision"] != decision:
             continue
         c = cand[r["pair_id"]]
-        new_rows.append({"name_ids_a": unit_key(units[int(c["unit_a"])]), "name_ids_b": unit_key(units[int(c["unit_b"])]),
-                         "centre_distance": c["centre_distance"], "confidence": r["confidence"]})
-    old_rows = list(csv.DictReader(JOINS.open(), delimiter="\t")) if JOINS.exists() else []
+        out.append({"name_ids_a": unit_key(units[int(c["unit_a"])]), "name_ids_b": unit_key(units[int(c["unit_b"])]),
+                    "centre_distance": c["centre_distance"], "confidence": r["confidence"]})
+    return out
+
+
+def write_pair_file(path: Path, new_rows: list) -> tuple[int, int]:
+    """Merge new_rows with the rows of path (merge_pair_rows), and write path. Return (rows written, old rows kept)."""
+    old_rows = list(csv.DictReader(path.open(), delimiter="\t")) if path.exists() else []
     rows, kept = merge_pair_rows(new_rows, old_rows)
-    JOINS.parent.mkdir(parents=True, exist_ok=True)
-    with JOINS.open("w", newline="") as f:
+    path.parent.mkdir(parents=True, exist_ok=True)
+    with path.open("w", newline="") as f:
         w = csv.DictWriter(f, fieldnames=JOIN_COLUMNS, delimiter="\t", extrasaction="ignore")
         w.writeheader()
         w.writerows(rows)
-    print(f"{len(new_rows)} joins from the answers + {kept} older joins kept = {len(rows)} written to {JOINS}")
+    return len(rows), kept
+
+
+def export_joins(args) -> None:
+    """Write the same answers to data/joins_v1.tsv and the different answers to data/join_differents_v1.tsv.
+    A later run reads both files, so it asks no pair again that has an answer."""
+    units = pickle.load(args.cache.open("rb"))["units"]
+    cand = {r["pair_id"]: r for r in csv.DictReader((RESULTS / "join_candidates_v1.tsv").open(), delimiter="\t")}
+    answers = list(csv.DictReader((RESULTS / "join_llm_v1.tsv").open(), delimiter="\t"))
+    for decision, path in (("same", JOINS), ("different", DIFFERENTS)):
+        new_rows = answer_rows(units, cand, answers, decision)
+        n, kept = write_pair_file(path, new_rows)
+        print(f"{decision}: {len(new_rows)} from the answers + {kept} older rows kept = {n} written to {path}")
 
 
 def subjects(args) -> None:

@@ -73,13 +73,42 @@ def test_known_answers_read_both_files_by_name_ids_and_a_different_answer_wins(t
                      "3 5\t9\t0.1\thigh\n7 8\t4\t0.1\thigh\n1 2\t9\t0.1\thigh\n", encoding="utf-8")
     cannot = tmp_path / "cannot.tsv"
     cannot.write_text("name_ids_a\tname_ids_b\tsource\tconfidence\n7 8\t4\tchain\tlow\n", encoding="utf-8")
-    known = known_answers(units, joins, cannot)
+    known = known_answers(units, joins, cannot, tmp_path / "none.tsv")
     assert known == {frozenset((0, 1)): "same", frozenset((2, 3)): "different"}
+
+
+def test_known_answers_read_the_stored_different_answers(tmp_path):
+    from scripts.subject_join import known_answers
+    differents = tmp_path / "differents.tsv"
+    differents.write_text("name_ids_a\tname_ids_b\tcentre_distance\tconfidence\n3 5\t9\t0.1\thigh\n", encoding="utf-8")
+    known = known_answers([[5, 3], [9]], tmp_path / "none.tsv", tmp_path / "none2.tsv", differents)
+    assert known == {frozenset((0, 1)): "different"}
+
+
+def test_answer_rows_key_each_answer_by_the_name_ids_of_its_units():
+    from scripts.subject_join import answer_rows
+    units = [[5, 3], [9], [7]]
+    cand = {"P1": {"unit_a": "0", "unit_b": "1", "centre_distance": "0.05"},
+            "P2": {"unit_a": "1", "unit_b": "2", "centre_distance": "0.09"}}
+    answers = [{"pair_id": "P1", "decision": "different", "confidence": "high"},
+               {"pair_id": "P2", "decision": "same", "confidence": "low"}]
+    assert answer_rows(units, cand, answers, "different") == [
+        {"name_ids_a": "3 5", "name_ids_b": "9", "centre_distance": "0.05", "confidence": "high"}]
+
+
+def test_write_pair_file_keeps_old_rows_and_writes_no_double(tmp_path):
+    from scripts.subject_join import write_pair_file
+    path = tmp_path / "differents.tsv"
+    row = {"name_ids_a": "3 5", "name_ids_b": "9", "centre_distance": "0.05", "confidence": "high"}
+    assert write_pair_file(path, [row]) == (1, 0)
+    other = dict(row, name_ids_b="7")
+    assert write_pair_file(path, [other]) == (2, 1)
+    assert write_pair_file(path, [other]) == (2, 1)
 
 
 def test_known_answers_with_no_files_is_empty(tmp_path):
     from scripts.subject_join import known_answers
-    assert known_answers([[1], [2]], tmp_path / "none.tsv", tmp_path / "none2.tsv") == {}
+    assert known_answers([[1], [2]], tmp_path / "none.tsv", tmp_path / "none2.tsv", tmp_path / "none3.tsv") == {}
 
 
 def test_merge_pair_rows_keeps_old_joins_that_the_new_answers_do_not_cover():
@@ -103,6 +132,7 @@ def test_chain_ingest_keeps_the_old_cannot_links(tmp_path, monkeypatch):
     monkeypatch.setattr(sj, "RESULTS", results)
     monkeypatch.setattr(sj, "JOINS", data / "joins.tsv")
     monkeypatch.setattr(sj, "CANNOT", data / "cannot.tsv")
+    monkeypatch.setattr(sj, "DIFFERENTS", data / "differents.tsv")
     units = [[1], [2], [3]]
     cache = tmp_path / "units.pkl"
     cache.write_bytes(pickle.dumps({"units": units}))
