@@ -1,20 +1,21 @@
 import React, { useEffect, useRef, useState } from "react";
-import { useSearchParams } from "react-router-dom";
+import { Link, useSearchParams } from "react-router-dom";
 import { getJSON } from "../assets/js/api.js";
 import { formatDateLong, formatNumber } from "../assets/js/format.js";
 import { useAnswer, useApi } from "../assets/js/useApi.js";
 import Breadcrumb from "../components/Breadcrumb.jsx";
 import Button from "../components/Button.jsx";
 import Chip from "../components/Chip.jsx";
+import CopyButton from "../components/CopyButton.jsx";
 import PageAnswer from "../components/PageAnswer.jsx";
 import PageLayout from "../components/PageLayout.jsx";
 import { ErrorState, Loading } from "../components/States.jsx";
 import CompareChart from "./trends/CompareChart.jsx";
 import CompareTable from "./trends/CompareTable.jsx";
-import InfoTip from "./trends/InfoTip.jsx";
+import MethodBlock from "./trends/MethodBlock.jsx";
 import TopicRace from "./trends/TopicRace.jsx";
 import YearStrip from "./trends/YearStrip.jsx";
-import { MAX_COMPARE, addSlug, headline, removeSlug, readSlugs } from "./trends/trendsData.js";
+import { HEADLINE_MIN_TAGGED, MAX_COMPARE, addSlug, defaultCompare, displayName, headline, removeSlug, readSlugs } from "./trends/trendsData.js";
 import "./trends.css";
 
 // Hand-picked starting points for Compare. They only fill the chart. They do not rank anything.
@@ -72,13 +73,20 @@ function SubjectPicker({ onAdd, full }) {
 }
 
 // The Trends page: which subjects stood out in each year, and a chart to compare subjects over the years.
+// The address keeps the state: compare (subjects), measure, month and view of the race.
+// A list "compare=" with no subject means the reader cleared the chart. No "compare" at all means the first, ruled choice.
 export default function Trends() {
   const [searchParams, setSearchParams] = useSearchParams();
-  const slugs = readSlugs(searchParams.get("compare"));
-  const compareRef = useRef(null);
   const [showTable, setShowTable] = useState(false);
-  const [measure, setMeasure] = useState("share");
+  const [sheetOpen, setSheetOpen] = useState(false);
+  const closeRef = useRef(null);
+  const measure = searchParams.get("measure") === "count" ? "count" : "share";
+  const raceMonth = searchParams.get("month");
+  const raceView = searchParams.get("view") === "lines" ? "lines" : "bars";
   const { data, loading, error, retry } = useAnswer("/api/trends");
+  const chosen = searchParams.has("compare");
+  const fallback = !chosen && data ? defaultCompare(data.years) : { slugs: [], years: [] };
+  const slugs = chosen ? readSlugs(searchParams.get("compare")) : fallback.slugs;
   const key = slugs.join(",");
   const series = useApi(key ? `compare:${key}` : null, (signal) =>
     Promise.all(slugs.map((s) => getJSON(`/api/trends/${encodeURIComponent(s)}`, undefined, { signal })))
@@ -88,16 +96,31 @@ export default function Trends() {
     document.title = "Trends · Torko";
   }, []);
 
-  const setCompare = (list) => {
-    const next = new URLSearchParams(searchParams);
-    if (list.length) next.set("compare", list.join(","));
-    else next.delete("compare");
-    setSearchParams(next, { replace: true, preventScrollReset: true });
+  // The sheet on a phone closes with Escape, and its close button takes the focus when it opens.
+  useEffect(() => {
+    if (!sheetOpen) return undefined;
+    closeRef.current?.focus();
+    const onKey = (e) => { if (e.key === "Escape") setSheetOpen(false); };
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, [sheetOpen]);
+
+  // Write some values of the address. A null value removes the key. The page does not scroll.
+  const patch = (values) => {
+    setSearchParams((prev) => {
+      const next = new URLSearchParams(prev);
+      Object.entries(values).forEach(([k, v]) => {
+        if (v === null || v === undefined || v === "") next.delete(k);
+        else next.set(k, v);
+      });
+      return next;
+    }, { replace: true, preventScrollReset: true });
   };
-  const addFromTimeline = (slug) => {
-    setCompare(addSlug(slugs, slug));
-    compareRef.current?.scrollIntoView({ behavior: "smooth", block: "nearest" });
-  };
+  const setCompare = (list) => patch({ compare: list.length ? list.join(",") : "" });
+  const setRace = ({ month, view }) => patch({ ...(month !== undefined ? { month } : {}), ...(view !== undefined ? { view } : {}) });
+  const setMeasure = (v) => patch({ measure: v === "count" ? "count" : null });
+  // A click in the list of years only adds the subject. The tray and the chart show it. The page does not scroll.
+  const addFromTimeline = (slug) => setCompare(addSlug(slugs, slug));
 
   if (loading && !data) return <main className="trends-page"><h1 className="sr-only">Trends</h1><Loading lines={8} /></main>;
   if (error) return <main className="trends-page"><ErrorState error={error} onRetry={retry} /></main>;
@@ -110,20 +133,31 @@ export default function Trends() {
         {top ? (
           <>
             In {top.year}, {top.phrase} tagged speeches in the Lok Sabha {top.phrase.startsWith("one") ? "was" : "were"} about{" "}
-            <span className="trends-head__subject">{top.name}</span>.
+            <Link className="trends-head__subject" to={`/tag/${top.slug}`}>{displayName(top.name)}</Link>
+            {top.n !== undefined && top.tagged ? <> <span className="trends-head__count">({formatNumber(top.n)} of {formatNumber(top.tagged)})</span></> : null}.
           </>
         ) : (
           "What the Lok Sabha talked about, year by year"
         )}
       </PageAnswer>
       <p className="trends-head__lede">
-        Each year has its own subjects. A war, a law, a scheme or a crisis takes the floor for a year, and then the house moves on.
-        Below, each year shows the subjects that rose furthest above their usual level.
+        Below: the subjects that rose furthest, month by month. Then the top subjects of each year. Then a chart to compare subjects.
+        A tagged speech is a speech with at least one subject label.
+      </p>
+      <p className="trends-head__rule">
+        The sentence shows the largest share that any subject had in one year. Years with fewer than {formatNumber(HEADLINE_MIN_TAGGED)} tagged speeches are left out.
       </p>
     </div>
   );
 
   const loaded = series.data && series.data.length === slugs.length ? series.data : [];
+  const lastDateLong = formatDateLong(data.last_date);
+  const lastYear = Number(String(data.last_date).slice(0, 4));
+  const partial = String(data.last_date).slice(5) !== "12-31" ? { year: lastYear, label: lastDateLong } : null;
+  const firstYear = loaded.length && loaded[0].years.length ? loaded[0].years[0].year : "";
+  const chartTitle = `${measure === "count" ? "Speeches that carry each subject" : "Share of tagged speeches that carry each subject"}, by year. Lok Sabha, ${firstYear} to ${lastDateLong}. Source: torko.in`;
+  const rules = data.rules || {};
+  const names = loaded.map((t) => displayName(t.name));
 
   return (
     <PageLayout breadcrumb={<Breadcrumb items={[{ label: "Trends" }]} />} answer={answer}>
@@ -131,24 +165,33 @@ export default function Trends() {
         <section className="trends-race" aria-labelledby="trends-race-title">
           <div className="trends-race__head">
             <h2 id="trends-race-title" className="trends-section-title">The subjects rise and fall, month by month</h2>
-            <InfoTip label="How Torko counts">
-              Each month covers the 12 months up to it. A value is how far the subject’s share of the tagged speeches is above its
-              usual share, in percentage points. Usual is its median over all months. Similar tags can each take a place.
-            </InfoTip>
           </div>
-          <TopicRace />
+          <TopicRace month={raceMonth} view={raceView} onChange={setRace} />
         </section>
 
         <section className="trends-years" aria-labelledby="trends-years-title">
           <h2 id="trends-years-title" className="trends-section-title">The year’s subjects, latest year first</h2>
           <p className="trends-years__note">
-            The bar is the subject’s share of the year. The thin mark is its usual share. A name opens its speeches of that year.
+            The bar is the subject’s share of the tagged speeches of the year. The thin mark is its usual share. A name opens its speeches of that year.
           </p>
-          <YearStrip years={data.years} slugs={slugs} onAdd={addFromTimeline} lastDate={formatDateLong(data.last_date)} />
+          <MethodBlock full={data.counts_note}>
+            <p>
+              Each year lists the top {rules.subjects_per_year} subjects. A subject needs {formatNumber(rules.min_year_speeches)} speeches in the year and
+              {" "}{formatNumber(rules.min_subject_speeches)} speeches over all years. Its share must be at least {rules.min_lift} times its usual share.
+            </p>
+            <p>
+              Usual is the median of the yearly shares of the subject. A year counts by the date of the debate.
+              Bars use one scale. The scale comes from years with at least {formatNumber(HEADLINE_MIN_TAGGED)} tagged speeches.
+            </p>
+          </MethodBlock>
+          <YearStrip years={data.years} slugs={slugs} onAdd={addFromTimeline} lastDate={partial ? lastDateLong : ""} />
         </section>
 
-        <section className="trends-compare" ref={compareRef} aria-labelledby="trends-compare-title">
-          <h2 id="trends-compare-title" className="trends-section-title">Compare subjects over the years</h2>
+        <section className={`trends-compare${sheetOpen ? " trends-compare--sheet" : ""}`} id="compare" aria-labelledby="trends-compare-title">
+          <div className="trends-compare__head">
+            <h2 id="trends-compare-title" className="trends-section-title">Compare subjects over the years</h2>
+            <button type="button" ref={closeRef} className="trends-compare__close" onClick={() => setSheetOpen(false)}>Close</button>
+          </div>
           <SubjectPicker onAdd={(s) => setCompare(addSlug(slugs, s))} full={slugs.length >= MAX_COMPARE} />
           {slugs.length === 0 ? (
             <div className="trends-compare__empty">
@@ -165,21 +208,28 @@ export default function Trends() {
             <Loading lines={4} />
           ) : (
             <>
+              {!chosen && fallback.years.length > 0 && (
+                <p className="trends-compare__first">
+                  Shown first: the leading subject of {fallback.years[0]}{fallback.years[1] ? ` and the leading subject of ${fallback.years[1]}` : ""}. Choose other subjects to replace them.
+                </p>
+              )}
               <div className="trends-compare__chips">
                 {loaded.map((t) => (
-                  <Chip key={t.slug} label={t.name} href={`/tag/${t.slug}`} onRemove={() => setCompare(removeSlug(slugs, slugs[loaded.indexOf(t)]))} />
+                  <Chip key={t.slug} label={displayName(t.name)} href={`/tag/${t.slug}`} onRemove={() => setCompare(removeSlug(slugs, slugs[loaded.indexOf(t)]))} />
                 ))}
+                <Button variant="text" onClick={() => setCompare([])}>Clear all</Button>
               </div>
               <div className="trends-measure" role="group" aria-label="Measure of the chart">
-                {[["share", "Share of the year"], ["count", "Number of speeches"]].map(([v, l]) => (
+                {[["share", "Share of tagged speeches"], ["count", "Number of speeches"]].map(([v, l]) => (
                   <button key={v} type="button" className="trends-measure__option" aria-pressed={measure === v} onClick={() => setMeasure(v)}>
                     {l}
                   </button>
                 ))}
               </div>
-              {showTable ? <CompareTable series={loaded} /> : <CompareChart series={loaded} measure={measure} />}
+              {showTable ? <CompareTable series={loaded} /> : <CompareChart series={loaded} measure={measure} title={chartTitle} partial={partial} />}
               <div className="trends-compare__foot">
-                <Button variant="text" onClick={() => setShowTable((v) => !v)}>{showTable ? "Show the chart" : "Show the table"}</Button>
+                <Button variant="text" onClick={() => setShowTable((v) => !v)}>{showTable ? "Show as chart" : "Show as table"}</Button>
+                <CopyButton text={() => window.location.href}>Copy link</CopyButton>
                 <p className="trends-compare__note">
                   Each line is the percent of the tagged speeches of a year that carry the subject. A share does not grow when a year simply has more speeches. A count does, so use the share to compare one year with another.
                 </p>
@@ -188,6 +238,15 @@ export default function Trends() {
           )}
         </section>
       </div>
+      {slugs.length > 0 && !sheetOpen && (
+        <div className="trends-tray" role="region" aria-label="Comparison">
+          <p className="trends-tray__text">
+            <span className="trends-tray__count">Compare ({slugs.length})</span>{" "}
+            <span className="trends-tray__names">{names.length ? names.join(", ") : slugs.join(", ")}</span>
+          </p>
+          <Button variant="secondary" onClick={() => setSheetOpen(true)}>Open chart</Button>
+        </div>
+      )}
     </PageLayout>
   );
 }

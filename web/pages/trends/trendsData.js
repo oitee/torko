@@ -35,10 +35,92 @@ export function headline(years, minTagged = HEADLINE_MIN_TAGGED) {
   let best = null;
   for (const y of (years || []).filter((x) => x.tagged === undefined || x.tagged >= minTagged)) {
     for (const s of y.subjects || []) {
-      if (!best || s.share > best.share) best = { year: y.year, name: s.name, share: s.share };
+      if (!best || s.share > best.share) best = { year: y.year, name: s.name, slug: s.slug, share: s.share, n: s.n, tagged: y.tagged };
     }
   }
   if (!best) return null;
   const phrase = best.share >= 5 ? `one in ${Math.round(100 / best.share)}` : `${best.share}%`;
   return { ...best, phrase };
+}
+
+// The share of a subject, with one decimal. Example: 3.4%.
+export function fmtShare(value) {
+  return `${Number(value).toFixed(1)}%`;
+}
+
+// The usual share of a subject. Below 0.05 the API rounds to 0, so the text says "under 0.05%".
+// Below 1 it has two decimals. From 1 up it has one decimal.
+export function fmtUsual(value) {
+  const v = Number(value);
+  if (v < 0.05) return "under 0.05%";
+  return v < 1 ? `${v.toFixed(2)}%` : `${v.toFixed(1)}%`;
+}
+
+const SMALL_WORDS = new Set(["of", "and", "the", "for", "in", "on", "to", "a", "an", "or"]);
+
+// The name of a subject as the page shows it. The data stays as it is.
+// A name cut by the source loses its closing bracket, so the bracket closes.
+// A stray space before a number, as in "COVID -19", goes.
+// A name in capitals only gets normal capitals. A word of one to three letters stays in capitals, except small words.
+export function displayName(name) {
+  if (!name) return "";
+  let out = String(name).trim().replace(/\s{2,}/g, " ").replace(/([A-Za-z]) -(\d)/g, "$1-$2");
+  const open = (out.match(/\(/g) || []).length;
+  const close = (out.match(/\)/g) || []).length;
+  if (open > close) out = `${out.replace(/\s+$/, "")})`;
+  if (out.includes(" ") && out === out.toUpperCase() && /[A-Z]/.test(out)) {
+    out = out
+      .split(" ")
+      .map((w, i) => {
+        const lower = w.toLowerCase();
+        if (i > 0 && SMALL_WORDS.has(lower)) return lower;
+        if (w.length <= 3 && !["ACT", "THE", "AND", "FOR"].includes(w)) return w;
+        return lower.charAt(0).toUpperCase() + lower.slice(1);
+      })
+      .join(" ");
+  }
+  return out;
+}
+
+// The comparison that the chart shows before the reader chooses.
+// Rule: the leading subject of the newest complete year, and the leading subject of the year before it.
+// A complete year has at least minTagged tagged speeches. When both years lead with the same subject,
+// the year before gives its next subject. It returns the slugs and the two years that they come from.
+export function defaultCompare(years, minTagged = HEADLINE_MIN_TAGGED) {
+  const full = (years || [])
+    .filter((y) => (y.tagged === undefined || y.tagged >= minTagged) && (y.subjects || []).length)
+    .sort((a, b) => b.year - a.year);
+  if (!full.length) return { slugs: [], years: [] };
+  const slugs = [full[0].subjects[0].slug];
+  const used = [full[0].year];
+  const before = full.find((y) => y.year === full[0].year - 1);
+  if (before) {
+    const pick = before.subjects.find((s) => !slugs.includes(s.slug));
+    if (pick) {
+      slugs.push(pick.slug);
+      used.push(before.year);
+    }
+  }
+  return { slugs, years: used };
+}
+
+// Make the text of a CSV file from rows (arrays). A cell with a comma, a quote or a line break gets quotes.
+export function toCsv(rows) {
+  const cell = (v) => {
+    const t = v === null || v === undefined ? "" : String(v);
+    return /[",\n]/.test(t) ? `"${t.replace(/"/g, '""')}"` : t;
+  };
+  return rows.map((r) => r.map(cell).join(",")).join("\n");
+}
+
+// Start the download of a CSV text in the browser.
+export function downloadCsv(filename, rows) {
+  const url = URL.createObjectURL(new Blob([toCsv(rows)], { type: "text/csv;charset=utf-8" }));
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = filename;
+  document.body.appendChild(a);
+  a.click();
+  a.remove();
+  URL.revokeObjectURL(url);
 }

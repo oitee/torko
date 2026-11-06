@@ -3,7 +3,6 @@ import { cleanup, render, screen } from "@testing-library/react";
 import { afterEach, describe, expect, it } from "vitest";
 import { MemoryRouter } from "react-router-dom";
 import YearStrip from "../pages/trends/YearStrip.jsx";
-import InfoTip from "../pages/trends/InfoTip.jsx";
 
 afterEach(cleanup);
 
@@ -19,16 +18,8 @@ describe("YearStrip", () => {
     const { container } = render(<MemoryRouter><YearStrip years={years} slugs={[]} onAdd={() => {}} lastDate="1 May 2003" /></MemoryRouter>);
     const order = [...container.querySelectorAll(".year-strip__number")].map((e) => e.textContent);
     expect(order).toEqual(["2003", "2002", "2001"]);
-    expect(screen.getByText(/3,000 tagged speeches, to 1 May 2003/)).toBeTruthy();
+    expect(screen.getAllByText(/3,000 tagged speeches/).length).toBe(3);
+    expect(screen.getByText(/Part year: 1 Jan to 1 May 2003 only/)).toBeTruthy();
   });
 });
 
-describe("InfoTip", () => {
-  it("names the button and gives the text as its description", () => {
-    render(<InfoTip label="How Torko counts">Each month covers the 12 months up to it.</InfoTip>);
-    const button = screen.getByRole("button", { name: "How Torko counts" });
-    const tip = screen.getByRole("tooltip", { hidden: true });
-    expect(button.getAttribute("aria-describedby")).toBe(tip.id);
-    expect(tip.textContent).toBe("Each month covers the 12 months up to it.");
-  });
-});

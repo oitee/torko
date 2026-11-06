@@ -53,3 +53,40 @@ export function spreadLabels(ys, gap, min, max) {
   order.forEach(([, i], k) => { result[i] = out[k]; });
   return result;
 }
+
+// The first month of the window that ends at frame i. A window has windowMonths calendar months.
+// Example: with 12 months, the window that ends in "2026-04" starts in "2025-05".
+export function windowStart(label, windowMonths = 12) {
+  const [y, m] = String(label).split("-").map(Number);
+  const index = y * 12 + (m - 1) - (windowMonths - 1);
+  return `${Math.floor(index / 12)}-${String((index % 12) + 1).padStart(2, "0")}`;
+}
+
+// The one scale of the bars for every frame of the race.
+// max is the largest distance above typical of any subject in any frame that it qualifies in.
+// The scale is a whole number of steps, so the gridlines fall on simple numbers. It returns the top and the step.
+export function raceScale(subjects, tagged, minWindow) {
+  let max = 0.1;
+  for (const s of subjects) {
+    for (let i = 0; i < tagged.length; i++) {
+      if (s.n[i] >= minWindow) max = Math.max(max, shareAt(s, tagged, i) - s.typical);
+    }
+  }
+  const raw = max / 3;
+  const size = 10 ** Math.floor(Math.log10(raw));
+  const step = [1, 2, 5, 10].map((k) => k * size).find((v) => v >= raw);
+  return { top: step * Math.ceil(max / step - 1e-9), step };
+}
+
+// The rows of the CSV file of the race: the top subjects of every month.
+export function raceCsvRows(data) {
+  const { rules } = data;
+  const rows = [["month", "window_start", "rank", "subject", "speeches_with_subject", "tagged_speeches", "share_percent", "usual_share_percent", "points_above_usual"]];
+  for (let f = 0; f < data.months.length; f++) {
+    rankAt(data.subjects, data.tagged, f, rules.top, rules.min_window_speeches).forEach((r, i) => {
+      rows.push([data.months[f], windowStart(data.months[f], rules.window_months), i + 1, r.subject.name, r.n, data.tagged[f],
+        r.share.toFixed(2), r.subject.typical, r.value.toFixed(2)]);
+    });
+  }
+  return rows;
+}
