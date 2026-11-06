@@ -6,6 +6,15 @@
   gap: var(--space-4);
 }
 
+/* A line above the sheet: the hint, or the button that copies the selected words. */
+.speech-text__select-bar {
+  display: flex;
+  align-items: center;
+  min-height: var(--control-height);
+  font-size: var(--size-count);
+  line-height: var(--lh-count);
+}
+
 .speech-text__heading {
   margin: 0;
   font-size: var(--size-title);
@@ -84,9 +93,35 @@
   color: var(--ink);
 }
 
+/* The paragraph sign is a link to the paragraph. It has the count size and the meta colour. */
+.speech-text__paragraph {
+  scroll-margin-top: var(--space-14);
+}
+
 .speech-text__para-num {
   user-select: none;
   line-height: inherit;
+  font-size: var(--size-count);
+  color: var(--meta);
+  text-decoration: none;
+}
+
+.speech-text__para-num:hover,
+.speech-text__para-num:focus-visible {
+  color: var(--action);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+.speech-text__para-num:focus-visible {
+  outline: 2px solid var(--action);
+  outline-offset: 2px;
+}
+
+/* The paragraph that the address names takes the ground colour. */
+.speech-text__paragraph--target,
+.speech-text__paragraph:target {
+  background: var(--ground);
 }
 
 .speech-text__mark {
