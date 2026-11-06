@@ -1,9 +1,10 @@
 import React from "react";
+import { Link } from "react-router-dom";
 import { formatNumber } from "../../assets/js/format.js";
 import "./TagSubjectsList.css";
 
 // TagSubjectsList renders specific subjects raised under this tag.
-export default function TagSubjectsList({ subjects = [] }) {
+export default function TagSubjectsList({ subjects = [], slug = "", total = null }) {
   const safeSubjects = Array.isArray(subjects) ? subjects : [];
 
   if (safeSubjects.length === 0) {
@@ -22,7 +23,7 @@ export default function TagSubjectsList({ subjects = [] }) {
           Subjects under this tag
         </h2>
         <p className="tag-subjects__subtitle">
-          The specific things members raised. Across all terms.
+          The specific things members raised. Counts are for all terms and do not change with the term filter. A speech can match more than one subject.
         </p>
       </div>
 
@@ -33,7 +34,11 @@ export default function TagSubjectsList({ subjects = [] }) {
           const label = s.label || s.name || "Subject";
 
           return (
-            <div key={s.id || idx} className="tag-subject-card">
+            <Link
+              key={s.id || idx}
+              to={`/search?tag=${slug}&subject=${s.id}`}
+              className="tag-subject-card"
+            >
               <span className="tag-subject-card__label">{label}</span>
               <div className="tag-subject-card__track">
                 <div
@@ -43,13 +48,13 @@ export default function TagSubjectsList({ subjects = [] }) {
               </div>
               <div className="tag-subject-card__meta mono">
                 <span className="tag-subject-card__count">
-                  {formatNumber(count)} speeches
+                  {total != null ? `${formatNumber(count)} of ${formatNumber(total)} speeches` : `${formatNumber(count)} speeches`}
                 </span>
                 {s.peak != null && (
-                  <span className="tag-subject-card__peak">peak {s.peak}</span>
+                  <span className="tag-subject-card__peak">most in {s.peak}</span>
                 )}
               </div>
-            </div>
+            </Link>
           );
         })}
       </div>

@@ -28,9 +28,24 @@ describe("TagPartyChart component", () => {
     expect(screen.getAllByText("CPI(M)").length).toBeGreaterThanOrEqual(1);
 
     expect(
-      screen.getByText(
-        "Party is the member's party on the day of the speech. Parties after the largest 6 are counted in Others, in grey."
-      )
+      screen.getByText(/Party is the member's party on the day of the speech\. Parties after the largest 6/)
     ).toBeTruthy();
   });
+
+  it("shows only the counts and shares, with no rate per 100 and no switch", () => {
+    const parties = [
+      { party: "BJP", n: 77, colour: "#FF9933", per100: 0.18, party_total: 42717 },
+      { party: "CPI(M)", n: 18, colour: "#CC0D0D", per100: 0.28, party_total: 6375 },
+    ];
+    render(
+      <MemoryRouter>
+        <TagPartyChart parties={parties} selectedTerm="" total={110} />
+      </MemoryRouter>
+    );
+    expect(screen.getByText(/95 of 110 speeches have a party/)).toBeTruthy();
+    expect(screen.getByText(/15 speeches have no party/)).toBeTruthy();
+    expect(screen.queryByText(/per 100/)).toBeNull();
+    expect(screen.queryByRole("button", { name: /Per 100|Share of the speeches/ })).toBeNull();
+  });
+
 });

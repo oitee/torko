@@ -1,0 +1,64 @@
+.tag-margin {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 18rem), 1fr));
+  align-items: start;
+  gap: var(--space-6) var(--space-10);
+}
+
+.tag-margin__section {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  border-top: 1px solid var(--ink);
+  padding-top: var(--space-4);
+}
+
+.tag-margin__heading {
+  margin: 0;
+  font-size: var(--size-heading);
+  line-height: var(--lh-heading);
+  font-weight: 600;
+  color: var(--ink);
+}
+
+.tag-margin__counts {
+  margin: 0;
+  padding: 0;
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  gap: var(--space-1) var(--space-3);
+  color: var(--ink-2);
+}
+
+.tag-margin__count-row {
+  display: contents;
+}
+
+.tag-margin__count-n {
+  margin: 0;
+  text-align: right;
+  font-size: var(--size-count);
+  font-weight: 500;
+  color: var(--ink);
+}
+
+.tag-margin__count-n a,
+.tag-margin__text a {
+  color: var(--action);
+  text-underline-offset: 3px;
+}
+
+.tag-margin__count-text {
+  margin: 0;
+  font-size: var(--size-label);
+  line-height: var(--lh-label);
+}
+
+.tag-margin__text {
+  margin: 0;
+  font-size: var(--size-label);
+  line-height: var(--lh-label);
+  color: var(--ink-2);
+}
+
+

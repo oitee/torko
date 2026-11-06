@@ -56,6 +56,7 @@ export default function SpeechGrid({ speeches = [], meta, href, action = "See al
                   </span>}
                   <span className="speech-card__date mono">
                     {formatDateLong(s.date)}
+                    {s.kind_label ? ` · ${s.kind_label}` : ""}
                   </span>
                 </div>
 

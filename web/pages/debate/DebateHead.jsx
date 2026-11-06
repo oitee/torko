@@ -2,6 +2,8 @@ import React, { useEffect, useRef, useState } from "react";
 import { formatDateLong, termLong } from "../../assets/js/format.js";
 import Breadcrumb from "../../components/Breadcrumb.jsx";
 import Button from "../../components/Button.jsx";
+import CopyButton from "../../components/CopyButton.jsx";
+import { accessedToday } from "../../components/HeadActions.jsx";
 import Popover from "../../components/Popover.jsx";
 import { tidyTitle } from "../../assets/js/titles.js";
 import { SITE_URL } from "../../assets/js/site.js";
@@ -36,18 +38,10 @@ export function formatDateWithWeekday(dateStr) {
   return `${WEEKDAYS[d.getUTCDay()]}, ${day} ${MONTHS_LONG[month]} ${year}`;
 }
 
-// The address of the debate on Torko.
 export function debateUrl(debate) {
   return `${SITE_URL}/debate/${debate.id}`;
 }
 
-// Today as 17 Dec 2025, for the "Accessed" part of the citation.
-function accessedText(now) {
-  const iso = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, "0")}-${String(now.getDate()).padStart(2, "0")}`;
-  return formatDateLong(iso);
-}
-
-// The citation of the debate: the date, the title, the term and session, the Torko address, the source, and the access date.
 export function buildDebateCitation(debate, now = new Date()) {
   if (!debate) return "";
   const dateStr = formatDateLong(debate.date);
@@ -55,12 +49,12 @@ export function buildDebateCitation(debate, now = new Date()) {
   const sess = debate.session_label || `Session ${debate.session}`;
   const torko = debate.id ? ` Torko: ${debateUrl(debate)}.` : "";
   const src = debate.source_url ? ` Source: ${debate.source_url}.` : "";
-  return `Lok Sabha Debates, ${dateStr}. “${tidyTitle(debate.title)}”. ${termStr}, ${sess}.${torko}${src} Accessed ${accessedText(now)}.`;
+  return `Lok Sabha Debates, ${dateStr}. “${tidyTitle(debate.title)}”. ${termStr}, ${sess}.${torko}${src} Accessed ${accessedToday(now)}.`;
 }
 
 export default function DebateHead({ debate }) {
   const [citeOpen, setCiteOpen] = useState(false);
-  const [copyState, setCopyState] = useState("idle");
+  const [copyFailed, setCopyFailed] = useState(false);
   const citeButtonWrapRef = useRef(null);
   const titleRef = useRef(null);
   const [titleOpen, setTitleOpen] = useState(false);
@@ -89,16 +83,6 @@ export default function DebateHead({ debate }) {
 
   const title = tidyTitle(debate.title);
   const citationText = buildDebateCitation(debate);
-
-  const handleCopyCitation = async () => {
-    try {
-      await navigator.clipboard.writeText(citationText);
-      setCopyState("copied");
-    } catch {
-      setCopyState("failed");
-    }
-    setTimeout(() => setCopyState("idle"), 2000);
-  };
 
   return (
     <section className="debate-head">
@@ -156,13 +140,17 @@ export default function DebateHead({ debate }) {
               <div className="debate-citation">
                 <p className="debate-citation__text">{citationText}</p>
                 <div className="debate-citation__actions">
-                  <Button variant="secondary" className="debate-citation__copy" onClick={handleCopyCitation}>
-                    <span aria-live="polite">
-                      {copyState === "copied" ? "Citation copied" : "Copy citation"}
-                    </span>
-                  </Button>
+                  <CopyButton
+                    text={citationText}
+                    variant="secondary"
+                    className="debate-citation__copy"
+                    copiedLabel="Citation copied"
+                    onResult={(ok) => setCopyFailed(!ok)}
+                  >
+                    Copy citation
+                  </CopyButton>
                   <span className="debate-citation__note meta" role="status">
-                    {copyState === "failed"
+                    {copyFailed
                       ? "The copy failed. Select the text above and copy it."
                       : "Cite the official record. The Torko link helps readers find this page."}
                   </span>

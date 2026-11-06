@@ -1,9 +1,9 @@
+import "./tag/TagMargin.css";
 import React, { useEffect } from "react";
 import { useParams, useSearchParams } from "react-router-dom";
 import { useApi } from "../assets/js/useApi.js";
 import { getJSON } from "../assets/js/api.js";
 import Breadcrumb from "../components/Breadcrumb.jsx";
-import HowTorkoCounts from "../components/HowTorkoCounts.jsx";
 import PageLayout from "../components/PageLayout.jsx";
 import { ErrorState, Loading } from "../components/States.jsx";
 import NotFound from "./not_found.jsx";
@@ -15,6 +15,7 @@ import TagMembersList from "./tag/TagMembersList.jsx";
 import TagRecentSpeeches from "./tag/TagRecentSpeeches.jsx";
 import TagSubjectsList from "./tag/TagSubjectsList.jsx";
 import TagRelatedTags from "./tag/TagRelatedTags.jsx";
+import TagMargin from "./tag/TagMargin.jsx";
 import "./tag.css";
 
 // The Tag page displays a subject tag, historical trends, speaker parties,
@@ -80,10 +81,17 @@ export default function Tag() {
     { label: tag.name },
   ];
 
+  // The speeches with the tag in the chosen terms. The party chart counts these.
+  const tagSlug = tag.slug || slug;
+  const termTotal = term
+    ? (tag.sessions || []).filter((x) => String(x.term) === String(term)).reduce((sum, x) => sum + (Number(x.n) || 0), 0)
+    : tag.total;
+
   return (
     <PageLayout
       breadcrumb={<Breadcrumb items={breadcrumbItems} />}
       answer={<TagHead tag={tag} />}
+      notes={<TagMargin tag={{ ...tag, slug: tagSlug }} />}
     >
       <TagTermBar
         tag={tag}
@@ -100,19 +108,24 @@ export default function Tag() {
           <ErrorState error={error} onRetry={retry} />
         </div>
       ) : (
-        <div className="page-main">
+        <div className="page-main tag-main">
           <TagWhenChart
             years={tag.years}
+            slug={tagSlug}
             selectedTerm={term}
           />
 
           <div className="tag-side-by-side">
             <TagPartyChart
               parties={tag.parties}
+              total={termTotal}
               selectedTerm={term}
             />
             <TagMembersList
               members={tag.members}
+              slug={tagSlug}
+              total={termTotal}
+              nMembers={term ? null : tag.n_members}
               selectedTerm={term}
             />
           </div>
@@ -123,17 +136,9 @@ export default function Tag() {
             selectedTerm={term}
           />
 
-          <TagSubjectsList subjects={tag.subjects} />
+          <TagSubjectsList subjects={tag.subjects} slug={tagSlug} total={tag.total} />
 
-          <TagRelatedTags related={tag.related} />
-
-          <section className="tag-section tag-section--method">
-            <HowTorkoCounts>
-              A speech carries this tag when the model named it in the speech,
-              when a word of the tag matched, or when the TLDR is near the tag
-              in meaning. Each speech counts once. A member counts once.
-            </HowTorkoCounts>
-          </section>
+          <TagRelatedTags related={tag.related} total={tag.total} />
         </div>
       )}
     </PageLayout>

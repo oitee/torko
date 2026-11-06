@@ -9,6 +9,7 @@ afterEach(cleanup);
 
 const mockTagData = {
   name: "Arrears",
+  counts_note: "total counts the speeches with the tag.",
   slug: "arrears",
   type: "topic",
   domain: "Economy, Finance and Taxation",
@@ -97,11 +98,15 @@ describe("Tag page integration", () => {
     });
 
     await waitFor(() => expect(document.title).toBe("Arrears · Torko"));
+    // The source is named, not linked: sansad.in has no page for all debates.
+    expect(screen.getByText(/Lok Sabha Debates, 13th to 18th Lok Sabha/)).toBeTruthy();
+    expect(screen.queryByRole("link", { name: "Lok Sabha Debates" })).toBeNull();
+    expect(screen.queryByText("Exact definitions of each count")).toBeNull();
     expect(screen.getByText("Topics")).toBeTruthy();
     expect(screen.getByText("Economy, Finance and Taxation")).toBeTruthy();
     expect(screen.getByText("Outstanding payments due.")).toBeTruthy();
-    expect(screen.getByText("205")).toBeTruthy();
-    expect(screen.getByText("145")).toBeTruthy();
+    expect(screen.getAllByText("205").length).toBeGreaterThanOrEqual(1);
+    expect(screen.getAllByText("145").length).toBeGreaterThanOrEqual(1);
     expect(screen.getByText("11")).toBeTruthy();
     expect(screen.getByText("1999–2025")).toBeTruthy();
 
@@ -171,7 +176,7 @@ describe("Tag page integration", () => {
     expect(screen.getByRole("heading", { level: 1 }).textContent).toBe("Arrears");
     // Meta count line appears under term bar: 41 + 15 = 56
     expect(
-      screen.getByText("56 of 205 speeches in the 17th Lok Sabha")
+      screen.getByText(/56 of 205 speeches in the 17th Lok Sabha/)
     ).toBeTruthy();
   });
 });

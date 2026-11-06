@@ -10,6 +10,24 @@
   padding: var(--space-8) 0;
 }
 
+/* The Tag page is dense, so its sections sit closer than on other pages.
+   Each section already has a top rule and space under it, so a smaller gap still separates them. */
+.tag-main {
+  gap: var(--space-8);
+  padding-bottom: 0;
+}
+
+/* The term bar above ends in a line, so the first section draws no second line. */
+.tag-main > :first-child {
+  border-top: 0;
+  padding-top: 0;
+}
+
+/* The term bar comes right under the head, so the head needs less space under its actions. */
+.page-layout__head:has(.tag-head) {
+  padding-bottom: var(--space-4);
+}
+
 .tag-side-by-side {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(min(100%, 420px), 1fr));

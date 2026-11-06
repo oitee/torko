@@ -10,7 +10,7 @@ from collections import Counter
 
 from sqlalchemy import text
 
-from pages.common import SPEECH_TAGS_CTE, cached, slug, speech_rows, speech_tags_cte
+from pages.common import SPEECH_TAGS_CTE, add_quotes, cached, place_slugs, slug, speech_rows, speech_tags_cte
 from pages.sessions import session_labels
 
 # A tag that more than this share of all tagged speeches carry is "very general".
@@ -162,6 +162,31 @@ def house_medians(conn):
     return cached("house_medians", load)
 
 
+def term_medians(conn):
+    """Return {term: (median speeches of a member in the term, number of members of the term)}. Cached.
+
+    The members of a term are all persons with a row in speakers for the term. A member with no speech counts as 0.
+    """
+    def load():
+        members = dict(conn.execute(text(
+            "SELECT lok_sabha_term, count(DISTINCT person_id) FROM speakers GROUP BY 1")).all())
+        per = {}
+        for term, n in conn.execute(text("""
+                SELECT d.loksabha, count(*) FROM speeches s JOIN debates d ON d.id = s.debate_id
+                WHERE s.person_id IS NOT NULL
+                  AND EXISTS (SELECT 1 FROM speakers sp WHERE sp.person_id = s.person_id AND sp.lok_sabha_term = d.loksabha)
+                GROUP BY d.loksabha, s.person_id""")).all():
+            per.setdefault(term, []).append(n)
+        return {t: (median_with_zeros(v, members.get(t, 0)), members.get(t, 0)) for t, v in per.items()}
+    return cached("term_medians", load)
+
+
+def state_slug(conn, state):
+    """Return the slug of the place page of a state, or None when the state has no place page."""
+    key = slug(state) if state else None
+    return key if key in place_slugs(conn) else None
+
+
 def member_sessions(conn, pid, term_numbers):
     """Return one row for each session of each term of the member: term, session, label, n, house_median."""
     medians, _ = house_medians(conn)
@@ -251,8 +276,10 @@ def member_page(conn, member_id, args=None):
             t["parties"].append(r["party"])
     for tnum in counts:
         terms.setdefault(tnum, {"term": tnum, "seat": None, "state": None, "parties": []})
+    medians = term_medians(conn)
     for tnum, t in terms.items():
         r = counts.get(tnum)
+        t["house_median"], t["house_members"] = medians.get(tnum, (None, None))
         t["speeches"] = r["n"] if r else 0
         t["words"] = int(r["words"] or 0) if r else 0
         t["first"] = r["first"].isoformat() if r and r["first"] else None
@@ -346,6 +373,7 @@ def member_page(conn, member_id, args=None):
         "seat": term_list[-1]["seat"] if term_list else None,
         "seat_slug": slug(conn.execute(text("SELECT tag FROM tags WHERE id = :i"), {"i": seat_id}).scalar()) if seat_id else None,
         "state": term_list[-1]["state"] if term_list else None,
+        "state_slug": state_slug(conn, term_list[-1]["state"] if term_list else None),
         "terms": term_list, "sessions": sessions, "speeches": sum(t["speeches"] for t in term_list), "tagged_speeches": mtotal,
         "typical": listed, "other": other, "typical_total_candidates": len(typical),
         "rule": {"general_share": GENERAL_SHARE, "min_member": MIN_MEMBER, "min_all": MIN_ALL,
@@ -359,8 +387,8 @@ def member_page(conn, member_id, args=None):
                   "by": {"turns": by["turns"], "speeches": by["speeches"]},
                   "of": {"turns": of["turns"], "speeches": of["speeches"], "chair": of["chair"],
                          "members": of["members"], "other": of["other"]}},
-        "recent": speech_rows(conn, recent_ids),
-        "longest": speech_rows(conn, long_ids),
+        "recent": add_quotes(conn, speech_rows(conn, recent_ids)),
+        "longest": add_quotes(conn, speech_rows(conn, long_ids)),
         "counts_note": (
             "speeches and terms[].speeches count all speeches of the member. "
             "tagged_speeches counts the member's speeches with at least one kept tag. "
@@ -370,6 +398,9 @@ def member_page(conn, member_id, args=None):
             "sessions[].n counts the member's speeches in the session. sessions[].house_median is the median over all members of the term; a member who joined or left during the term counts in every session. A member with no speech in the session counts as 0. "
             "typical[].member_share is typical[].n divided by tagged_speeches. typical[].house_share is the count of tagged speeches with the tag in the terms of the member, divided by the count of all tagged speeches in those terms (all members). "
             "typical[].lift_terms is member_share divided by house_share. other counts the member's tagged speeches with none of the listed typical tags, and other.all counts the same over all members in the terms of the member. "
+            "terms[].house_median is the median over all members of the term of their speeches in the term (a member with no speech counts as 0), and terms[].house_members is the number of those members. "
+            "recent.quote and longest.quote are one sentence from the own turns of the member in that speech, or null. quote_lang is en or hi. "
+            "state_slug is the slug of the place page of the state, or null. "
             "places[].own_seat is true when the place is a seat of the member. "
             "subjects[].n counts the member's speeches with a kept item of the subject, and subjects[].all counts the same over all members. "
             "house counts turns of at most house.short_words words that belong to no speech."),

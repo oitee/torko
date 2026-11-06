@@ -10,6 +10,7 @@ import time
 from sqlalchemy import create_engine, event, text
 
 from db import database_url
+from pages.quotes import pick_quote
 
 
 def engine():
@@ -298,3 +299,24 @@ def year_rows(years, tagged_by_year):
     """
     return [{"year": y, "n": years.get(y, 0), "tagged": tagged_by_year.get(y, 0)}
             for y in sorted(set(years) | {y for y in tagged_by_year if years and min(years) <= y <= max(years)})]
+
+
+def add_quotes(conn, rows):
+    """Add quote and quote_lang to each speech row: one good sentence from the own turns of the member, or None."""
+    ids = [r["id"] for r in rows]
+    turns = {}
+    if ids:
+        for sid, txt in conn.execute(text("""
+            SELECT t.speech_id, t.text FROM turns t JOIN speeches s ON s.id = t.speech_id
+            WHERE t.speech_id = ANY(:ids) AND t.person_id = s.person_id AND t.person_id IS NOT NULL
+            ORDER BY t.speech_id, t.seq"""), {"ids": ids}):
+            turns.setdefault(sid, []).append(txt)
+    for r in rows:
+        r["quote"], r["quote_lang"] = pick_quote(turns.get(r["id"], []), r["debate"])
+    return rows
+
+
+def place_slugs(conn):
+    """Return the set of slugs of the live place tags. Each slug has a place page. Cached."""
+    return cached("place_slugs", lambda: {slug(r[0]) for r in conn.execute(text(
+        "SELECT tag FROM tags WHERE type = 'place' AND status NOT IN ('rejected', 'merged')")).all()})

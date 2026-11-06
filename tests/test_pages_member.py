@@ -134,3 +134,21 @@ def test_pick_seat_tag_reads_the_state_anywhere_in_the_description():
     tags = [{"id": 1, "tag": "Thiruvananthapuram", "description": "Capital city of Kerala state."}]
     assert m.pick_seat_tag("Thiruvananthapuram", "Kerala", tags) == 1
     assert m.pick_seat_tag("Thiruvananthapuram", "Tamil Nadu", tags) is None
+
+
+def test_member_page_term_median_and_member_count(page_conn):
+    d = m.member_page(page_conn, "368", {})
+    for t in d["terms"]:
+        assert t["house_members"] > 0
+        assert t["house_median"] is not None and t["house_median"] >= 0
+    direct = page_conn.execute(m.text(
+        "SELECT count(DISTINCT person_id) FROM speakers WHERE lok_sabha_term = :t"), {"t": d["terms"][0]["term"]}).scalar()
+    assert d["terms"][0]["house_members"] == direct
+
+
+def test_member_page_state_slug_and_quote_fields(page_conn):
+    d = m.member_page(page_conn, "368", {})
+    assert "state_slug" in d
+    for key in ("recent", "longest"):
+        for row in d[key]:
+            assert "quote" in row and row["quote_lang"] in (None, "en", "hi")

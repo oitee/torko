@@ -1,5 +1,6 @@
 import React from "react";
 import { cleanup, render, screen } from "@testing-library/react";
+import { MemoryRouter } from "react-router-dom";
 import { afterEach, describe, expect, it } from "vitest";
 import TagSubjectsList from "../pages/tag/TagSubjectsList.jsx";
 
@@ -12,20 +13,23 @@ describe("TagSubjectsList component", () => {
   ];
 
   it("renders subjects heading, cards, speech counts, and peak years", () => {
-    render(<TagSubjectsList subjects={mockSubjects} />);
+    render(
+      <MemoryRouter>
+        <TagSubjectsList subjects={mockSubjects} slug="arrears" total={210} />
+      </MemoryRouter>
+    );
 
     expect(screen.getByRole("heading", { name: "Subjects under this tag" })).toBeTruthy();
-    expect(
-      screen.getByText("The specific things members raised. Across all terms.")
-    ).toBeTruthy();
+    expect(screen.getByText(/Counts are for all terms/)).toBeTruthy();
+    expect(screen.getByRole("link", { name: /Wage and salary arrears/ }).getAttribute("href")).toBe("/search?tag=arrears&subject=23204");
 
     expect(screen.getByText("Wage and salary arrears")).toBeTruthy();
-    expect(screen.getByText("44 speeches")).toBeTruthy();
-    expect(screen.getByText("peak 2001")).toBeTruthy();
+    expect(screen.getByText("44 of 210 speeches")).toBeTruthy();
+    expect(screen.getByText("most in 2001")).toBeTruthy();
 
     expect(screen.getByText("Agricultural dues")).toBeTruthy();
-    expect(screen.getByText("13 speeches")).toBeTruthy();
-    expect(screen.getByText("peak 2002")).toBeTruthy();
+    expect(screen.getByText("13 of 210 speeches")).toBeTruthy();
+    expect(screen.getByText("most in 2002")).toBeTruthy();
   });
 
   it("returns null when subjects array is empty", () => {

@@ -37,7 +37,6 @@ export default function TagTermBar({ tag, selectedTerm = "", onTermChange }) {
   return (
     <div className="tag-term-bar">
       <div className="tag-term-bar__row">
-        <span className="tag-term-bar__label">Lok Sabha term</span>
         <div className="tag-term-bar__buttons" role="group" aria-label="Lok Sabha terms">
           <button
             type="button"
