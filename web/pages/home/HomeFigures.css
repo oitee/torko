@@ -33,3 +33,25 @@
   color: var(--ink-2);
 }
 
+/* On a phone the four figures sit two by two, so they take half of the height. */
+@media (max-width: 639px) {
+  .home-figures {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 0 var(--space-4);
+  }
+
+  .home-figures__item {
+    padding: var(--space-3) 0;
+    gap: var(--space-1);
+  }
+
+  .home-figures__value {
+    font-size: var(--size-heading);
+    line-height: var(--lh-heading);
+  }
+
+  .home-figures__label {
+    font-size: var(--size-count);
+    line-height: var(--lh-count);
+  }
+}

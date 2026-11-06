@@ -2,7 +2,7 @@ import React from "react";
 import { cleanup, fireEvent, render, screen } from "@testing-library/react";
 import { afterEach, describe, expect, it, vi } from "vitest";
 import { MemoryRouter } from "react-router-dom";
-import HomeHero, { ideaHref } from "../pages/home/HomeHero.jsx";
+import HomeHero, { groupIdeas, ideaHref } from "../pages/home/HomeHero.jsx";
 import homeAnswer from "./fixtures/home/home.json";
 import featuredAnswer from "./fixtures/home/home_featured.json";
 
@@ -57,5 +57,50 @@ describe("HomeHero", () => {
     renderHero({ corpusError: { status: 500, message: "The server could not answer. Try again." }, onRetryCorpus: retry });
     fireEvent.click(screen.getByRole("button", { name: "Try again" }));
     expect(retry).toHaveBeenCalledTimes(1);
+  });
+
+  it("shows the static opening text before the corpus loads, and the dates when it arrives", () => {
+    const { container, rerender } = renderHero({});
+    expect(container.querySelector(".home-hero__lede").textContent).toContain(
+      "Torko reads the Lok Sabha debates on sansad.in. It finds the member who spoke each turn"
+    );
+    expect(screen.queryByText("20 Oct 1999")).toBeNull();
+    rerender(
+      <MemoryRouter>
+        <HomeHero corpus={homeAnswer.corpus} />
+      </MemoryRouter>
+    );
+    expect(container.querySelector(".home-hero__lede").textContent).toContain("sansad.in from 20 Oct 1999 to 18 Apr 2026.");
+  });
+
+  it("links to the page that finds an MP, in the text and on the marked seat", () => {
+    renderHero({ corpus: homeAnswer.corpus });
+    expect(screen.getByRole("link", { name: "Find your MP by the name of your seat" }).getAttribute("href")).toBe("/my-mp");
+    expect(screen.getByRole("link", { name: "Find your MP: the marked seat" }).getAttribute("href")).toBe("/my-mp");
+  });
+
+  it("groups the search ideas by kind", () => {
+    renderHero({ corpus: homeAnswer.corpus, ideas: featuredAnswer.search_ideas });
+    expect(screen.getByRole("group", { name: "Places" }).textContent).toContain("Latur");
+    expect(screen.getByRole("group", { name: "Places" }).textContent).toContain("Gaya");
+    expect(screen.getByRole("group", { name: "Schemes" }).textContent).toContain("MNREGA");
+    expect(screen.getByRole("group", { name: "Topics" }).textContent).toContain("Arrears");
+  });
+});
+
+describe("groupIdeas", () => {
+  it("keeps the order of the answer for the groups and for the ideas in a group", () => {
+    const groups = groupIdeas([
+      { name: "B", slug: "b", type: "topic" },
+      { name: "A", slug: "a", type: "place" },
+      { name: "C", slug: "c", type: "topic" },
+    ]);
+    expect(groups.map((g) => g.kind)).toEqual(["topic", "place"]);
+    expect(groups[0].ideas.map((i) => i.name)).toEqual(["B", "C"]);
+  });
+
+  it("names an unknown kind with its own word", () => {
+    expect(groupIdeas([{ name: "X", slug: "x", type: "bill" }])[0].label).toBe("Bill");
+    expect(groupIdeas(undefined)).toEqual([]);
   });
 });

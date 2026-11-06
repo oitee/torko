@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import BarTip from "../../components/BarTip.jsx";
 import Button from "../../components/Button.jsx";
 import { formatNumber, shareOf } from "../../assets/js/format.js";
 import "./HomeTrend.css";
@@ -33,9 +34,21 @@ export default function HomeTrend({ trend }) {
   const peak = data.find((d) => d.rate === maxRate);
   const first = data[0].year;
   const last = data[data.length - 1].year;
-  const readout = active
-    ? `${active.year} · ${shareOf(active.n, active.tagged)}`
-    : "Point at a year for its share";
+  // One bar is green: the year under the pointer or the finger, else the highest year. Only a year under the pointer or the finger shows a pop-up.
+  // The list of years is built again on each render, so the active year is found by its year, not by the object.
+  const hovered = (active && data.find((d) => d.year === active.year)) || null;
+  const shown = hovered || peak;
+  // The tick in the middle of the axis is the year in the middle of the range.
+  const middle = Math.round((first + last) / 2);
+
+  // A finger that drags over the bars picks the year under it.
+  const pickAt = (event) => {
+    const touch = event.touches?.[0];
+    if (!touch) return;
+    const box = event.currentTarget.getBoundingClientRect();
+    const index = Math.floor(((touch.clientX - box.left) / box.width) * data.length);
+    setActive(data[Math.min(data.length - 1, Math.max(0, index))]);
+  };
 
   return (
     <section className="home-feature" aria-labelledby="home-trend-title">
@@ -48,8 +61,8 @@ export default function HomeTrend({ trend }) {
           {trend.name}. A share does not grow when a year simply has more speeches.
         </p>
         <div className="home-feature__action">
-          <Button variant="text" href={`/tag/${trend.slug}`}>
-            See the tag {trend.name}
+          <Button variant="text" href={`/tag/${trend.slug}`} className="home-feature__stretch">
+            Open the tag {trend.name} and read its speeches
           </Button>
         </div>
       </div>
@@ -57,9 +70,6 @@ export default function HomeTrend({ trend }) {
       <div className="home-trend">
         <div className="home-trend__head">
           <p className="home-trend__title">{trend.name} · share of tagged speeches, by year</p>
-          <p className="home-trend__readout" aria-live="polite">
-            {readout}
-          </p>
         </div>
 
         <div className={showTable ? "sr-only" : "home-trend__visual"} aria-hidden={showTable ? "true" : undefined}>
@@ -67,13 +77,13 @@ export default function HomeTrend({ trend }) {
             className="home-trend__plot"
             style={{ gridTemplateColumns: `repeat(${data.length}, minmax(0, 1fr))` }}
             onMouseLeave={() => setActive(null)}
+            onTouchStart={pickAt}
+            onTouchMove={pickAt}
           >
             {data.map((d) => (
               <div
                 key={d.year}
-                className={`home-trend__col${d === peak ? " home-trend__col--peak" : ""}${
-                  active?.year === d.year ? " home-trend__col--active" : ""
-                }`}
+                className={`home-trend__col${shown?.year === d.year ? " home-trend__col--active" : ""}`}
                 style={{ height: `${(d.rate / maxRate) * 100}%` }}
                 tabIndex={0}
                 role="img"
@@ -82,11 +92,16 @@ export default function HomeTrend({ trend }) {
                 onMouseEnter={() => setActive(d)}
                 onFocus={() => setActive(d)}
                 onBlur={() => setActive(null)}
+                onClick={() => setActive(d)}
               />
             ))}
+            <BarTip index={hovered ? data.indexOf(hovered) : -1} count={data.length} heightPct={hovered ? (hovered.rate / maxRate) * 100 : 0}>
+              {hovered ? `${hovered.year} · ${shareOf(hovered.n, hovered.tagged)}` : null}
+            </BarTip>
           </div>
           <div className="home-trend__axis">
             <span>{first}</span>
+            {middle > first && middle < last && <span>{middle}</span>}
             <span>{last}</span>
           </div>
         </div>

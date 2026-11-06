@@ -67,3 +67,9 @@
   line-height: var(--lh-count);
   color: var(--meta);
 }
+
+.home-quote__source-link {
+  font-size: var(--size-count);
+  line-height: var(--lh-count);
+  align-self: flex-start;
+}

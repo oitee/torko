@@ -71,6 +71,29 @@ describe("HomeQuote", () => {
 
   it("links to the whole speech", () => {
     renderQuote(quote);
-    expect(screen.getByRole("link", { name: "Read the speech" }).getAttribute("href")).toBe("/speech/178379");
+    expect(
+      screen.getByRole("link", { name: "Read the full speech by Mahua Moitra (17 Dec 2025)" }).getAttribute("href")
+    ).toBe("/speech/178379");
+  });
+
+  it("names the term next to the date, and links the source page on sansad.in", () => {
+    const { container } = renderQuote(quote);
+    expect(container.querySelector(".home-quote__meta").textContent).toContain("17 Dec 2025 · 18th Lok Sabha · ");
+    expect(screen.getByRole("link", { name: "Source on sansad.in" }).getAttribute("href")).toBe(quote.source_url);
+  });
+
+  it("leaves out the source link when the answer has none", () => {
+    renderQuote({ ...quote, source_url: null });
+    expect(screen.queryByRole("link", { name: "Source on sansad.in" })).toBeNull();
+  });
+
+  it("links the count of tags to the speech, where all tags show", () => {
+    renderQuote(quote);
+    expect(screen.getByRole("link", { name: "See all 13 tags" }).getAttribute("href")).toBe("/speech/178379");
+  });
+
+  it("shows no link to more tags when the chips show all of them", () => {
+    renderQuote({ ...quote, tags: quote.tags.slice(0, 2) });
+    expect(screen.queryByRole("link", { name: /See all/ })).toBeNull();
   });
 });
