@@ -9,6 +9,7 @@ import MyMp from "./pages/my_mp.jsx";
 import Party from "./pages/party.jsx";
 import Place from "./pages/place.jsx";
 import Search from "./pages/search.jsx";
+import Trends from "./pages/trends.jsx";
 import Method from "./pages/method.jsx";
 import NotFound from "./pages/not_found.jsx";
 import DevComponents from "./pages/dev_components.jsx";
@@ -27,6 +28,7 @@ export const routes = [
       { path: "/my-mp", element: <MyMp /> },
       { path: "/party/:code", element: <Party /> },
       { path: "/search", element: <Search /> },
+      { path: "/trends", element: <Trends /> },
       { path: "/method", element: <Method /> },
       // The components page exists only in development. The live site has no such address.
       ...(import.meta.env.DEV ? [{ path: "/dev/components", element: <DevComponents /> }] : []),

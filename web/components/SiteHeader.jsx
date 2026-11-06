@@ -5,7 +5,7 @@ import ThemeSwitch from "./ThemeSwitch.jsx";
 import "./SiteHeader.css";
 
 // The SiteHeader component renders the top navigation band.
-// It includes the logo, the links to the Search and Method pages, and the theme switch.
+// It includes the logo, the links to the Search, Trends and Method pages, and the theme switch.
 export default function SiteHeader({
   theme = "system",
   onThemeChange,
@@ -13,6 +13,7 @@ export default function SiteHeader({
 }) {
   const location = useLocation();
   const isSearchActive = location.pathname.startsWith("/search");
+  const isTrendsActive = location.pathname.startsWith("/trends");
   const isMethodActive = location.pathname.startsWith("/method");
 
   const handleThemeChange = (next) => {
@@ -38,6 +39,17 @@ export default function SiteHeader({
             aria-current={isSearchActive ? "page" : undefined}
           >
             Search
+          </Link>
+          <Link
+            to="/trends"
+            className={
+              isTrendsActive
+                ? "site-header__link site-header__link--active"
+                : "site-header__link"
+            }
+            aria-current={isTrendsActive ? "page" : undefined}
+          >
+            Trends
           </Link>
           <Link
             to="/method"
