@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { useNavigate, useSearchParams } from "react-router-dom";
+import { Link, useNavigate, useSearchParams } from "react-router-dom";
 import { getJSON } from "../assets/js/api.js";
 import { useApi } from "../assets/js/useApi.js";
 import { formatNumber, termShort } from "../assets/js/format.js";
@@ -15,6 +15,8 @@ import SearchResults from "./search/SearchResults.jsx";
 import SearchScopeCard from "./search/SearchScopeCard.jsx";
 import AskLine, { askAnswers } from "./search/AskLine.jsx";
 import FilterRail from "./search/FilterRail.jsx";
+import CopyButton from "../components/CopyButton.jsx";
+import StartBlock from "./search/StartBlock.jsx";
 import { chipsFrom, draftChanges, draftFrom, listOf } from "./search/filterRules.js";
 import { FILTER_KEYS, askHref, defaultSort, headingParts, readSearch } from "./search/searchParams.js";
 import "./search.css";
@@ -48,6 +50,8 @@ export default function Search() {
   }, [ask, askCall.data, askCall.dataKey, askCall.error, askCall.loading]);
   const q = scope.q || "";
   const hasFilters = Object.keys(params).some((k) => k !== "q");
+  // Nothing is searched: no words, no scope and no filter. The page then shows its start block.
+  const searched = Object.keys(params).length > 0;
 
   const listParams = { ...scope, ...filters, sort, page, per_page: PER_PAGE };
   const listKey = JSON.stringify({ listParams, view });
@@ -82,6 +86,12 @@ export default function Search() {
   const membersParams = { ...scope, ...filters, group: "member", per_page: 1 };
   const membersCall = useApi(view === "speeches" && listDone ? JSON.stringify(membersParams) : null, (signal) =>
     getJSON("/api/speeches", membersParams, { signal })
+  );
+
+  // The start block reads two more answers: the years and members of the whole archive, and the member with the most speeches.
+  const homeCall = useApi(!searched && !ask ? "start:home" : null, (signal) => getJSON("/api/home", undefined, { signal }));
+  const topMemberCall = useApi(!searched && !ask ? "start:member" : null, (signal) =>
+    getJSON("/api/speeches", { group: "member", sort: "most", per_page: 1 }, { signal })
   );
 
   const matches = useApi(q || null, (signal) => getJSON("/api/search", { q }, { signal }));
@@ -145,6 +155,9 @@ export default function Search() {
     Object.entries({ ...scope, ...filters, sort, format: "csv" })
   ).toString()}`;
 
+  // The breadcrumb names the scope of the search. With no scope to name, the page has no breadcrumb.
+  const crumbLabel = q || scopeNames.tag || scopeNames.place || scopeNames.member || "";
+
   const answer = (
     <div className="search-head">
       <h1 className="search-head__title">
@@ -165,15 +178,15 @@ export default function Search() {
         </div>
       )}
       <div className="search-head__summary">
-        {speechTotal !== null && <Count n={speechTotal} total={hasFilters ? unfilteredTotal ?? undefined : undefined} noun="speeches" />}
-        <Button variant="text" onClick={() => navigator.clipboard?.writeText(window.location.href)}>Copy link</Button>
-        <a className="search-rail__csv" href={csvHref} download>Download CSV</a>
+        {speechTotal !== null && <Count n={speechTotal} total={hasFilters ? unfilteredTotal ?? undefined : undefined} noun={searched ? "speeches" : "speeches in total"} />}
+        {searched && <CopyButton text={() => window.location.href}>Copy link</CopyButton>}
+        {searched && <a className="search-rail__csv" href={csvHref} download>Download CSV</a>}
       </div>
     </div>
   );
 
   return (
-    <PageLayout breadcrumb={<Breadcrumb items={[{ label: "Search" }]} />} answer={answer}>
+    <PageLayout breadcrumb={crumbLabel ? <Breadcrumb items={[{ label: "Search", href: "/search" }, { label: crumbLabel }]} /> : null} answer={answer}>
       {!ask && <div className="search-body">
         <aside className="search-rail" aria-label="Filters and method">
           <FilterRail
@@ -193,12 +206,24 @@ export default function Search() {
               {q
                 ? "A speech matches when its own turns and the name of the member hold all the words, or when its summary is near the search in meaning. Words that another member says in an interruption do not count. An exact repeat by the same member is left out. "
                 : ""}
-              Each speech counts once. The counts by party leave out the speeches with no identified member. A filter of party or state leaves them out too, also with “is not”.
+              Each speech counts once. Speeches with no identified member are not in the party counts. A party or state filter leaves them out.{" "}
+              <Link to="/method">Read the full method</Link>
             </HowTorkoCounts>
           </div>
         </aside>
 
         <div className="search-main">
+          {!searched && !ask && (
+            <StartBlock
+              total={speechTotal}
+              members={homeCall.data?.corpus?.members}
+              first={homeCall.data?.corpus?.first}
+              last={homeCall.data?.corpus?.last}
+              tagRows={tagCall.data?.facets?.tag}
+              topMember={topMemberCall.data?.members?.[0]}
+              termRows={facets.term}
+            />
+          )}
           {(tags.length > 0 || scope.place) && (
             <div className="search-scopes">
               {tags.map((t, i) => (
@@ -226,6 +251,7 @@ export default function Search() {
             onSort={(s) => setWith({ sort: s === defaultSort(q) ? null : s })}
             query={q}
             tagCount={tags.length}
+            heading={searched ? "" : "Latest speeches"}
             hasFilters={hasFilters}
             onReset={resetFilters}
           />

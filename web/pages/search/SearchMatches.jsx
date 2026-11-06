@@ -79,7 +79,9 @@ export default function SearchMatches({ results, query }) {
                         </span>
                       )}
                     </div>
-                    <span className="search-matches__count">{formatNumber(item.n_speeches)}</span>
+                    <span className="search-matches__count">
+                      {formatNumber(item.n_speeches)} {item.kind === "tag" ? "speeches tagged" : "speeches"}
+                    </span>
                   </li>
                 );
               })}
@@ -87,7 +89,7 @@ export default function SearchMatches({ results, query }) {
           </div>
         ))}
       </div>
-      <p className="search-matches__note">Each number counts the speeches on that page.</p>
+      <p className="search-matches__note">Each number counts all speeches with that tag, subject, place or member, not only the speeches that match the words.</p>
     </section>
   );
 }

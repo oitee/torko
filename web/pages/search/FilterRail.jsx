@@ -24,7 +24,7 @@ function TickGroup({ title, rows, field, draft, setDraft, locked }) {
         return (
           <label key={r.value} className={`search-ticks__row ${r.n === 0 || isLocked ? "search-ticks__row--off" : ""}`}>
             <input type="checkbox" checked={!isLocked && draft[field].includes(r.value)} disabled={isLocked} onChange={() => toggle(r.value)} />
-            <span className="search-ticks__name">{r.label}</span>
+            <span className="search-ticks__name" title={r.label}>{r.label}</span>
             {r.n !== null && r.n !== undefined && <span className="search-ticks__n">{formatNumber(r.n)}</span>}
           </label>
         );
@@ -78,6 +78,7 @@ export default function FilterRail({ params, facets, tagRows, names, chipCount, 
       </div>
       <div className="search-filters__body">
         <AddFilter params={params} facets={facets} onAdd={onAdd} />
+        <p className="search-ticks__note">Each number counts the speeches of this search with that value.</p>
         <TickGroup title="Tag" field="tag" rows={withTicked(tags, draft.tag, (v) => names.slug?.[v] || v)} draft={draft} setDraft={setDraft} locked={listOf(params.tag_not)} />
         <DateYears params={params} draft={draft} setDraft={setDraft} />
         <TickGroup title="Term" field="term" rows={terms} draft={draft} setDraft={setDraft} locked={listOf(params.term_not)} />

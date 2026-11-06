@@ -1,11 +1,12 @@
 import React from "react";
 import { MemoryRouter } from "react-router-dom";
-import { cleanup, render, screen } from "@testing-library/react";
-import { afterEach, describe, expect, it } from "vitest";
-import { askHref, excerptParts, headingParts, isQuestion, pageWindow, readSearch, yearSpan } from "../pages/search/searchParams.js";
+import { act, cleanup, fireEvent, render, screen } from "@testing-library/react";
+import { afterEach, describe, expect, it, vi } from "vitest";
+import { askHref, citationText, excerptParts, headingParts, isQuestion, pageWindow, readSearch, yearSpan } from "../pages/search/searchParams.js";
 import AskLine, { askAnswers } from "../pages/search/AskLine.jsx";
 import { FIELDS, addFilterChanges, chipsFrom, draftChanges, draftFrom, pendingCount } from "../pages/search/filterRules.js";
-import { SearchSpeechRow } from "../pages/search/SearchResults.jsx";
+import SearchResults, { SearchSpeechRow } from "../pages/search/SearchResults.jsx";
+import StartBlock, { dataLine, startExamples } from "../pages/search/StartBlock.jsx";
 import SearchMatches from "../pages/search/SearchMatches.jsx";
 
 afterEach(cleanup);
@@ -125,7 +126,7 @@ describe("search rows", () => {
     );
     expect(screen.getByText("arrears").tagName).toBe("MARK");
     expect(screen.getByText("Speaker not identified")).toBeTruthy();
-    expect(screen.getByText("120 words")).toBeTruthy();
+    expect(screen.getByText(/· 120 words$/)).toBeTruthy();
   });
 
   it("shows the TLDR and the marked words together in a word search", () => {
@@ -142,10 +143,10 @@ describe("search rows", () => {
     );
     expect(screen.getByText("Criticises the Budget for its lack of jobs.")).toBeTruthy();
     expect(screen.getByText("Bollywood").tagName).toBe("MARK");
-    // The TLDR comes before the excerpt, under the debate name.
+    // The words of the member come before the TLDR.
     const tldr = container.querySelector(".search-row__tldr");
     const excerpt = container.querySelector(".search-row__excerpt");
-    expect(tldr.compareDocumentPosition(excerpt) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
+    expect(excerpt.compareDocumentPosition(tldr) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
   });
 
   it("shows the TLDR alone in a search with no words, such as a tag", () => {
@@ -206,5 +207,101 @@ describe("filter rules", () => {
     expect(pendingCount(draftFrom(params), params)).toBe(0);
     expect(pendingCount(draft, params)).toBe(3);
     expect(draftChanges(draft)).toEqual({ tag: null, party: "BJP", term: "17", date_from: "2014-01-01", date_to: null });
+  });
+});
+
+const SPEECH = {
+  id: 293051, date: "2024-12-05", term: 18, kind_label: "Rule 377", words: 190, member: "Balabhadra Majhi", party: "BJP", seat: "Nabarangpur",
+  debate: "Need to ensure daily payment of wages under MGNREGA-laid", source_url: "https://sansad.in/ls/debates/view-debate?ls=18",
+  excerpt: "Payment under MGNREGA is delayed .", marks: [[14, 21]],
+  tags: [1, 2, 3, 4, 5].map((n) => ({ name: `Tag ${n}`, slug: `tag-${n}` })),
+};
+
+describe("search row details", () => {
+  it("puts the words in the meta line, tidies the title and removes the space before a full stop", () => {
+    const { container } = render(<MemoryRouter><ul><SearchSpeechRow speech={SPEECH} /></ul></MemoryRouter>);
+    expect(container.querySelector(".search-row__meta").textContent).toBe("2024-12-05 · 18th LS · Rule 377 · 190 words");
+    const title = screen.getByRole("link", { name: "Need to ensure daily payment of wages under MGNREGA" });
+    expect(title.getAttribute("title")).toBe("Need to ensure daily payment of wages under MGNREGA");
+    expect(container.querySelector(".search-row__excerpt").textContent).toBe("“Payment under MGNREGA is delayed.”");
+  });
+
+  it("shows 3 tags as links that keep nothing else, and counts the rest", () => {
+    render(<MemoryRouter><ul><SearchSpeechRow speech={SPEECH} /></ul></MemoryRouter>);
+    expect(screen.getByRole("link", { name: "Tag 2" }).getAttribute("href")).toBe("/search?tag=tag-2");
+    expect(screen.queryByRole("link", { name: "Tag 4" })).toBeNull();
+    expect(screen.getByText("+2 more")).toBeTruthy();
+  });
+
+  it("links to sansad.in and copies one line of citation for 2 seconds", async () => {
+    vi.useFakeTimers();
+    const writeText = vi.fn().mockResolvedValue();
+    Object.defineProperty(navigator, "clipboard", { value: { writeText }, configurable: true });
+    render(<MemoryRouter><ul><SearchSpeechRow speech={SPEECH} /></ul></MemoryRouter>);
+    expect(screen.getByRole("link", { name: "Open on sansad.in" }).getAttribute("href")).toBe(SPEECH.source_url);
+    await act(async () => { fireEvent.click(screen.getByRole("button", { name: "Copy citation" })); });
+    expect(writeText).toHaveBeenCalledWith(
+      `\u201cPayment under MGNREGA is delayed.\u201d - Balabhadra Majhi, BJP, Nabarangpur, Lok Sabha, 2024-12-05. Torko: ${window.location.origin}/speech/293051`
+    );
+    expect(screen.getByRole("button", { name: "Copied" })).toBeTruthy();
+    await act(async () => { vi.advanceTimersByTime(2100); });
+    expect(screen.getByRole("button", { name: "Copy citation" })).toBeTruthy();
+    vi.useRealTimers();
+  });
+
+  it("cites the summary when there is no excerpt, and a speaker who is not identified", () => {
+    expect(citationText({ id: 5, date: "2020-01-02", summary: "Supports the Bill." }, "https://torko.in")).toBe(
+      "\u201cSupports the Bill.\u201d - Speaker not identified, Lok Sabha, 2020-01-02. Torko: https://torko.in/speech/5"
+    );
+  });
+});
+
+describe("rows of the same debate", () => {
+  const rows = [
+    { id: 1, date: "2026-04-01", debate: "The Delimitation Bill?Contd..", member: "A", words: 10 },
+    { id: 2, date: "2026-04-01", debate: "The Delimitation Bill?Contd..", member: "B", words: 20 },
+    { id: 3, date: "2026-04-01", debate: "Other debate", member: "C", words: 30 },
+  ];
+  it("shows the title on the first row of a run only", () => {
+    render(
+      <MemoryRouter>
+        <SearchResults view="speeches" sort="latest" page={1} data={{ speeches: rows, total: 3, pages: 1, per_page: 20 }} loading={false}
+          speechTotal={3} membersTotal={null} viewHref={() => "/search"} pageHref={() => "/search"} memberHref={() => "/"} onSort={() => {}} />
+      </MemoryRouter>
+    );
+    expect(screen.getAllByText("The Delimitation Bill (contd.)")).toHaveLength(1);
+    expect(screen.getAllByText("Same debate")).toHaveLength(1);
+    expect(screen.getByText("Other debate")).toBeTruthy();
+  });
+});
+
+describe("empty page start block", () => {
+  const tagRows = [
+    { slug: "farmers", tag: "Farmers", n: 17143 }, { slug: "railway-connectivity", tag: "Railway Connectivity", n: 7532 },
+    { slug: "constitution", tag: "Constitution", n: 6676 }, { slug: "a", tag: "A", n: 5 }, { slug: "b", tag: "B", n: 4 }, { slug: "c", tag: "C", n: 3 },
+    { slug: "d", tag: "Union Budget", n: 2 },
+  ];
+  it("builds the data line from the counts", () => {
+    expect(dataLine({ total: 173225, members: 2165, first: "1999-10-20", last: "2026-04-18" })).toBe("173,225 speeches by 2,165 members, 1999 to 2026");
+    expect(dataLine({ total: 5 })).toBe("5 speeches");
+  });
+  it("picks the examples by rule from the facets", () => {
+    const ex = startExamples({ tagRows, topMember: { id: 7, name: "Om Birla", n: 956 } });
+    expect(ex.map((e) => e.key)).toEqual(["tag-farmers", "tag-railway-connectivity", "tag-constitution", "tag-a", "tag-b", "phrase", "member"]);
+    expect(ex[5].to).toBe("/search?q=%22Union%20Budget%22");
+    expect(ex[6].to).toBe("/search?member=7");
+  });
+  it("shows the line, the example links and the terms", () => {
+    render(
+      <MemoryRouter>
+        <StartBlock total={173225} members={2165} first="1999-10-20" last="2026-04-18" tagRows={tagRows}
+          topMember={{ id: 7, name: "Om Birla", n: 956 }} termRows={[{ term: 17, n: 29891 }, { term: 18, n: 12676 }]} />
+      </MemoryRouter>
+    );
+    expect(screen.getByText("173,225 speeches by 2,165 members, 1999 to 2026")).toBeTruthy();
+    expect(screen.getByRole("link", { name: "Farmers" }).getAttribute("href")).toBe("/search?tag=farmers");
+    expect(screen.getByRole("link", { name: "18th Lok Sabha" }).getAttribute("href")).toBe("/search?term=18");
+    const terms = screen.getAllByRole("link", { name: /Lok Sabha$/ }).map((a) => a.textContent);
+    expect(terms).toEqual(["18th Lok Sabha", "17th Lok Sabha"]);
   });
 });
