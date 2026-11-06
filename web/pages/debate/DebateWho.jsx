@@ -6,7 +6,6 @@ import PartyLink from "../../components/PartyLink.jsx";
 
 export default function DebateWho({
   people = [],
-  unidentified = null,
   silent = [],
   selectedMemberId = null,
   onSelectMember,
@@ -94,18 +93,6 @@ export default function DebateWho({
             <button type="button" className="button button--text" onClick={() => setShowAll(true)}>
               Show all {formatNumber(memN)} members
             </button>
-          </div>
-        )}
-
-        {unidentified && unidentified.speeches > 0 && (
-          <div className="debate-who__unidentified meta">
-            Speaker not identified ·{" "}
-            <span className="mono">
-              {unidentified.speeches === 1
-                ? "1 speech"
-                : `${formatNumber(unidentified.speeches)} speeches`}
-            </span>
-            . Torko could not match this name to one member.
           </div>
         )}
       </div>

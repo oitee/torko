@@ -37,9 +37,16 @@ def is_listed(sansad_id, person_name, person_codes, official):
     return bool(mine) and any(o and (mine <= o or o <= mine) for o in (tokens(e["name"]) for e in official))
 
 
-def turn_kind(person, role_kind):
-    """member, a role kind such as presiding or crowd, or unattributed."""
-    return "member" if person else (role_kind or "unattributed")
+def turn_kind(person, role_kind, label=None, in_speech=True):
+    """member, a role kind such as presiding or crowd, heading, or unattributed.
+    A heading is a line with no speaker label outside every speech, for example the title of the debate."""
+    if person:
+        return "member"
+    if role_kind:
+        return role_kind
+    if not (label or "").strip() and not in_speech:
+        return "heading"
+    return "unattributed"
 
 
 def role_in_debate(speech_id, span_id, role_kind):
@@ -173,14 +180,19 @@ def debate_page(conn, debate_id, args=None):
             row["inside_speech"] = span
         return row, span
 
-    turn_list = [{
-        "seq": t["seq"], "label": t["speaker_label"], "text": clean_layout(t["text"]), "words": t["word_count"],
-        "kind": turn_kind(t["person"], t["role_kind"]), "attributed": t["person"] is not None,
-        "member": t["person"], "member_id": t["pid"], "role": t["role"], "role_kind": t["role_kind"],
-        "how": t["name_source"], "repair": t["text_source"], "speech": t["speech_id"], "span": turn_row(t)[1],
-        "listed": listed(t) if t["pid"] else None,
-        **turn_row(t)[0],
-    } for t in turns]
+    turn_list = []
+    for t in turns:
+        where, span = turn_row(t)
+        in_speech = t["speech_id"] is not None or span is not None
+        turn_list.append({
+            "seq": t["seq"], "label": t["speaker_label"], "text": clean_layout(t["text"]), "words": t["word_count"],
+            "kind": turn_kind(t["person"], t["role_kind"], t["speaker_label"], in_speech),
+            "attributed": t["person"] is not None,
+            "member": t["person"], "member_id": t["pid"], "role": t["role"], "role_kind": t["role_kind"],
+            "how": t["name_source"], "repair": t["text_source"], "speech": t["speech_id"], "span": span,
+            "listed": listed(t) if t["pid"] else None,
+            **where,
+        })
 
     # Turns and words with no member. The denominator is the turns of this debate.
     unidentified = {"turns": sum(1 for t in turns if not t["pid"]),

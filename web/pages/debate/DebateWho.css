@@ -114,14 +114,6 @@
   color: var(--sheet);
 }
 
-.debate-who__unidentified {
-  margin: 0;
-  padding: var(--space-3) var(--space-4);
-  font-size: var(--size-count);
-  line-height: var(--lh-count);
-  color: var(--ink-2);
-}
-
 .debate-who__silent {
   display: flex;
   flex-direction: column;

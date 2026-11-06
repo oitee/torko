@@ -41,7 +41,6 @@ describe("DebateWho", () => {
       <MemoryRouter>
         <DebateWho
           people={samplePeople}
-          unidentified={{ speeches: 2, turns: 4, words: 90 }}
           silent={sampleSilent}
           selectedMemberId={101}
           onSelectMember={onSelect}
@@ -68,15 +67,8 @@ describe("DebateWho", () => {
     fireEvent.click(sunitaBtn);
     expect(onSelect).toHaveBeenCalledWith(102);
 
-    expect(
-      screen.getByText(
-        (_, el) =>
-          el?.classList?.contains("debate-who__unidentified") &&
-          el?.textContent?.includes(
-            "Speaker not identified · 2 speeches. Torko could not match this name"
-          )
-      )
-    ).toBeTruthy();
+    // The list has no line for the speeches of unknown speakers.
+    expect(screen.queryByText(/Speaker not identified/)).toBeNull();
 
     expect(
       screen.getByRole("heading", { name: /Listed but did not speak/ })
