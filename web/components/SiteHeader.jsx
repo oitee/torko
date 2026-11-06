@@ -9,6 +9,7 @@ export const NAV_ITEMS = [
   { to: "/search", label: "Search" },
   { to: "/my-mp", label: "Your MP" },
   { to: "/trends", label: "Trends" },
+  { to: "/parties", label: "Parties" },
   { to: "/method", label: "Method" },
 ];
 

@@ -40,6 +40,8 @@ export default function Layout() {
           <nav className="site-footer__nav" aria-label="Footer">
             <Link to="/search">Search</Link>
             <Link to="/trends">Trends</Link>
+            <Link to="/parties">Parties</Link>
+            <Link to="/places">Places</Link>
             <Link to="/method">How Torko works</Link>
             <a href="/api/docs/">API</a>
           </nav>

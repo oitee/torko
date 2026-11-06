@@ -33,7 +33,7 @@ describe("SiteHeader", () => {
     expect(button.getAttribute("aria-expanded")).toBe("false");
     fireEvent.click(button);
     const menu = screen.getByRole("navigation", { name: "Menu" });
-    expect(menu.querySelectorAll("a")).toHaveLength(4);
+    expect(menu.querySelectorAll("a")).toHaveLength(5);
     expect(menu.querySelector('a[aria-current="page"]').textContent).toBe("Trends");
     fireEvent.click(screen.getByRole("button", { name: "Close" }));
     expect(screen.queryByRole("navigation", { name: "Menu" })).toBeNull();

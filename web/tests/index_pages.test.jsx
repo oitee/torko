@@ -1,0 +1,83 @@
+import React from "react";
+import { cleanup, fireEvent, render, screen } from "@testing-library/react";
+import { afterEach, describe, expect, it, vi } from "vitest";
+import { MemoryRouter } from "react-router-dom";
+import * as api from "../assets/js/api.js";
+import Parties, { shareText, termsText } from "../pages/parties.jsx";
+import Places, { filterStates } from "../pages/places.jsx";
+
+afterEach(() => {
+  cleanup();
+  vi.restoreAllMocks();
+});
+
+const PARTIES = {
+  total: 1000,
+  count: 2,
+  parties: [
+    { code: "BJP", name: "Bharatiya Janata Party", speeches: 600, members: 50, terms: [13, 14, 15] },
+    { code: "BJD", name: "Biju Janata Dal", speeches: 1, members: 1, terms: [14, 16] },
+  ],
+};
+
+const PLACES = {
+  seat_count: 3,
+  state_count: 2,
+  featured: [{ name: "Latur", slug: "latur", page: true, speeches: 9, state: "Maharashtra" }],
+  states: [
+    { name: "Kerala", slug: "kerala", page: true, speeches: 40, seats: [{ name: "Alappuzha", slug: "alappuzha", page: false, speeches: null }] },
+    {
+      name: "Maharashtra",
+      slug: "maharashtra",
+      page: true,
+      speeches: 90,
+      seats: [
+        { name: "Latur", slug: "latur", page: true, speeches: 9 },
+        { name: "Pune", slug: "pune", page: true, speeches: 12 },
+      ],
+    },
+  ],
+};
+
+describe("Parties", () => {
+  it("lists every party with a link, its share and its terms, and filters by name", async () => {
+    vi.spyOn(api, "getJSON").mockResolvedValue(PARTIES);
+    render(
+      <MemoryRouter>
+        <Parties />
+      </MemoryRouter>
+    );
+    expect((await screen.findByRole("link", { name: "Bharatiya Janata Party" })).getAttribute("href")).toBe("/party/BJP");
+    expect(screen.getByText("60.0%")).toBeTruthy();
+    expect(screen.getByText("13th–15th LS")).toBeTruthy();
+    fireEvent.change(screen.getByLabelText("Find a party"), { target: { value: "biju" } });
+    expect(screen.queryByRole("link", { name: "Bharatiya Janata Party" })).toBeNull();
+    expect(screen.getByText("1 of 2 parties")).toBeTruthy();
+  });
+
+  it("writes small shares and broken term runs plainly", () => {
+    expect(shareText(1, 1000)).toBe("0.1%");
+    expect(shareText(1, 100000)).toBe("under 0.1%");
+    expect(termsText([14, 16])).toBe("14th, 16th LS");
+  });
+});
+
+describe("Places", () => {
+  it("links seats that have a page and leaves the others as text", async () => {
+    vi.spyOn(api, "getJSON").mockResolvedValue(PLACES);
+    render(
+      <MemoryRouter>
+        <Places />
+      </MemoryRouter>
+    );
+    expect((await screen.findAllByRole("link", { name: "Latur" }))[0].getAttribute("href")).toBe("/place/latur");
+    expect(screen.queryByRole("link", { name: "Alappuzha" })).toBeNull();
+    expect(screen.getByText("Alappuzha")).toBeTruthy();
+  });
+
+  it("keeps a state that matches with all its seats, and else only the seats that match", () => {
+    expect(filterStates(PLACES.states, "kerala").map((s) => s.name)).toEqual(["Kerala"]);
+    const pune = filterStates(PLACES.states, "pune");
+    expect(pune.map((s) => [s.name, s.seats.map((x) => x.name)])).toEqual([["Maharashtra", ["Pune"]]]);
+  });
+});

@@ -127,7 +127,7 @@ def api_search():
 # Flask sends the one file index.html for every page address, and the browser picks the page.
 WEB_DIST = pathlib.Path(__file__).resolve().parent / "web" / "dist"
 SITE_PAGES = ["/", "/tag/<slug>", "/member/<int:member_id>", "/speech/<int:speech_id>", "/debate/<int:debate_id>",
-              "/place/<slug>", "/my-mp", "/party/<code>", "/search", "/trends", "/method"]
+              "/place/<slug>", "/places", "/my-mp", "/party/<code>", "/parties", "/search", "/trends", "/method"]
 
 
 def site_index(status=200):
