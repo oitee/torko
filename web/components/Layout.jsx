@@ -32,7 +32,7 @@ export default function Layout() {
   return (
     <>
       <SiteHeader theme={theme} onThemeChange={setTheme} />
-      <div className="container">
+      <div id="main" className="container site-main" tabIndex={-1}>
         <Outlet />
       </div>
       <footer className="site-footer">

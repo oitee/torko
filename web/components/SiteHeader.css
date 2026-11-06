@@ -1,9 +1,9 @@
 /* SiteHeader component styles. All values come from tokens.css. */
 
 .site-header {
+  position: relative;
   background: var(--header-bg);
   color: var(--header-ink);
-  height: var(--header-height);
   box-sizing: border-box;
 }
 
@@ -11,22 +11,26 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
-  height: 100%;
+  height: var(--header-height);
 }
 
-.site-header__nav {
+.site-header__nav,
+.site-header__wide {
   display: flex;
   align-items: center;
-  gap: var(--space-2);
+  gap: var(--space-1);
   height: 100%;
 }
 
 .site-header__link {
+  position: relative;
   display: inline-flex;
   align-items: center;
   height: 100%;
   min-height: var(--control-height);
   padding: 0 var(--space-3);
+  border: 0;
+  background: transparent;
   color: var(--header-ink);
   font-family: var(--font-sans);
   font-size: var(--size-label);
@@ -34,7 +38,21 @@
   font-weight: 500;
   text-decoration: none;
   white-space: nowrap;
+  cursor: pointer;
   box-sizing: border-box;
+}
+
+/* The current page has a full-strength bar. Hover shows a weaker bar. Green stays for actions. */
+.site-header__link::after {
+  content: "";
+  position: absolute;
+  left: var(--space-3);
+  right: var(--space-3);
+  bottom: 0;
+  height: 2px;
+  background: var(--header-ink);
+  opacity: 0;
+  transition: opacity 120ms ease-out;
 }
 
 .site-header__link:hover {
@@ -42,11 +60,66 @@
   text-decoration: none;
 }
 
-.site-header__link--active {
-  box-shadow: inset 0 -2px 0 var(--header-action);
+.site-header__link:hover::after {
+  opacity: 0.4;
+}
+
+.site-header__link--active::after {
+  opacity: 1;
 }
 
 .site-header :focus-visible {
   outline: 2px solid var(--header-action);
-  outline-offset: 2px;
+  outline-offset: -2px;
+}
+
+.site-header__menu-button {
+  display: none;
+}
+
+.site-header__menu {
+  border-top: 1px solid rgba(228, 232, 236, 0.18);
+  padding: var(--space-2) 0 var(--space-4);
+}
+
+.site-header__menu .container {
+  display: flex;
+  flex-direction: column;
+}
+
+.site-header__menu .site-header__link {
+  padding: 0;
+  height: var(--control-height);
+}
+
+.site-header__menu .site-header__link::after {
+  left: 0;
+  right: auto;
+  width: var(--space-6);
+}
+
+.site-header__skip {
+  position: absolute;
+  left: var(--space-4);
+  top: -100px;
+  z-index: 10;
+  padding: var(--space-2) var(--space-4);
+  background: var(--sheet);
+  color: var(--ink);
+  font-size: var(--size-label);
+  font-weight: 500;
+}
+
+.site-header__skip:focus {
+  top: var(--space-2);
+}
+
+@media (max-width: 639px) {
+  .site-header__wide {
+    display: none;
+  }
+
+  .site-header__menu-button {
+    display: inline-flex;
+  }
 }
