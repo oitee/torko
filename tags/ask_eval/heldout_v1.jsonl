@@ -1,0 +1,20 @@
+{"id": "H01", "lang": "en", "question": "What has Gaurav Gogoi said about the Citizenship Amendment Act protests?", "filters": {"member": "543", "tag": "citizenship-amendment-act-protests"}, "optional": {}}
+{"id": "H02", "lang": "en", "question": "Speeches on onion prices by NCP members", "filters": {"party": "NCP", "tag": "onion-prices"}, "optional": {}}
+{"id": "H03", "lang": "en", "question": "Which MPs raised road accidents in the 16th Lok Sabha?", "filters": {"tag": "road-accidents", "term": "16", "view": "members", "sort": "most"}, "optional": {}}
+{"id": "H04", "lang": "en", "question": "Mamata Banerjee on coal block allocation scam", "filters": {"member": "135", "tag": "coal-block-allocation-scam"}, "optional": {}}
+{"id": "H05", "lang": "en", "question": "Cauvery water dispute speeches from Karnataka MPs", "filters": {"state": "Karnataka", "tag": "cauvery-water-dispute"}, "optional": {}}
+{"id": "H06", "lang": "en", "question": "Rafale deal debate in 2018", "filters": {"tag": "rafale-deal", "date_from": "2018-01-01", "date_to": "2018-12-31"}, "optional": {}}
+{"id": "H07", "lang": "en", "question": "Article 370 and Ladakh", "filters": {"tag": "article-370", "place": "ladakh"}, "optional": {}}
+{"id": "H08", "lang": "en", "question": "dowry deaths before 2005", "filters": {"tag": "dowry-deaths", "date_to": "2004-12-31"}, "optional": {}}
+{"id": "H09", "lang": "en", "question": "Yogi Adityanath speeches on cow protection", "filters": {"member": "16", "tag": "cow-protection"}, "optional": {}}
+{"id": "H10", "lang": "en", "question": "What did Atal Bihari Vajpayee say about China?", "filters": {"member": "2049", "place": "china"}, "optional": {}}
+{"id": "H11", "lang": "en", "question": "RJD MPs on reservation in promotion", "filters": {"party": "RJD", "tag": "reservation-in-promotion"}, "optional": {}}
+{"id": "H12", "lang": "en", "question": "child labour in Uttar Pradesh since 2009", "filters": {"tag": "child-labour", "place": "uttar-pradesh", "date_from": "2009-01-01"}, "optional": {}}
+{"id": "H13", "lang": "en", "question": "Kirron Kher zero hour", "filters": {"member": "782", "kind": "zero_hour"}, "optional": {}}
+{"id": "H14", "lang": "hi", "question": "राफेल सौदे पर राहुल गांधी", "filters": {"member": "506", "tag": "rafale-deal"}, "optional": {}}
+{"id": "H15", "lang": "hi", "question": "2014 से पहले कोयला घोटाले पर भाजपा", "filters": {"party": "BJP", "tag": "coal-block-allocation-scam", "date_to": "2013-12-31"}, "optional": {}}
+{"id": "H16", "lang": "hi", "question": "उत्तर प्रदेश के सांसदों ने गन्ना किसानों के बकाया पर क्या कहा", "filters": {"state": "Uttar Pradesh", "tag": "sugarcane-farmers-arrears"}, "optional": {}}
+{"id": "H17", "lang": "hi", "question": "पेगासस पर सबसे ज़्यादा किसने बोला", "filters": {"tag": "pegasus", "view": "members", "sort": "most"}, "optional": {}}
+{"id": "H18", "lang": "hinglish", "question": "Hema Malini ne Mathura par kya kaha", "filters": {"member": "938", "place": "mathura"}, "optional": {}}
+{"id": "H19", "lang": "hinglish", "question": "OBC reservation par Samajwadi Party ke saansad", "filters": {"party": "SP", "tag": "obc-reservation"}, "optional": {}}
+{"id": "H20", "lang": "hinglish", "question": "2019 ke baad LPG cylinder prices par speeches", "filters": {"tag": "lpg-cylinder-prices", "date_from": "2020-01-01"}, "optional": {}}

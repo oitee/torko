@@ -63,6 +63,7 @@ SORTS = {
     "longest": "s.word_count DESC NULLS LAST, s.id DESC",
 }
 GROUP_SORTS = {
+    "most": "n DESC, words DESC, pe.name",
     "latest": "last DESC, pe.name",
     "oldest": "first ASC, pe.name",
     "longest": "words DESC, pe.name",
@@ -575,7 +576,8 @@ def speeches(conn, args):
     conds = conditions(f)
     words_query = f["q"] and not f["phrase"]
     sort = args.get("sort")
-    if sort not in SORTS and not (sort == "best" and words_query):
+    # Most speeches first orders only the Members view.
+    if sort not in SORTS and not (sort == "best" and words_query) and not (sort == "most" and args.get("group") == "member"):
         sort = "best" if words_query else "latest"
     page = int_arg(args.get("page"), 1, 1, 10**6)
     per_page = int_arg(args.get("per_page"), DEFAULT_PER_PAGE, 1, MAX_PER_PAGE)

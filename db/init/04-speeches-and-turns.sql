@@ -123,3 +123,19 @@ CREATE TABLE IF NOT EXISTS query_vectors (
     near_ids    BIGINT[],
     created_at  TIMESTAMPTZ NOT NULL DEFAULT now()
 );
+
+-- The LLM answer for a question in plain language (/api/ask), so that a repeat of the question needs no model call.
+-- answer holds the raw JSON of the LLM. Each read checks it again against the names of the data.
+CREATE TABLE IF NOT EXISTS ask_answers (
+    question    TEXT NOT NULL,
+    model       TEXT NOT NULL,
+    answer      JSONB NOT NULL,
+    created_at  TIMESTAMPTZ NOT NULL DEFAULT now(),
+    PRIMARY KEY (question, model)
+);
+
+-- The number of LLM calls of /api/ask on each day, for the daily limit.
+CREATE TABLE IF NOT EXISTS ask_llm_days (
+    day    DATE PRIMARY KEY,
+    calls  INTEGER NOT NULL
+);
