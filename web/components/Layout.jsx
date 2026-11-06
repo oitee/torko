@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { Outlet } from "react-router-dom";
+import { Link, Outlet, ScrollRestoration } from "react-router-dom";
 import SiteHeader from "./SiteHeader.jsx";
 
 const THEMES = ["system", "light", "dark"];
@@ -36,10 +36,24 @@ export default function Layout() {
         <Outlet />
       </div>
       <footer className="site-footer">
-        <div className="container">
-          Source: Lok Sabha debates on sansad.in. Torko is not an official site.
+        <div className="container site-footer__inner">
+          <nav className="site-footer__nav" aria-label="Footer">
+            <Link to="/search">Search</Link>
+            <Link to="/trends">Trends</Link>
+            <Link to="/method">How Torko works</Link>
+            <a href="/api/docs/">API</a>
+          </nav>
+          <p className="site-footer__source">
+            Source: Lok Sabha debates on{" "}
+            <a href="https://sansad.in/ls/debates/debates" rel="noreferrer">
+              sansad.in
+            </a>
+            . Torko is not an official site.
+          </p>
         </div>
       </footer>
+      {/* A new page opens at its top. The key is the path, so a change of filters in the address does not move the page. */}
+      <ScrollRestoration getKey={(location) => location.pathname} />
     </>
   );
 }

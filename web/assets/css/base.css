@@ -17,6 +17,12 @@ body {
   font-family: var(--font-sans);
   font-size: var(--size-body);
   line-height: var(--lh-body);
+  font-variant-numeric: tabular-nums;
+}
+
+::selection {
+  background: var(--ink);
+  color: var(--sheet);
 }
 
 h1 {
@@ -87,5 +93,37 @@ button {
   color: var(--meta);
   font-size: var(--size-label);
   margin-top: var(--space-14);
-  padding: var(--space-6) 0;
+  padding: var(--space-8) 0;
+}
+
+.site-footer__inner {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: var(--space-4) var(--space-8);
+}
+
+.site-footer__nav {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2) var(--space-6);
+}
+
+.site-footer__nav a {
+  color: var(--ink-2);
+  font-weight: 500;
+  text-decoration: none;
+  min-height: 44px;
+  display: inline-flex;
+  align-items: center;
+}
+
+.site-footer__nav a:hover {
+  color: var(--ink);
+  text-decoration: underline;
+}
+
+.site-footer__source {
+  margin: 0;
 }
