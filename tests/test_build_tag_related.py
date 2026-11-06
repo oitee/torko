@@ -36,7 +36,7 @@ def test_sugarcane_related_on_database(page_conn):  # noqa: F811
     names = [r["name"] for r in out["related"]]
     assert "Sugarcane Growers" in names and "Sugarcane Pricing" in names
     first = out["related"][0]
-    assert first["name"] == "Sugar" and first["speeches_shared"] == 198 and first["lift"] == 222.5
+    assert first["name"] == "Sugar" and first["speeches_shared"] == 202 and first["lift"] == 241.8  # after the 2026-11-06 data update
     lifts = [r["lift"] for r in out["related"]]
     assert lifts == sorted(lifts, reverse=True) and len(names) <= 14
     assert all(r["speeches_shared"] >= 8 for r in out["related"])
