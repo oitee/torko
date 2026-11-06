@@ -12,7 +12,28 @@ export const SORTS = [
   { value: "latest", label: "Latest first" },
   { value: "oldest", label: "Oldest first" },
   { value: "longest", label: "Longest first" },
+  { value: "most", label: "Most speeches first" },
 ];
+
+// A sort that only the Members view has.
+export const MEMBER_ONLY_SORTS = ["most"];
+
+// Text that reads as a question goes to /api/ask: three or more words, or Hindi script.
+export function isQuestion(text) {
+  const t = (text || "").trim();
+  if (!t || isPhrase(t)) return false;
+  return /[\u0900-\u097F]/.test(t) || t.split(/\s+/).length >= 3;
+}
+
+// The address of the Search page for an answer of /api/ask. asked keeps the question for the Read as line.
+export function askHref(answer, question) {
+  const next = new URLSearchParams();
+  for (const [k, v] of Object.entries(answer?.params || {})) {
+    if (v !== null && v !== undefined && v !== "") next.set(k, String(v));
+  }
+  next.set("asked", question);
+  return `/search?${next.toString()}`;
+}
 
 // Text in quote marks asks for an exact phrase. Best match is the default for any other search text.
 export function isPhrase(q) {
@@ -23,8 +44,11 @@ export function defaultSort(q) {
   return q && !isPhrase(q) ? "best" : "latest";
 }
 
-function sortOf(value, q) {
-  const allowed = SORTS.some((s) => s.value === value) && (value !== "best" || defaultSort(q) === "best");
+function sortOf(value, q, view) {
+  const allowed =
+    SORTS.some((s) => s.value === value) &&
+    (value !== "best" || defaultSort(q) === "best") &&
+    (!MEMBER_ONLY_SORTS.includes(value) || view === "members");
   return allowed ? value : defaultSort(q);
 }
 
@@ -40,10 +64,10 @@ export function readSearch(searchParams) {
     if (get(k)) filters[k] = get(k);
   }
   const view = get("view") === "members" ? "members" : "speeches";
-  const sort = sortOf(get("sort"), scope.q);
+  const sort = sortOf(get("sort"), scope.q, view);
   const pageNum = parseInt(get("page") || "1", 10);
   const page = Number.isInteger(pageNum) && pageNum > 0 ? pageNum : 1;
-  return { scope, filters, view, sort, page };
+  return { scope, filters, view, sort, page, ask: get("ask"), asked: get("asked") };
 }
 
 // The terms that the address selects, as numbers.

@@ -2,7 +2,8 @@ import React from "react";
 import { MemoryRouter } from "react-router-dom";
 import { cleanup, render, screen } from "@testing-library/react";
 import { afterEach, describe, expect, it } from "vitest";
-import { excerptParts, headingParts, pageWindow, readSearch, yearSpan } from "../pages/search/searchParams.js";
+import { askHref, excerptParts, headingParts, isQuestion, pageWindow, readSearch, yearSpan } from "../pages/search/searchParams.js";
+import AskLine, { askAnswers } from "../pages/search/AskLine.jsx";
 import { FIELDS, addFilterChanges, chipsFrom, draftChanges, draftFrom, pendingCount } from "../pages/search/filterRules.js";
 import { SearchSpeechRow } from "../pages/search/SearchResults.jsx";
 import SearchMatches from "../pages/search/SearchMatches.jsx";
@@ -19,6 +20,53 @@ describe("search address", () => {
     expect(readSearch(new URLSearchParams("tag=arrears&sort=best")).sort).toBe("latest");
     expect(readSearch(new URLSearchParams('q="triple talaq"')).sort).toBe("latest");
     expect(out.page).toBe(1);
+  });
+});
+
+describe("questions in plain language", () => {
+  it("treats three or more words, or Hindi script, as a question, and a phrase in quote marks as words", () => {
+    expect(isQuestion("Kerala MPs on fishermen")).toBe(true);
+    expect(isQuestion("बाढ़")).toBe(true);
+    expect(isQuestion("price rise")).toBe(false);
+    expect(isQuestion('"price rise in Kerala"')).toBe(false);
+    expect(isQuestion("")).toBe(false);
+  });
+
+  it("builds the address of the filters and keeps the question", () => {
+    const href = askHref({ params: { state: "Kerala", tag: "fishermen", q: "", view: "members", sort: "most" } }, "Kerala MPs?");
+    expect(href).toBe("/search?state=Kerala&tag=fishermen&view=members&sort=most&asked=Kerala+MPs%3F");
+  });
+
+  it("allows the sort Most speeches first only in the Members view", () => {
+    expect(readSearch(new URLSearchParams("tag=naxalism&view=members&sort=most")).sort).toBe("most");
+    expect(readSearch(new URLSearchParams("tag=naxalism&sort=most")).sort).toBe("latest");
+    expect(readSearch(new URLSearchParams("asked=x&state=Kerala")).asked).toBe("x");
+  });
+
+  it("shows the Read as line from the answer, with each dropped name", () => {
+    askAnswers.set("Owaisi on triple talaq", {
+      read_as: [{ key: "tag", text: "on Triple Talaq" }],
+      words: "",
+      dropped: [{ text: "Owaisi", why: "2 members have this name" }],
+    });
+    render(
+      <MemoryRouter>
+        <AskLine question="Owaisi on triple talaq" />
+      </MemoryRouter>
+    );
+    expect(screen.getByText(/on Triple Talaq/)).toBeTruthy();
+    expect(screen.getByText(/“Owaisi” is not a filter: 2 members have this name\./)).toBeTruthy();
+    const link = screen.getByRole("link", { name: /search the words of the question instead/ });
+    expect(link.getAttribute("href")).toBe("/search?q=Owaisi%20on%20triple%20talaq");
+  });
+
+  it("uses the chips when the answer is not in memory, as for a shared link", () => {
+    render(
+      <MemoryRouter>
+        <AskLine question="shared question" chips={[{ key: "state", label: "State: Kerala" }]} />
+      </MemoryRouter>
+    );
+    expect(screen.getByText(/State: Kerala/)).toBeTruthy();
   });
 });
 

@@ -5,7 +5,7 @@ import Button from "../../components/Button.jsx";
 import SpeakerLine from "../../components/SpeakerLine.jsx";
 import TLDR from "../../components/TLDR.jsx";
 import { EmptyState, ErrorState, Loading } from "../../components/States.jsx";
-import { SORTS, defaultSort, excerptParts, isPhrase, pageWindow, yearSpan } from "./searchParams.js";
+import { MEMBER_ONLY_SORTS, SORTS, defaultSort, excerptParts, isPhrase, pageWindow, yearSpan } from "./searchParams.js";
 import PartyLink from "../../components/PartyLink.jsx";
 
 // One speech that matches: when, which debate, who, and the words in their sentence.
@@ -250,7 +250,9 @@ export default function SearchResults({
         <label className="search-sort">
           <span className="search-sort__label">Sort</span>
           <select className="search-sort__select" value={sort} onChange={(e) => onSort(e.target.value)}>
-            {SORTS.filter((s) => s.value !== "best" || defaultSort(query) === "best").map((s) => (
+            {SORTS.filter(
+              (s) => (s.value !== "best" || defaultSort(query) === "best") && (!MEMBER_ONLY_SORTS.includes(s.value) || view === "members")
+            ).map((s) => (
               <option key={s.value} value={s.value}>
                 {view === "members" && s.value === "longest" ? "Most words first" : s.label}
               </option>

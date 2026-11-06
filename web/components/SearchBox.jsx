@@ -2,6 +2,7 @@ import React, { useEffect, useId, useRef, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { getJSON } from "../assets/js/api.js";
 import { formatNumber } from "../assets/js/format.js";
+import { isQuestion } from "../pages/search/searchParams.js";
 import Button from "./Button.jsx";
 import Popover from "./Popover.jsx";
 import "./SearchBox.css";
@@ -145,7 +146,9 @@ export default function SearchBox({ initial = "", buttonVariant = "primary", lab
       event.preventDefault();
     }
     setIsOpen(false);
-    navigate(`/search?q=${encodeURIComponent(query.trim())}`);
+    // A question goes to the Search page, which reads it as filters. A word or two stays a word search.
+    const key = isQuestion(query) ? "ask" : "q";
+    navigate(`/search?${key}=${encodeURIComponent(query.trim())}`);
   };
 
   const handleKeyDown = (event) => {

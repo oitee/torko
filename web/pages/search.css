@@ -1170,3 +1170,28 @@ a.search-pager__num:hover {
   content-visibility: auto;
   contain-intrinsic-size: auto 32px;
 }
+
+/* The Read as line of a question in plain language. */
+.search-ask {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+}
+
+.search-ask__line {
+  margin: 0;
+  font-family: var(--font-sans);
+  color: var(--ink);
+}
+
+.search-ask__label {
+  color: var(--meta);
+}
+
+.search-ask__note {
+  margin: 0;
+  font-family: var(--font-sans);
+  font-size: var(--size-label);
+  line-height: var(--lh-label);
+  color: var(--meta);
+}

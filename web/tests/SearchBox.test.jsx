@@ -183,6 +183,16 @@ describe("SearchBox", () => {
     expect(screen.getByTestId("location").textContent).toBe("/search?q=budget");
   });
 
+  it("sends a question of three or more words, or in Hindi script, to /search?ask=<text>", () => {
+    render(<Harness initial="Kerala MPs on fishermen" />);
+    fireEvent.click(screen.getByRole("button", { name: "Search" }));
+    expect(screen.getByTestId("location").textContent).toBe("/search?ask=Kerala%20MPs%20on%20fishermen");
+    cleanup();
+    render(<Harness initial="बिहार में बाढ़" />);
+    fireEvent.click(screen.getByRole("button", { name: "Search" }));
+    expect(screen.getByTestId("location").textContent).toBe(`/search?ask=${encodeURIComponent("बिहार में बाढ़")}`);
+  });
+
   it("navigates to /search?q=<text> when Search button is clicked", () => {
     render(<Harness initial="railways" />);
     const searchButton = screen.getByRole("button", { name: "Search" });

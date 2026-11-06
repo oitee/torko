@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { useSearchParams } from "react-router-dom";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import { getJSON } from "../assets/js/api.js";
 import { useApi } from "../assets/js/useApi.js";
 import { formatNumber, termShort } from "../assets/js/format.js";
@@ -13,9 +13,10 @@ import SearchBox from "../components/SearchBox.jsx";
 import SearchMatches from "./search/SearchMatches.jsx";
 import SearchResults from "./search/SearchResults.jsx";
 import SearchScopeCard from "./search/SearchScopeCard.jsx";
+import AskLine, { askAnswers } from "./search/AskLine.jsx";
 import FilterRail from "./search/FilterRail.jsx";
 import { chipsFrom, draftChanges, draftFrom, listOf } from "./search/filterRules.js";
-import { FILTER_KEYS, defaultSort, headingParts, readSearch } from "./search/searchParams.js";
+import { FILTER_KEYS, askHref, defaultSort, headingParts, readSearch } from "./search/searchParams.js";
 import "./search.css";
 
 const PER_PAGE = 20;
@@ -30,18 +31,31 @@ const SCOPE_NAME_URL = {
 // The Search page: the speeches that contain the words, the pages whose names match, and filters.
 export default function Search() {
   const [searchParams, setSearchParams] = useSearchParams();
-  const { scope, filters, view, sort, page } = readSearch(searchParams);
+  const { scope, filters, view, sort, page, ask, asked } = readSearch(searchParams);
   const params = { ...scope, ...filters };
+  const navigate = useNavigate();
+  // A question in the address (?ask=) is read as filters first. The page then replaces the address with the filters.
+  const askCall = useApi(ask ? `ask:${ask}` : null, (signal) => getJSON("/api/ask", { q: ask }, { signal }));
+  useEffect(() => {
+    if (!ask) return;
+    const mine = askCall.dataKey === `ask:${ask}`;
+    if (askCall.data && mine && !askCall.loading) {
+      askAnswers.set(ask, askCall.data);
+      navigate(askHref(askCall.data, ask), { replace: true });
+    } else if (askCall.error && mine) {
+      navigate(`/search?q=${encodeURIComponent(ask)}`, { replace: true });
+    }
+  }, [ask, askCall.data, askCall.dataKey, askCall.error, askCall.loading]);
   const q = scope.q || "";
   const hasFilters = Object.keys(params).some((k) => k !== "q");
 
   const listParams = { ...scope, ...filters, sort, page, per_page: PER_PAGE };
   const listKey = JSON.stringify({ listParams, view });
-  const list = useApi(listKey, (signal) =>
+  const list = useApi(ask ? null : listKey, (signal) =>
     getJSON("/api/speeches", { ...listParams, ...(view === "members" ? { group: "member" } : {}) }, { signal })
   );
   // The other calls wait for the list. The list stores the vector and the nearest speeches of a new search for them.
-  const listDone = !list.loading;
+  const listDone = !ask && !list.loading;
 
   // The facets are a call of their own, so the speeches do not wait for them.
   const facetParams = { ...scope, ...filters, facets: 1, per_page: 1 };
@@ -105,6 +119,8 @@ export default function Search() {
       else next.set(k, String(v));
     }
     if (!("page" in changes)) next.delete("page");
+    // A change of a filter ends the Read as line: the filters are no longer the reading of the question.
+    if (Object.keys(changes).some((k) => !["page", "view", "sort"].includes(k))) next.delete("asked");
     const qs = next.toString();
     return qs ? `/search?${qs}` : "/search";
   };
@@ -136,8 +152,10 @@ export default function Search() {
         {heading.rest}
       </h1>
       <div className="search-head__box">
-        <SearchBox key={q} initial={q} />
+        <SearchBox key={asked || ask || q} initial={asked || ask || q} />
       </div>
+      {ask && <p className="search-ask__line" role="status">Reading your question…</p>}
+      {asked && !ask && <AskLine question={asked} chips={chips} />}
       {chips.length > 0 && (
         <div className="search-head__active" aria-label="Filters that are on">
           {chips.map((c) => (
@@ -156,7 +174,7 @@ export default function Search() {
 
   return (
     <PageLayout breadcrumb={<Breadcrumb items={[{ label: "Search" }]} />} answer={answer}>
-      <div className="search-body">
+      {!ask && <div className="search-body">
         <aside className="search-rail" aria-label="Filters and method">
           <FilterRail
             params={params}
@@ -212,7 +230,7 @@ export default function Search() {
             onReset={resetFilters}
           />
         </div>
-      </div>
+      </div>}
     </PageLayout>
   );
 }
