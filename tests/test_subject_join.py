@@ -121,6 +121,25 @@ def test_merge_pair_rows_keeps_old_joins_that_the_new_answers_do_not_cover():
     assert rows == [new[0], old[1]]
 
 
+def test_a_reused_answer_keeps_the_confidence_of_the_stored_row():
+    # Real case from data/joins_v1.tsv: this pair was stored as high, and the next export wrote it back as reused.
+    from scripts.subject_join import merge_pair_rows
+    new = [{"name_ids_a": "93348 109867", "name_ids_b": "101760 658286", "centre_distance": "0.0520", "confidence": "reused"},
+           {"name_ids_a": "5", "name_ids_b": "6", "centre_distance": "0.1", "confidence": "reused"}]
+    old = [{"name_ids_a": "101760 658286", "name_ids_b": "93348 109867", "centre_distance": "0.0520", "confidence": "high"}]
+    rows, kept = merge_pair_rows(new, old)
+    assert kept == 0
+    assert [r["confidence"] for r in rows] == ["high", "reused"]  # a pair with no stored row stays reused
+    assert new[0]["confidence"] == "reused"  # the input rows do not change
+
+
+def test_a_new_answer_still_replaces_the_stored_confidence():
+    from scripts.subject_join import merge_pair_rows
+    new = [{"name_ids_a": "1", "name_ids_b": "2", "source": "chain", "confidence": "low"}]
+    old = [{"name_ids_a": "1", "name_ids_b": "2", "source": "chain", "confidence": "high"}]
+    assert merge_pair_rows(new, old)[0][0]["confidence"] == "low"
+
+
 def test_chain_ingest_keeps_the_old_cannot_links(tmp_path, monkeypatch):
     import argparse
     import json

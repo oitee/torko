@@ -62,6 +62,7 @@ MAX_JOINED = 40
 SHOW_NAMES = 12
 JOB_BYTES = 14000
 DECISIONS = ("same", "different")
+REUSED = "reused"  # the confidence of an answer that ingest --cache copied from a stored row
 
 
 def unit_line(names: list) -> str:
@@ -238,7 +239,7 @@ def ingest(args) -> None:
         for pid, r in rows.items():
             dec = known.get(frozenset((int(r["unit_a"]), int(r["unit_b"]))))
             if dec and pid not in got:
-                got[pid] = (dec, "reused")
+                got[pid] = (dec, REUSED)
                 reused += 1
     with (RESULTS / "join_llm_v1.tsv").open("w", newline="") as f:
         w = csv.writer(f, delimiter="\t")
@@ -393,10 +394,18 @@ JOIN_COLUMNS = ["name_ids_a", "name_ids_b", "centre_distance", "confidence"]
 def merge_pair_rows(new_rows: list, old_rows: list) -> tuple[list, int]:
     """The new rows, then each old row whose pair of name ID sets is not in the new rows. It serves the joins and the
     cannot-links. An old row can belong to units of an earlier run, so a new run must not delete it.
+    A new row with the confidence `reused` repeats a stored answer, so it takes the confidence of the stored row.
     Returns (rows, old rows kept)."""
+    old = {frozenset((r["name_ids_a"], r["name_ids_b"])): r for r in old_rows}
+    out = []
+    for r in new_rows:
+        stored = old.get(frozenset((r["name_ids_a"], r["name_ids_b"])))
+        if r.get("confidence") == REUSED and stored and stored.get("confidence") not in (None, "", REUSED):
+            r = dict(r, confidence=stored["confidence"])
+        out.append(r)
     seen = {frozenset((r["name_ids_a"], r["name_ids_b"])) for r in new_rows}
     kept = [r for r in old_rows if frozenset((r["name_ids_a"], r["name_ids_b"])) not in seen]
-    return new_rows + kept, len(kept)
+    return out + kept, len(kept)
 
 
 def answer_rows(units: list, cand: dict, answers: list, decision: str) -> list:
