@@ -9,7 +9,7 @@ import re
 from sqlalchemy import text
 
 from pages.common import slug as to_slug, year_rows, year_tagged
-from pages.common import (PARTY_AT_DATE, SPEECH_TAGS_CTE, cached, corpus_party_totals, resolve_tag, speech_rows,
+from pages.common import (PARTY_AT_DATE, SPEECH_TAGS_CTE, cached, corpus_party_totals, place_slugs, resolve_tag, speech_rows,
                           speech_tags_cte, tag_speeches)
 
 # Subjects most associated with a place. lift = the share of the place's tagged speeches that carry the tag,
@@ -27,7 +27,8 @@ COUNTS_NOTE = (
     "parties[].per100 is the party's speeches on the place per 100 of all speeches of that party that have any kept item "
     "(party_total). n_members counts distinct members with at least one such speech. "
     "years[].n counts the speeches of the year, by the date of the debate of each speech. years[].tagged is the denominator: "
-    "the speeches of the year that have at least one kept item of any tag."
+    "the speeches of the year that have at least one kept item of any tag. "
+    "state is the state of the latest seat holder, with its slug and page (true when the state has a place page), or null."
 )
 
 # The tags of the speeches in :ids only. It is fast for one tag.
@@ -137,8 +138,13 @@ def place_page(conn, slug, args):
         SELECT s.id FROM speeches s JOIN debates d ON d.id = s.debate_id
         WHERE s.id = ANY(:ids) AND s.person_id IS NOT NULL ORDER BY d.debate_date DESC, s.word_count DESC, s.id LIMIT 8"""), p).all()]
 
+    state = None
+    if holders and holders[-1]["state"]:
+        state_name = holders[-1]["state"]
+        state = {"name": state_name, "slug": to_slug(state_name), "page": to_slug(state_name) in place_slugs(conn)}
+
     return {
-        "name": name, "slug": to_slug(name), "subtype": t["subtype"], "domain": t["domain"],
+        "name": name, "slug": to_slug(name), "state": state, "subtype": t["subtype"], "domain": t["domain"],
         "description": t["description"], "aliases": t["aliases"],
         "total": total, "first": str(span[0]) if span[0] else None, "last": str(span[1]) if span[1] else None,
         "debates": span[2], "n_members": n_members,

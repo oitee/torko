@@ -1,11 +1,11 @@
 import React, { useEffect } from "react";
-import { useParams } from "react-router-dom";
+import { Link, useParams } from "react-router-dom";
 import { useAnswer } from "../assets/js/useApi.js";
 import PageLayout from "../components/PageLayout.jsx";
 import { ErrorState, Loading } from "../components/States.jsx";
 import NotFound from "./not_found.jsx";
 import PlaceHead from "./place/PlaceHead.jsx";
-import TagWhenChart from "./tag/TagWhenChart.jsx";
+import PlaceWhen from "./place/PlaceWhen.jsx";
 import PlaceHolders from "./place/PlaceHolders.jsx";
 import PlaceMembers from "./place/PlaceMembers.jsx";
 import PlaceParties from "./place/PlaceParties.jsx";
@@ -16,6 +16,15 @@ import "./place.css";
 
 // The Place page shows one place (a seat, district or state) with historical trends,
 // MP holders, members who spoke about it, parties, associated subjects, and speeches.
+// The name of a place from its address while the page loads: "west-bengal" becomes "West Bengal".
+export function slugTitle(slug) {
+  return String(slug || "")
+    .split("-")
+    .filter(Boolean)
+    .map((w) => w.charAt(0).toUpperCase() + w.slice(1))
+    .join(" ");
+}
+
 export default function Place() {
   const { slug } = useParams();
 
@@ -33,7 +42,7 @@ export default function Place() {
   if (loading && !place) {
     return (
       <main className="place-page place-page--loading">
-        <h1 className="sr-only">Place</h1>
+        <h1 className="head-title">{slugTitle(slug)}</h1>
         <Loading lines={6} />
       </main>
     );
@@ -62,12 +71,16 @@ export default function Place() {
     >
       <div className="place-main">
         {isEmpty ? (
-          <p className="place-empty-notice">
-            No speech in the record names this place yet.
-          </p>
+          <>
+            <p className="place-empty-notice">
+              Torko has no speech with the tag {place.name}. The <Link to="/search">Search page</Link> can find speeches that
+              use the name in their words.
+            </p>
+            {place.holders && place.holders.length > 0 && <PlaceHolders holders={place.holders} />}
+          </>
         ) : (
           <>
-            <TagWhenChart years={place.years} />
+            <PlaceWhen years={place.years} />
 
             {place.holders && place.holders.length > 0 && (
               <PlaceHolders holders={place.holders} />
@@ -78,10 +91,7 @@ export default function Place() {
                 members={place.members}
                 totalSpeeches={place.total}
               />
-              <PlaceParties
-                parties={place.parties}
-                placeName={place.name}
-              />
+              <PlaceParties parties={place.parties} />
             </div>
 
             <PlaceSubjects

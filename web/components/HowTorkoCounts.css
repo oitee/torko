@@ -24,3 +24,9 @@
   line-height: var(--lh-body);
   color: var(--meta);
 }
+
+/* A section that already draws a top rule needs no second rule when the note is its first block. */
+:is(.place-section, .party-section--method, .debate-method-source__counts) > .how-torko-counts:first-child {
+  border-top: 0;
+  padding-top: 0;
+}

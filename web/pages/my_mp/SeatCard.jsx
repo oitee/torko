@@ -2,10 +2,26 @@ import React, { useState } from "react";
 import { Link } from "react-router-dom";
 import Button from "../../components/Button.jsx";
 import Chip from "../../components/Chip.jsx";
-import { formatNumber, termShort } from "../../assets/js/format.js";
+import { formatDateLong, formatNumber, termShort } from "../../assets/js/format.js";
 import PartyLink from "../../components/PartyLink.jsx";
 
 const OLDER_SHOWN = 10;
+
+// The years of each Lok Sabha term. The last term has no end year yet.
+const TERM_YEARS = { 13: "1999–2004", 14: "2004–09", 15: "2009–14", 16: "2014–19", 17: "2019–24", 18: "2024–" };
+
+// The years of the terms of a member, for example "2014–19, 2019–24". A term with no known years is left out.
+export function termYears(terms) {
+  return (Array.isArray(terms) ? terms : []).map((t) => TERM_YEARS[t]).filter(Boolean).join(", ");
+}
+
+// One sentence about how often the member spoke, for example "Spoke 22 times in all terms. Latest speech 29 Jan 2026."
+export function speechLine(member) {
+  if (member.speeches === undefined || member.speeches === null) return null;
+  if (member.speeches === 0) return "No speech of this member is in the record.";
+  const count = member.speeches === 1 ? "Spoke 1 time" : `Spoke ${formatNumber(member.speeches)} times`;
+  return `${count} in all terms.${member.last_speech ? ` Latest speech ${formatDateLong(member.last_speech)}.` : ""}`;
+}
 
 // The terms of a member, for example "16th LS, 17th LS".
 export function termsText(terms) {
@@ -14,7 +30,7 @@ export function termsText(terms) {
 }
 
 // SeatCard shows one seat: the current member with the subjects of most of their speeches, then the older members.
-// The seat name has no link, because the API does not say if a Place page exists for the seat.
+// The seat name links to the Place page when the API says the seat has one.
 export default function SeatCard({ seat, latestTerm }) {
   const [showAll, setShowAll] = useState(false);
   const current = Array.isArray(seat.current) ? seat.current : [];
@@ -27,7 +43,7 @@ export default function SeatCard({ seat, latestTerm }) {
     <section className="my-mp-seat" aria-labelledby={headingId}>
       <div className="section-header">
         <h2 id={headingId} className="my-mp-seat__title">
-          {seat.seat}
+          {seat.place_page ? <Link to={`/place/${seat.slug}`}>{seat.seat}</Link> : seat.seat}
         </h2>
         {state && <span className="my-mp-seat__meta mono">{state}</span>}
       </div>
@@ -39,6 +55,7 @@ export default function SeatCard({ seat, latestTerm }) {
       ) : (
         current.map((m) => {
           const terms = termsText(m.terms);
+          const line = speechLine(m);
           const tags = Array.isArray(m.top_tags) ? m.top_tags : [];
           return (
             <div key={m.id} className="my-mp-member">
@@ -53,9 +70,12 @@ export default function SeatCard({ seat, latestTerm }) {
                   {terms}
                 </p>
               )}
+              {line && <p className="my-mp-member__speeches">{line}</p>}
               {tags.length > 0 && (
                 <div className="my-mp-member__tags">
-                  <h3 className="my-mp-member__tags-title">Subjects of most speeches</h3>
+                  <h3 className="my-mp-member__tags-title">
+                    Subjects of most speeches{m.speeches ? `, out of ${formatNumber(m.speeches)} speeches` : ""}
+                  </h3>
                   <ul className="chip-list">
                     {tags.map((t) => (
                       <li key={t.slug}>
@@ -67,7 +87,7 @@ export default function SeatCard({ seat, latestTerm }) {
               )}
               <div className="my-mp-member__action">
                 <Button variant="secondary" href={`/member/${m.id}`}>
-                  See all speeches of {m.member}
+                  All speeches
                 </Button>
               </div>
             </div>
@@ -81,7 +101,9 @@ export default function SeatCard({ seat, latestTerm }) {
         <div className="my-mp-older">
           <div className="my-mp-older__header">
             <h3 className="my-mp-older__title">Members before</h3>
-            <span className="my-mp-older__meta mono">{formatNumber(older.length)}</span>
+            <span className="my-mp-older__meta mono">
+              {formatNumber(older.length)} {older.length === 1 ? "member" : "members"}
+            </span>
           </div>
           <ul className="my-mp-older__list">
             {visibleOlder.map((m) => (
@@ -89,7 +111,11 @@ export default function SeatCard({ seat, latestTerm }) {
                 <Link to={`/member/${m.id}`} className="my-mp-older__row">
                   <span className="my-mp-older__name">{m.member}</span>
                   <span className="my-mp-older__party mono">{m.party || "–"}</span>
-                  <span className="my-mp-older__terms mono">{termsText(m.terms)}</span>
+                  <span className="my-mp-older__terms mono">
+                    {termsText(m.terms)}
+                    {termYears(m.terms) && <span className="my-mp-older__years"> · {termYears(m.terms)}</span>}
+                  </span>
+                  <span className="my-mp-older__arrow" aria-hidden="true">→</span>
                 </Link>
               </li>
             ))}

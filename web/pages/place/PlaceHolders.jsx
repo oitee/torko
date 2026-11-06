@@ -1,17 +1,16 @@
 import React from "react";
 import { Link } from "react-router-dom";
 import { formatMonthYear } from "./PlaceHead.jsx";
-import { ordinal } from "../../assets/js/format.js";
+import { ordinal, termYears } from "../../assets/js/format.js";
 import PartyLink from "../../components/PartyLink.jsx";
 
-const TERM_YEARS = {
-  13: "1999–2004",
-  14: "2004–09",
-  15: "2009–14",
-  16: "2014–19",
-  17: "2019–24",
-  18: "2024–",
-};
+// The months in which the member spoke for this seat, for example "spoke Dec 2014 to Feb 2019", or "spoke in Dec 2003" for one month.
+export function spokeText(first, last) {
+  if (!first || !last) return null;
+  const a = formatMonthYear(first);
+  const b = formatMonthYear(last);
+  return a === b ? `spoke in ${a}` : `spoke ${a} to ${b}`;
+}
 
 export default function PlaceHolders({ holders = [] }) {
   const safeHolders = Array.isArray(holders) ? holders : [];
@@ -38,7 +37,7 @@ export default function PlaceHolders({ holders = [] }) {
     >
       <div className="section-header">
         <h2 id="holders-heading" className="place-section__title">
-          MPs for this seat
+          MPs of this seat who spoke in the House
         </h2>
         <span className="place-section__meta mono">Across all terms</span>
       </div>
@@ -47,23 +46,19 @@ export default function PlaceHolders({ holders = [] }) {
         {terms.map((term) => {
           const items = termMap.get(term) || [];
           const termLabel = ordinal(term);
-          const years = TERM_YEARS[term] || "";
+          const years = termYears(term);
 
           return (
             <div key={term} className="place-holders__row">
-              <div className="place-holders__term-col">
-                <span className="place-holders__term-name mono">{termLabel}</span>
-                {years && (
-                  <span className="place-holders__term-years mono">{years}</span>
-                )}
+              <div className="place-holders__term-col mono">
+                <span className="place-holders__term-name">{termLabel}</span>
+                {years && <span className="place-holders__term-years"> · {years}</span>}
               </div>
 
               <div className="place-holders__items-col">
                 {items.map((h, idx) => {
-                  const spokeText =
-                    h.first_spoke && h.last_spoke
-                      ? `spoke from ${formatMonthYear(h.first_spoke)} to ${formatMonthYear(h.last_spoke)}`
-                      : null;
+                  const sinceText = h.since ? `in office from ${formatMonthYear(h.since)}` : null;
+                  const dates = [sinceText, spokeText(h.first_spoke, h.last_spoke)].filter(Boolean).join(" · ");
 
                   return (
                     <div
@@ -83,15 +78,9 @@ export default function PlaceHolders({ holders = [] }) {
                         </span>
                       )}
 
-                      {h.state && (
-                        <span className="place-holders__state">
-                          {h.state}
-                        </span>
-                      )}
-
-                      {spokeText && (
+                      {dates && (
                         <span className="place-holders__spoke mono">
-                          {spokeText}
+                          {dates}
                         </span>
                       )}
                     </div>

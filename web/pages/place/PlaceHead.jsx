@@ -74,14 +74,14 @@ export function getKindLabel(subtype) {
 export default function PlaceHead({ place }) {
   if (!place) return null;
 
-  const state = getStateFromDescription(place.description, place.subtype);
+  // The API gives the state of the seat. The page does not read it from the description.
+  const state = place.state && place.state.name ? place.state : null;
   const breadcrumbItems = [
-    { label: "Places" },
-    ...(state ? [{ label: state }] : []),
+    { label: "Places", href: "/places" },
+    ...(state ? [{ label: state.name, href: state.page ? `/place/${state.slug}` : undefined }] : []),
     { label: place.name },
   ];
 
-  const span = formatSpan(place.first, place.last);
   const hasAliases = Array.isArray(place.aliases) && place.aliases.length > 0;
   const hasData = (place.total || 0) > 0;
 
@@ -104,7 +104,9 @@ export default function PlaceHead({ place }) {
       {hasData && (
         <dl className="head-numbers">
           <div className="place-head__stat">
-            <dt className="head-stat-label">speeches about this place</dt>
+            <dt className="head-stat-label">
+              speeches about this place
+            </dt>
             <dd className="head-stat-value">{formatNumber(place.total)}</dd>
           </div>
           <div className="place-head__stat">
@@ -116,8 +118,12 @@ export default function PlaceHead({ place }) {
             <dd className="head-stat-value">{formatNumber(place.n_members)}</dd>
           </div>
           <div className="place-head__stat">
-            <dt className="head-stat-label">first and latest speech</dt>
-            <dd className="head-stat-value">{span}</dd>
+            <dt className="head-stat-label">first speech</dt>
+            <dd className="head-stat-value">{formatMonthYear(place.first) || "–"}</dd>
+          </div>
+          <div className="place-head__stat">
+            <dt className="head-stat-label">latest speech</dt>
+            <dd className="head-stat-value">{formatMonthYear(place.last) || "–"}</dd>
           </div>
         </dl>
       )}

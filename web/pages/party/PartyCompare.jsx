@@ -1,14 +1,18 @@
 import React, { useState } from "react";
 import { Link } from "react-router-dom";
+import Chip from "../../components/Chip.jsx";
 import { formatNumber } from "../../assets/js/format.js";
 import { perThousand, subjectSentence, timesText } from "./partyData.js";
 
 // PartyCompare draws one row for each subject: a dot for the party and a ring for all parties, on one scale.
 // The scale is speeches with the subject in every 1,000 tagged speeches. The line between the two marks is the gap.
 // rows: { tag, slug, n, share, base, lift, extra }, in the order of extra. hrefBase is "/tag/" or "/place/".
-export default function PartyCompare({ id, title, meta, rows = [], code, hrefBase, empty, controls }) {
+export default function PartyCompare({ id, title, meta, rows = [], code, hrefBase, empty, controls, keyText }) {
   const [active, setActive] = useState(null);
-  const list = Array.isArray(rows) ? rows : [];
+  const [order, setOrder] = useState("extra");
+  const given = Array.isArray(rows) ? rows : [];
+  // The API sends the rows in the order of extra speeches. The reader can pick the order of times instead.
+  const list = order === "times" ? [...given].sort((a, b) => (b.lift - a.lift) || (b.extra - a.extra)) : given;
   const max = Math.max(0, ...list.flatMap((r) => [Number(r.share) || 0, Number(r.base) || 0]));
   const pos = (v) => (max > 0 ? ((Number(v) || 0) / max) * 100 : 0);
 
@@ -39,6 +43,18 @@ export default function PartyCompare({ id, title, meta, rows = [], code, hrefBas
                   All parties
                 </li>
               </ul>
+              {keyText && <p className="party-box__hint">{keyText}</p>}
+              <div className="party-compare__order">
+                <span className="party-box__hint">Order of the rows</span>
+                <ul className="chip-list" aria-label="Order of the rows">
+                  <li>
+                    <Chip label="Most speeches above expected" selected={order === "extra"} onClick={() => setOrder("extra")} />
+                  </li>
+                  <li>
+                    <Chip label="Most times the House rate" selected={order === "times"} onClick={() => setOrder("times")} />
+                  </li>
+                </ul>
+              </div>
               <p className={`party-box__readout${active ? " mono" : " party-box__readout--hint"}`} aria-live="polite">
                 {active ? subjectSentence(active, code) : "Point at a row"}
               </p>
@@ -48,11 +64,12 @@ export default function PartyCompare({ id, title, meta, rows = [], code, hrefBas
               <span />
               <span className="party-compare__scale">
                 <span>0</span>
+                <span>{perThousand(max / 2)}</span>
                 <span>{perThousand(max)} per 1,000</span>
               </span>
-              <span className="party-compare__num">times</span>
+              <span className="party-compare__num">vs House</span>
               <span className="party-compare__num">speeches</span>
-              <span className="party-compare__num">extra</span>
+              <span className="party-compare__num">above expected</span>
             </div>
 
             <ul className="party-compare" onMouseLeave={() => setActive(null)}>

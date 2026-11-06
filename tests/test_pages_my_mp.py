@@ -33,3 +33,11 @@ def test_my_mp_route(page_conn):
 def test_my_mp_unknown_and_empty(page_conn):
     assert my_mp_page(page_conn, {"q": "zzzzqq"})["seats"] == []
     assert my_mp_page(page_conn, {})["seats"] == []
+
+
+def test_my_mp_speech_count_and_place_page(page_conn):
+    seat = my_mp_page(page_conn, {"q": "gorakh"})["seats"][0]
+    member = seat["current"][0]
+    assert member["speeches"] >= 0
+    assert (member["last_speech"] is None) == (member["speeches"] == 0)
+    assert isinstance(seat["place_page"], bool)

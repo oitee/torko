@@ -42,17 +42,18 @@ export function activeTerms(terms) {
   return (Array.isArray(terms) ? terms : []).filter((t) => (Number(t.tagged) || 0) > 0);
 }
 
-// The big numbers at the top of the page.
+// The big numbers at the top of the page. Each label names what the number counts, and the share names its denominator.
 export function headNumbers(party) {
   const active = activeTerms(party.terms);
   const share = party.all_tagged ? party.total_tagged / party.all_tagged : null;
-  const most = active.reduce((best, t) => (!best || t.members_speaking > best.members_speaking ? t : best), null);
+  const all = Array.isArray(party.terms) ? party.terms : [];
+  const latest = all.length ? all[all.length - 1] : null;
   return [
     { label: "tagged speeches, all terms", value: formatNumber(party.total_tagged) },
-    { label: "of all tagged speeches in the House", value: percent(share), lead: true },
+    { label: `of all ${formatNumber(party.all_tagged)} tagged speeches in the House`, value: percent(share) },
     { label: active.length === 1 ? "term with speeches" : "terms with speeches", value: String(active.length) },
-    most
-      ? { label: `members spoke in the ${termLong(most.term)}, the most in one term`, value: formatNumber(most.members_speaking) }
+    latest
+      ? { label: `members spoke in the ${termLong(latest.term)}`, value: formatNumber(latest.members_speaking) }
       : null,
   ].filter(Boolean);
 }

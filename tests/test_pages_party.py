@@ -42,3 +42,10 @@ def test_party_page_real(page_conn):
 
 def test_party_page_unknown(page_conn):
     assert p.party_page(page_conn, "NO-SUCH-PARTY", {}) is None
+
+
+def test_party_page_recent_speeches(page_conn):
+    d = p.party_page(page_conn, "bjp", {})
+    assert 0 < len(d["recent"]) <= p.RECENT
+    assert [r["date"] for r in d["recent"]] == sorted((r["date"] for r in d["recent"]), reverse=True)
+    assert all(r["party"] == "BJP" for r in d["recent"])

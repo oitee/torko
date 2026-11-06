@@ -1,31 +1,10 @@
 import React from "react";
 import { formatNumber } from "../../assets/js/format.js";
-import { partyShades } from "../../assets/js/colour.js";
 import PartyLink from "../../components/PartyLink.jsx";
 
 const KNOWN_PARTY_TOKENS = new Set(["bjp", "inc", "aitc", "tdp", "bsp"]);
 
-const WIKIPEDIA_PARTY_HEX = {
-  BJP: "#CD7407",
-  INC: "#0395C8",
-  SHS: "#D95A0B",
-  SS: "#D95A0B",
-  SHSUBT: "#D95A0B",
-  NCP: "#009797",
-  DMK: "#FF0D0D",
-  AIADMK: "#138808",
-  AITC: "#03A132",
-  "CPI(M)": "#CC0000",
-  CPI: "#D90000",
-  PMK: "#998100",
-  VCK: "#0F52BA",
-  BJD: "#006400",
-  "JD(U)": "#003366",
-  AAP: "#0072B0",
-  SP: "#E40000",
-};
-
-export default function PlaceParties({ parties = [], placeName = "" }) {
+export default function PlaceParties({ parties = [] }) {
   const safeParties = Array.isArray(parties) ? parties : [];
   if (safeParties.length === 0) {
     return null;
@@ -57,28 +36,13 @@ export default function PlaceParties({ parties = [], placeName = "" }) {
           {safeParties.map((p, idx) => {
             const widthPercent = (p.n / maxN) * 100;
             const code = String(p.party || "").trim().toLowerCase();
-            const upperCode = String(p.party || "").trim().toUpperCase();
 
             let barStyle = {
               width: `${widthPercent}%`,
             };
 
-            if (idx < 6) {
-              if (KNOWN_PARTY_TOKENS.has(code)) {
-                barStyle.backgroundColor = `var(--party-${code})`;
-              } else if (WIKIPEDIA_PARTY_HEX[upperCode]) {
-                const shades = partyShades(WIKIPEDIA_PARTY_HEX[upperCode]);
-                if (shades) {
-                  barStyle.backgroundColor = shades.light;
-                } else {
-                  barStyle.backgroundColor = "var(--control)";
-                }
-              } else {
-                barStyle.backgroundColor = "var(--control)";
-              }
-            } else {
-              barStyle.backgroundColor = "var(--control)";
-            }
+            // Only the parties with a colour token in tokens.css get a colour. Every other party is control grey.
+            barStyle.backgroundColor = KNOWN_PARTY_TOKENS.has(code) ? `var(--party-${code})` : "var(--control)";
 
             const per100Text =
               typeof p.per100 === "number"
@@ -111,10 +75,8 @@ export default function PlaceParties({ parties = [], placeName = "" }) {
       </div>
 
       <p className="place-parties__note">
-        Per 100: of every 100 speeches the party made in the house, how many were
-        about {placeName}. This keeps a large party from looking important only
-        because it is large. Party colours follow Wikipedia. Parties after the
-        largest 6 are grey.{" "}
+        Per 100 stops a large party from looking important only because it is large. Five parties have their own colour. All
+        other parties are grey.{" "}
         <a href="#method" className="place-parties__method-link">
           Method
         </a>
