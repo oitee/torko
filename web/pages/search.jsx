@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { Link, useNavigate, useSearchParams } from "react-router-dom";
 import { getJSON } from "../assets/js/api.js";
 import { useApi } from "../assets/js/useApi.js";
@@ -16,7 +16,7 @@ import SearchScopeCard from "./search/SearchScopeCard.jsx";
 import AskLine, { askAnswers } from "./search/AskLine.jsx";
 import FilterRail from "./search/FilterRail.jsx";
 import CopyButton from "../components/CopyButton.jsx";
-import StartBlock from "./search/StartBlock.jsx";
+import SearchLanding from "./search/SearchLanding.jsx";
 import { chipsFrom, draftChanges, draftFrom, listOf } from "./search/filterRules.js";
 import { FILTER_KEYS, askHref, defaultSort, headingParts, readSearch } from "./search/searchParams.js";
 import "./search.css";
@@ -61,6 +61,15 @@ export default function Search() {
   // The other calls wait for the list. The list stores the vector and the nearest speeches of a new search for them.
   const listDone = !ask && !list.loading;
 
+  // The landing view shows while nothing is searched. A search that starts from it keeps the landing view
+  // until its results arrive, so the page changes once, from the box to the results. A direct link to a search
+  // opens the results view at once.
+  const resultsReady = list.dataKey === listKey && !list.loading;
+  const landingRef = useRef(!searched);
+  if (!searched) landingRef.current = true;
+  else if (landingRef.current && !ask && (resultsReady || list.error)) landingRef.current = false;
+  const landing = landingRef.current;
+
   // The facets are a call of their own, so the speeches do not wait for them.
   const facetParams = { ...scope, ...filters, facets: 1, per_page: 1 };
   const facetCall = useApi(listDone ? JSON.stringify(facetParams) : null, (signal) =>
@@ -89,8 +98,8 @@ export default function Search() {
   );
 
   // The start block reads two more answers: the years and members of the whole archive, and the member with the most speeches.
-  const homeCall = useApi(!searched && !ask ? "start:home" : null, (signal) => getJSON("/api/home", undefined, { signal }));
-  const topMemberCall = useApi(!searched && !ask ? "start:member" : null, (signal) =>
+  const homeCall = useApi(landing ? "start:home" : null, (signal) => getJSON("/api/home", undefined, { signal }));
+  const topMemberCall = useApi(landing ? "start:member" : null, (signal) =>
     getJSON("/api/speeches", { group: "member", sort: "most", per_page: 1 }, { signal })
   );
 
@@ -185,6 +194,48 @@ export default function Search() {
     </div>
   );
 
+  if (landing) {
+    return (
+      <main className="search-page search-page--landing">
+        <SearchLanding
+          initial={asked || ask || q}
+          total={searched ? null : speechTotal}
+          members={homeCall.data?.corpus?.members}
+          first={homeCall.data?.corpus?.first}
+          last={homeCall.data?.corpus?.last}
+          tagRows={tagCall.data?.facets?.tag}
+          topMember={topMemberCall.data?.members?.[0]}
+          busy={searched}
+          status={ask ? "Reading your question…" : ""}
+        />
+        {!searched && !ask && (
+          <section id="latest-speeches" className="search-latest" aria-label="Latest speeches">
+            <SearchResults
+              view={view}
+              sort={sort}
+              page={page}
+              data={list.data}
+              loading={list.loading}
+              error={list.error}
+              onRetry={list.retry}
+              speechTotal={speechTotal}
+              membersTotal={membersTotal}
+              viewHref={(v) => hrefWith({ view: v === "speeches" ? null : v })}
+              pageHref={(p) => hrefWith({ page: p > 1 ? p : null })}
+              memberHref={(id) => hrefWith({ member: id, view: null })}
+              onSort={(s) => setWith({ sort: s === defaultSort(q) ? null : s })}
+              query=""
+              tagCount={0}
+              heading="Latest speeches"
+              hasFilters={false}
+              onReset={resetFilters}
+            />
+          </section>
+        )}
+      </main>
+    );
+  }
+
   return (
     <PageLayout breadcrumb={crumbLabel ? <Breadcrumb items={[{ label: "Search", href: "/search" }, { label: crumbLabel }]} /> : null} answer={answer}>
       {!ask && <div className="search-body">
@@ -213,17 +264,6 @@ export default function Search() {
         </aside>
 
         <div className="search-main">
-          {!searched && !ask && (
-            <StartBlock
-              total={speechTotal}
-              members={homeCall.data?.corpus?.members}
-              first={homeCall.data?.corpus?.first}
-              last={homeCall.data?.corpus?.last}
-              tagRows={tagCall.data?.facets?.tag}
-              topMember={topMemberCall.data?.members?.[0]}
-              termRows={facets.term}
-            />
-          )}
           {(tags.length > 0 || scope.place) && (
             <div className="search-scopes">
               {tags.map((t, i) => (

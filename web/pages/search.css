@@ -1408,3 +1408,83 @@ a.search-pager__num:hover {
     padding: var(--space-4);
   }
 }
+
+/* The landing view of Search: the box in the middle of the first screen, the suggestions under it,
+   and the latest speeches one screen below. */
+.search-landing {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-5);
+  min-height: calc(100vh - var(--header-height) - var(--space-10));
+  padding: var(--space-10) 0;
+  text-align: center;
+}
+
+.search-landing__title {
+  margin: 0;
+  max-width: 18ch;
+}
+
+.search-landing__box {
+  width: min(44rem, 100%);
+  text-align: left;
+}
+
+.search-landing__box .search-box__input {
+  height: 60px;
+}
+
+@media (min-width: 640px) {
+  .search-landing__box .search-box__input {
+    font-size: 1.125rem;
+  }
+}
+
+.search-landing__box .search-box__button-wrap .button {
+  min-height: 60px;
+  padding: 0 var(--space-6);
+}
+
+.search-landing__suggestions {
+  list-style: none;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: var(--space-2) var(--space-5);
+  max-width: 44rem;
+  margin: 0;
+  padding: 0;
+}
+
+.search-landing__suggestions a {
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+  font-weight: 500;
+}
+
+.search-landing__status {
+  margin: 0;
+  color: var(--ink-2);
+}
+
+.search-landing__line {
+  margin: 0;
+  font-family: var(--font-mono);
+  font-size: var(--size-count);
+  line-height: var(--lh-count);
+  color: var(--meta);
+}
+
+.search-landing__down {
+  margin-top: var(--space-6);
+  font-size: var(--size-label);
+  color: var(--ink-2);
+}
+
+.search-latest {
+  scroll-margin-top: var(--space-6);
+  padding-bottom: var(--space-10);
+}
