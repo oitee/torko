@@ -17,6 +17,11 @@ body {
   font-family: var(--font-sans);
   font-size: var(--size-body);
   line-height: var(--lh-body);
+}
+
+/* Numbers in a table line up in columns. In running text and headings they keep their own width. */
+td,
+th {
   font-variant-numeric: tabular-nums;
 }
 
