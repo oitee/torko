@@ -72,18 +72,17 @@ describe("Home page", () => {
     expect(await screen.findByText("SUSHRI MAHUA MOITRA (KRISHNANAGAR)")).toBeTruthy();
     expect(screen.getByRole("link", { name: "Krishnanagar" }).getAttribute("href")).toBe("/place/krishnanagar");
     expect(screen.getByText(/allocation-based scheme which the Central Government can alter at whim/)).toBeTruthy();
-    expect(screen.getByText("3 of 13 tags of this speech")).toBeTruthy();
     expect(screen.getByText("205 speeches carry the tag Arrears in all years.")).toBeTruthy();
     expect(screen.getByRole("link", { name: "Latur" }).getAttribute("href")).toBe("/place/latur");
   });
 
-  it("shows the subjects that rose in the newest session, with a count for each", async () => {
+  it("shows the topics trending this session, with a count for each", async () => {
     mockAnswers();
     renderHome();
     const first = homeAnswer.typical[0];
-    const link = await screen.findByRole("link", { name: first.name });
+    const link = await screen.findByRole("link", { name: new RegExp(`^${first.name.replace(/[()]/g, "\\$&")}, trending`) });
     expect(link.getAttribute("href")).toBe(`/tag/${first.slug}`);
-    expect(screen.getByRole("heading", { level: 2, name: "Subjects that rose in the newest session" })).toBeTruthy();
+    expect(screen.getByRole("heading", { level: 2, name: "Topics trending this session" })).toBeTruthy();
   });
 
   it("shows the steps of Torko with their counts, from the Method answer", async () => {

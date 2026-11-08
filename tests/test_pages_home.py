@@ -20,6 +20,8 @@ def test_home_page_on_database(page_conn):  # noqa: F811
     assert lifts == sorted(lifts, reverse=True)
     assert all(t["speeches_in_session"] >= home.MIN_SPEECHES for t in out["typical"])
     assert set(out["lit"]) <= {t["slug"] for t in out["typical"]}
+    # The newest session has the same name as on the debate pages, for example "Budget 2026".
+    assert out["session_label"] and out["session_label"][-4:].isdigit()
 
 
 def test_corpus_block_matches_direct_counts(page_conn):  # noqa: F811

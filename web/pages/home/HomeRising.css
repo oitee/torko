@@ -1,9 +1,15 @@
-/* The subjects that rose in the newest session, as a short list under the ink band. */
 
 .home-rising {
   display: flex;
   flex-direction: column;
   gap: var(--space-3);
+}
+
+.home-rising__head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 0 var(--space-3);
 }
 
 .home-rising__title {
@@ -14,47 +20,58 @@
   color: var(--ink);
 }
 
+.home-rising__session {
+  margin: 0;
+  font-size: var(--size-label);
+  color: var(--meta);
+}
+
 .home-rising__list {
   list-style: none;
   margin: 0;
   padding: 0;
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(min(100%, 300px), 1fr));
-  gap: 0 var(--space-6);
-  border-top: 1px solid var(--hairline);
-}
-
-.home-rising__item {
   display: flex;
   flex-wrap: wrap;
-  align-items: baseline;
-  justify-content: space-between;
-  gap: var(--space-1) var(--space-3);
-  min-height: 44px;
-  padding: var(--space-2) 0;
-  border-bottom: 1px solid var(--hairline);
+  gap: var(--space-2);
+}
+
+.home-rising__chip {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  min-height: 36px;
+  padding: var(--space-1) var(--space-3);
+  border: 1px solid var(--hairline);
+  border-radius: var(--radius);
+  background: var(--sheet);
+  color: var(--ink);
+  text-decoration: none;
+}
+
+.home-rising__chip:hover {
+  border-color: var(--ink);
+  color: var(--ink);
 }
 
 .home-rising__name {
-  font-size: var(--size-body);
-  line-height: var(--lh-body);
+  font-size: var(--size-label);
   font-weight: 500;
-  min-width: 0;
-  overflow-wrap: anywhere;
+}
+
+/* The arrow is ink, not green: it marks a rise in the data, not an action. */
+.home-rising__up {
+  flex: none;
+  color: var(--ink-2);
 }
 
 .home-rising__count {
   font-family: var(--font-mono);
   font-size: var(--size-count);
-  line-height: var(--lh-count);
   color: var(--ink-2);
-  white-space: nowrap;
 }
 
-.home-rising__meta {
-  margin: 0;
-  max-width: 72ch;
-  font-size: var(--size-count);
-  line-height: var(--lh-count);
-  color: var(--meta);
+@media (pointer: coarse) {
+  .home-rising__chip {
+    min-height: 44px;
+  }
 }

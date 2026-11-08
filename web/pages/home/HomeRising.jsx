@@ -1,51 +1,49 @@
 import React from "react";
 import { Link } from "react-router-dom";
-import { formatDateLong, formatNumber, ordinal } from "../../assets/js/format.js";
+import { formatNumber, ordinal } from "../../assets/js/format.js";
 import "./HomeRising.css";
 
-// The most subjects that the block shows.
-export const MAX_RISING = 5;
+export const MAX_RISING = 6;
 
-// The page of a subject. A place has its own page, and every other tag opens the tag page.
+// The page of a topic. A place has its own page, and every other tag opens the tag page.
 function subjectHref(subject) {
   return subject.type === "place" ? `/place/${subject.slug}` : `/tag/${subject.slug}`;
 }
 
-// HomeRising lists the subjects that rose in the newest session. It shows that the data is current.
-// The list is the first MAX_RISING subjects of /api/home → typical, in the order of the answer.
-// The API orders them by lift: the share of the session speeches that carry the subject,
-// divided by the share of all speeches of the term that carry it.
-export default function HomeRising({ typical, session, term, first, last }) {
+export function sessionLine(sessionLabel, term) {
+  const parts = [sessionLabel ? `${sessionLabel} session` : "", term != null ? `${ordinal(term)} Lok Sabha` : ""].filter(Boolean);
+  return parts.length ? `(${parts.join(", ")})` : "";
+}
+
+// The first MAX_RISING topics of /api/home → typical, in the order of the answer (by lift).
+// The number in brackets counts the speeches of the session that carry the topic.
+export default function HomeRising({ typical, sessionLabel, term }) {
   const list = (Array.isArray(typical) ? typical : []).slice(0, MAX_RISING);
   if (list.length === 0) return null;
+  const line = sessionLine(sessionLabel, term);
 
   return (
     <section className="home-rising" aria-labelledby="home-rising-title">
-      <h2 id="home-rising-title" className="home-rising__title">
-        Subjects that rose in the newest session
-      </h2>
+      <div className="home-rising__head">
+        <h2 id="home-rising-title" className="home-rising__title">Topics trending this session</h2>
+        {line && <p className="home-rising__session">{line}</p>}
+      </div>
       <ul className="home-rising__list">
-        {list.map((subject) => (
-          <li key={subject.slug} className="home-rising__item">
-            <Link to={subjectHref(subject)} className="home-rising__name">
-              {subject.name}
-            </Link>
-            <span className="home-rising__count">
-              {formatNumber(subject.speeches_in_session ?? subject.n)} speeches
-            </span>
-          </li>
-        ))}
+        {list.map((subject) => {
+          const n = subject.speeches_in_session ?? subject.n;
+          return (
+            <li key={subject.slug}>
+              <Link to={subjectHref(subject)} className="home-rising__chip" aria-label={`${subject.name}, trending, ${formatNumber(n)} speeches this session`}>
+                <span className="home-rising__name">{subject.name}</span>
+                <svg className="home-rising__up" viewBox="0 0 10 10" width="10" height="10" aria-hidden="true">
+                  <path d="M5 1 L9.5 8.5 L0.5 8.5 Z" fill="currentColor" />
+                </svg>
+                <span className="home-rising__count">({formatNumber(n)})</span>
+              </Link>
+            </li>
+          );
+        })}
       </ul>
-      <p className="home-rising__meta">
-        {session != null && term != null && (
-          <>
-            Newest session: session {session} of the {ordinal(term)} Lok Sabha
-            {first && last ? `, ${formatDateLong(first)} to ${formatDateLong(last)}` : ""}.{" "}
-          </>
-        )}
-        Torko ranks a subject by its share of the speeches of this session, against its share of all speeches
-        of the term. The list shows the {list.length} highest.
-      </p>
     </section>
   );
 }

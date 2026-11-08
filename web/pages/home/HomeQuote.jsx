@@ -3,7 +3,7 @@ import { Link } from "react-router-dom";
 import Button from "../../components/Button.jsx";
 import Chip from "../../components/Chip.jsx";
 import { tidyTitle } from "../../assets/js/titles.js";
-import { countOf, formatDateLong, formatNumber, termLong } from "../../assets/js/format.js";
+import { formatDateLong, termLong } from "../../assets/js/format.js";
 import "./HomeQuote.css";
 
 // The most chips that the quote shows.
@@ -68,11 +68,6 @@ export default function HomeQuote({ quote }) {
             {quote.term != null && <> · {termLong(quote.term)}</>}
             {quote.debate && <> · {tidyTitle(quote.debate)}</>}
           </span>
-          {quote.source_url && (
-            <a href={quote.source_url} className="home-quote__source-link" rel="noreferrer">
-              Source on sansad.in
-            </a>
-          )}
         </figcaption>
         {shown.length > 0 && (
           <div className="home-quote__tags">
@@ -81,15 +76,6 @@ export default function HomeQuote({ quote }) {
                 <Chip key={tag.slug} label={tag.name} href={tagHref(tag)} />
               ))}
             </div>
-            <p className="home-quote__count">
-              <span>{countOf(shown.length, tags.length, "tags of this speech")}</span>
-              {tags.length > shown.length && (
-                <>
-                  {" "}
-                  <Link to={speechPath}>See all {formatNumber(tags.length)} tags</Link>
-                </>
-              )}
-            </p>
           </div>
         )}
       </figure>

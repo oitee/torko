@@ -9,10 +9,6 @@ import HomeQuote from "./home/HomeQuote.jsx";
 import HomeTrend from "./home/HomeTrend.jsx";
 import "./home.css";
 
-// TODO before deployment: build the Data and API page.
-// Then add a "Download the data" task to the Home page.
-// The header shows only the pages that exist, so it gets the Data and API link then.
-
 // The Home page. The top band holds the search and the site figures from /api/home.
 // The parts below show what Torko can do, with the hand-checked sample from /api/home/featured.
 // The three answers load apart, so a failed answer hides only its own parts.
@@ -40,10 +36,8 @@ export default function Home() {
         {home.data && (
           <HomeRising
             typical={home.data.typical}
-            session={home.data.session}
+            sessionLabel={home.data.session_label}
             term={home.data.term}
-            first={home.data.first}
-            last={home.data.last}
           />
         )}
 

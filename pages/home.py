@@ -6,6 +6,7 @@ than its share across the whole term. A general tag has a high count in every se
 from sqlalchemy import text
 
 from pages.common import cached, slug, speech_tags_cte
+from pages.sessions import session_labels
 
 # The shared CTE, limited to the speeches of one term (:t). It reads far fewer items than the whole table.
 TERM_SPEECH_TAGS = speech_tags_cte(
@@ -102,6 +103,7 @@ def home_page(conn, args):
     return {
         "chamber": [[r[0], r[1], r[2]] for r in chamber], "lit": lit,
         "term": term, "session": session, "first": str(span[0]), "last": str(span[1]), "debates": span[2],
+        "session_label": session_labels(conn).get((term, session), {}).get("label"),
         "typical": shape_typical(rows), "corpus": corpus_figures(conn), "counts_note": COUNTS_NOTE,
     }
 
