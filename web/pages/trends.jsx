@@ -10,10 +10,10 @@ import PageLayout from "../components/PageLayout.jsx";
 import { ErrorState, Loading } from "../components/States.jsx";
 import CompareChart from "./trends/CompareChart.jsx";
 import CompareTable from "./trends/CompareTable.jsx";
-import MethodBlock from "./trends/MethodBlock.jsx";
+import MethodBlock from "../components/MethodBlock.jsx";
 import TopicRace from "./trends/TopicRace.jsx";
 import YearStrip from "./trends/YearStrip.jsx";
-import { MAX_COMPARE, addSlug, defaultCompare, displayName, headline, removeSlug, readSlugs } from "./trends/trendsData.js";
+import { MAX_COMPARE, addSlug, defaultCompare, displayName, headline, removeSlug, readSlugs, shortName } from "./trends/trendsData.js";
 import "./trends.css";
 
 // Hand-picked starting points for Compare. They only fill the chart. They do not rank anything.
@@ -23,7 +23,6 @@ const EXAMPLES = [
   { label: "WTO and Atmanirbhar Bharat", slugs: "world-trade-organisation-wto,atmanirbhar-bharat" },
 ];
 
-// The box that finds a tag or place to compare.
 function SubjectPicker({ onAdd, full }) {
   const [text, setText] = useState("");
   const [rows, setRows] = useState([]);
@@ -70,8 +69,7 @@ function SubjectPicker({ onAdd, full }) {
   );
 }
 
-// The Trends page: which subjects stood out in each year, and a chart to compare subjects over the years.
-// The address keeps the state: compare (subjects), measure, month and view of the race.
+// The address keeps the state: compare (subjects), measure, and month of the race.
 // A list "compare=" with no subject means the reader cleared the chart. No "compare" at all means the first, ruled choice.
 export default function Trends() {
   const [searchParams, setSearchParams] = useSearchParams();
@@ -80,7 +78,6 @@ export default function Trends() {
   const closeRef = useRef(null);
   const measure = searchParams.get("measure") === "count" ? "count" : "share";
   const raceMonth = searchParams.get("month");
-  const raceView = searchParams.get("view") === "lines" ? "lines" : "bars";
   const { data, loading, error, retry } = useAnswer("/api/trends");
   const chosen = searchParams.has("compare");
   const fallback = !chosen && data ? defaultCompare(data.years) : { slugs: [], years: [] };
@@ -103,7 +100,6 @@ export default function Trends() {
     return () => window.removeEventListener("keydown", onKey);
   }, [sheetOpen]);
 
-  // Write some values of the address. A null value removes the key. The page does not scroll.
   const patch = (values) => {
     setSearchParams((prev) => {
       const next = new URLSearchParams(prev);
@@ -115,7 +111,7 @@ export default function Trends() {
     }, { replace: true, preventScrollReset: true });
   };
   const setCompare = (list) => patch({ compare: list.length ? list.join(",") : "" });
-  const setRace = ({ month, view }) => patch({ ...(month !== undefined ? { month } : {}), ...(view !== undefined ? { view } : {}) });
+  const setRace = ({ month }) => patch({ month });
   const setMeasure = (v) => patch({ measure: v === "count" ? "count" : null });
   // A click in the list of years only adds the subject. The tray and the chart show it. The page does not scroll.
   const addFromTimeline = (slug) => setCompare(addSlug(slugs, slug));
@@ -131,7 +127,7 @@ export default function Trends() {
       {top && (
         <p className="trends-head__lede">
           In {top.year}, {top.phrase} tagged speeches in the Lok Sabha {top.phrase.startsWith("one") ? "was" : "were"} about{" "}
-          <Link className="trends-head__subject" to={`/tag/${top.slug}`}>{displayName(top.name)}</Link>
+          <Link className="trends-head__subject" to={`/tag/${top.slug}`} title={displayName(top.name)}>{shortName(top.name)}</Link>
         </p>
       )}
     </div>
@@ -153,7 +149,7 @@ export default function Trends() {
           <div className="trends-race__head">
             <h2 id="trends-race-title" className="trends-section-title">Rise and fall of topics discussed</h2>
           </div>
-          <TopicRace month={raceMonth} view={raceView} onChange={setRace} />
+          <TopicRace month={raceMonth} onChange={setRace} />
         </section>
 
         <section className="trends-years" aria-labelledby="trends-years-title">

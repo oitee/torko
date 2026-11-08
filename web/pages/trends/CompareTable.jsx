@@ -1,22 +1,7 @@
 import React from "react";
 import { formatNumber } from "../../assets/js/format.js";
-import { displayName, downloadCsv, fmtShare, yearRates } from "./trendsData.js";
-import Button from "../../components/Button.jsx";
+import { displayName, fmtShare, yearRates } from "./trendsData.js";
 
-// The rows of the table, and of the CSV file: a year, its tagged speeches, and a share and a count for each subject.
-export function compareRows(series) {
-  const lines = series.map((s) => yearRates(s.years));
-  const head = ["Year", "Tagged speeches"];
-  series.forEach((s) => head.push(`${displayName(s.name)} share (%)`, `${displayName(s.name)} speeches`));
-  const body = lines[0].map((p, j) => {
-    const row = [p.year, p.tagged];
-    lines.forEach((l) => row.push(l[j].rate === null ? "" : l[j].rate.toFixed(2), l[j].n));
-    return row;
-  });
-  return [head, ...body];
-}
-
-// The numbers of the chart as a table, with a file to download.
 export default function CompareTable({ series }) {
   const lines = series.map((s) => yearRates(s.years));
   return (
@@ -52,7 +37,6 @@ export default function CompareTable({ series }) {
           </tbody>
         </table>
       </div>
-      <Button variant="text" onClick={() => downloadCsv("torko-compare-subjects.csv", compareRows(series))}>Download CSV</Button>
     </div>
   );
 }

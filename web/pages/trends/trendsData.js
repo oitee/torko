@@ -1,4 +1,3 @@
-// The pure rules of the Trends page.
 export const MAX_COMPARE = 4;
 
 export function readSlugs(value) {
@@ -104,23 +103,11 @@ export function defaultCompare(years, minTagged = HEADLINE_MIN_TAGGED) {
   return { slugs, years: used };
 }
 
-// Make the text of a CSV file from rows (arrays). A cell with a comma, a quote or a line break gets quotes.
-export function toCsv(rows) {
-  const cell = (v) => {
-    const t = v === null || v === undefined ? "" : String(v);
-    return /[",\n]/.test(t) ? `"${t.replace(/"/g, '""')}"` : t;
-  };
-  return rows.map((r) => r.map(cell).join(",")).join("\n");
-}
-
-// Start the download of a CSV text in the browser.
-export function downloadCsv(filename, rows) {
-  const url = URL.createObjectURL(new Blob([toCsv(rows)], { type: "text/csv;charset=utf-8" }));
-  const a = document.createElement("a");
-  a.href = url;
-  a.download = filename;
-  document.body.appendChild(a);
-  a.click();
-  a.remove();
-  URL.revokeObjectURL(url);
+// A short form of a tag name for a sentence. Rule: a name that ends in an abbreviation in brackets
+// (2 to 12 characters with at least two capital letters together) shows only that abbreviation.
+// "Novel Coronavirus (COVID-19)" becomes "COVID-19". "Seat (Bihar)" and "Scheme (Ayushman Bharat)" stay whole.
+export function shortName(name) {
+  const full = displayName(name);
+  const m = full.match(/^.{8,}\s\(([^()]{2,12})\)$/);
+  return m && /[A-Z]{2,}/.test(m[1]) ? m[1] : full;
 }

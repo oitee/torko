@@ -1,10 +1,9 @@
-/* Trends page styles. Every colour, font, size and space comes from tokens.css. */
 .trends-head { display: flex; flex-direction: column; gap: var(--space-3); }
 .trends-head__title { margin: var(--space-6) 0 0; }
 .trends-head__subject { color: var(--action); text-decoration: underline; text-underline-offset: 4px; text-decoration-thickness: 1px; }
 .trends-head__subject:hover { color: var(--action-hover); }
 .trends-head__subject:focus-visible { outline: 2px solid var(--action); outline-offset: 2px; }
-.trends-head__lede { margin: 0; max-width: 62ch; font-size: var(--size-speech); line-height: 1.55; color: var(--ink); }
+.trends-head__lede { margin: 0; max-width: 72ch; font-size: var(--size-speech); line-height: 1.55; color: var(--ink); }
 .trends-body { display: flex; flex-direction: column; gap: var(--space-10); }
 .trends-section-title { margin: 0; font-size: var(--size-title); line-height: var(--lh-title); font-weight: 600; color: var(--ink); }
 
@@ -63,7 +62,6 @@
 
 .trends-years { display: flex; flex-direction: column; gap: var(--space-3); }
 
-/* The method control under a chart */
 
 @media (min-width: 1024px) {
   .trends-body { display: grid; grid-template-columns: minmax(0, 5fr) minmax(0, 6fr); gap: var(--space-8); align-items: start; }
@@ -82,7 +80,6 @@
   .trends-compare--sheet .trends-compare__close { display: inline-flex; align-items: center; }
 }
 
-/* The years, told in order */
 .trends-years__note { margin: 0; max-width: 60ch; font-size: var(--size-label); color: var(--ink-2); }
 .year-strip { margin: 0; padding: 0; list-style: none; border-top: 1px solid var(--ink); }
 .year-strip__year { display: grid; grid-template-columns: 6.5rem minmax(0, 1fr); gap: var(--space-4); padding: var(--space-4) 0 var(--space-5); border-bottom: 1px solid var(--hairline); scroll-margin-top: var(--space-4); }
@@ -134,13 +131,11 @@
   .trends-measure__option { min-height: 44px; }
 }
 
-/* The race of subjects, month by month */
 .trends-race { display: flex; flex-direction: column; gap: var(--space-4); grid-column: 1 / -1; }
-.race { display: flex; flex-direction: column; gap: var(--space-3); }
-.race__foot { display: flex; flex-wrap: wrap; align-items: center; gap: var(--space-1) var(--space-4); }
+.race { display: flex; flex-direction: column; gap: var(--space-2); }
+.race__foot { display: flex; flex-wrap: wrap; align-items: center; gap: 0 var(--space-4); margin-left: calc(-1 * var(--space-2)); }
 .race-bars__name:hover { text-decoration: underline; }
 .race-bars__name:focus-visible { outline: 2px solid var(--action); outline-offset: 2px; }
-.race-lines-box { width: 100%; min-width: 0; }
 
 .race-bars-box { --race-row: 3.25rem; --race-value-w: 4rem; --race-name-w: 16rem; }
 .race-bars__unit { margin: 0 0 var(--space-1); font-family: var(--font-mono); font-size: var(--size-count); line-height: var(--lh-count); color: var(--meta); }
@@ -157,15 +152,6 @@
 .race-axis__area { position: relative; height: 1.5rem; margin-left: calc(var(--race-name-w) + var(--space-3)); margin-right: var(--race-value-w); }
 .race-axis__tick { position: absolute; top: var(--space-1); transform: translateX(-50%); font-family: var(--font-mono); font-size: var(--size-count); color: var(--meta); }
 
-.race-lines { display: block; max-width: 100%; }
-.race-lines__line polyline { fill: none; stroke: var(--control); stroke-width: 1.5; }
-.race-lines__line circle { fill: var(--control); }
-.race-lines__line--lead polyline { stroke: var(--ink); stroke-width: 2.5; }
-.race-lines__line--lead circle { fill: var(--ink); }
-.race-lines__leader { stroke: var(--hairline); }
-.race-lines__label { font-family: var(--font-sans); font-size: var(--size-count); fill: var(--ink-2); }
-.race-lines__line--lead .race-lines__label { fill: var(--ink); font-weight: 600; }
-.race-lines__value { font-family: var(--font-mono); font-size: var(--size-count); fill: var(--meta); font-weight: 400; }
 
 @media (prefers-reduced-motion: no-preference) {
   .race-bars__row { transition: transform 600ms ease-in-out; }
@@ -183,10 +169,7 @@
 }
 
 
-/* The play button is an icon of the size of a touch target. */
 .race-bars__unit { margin: var(--space-2) 0 0; }
-.race-lines__link { cursor: pointer; }
-.race-lines__link:hover .race-lines__label { text-decoration: underline; }
 
 /* The stage holds the chart and the month. The month is large and quiet in the lower right corner,
    as in a bar chart race, so it needs no row of its own. */
@@ -196,7 +179,6 @@
   letter-spacing: -0.02em; color: var(--meta); opacity: 0.55; font-variant-numeric: tabular-nums; }
 .race-bars, .race-axis { position: relative; z-index: 1; }
 
-/* The timeline: a small play button and a thin track with the years under it. */
 .race__timeline { display: flex; align-items: flex-start; gap: var(--space-3); margin-top: var(--space-2); }
 .race__play { flex: none; display: inline-flex; align-items: center; justify-content: center; width: 36px; height: 36px;
   border: 1px solid var(--control); border-radius: var(--radius); background: var(--sheet); color: var(--ink); cursor: pointer; }
@@ -221,3 +203,9 @@
 @media (max-width: 639px) {
   .race__month { position: static; display: block; margin: 0 0 var(--space-2); font-size: var(--size-title); opacity: 1; color: var(--ink-2); }
 }
+
+.race__panel { padding: var(--space-4) var(--space-4) var(--space-2); background: var(--sheet); border: 1px solid var(--hairline); }
+.race__panel .race__timeline { margin-top: var(--space-1); }
+.race__panel .race__track { padding-bottom: 0.75rem; }
+.race-bars__unit { margin-top: var(--space-1); }
+.race__month { right: var(--space-2); }

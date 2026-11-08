@@ -35,7 +35,7 @@ describe("yearLabels", () => {
   });
 });
 
-describe("displayName, defaultCompare and toCsv", () => {
+describe("displayName and defaultCompare", () => {
   it("tidies tag names from the stored data for display only", async () => {
     const { displayName } = await import("../pages/trends/trendsData.js");
     expect(displayName("Novel Coronavirus (COVID -19)")).toBe("Novel Coronavirus (COVID-19)");
@@ -55,9 +55,29 @@ describe("displayName, defaultCompare and toCsv", () => {
     ];
     expect(defaultCompare(years)).toEqual({ slugs: ["jal-jeevan", "ayushman"], years: [2025, 2024] });
   });
+});
 
-  it("quotes a CSV cell that holds a comma or a quote", async () => {
-    const { toCsv } = await import("../pages/trends/trendsData.js");
-    expect(toCsv([["name", "n"], ['Bills, "pending"', 3]])).toBe('name,n\n"Bills, ""pending""",3');
+describe("shortName", () => {
+  it("shows only the abbreviation in brackets, when it is an acronym", async () => {
+    const { shortName } = await import("../pages/trends/trendsData.js");
+    expect(shortName("Novel Coronavirus (COVID -19)")).toBe("COVID-19");
+    expect(shortName("Goods and Services Tax (GST)")).toBe("GST");
+    expect(shortName("National Health Protection Scheme (Ayushman Bharat)")).toBe("National Health Protection Scheme (Ayushman Bharat)");
+    expect(shortName("Maharajganj (Bihar)")).toBe("Maharajganj (Bihar)");
+    expect(shortName("Women")).toBe("Women");
+  });
+});
+
+describe("canAutoplay", () => {
+  it("never starts the race when the address names a month or the system asks for reduced motion", async () => {
+    const { canAutoplay } = await import("../pages/trends/TopicRace.jsx");
+    expect(canAutoplay("2016-12")).toBe(false);
+    const old = window.matchMedia;
+    globalThis.IntersectionObserver = globalThis.IntersectionObserver || class { observe() {} disconnect() {} };
+    window.matchMedia = (q) => ({ matches: q.includes("reduce") });
+    expect(canAutoplay(null)).toBe(false);
+    window.matchMedia = () => ({ matches: false });
+    expect(canAutoplay(null)).toBe(true);
+    window.matchMedia = old;
   });
 });
