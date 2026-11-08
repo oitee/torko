@@ -89,7 +89,7 @@ describe("Home page", () => {
     mockAnswers();
     renderHome();
     const link = await screen.findByRole("link", { name: /turns read from the debates/ });
-    expect(link.getAttribute("href")).toBe("/method#read");
+    expect(link.getAttribute("href")).toBe("/method");
   });
 
   it("keeps the text of the Method part when the Method answer fails", async () => {

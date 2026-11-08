@@ -16,36 +16,33 @@ export function methodRows(method) {
   return [
     turns?.total != null && {
       key: "read",
-      href: "/method#read",
+      href: "/method",
       value: formatNumber(turns.total),
       label: "turns read from the debates",
     },
     turns?.member != null &&
       oneSpeaker != null && {
         key: "who",
-        href: "/method#who",
+        href: "/method",
         value: formatNumber(turns.member),
         label: `of ${formatNumber(oneSpeaker)} turns of one speaker have a member name`,
       },
     speeches?.total != null && {
       key: "join",
-      href: "/method#join",
+      href: "/method",
       value: formatNumber(speeches.total),
       label: "speeches, joined from the turns",
     },
     speeches?.with_tag != null &&
       speeches?.eligible != null && {
         key: "subjects",
-        href: "/method#subjects",
+        href: "/method",
         value: formatNumber(speeches.with_tag),
         label: `of ${formatNumber(speeches.eligible)} speeches of ${minWords} words or more have a tag`,
       },
   ].filter(Boolean);
 }
 
-// HomeMethod is the last block of the Home page: the text of the link to the Method page,
-// and a card with the real counts of the steps. The counts come from /api/method.
-// Without the answer the block shows the text alone.
 export default function HomeMethod({ method, loading }) {
   const rows = methodRows(method);
 

@@ -52,7 +52,7 @@ export default function HomeQuote({ quote }) {
         </p>
         <div className="home-feature__action">
           <Button variant="text" href={speechPath} className="home-feature__stretch">
-            Read the full speech by {quote.member} ({formatDateLong(quote.date)})
+            Read the full speech by {quote.member}
           </Button>
         </div>
       </div>

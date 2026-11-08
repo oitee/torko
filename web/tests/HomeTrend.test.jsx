@@ -2,7 +2,8 @@ import React from "react";
 import { cleanup, fireEvent, render, screen } from "@testing-library/react";
 import { afterEach, describe, expect, it } from "vitest";
 import { MemoryRouter } from "react-router-dom";
-import HomeTrend, { yearShares } from "../pages/home/HomeTrend.jsx";
+import HomeTrend from "../pages/home/HomeTrend.jsx";
+import { yearSeries } from "../assets/js/years.js";
 import featuredAnswer from "./fixtures/home/home_featured.json";
 
 afterEach(cleanup);
@@ -17,20 +18,20 @@ function renderTrend(t) {
   );
 }
 
-describe("yearShares", () => {
+describe("yearSeries", () => {
   it("divides the speeches with the tag by the tagged speeches of the year", () => {
-    const shares = yearShares(trend.years);
+    const shares = yearSeries(trend.years);
     const y2014 = shares.find((d) => d.year === 2014);
     expect(y2014.rate).toBeCloseTo(21 / 4973);
     expect(shares).toHaveLength(trend.years.length);
   });
 
   it("gives a share of 0 to a year with no tagged speech", () => {
-    expect(yearShares([{ year: 2000, n: 3, tagged: 0 }])[0].rate).toBe(0);
+    expect(yearSeries([{ year: 2000, n: 3, tagged: 0 }])[0].rate).toBe(0);
   });
 
   it("sorts the years", () => {
-    const shares = yearShares([{ year: 2002, n: 1, tagged: 2 }, { year: 2001, n: 1, tagged: 2 }]);
+    const shares = yearSeries([{ year: 2002, n: 1, tagged: 2 }, { year: 2001, n: 1, tagged: 2 }]);
     expect(shares.map((d) => d.year)).toEqual([2001, 2002]);
   });
 });
@@ -78,7 +79,7 @@ describe("HomeTrend", () => {
   it("states the total and links to the tag", () => {
     renderTrend(trend);
     expect(screen.getByText("205 speeches carry the tag Arrears in all years.")).toBeTruthy();
-    expect(screen.getByRole("link", { name: "Open the tag Arrears and read its speeches" }).getAttribute("href")).toBe("/tag/arrears");
+    expect(screen.getByRole("link", { name: "Read the speeches tagged under Arrears" }).getAttribute("href")).toBe("/tag/arrears");
   });
 
   it("rests on the highest year without the word peak, and labels the middle year of the axis", () => {

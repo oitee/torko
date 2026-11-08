@@ -35,7 +35,8 @@ describe("HomeMethod", () => {
   it("links each row to its step on the Method page", () => {
     renderMethod({ method: methodAnswer });
     const hrefs = screen.getAllByRole("link").map((a) => a.getAttribute("href"));
-    expect(hrefs).toEqual(["/method", "/method#read", "/method#who", "/method#join", "/method#subjects"]);
+    // The Method page has no section anchors, so every row opens the page itself.
+    expect(hrefs).toEqual(["/method", "/method", "/method", "/method", "/method"]);
   });
 
   it("shows the text and the link alone when the answer is missing", () => {

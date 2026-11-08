@@ -71,7 +71,7 @@ describe("HomeQuote", () => {
   it("links to the whole speech", () => {
     renderQuote(quote);
     expect(
-      screen.getByRole("link", { name: "Read the full speech by Mahua Moitra (17 Dec 2025)" }).getAttribute("href")
+      screen.getByRole("link", { name: "Read the full speech by Mahua Moitra" }).getAttribute("href")
     ).toBe("/speech/178379");
   });
 

@@ -2,22 +2,8 @@ import React, { useState } from "react";
 import BarTip from "../../components/BarTip.jsx";
 import Button from "../../components/Button.jsx";
 import { formatNumber, shareOf } from "../../assets/js/format.js";
+import { peakYear, yearSeries } from "../../assets/js/years.js";
 import "./HomeTrend.css";
-
-// The share of each year: speeches with the tag, out of all speeches with a kept tag in that year.
-// The number of tagged speeches changes from year to year, so a raw count would show the size of the year, not the subject.
-// A year with no tagged speech has a share of 0.
-export function yearShares(years) {
-  const list = Array.isArray(years) ? years : [];
-  return list
-    .map((y) => {
-      const n = Number(y.n) || 0;
-      const tagged = Number(y.tagged) || 0;
-      return { year: Number(y.year), n, tagged, rate: tagged > 0 ? n / tagged : 0 };
-    })
-    .filter((y) => !Number.isNaN(y.year))
-    .sort((a, b) => a.year - b.year);
-}
 
 // HomeTrend shows when one subject rose and fell, as a bar for each year.
 // The trend comes from /api/home/featured → trend.
@@ -27,21 +13,19 @@ export default function HomeTrend({ trend }) {
 
   if (!trend) return null;
 
-  const data = yearShares(trend.years);
+  const data = yearSeries(trend.years);
   if (data.length === 0) return null;
 
   const maxRate = Math.max(...data.map((d) => d.rate)) || 1;
-  const peak = data.find((d) => d.rate === maxRate);
+  const peak = peakYear(data, (d) => d.rate);
   const first = data[0].year;
   const last = data[data.length - 1].year;
-  // One bar is green: the year under the pointer or the finger, else the highest year. Only a year under the pointer or the finger shows a pop-up.
+  // One bar is green: the year under the pointer or the finger, else the highest year. Only the first has a pop-up.
   // The list of years is built again on each render, so the active year is found by its year, not by the object.
   const hovered = (active && data.find((d) => d.year === active.year)) || null;
   const shown = hovered || peak;
-  // The tick in the middle of the axis is the year in the middle of the range.
   const middle = Math.round((first + last) / 2);
 
-  // A finger that drags over the bars picks the year under it.
   const pickAt = (event) => {
     const touch = event.touches?.[0];
     if (!touch) return;
@@ -62,7 +46,7 @@ export default function HomeTrend({ trend }) {
         </p>
         <div className="home-feature__action">
           <Button variant="text" href={`/tag/${trend.slug}`} className="home-feature__stretch">
-            Open the tag {trend.name} and read its speeches
+            Read the speeches tagged under {trend.name}
           </Button>
         </div>
       </div>
