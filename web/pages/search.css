@@ -695,18 +695,6 @@ a.search-matches__name:hover {
   outline: none;
 }
 
-/* A later row of the same debate shows a short line in the meta size, not the title. */
-.search-row__debate--same {
-  display: inline;
-  font-family: var(--font-mono);
-  font-size: var(--size-count);
-  line-height: var(--lh-count);
-  font-weight: 400;
-  color: var(--meta);
-  text-decoration: underline;
-  text-underline-offset: 3px;
-}
-
 .search-row__tags {
   display: flex;
   flex-wrap: wrap;
@@ -1125,11 +1113,15 @@ a.search-pager__num:hover {
   accent-color: var(--ink);
 }
 
-/* The bar for waiting changes stays in view while the panel scrolls. */
+/* The bar for waiting changes is fixed to the bottom of the window, so it shows at once wherever the box is.
+   The panel scrolls on its own, and at the top of the page its bottom edge is below the window.
+   On a wide screen the bar has the width of the panel and sits under it. */
 .search-apply {
-  position: sticky;
+  position: fixed;
   bottom: var(--space-4);
-  z-index: 5;
+  left: var(--page-pad);
+  right: var(--page-pad);
+  z-index: 30;
   display: flex;
   flex-direction: column;
   gap: var(--space-2);
@@ -1142,6 +1134,14 @@ a.search-pager__num:hover {
 .search-apply__text {
   font-size: var(--size-label);
   color: var(--ink-2);
+}
+
+@media (min-width: 1024px) {
+  .search-apply {
+    right: auto;
+    width: 276px;
+    left: max(var(--page-pad), calc((100vw - var(--page-max)) / 2 + var(--page-pad)));
+  }
 }
 
 .search-apply__actions {
