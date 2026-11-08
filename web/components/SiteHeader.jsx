@@ -7,7 +7,6 @@ import "./SiteHeader.css";
 // The main pages, in the order of the header. Each item is active on its path and on the paths under it.
 export const NAV_ITEMS = [
   { to: "/search", label: "Search" },
-  { to: "/my-mp", label: "Your MP" },
   { to: "/trends", label: "Trends" },
   { to: "/parties", label: "Parties" },
   { to: "/method", label: "Method" },
@@ -30,13 +29,11 @@ function NavLinks({ pathname, onPick }) {
   });
 }
 
-// The SiteHeader component renders the top navigation band: the logo, the main pages and the theme switch.
-// On a phone the links do not fit in one row. A Menu button then opens them as a list under the band.
+// On a phone the links do not fit in one row, so a Menu button opens them as a list under the band.
 export default function SiteHeader({ theme = "system", onThemeChange, setTheme }) {
   const { pathname } = useLocation();
   const [menuOpen, setMenuOpen] = useState(false);
 
-  // A new page closes the menu.
   useEffect(() => setMenuOpen(false), [pathname]);
 
   const handleThemeChange = (next) => {

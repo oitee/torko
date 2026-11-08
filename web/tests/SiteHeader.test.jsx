@@ -19,7 +19,7 @@ describe("SiteHeader", () => {
     expect(searchLink.getAttribute("href")).toBe("/search");
     expect(searchLink.getAttribute("aria-current")).toBeNull();
     expect(screen.getByRole("link", { name: "Method" }).getAttribute("href")).toBe("/method");
-    expect(screen.getByRole("link", { name: "Your MP" }).getAttribute("href")).toBe("/my-mp");
+    expect(screen.queryByRole("link", { name: "Your MP" })).toBeNull();
     expect(screen.getByRole("link", { name: "Skip to the content" }).getAttribute("href")).toBe("#main");
   });
 
@@ -33,7 +33,7 @@ describe("SiteHeader", () => {
     expect(button.getAttribute("aria-expanded")).toBe("false");
     fireEvent.click(button);
     const menu = screen.getByRole("navigation", { name: "Menu" });
-    expect(menu.querySelectorAll("a")).toHaveLength(5);
+    expect(menu.querySelectorAll("a")).toHaveLength(4);
     expect(menu.querySelector('a[aria-current="page"]').textContent).toBe("Trends");
     fireEvent.click(screen.getByRole("button", { name: "Close" }));
     expect(screen.queryByRole("navigation", { name: "Menu" })).toBeNull();

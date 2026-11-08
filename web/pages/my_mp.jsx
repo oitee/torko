@@ -120,7 +120,6 @@ export default function MyMp() {
     </div>
   );
 
-  // A word after a comma keeps only the seats of a state that starts with it.
   const allSeats = result?.seats || [];
   const seatState = (x) => x.current?.[0]?.state || x.older?.[0]?.state || "";
   const seats = stateWords
@@ -140,10 +139,7 @@ export default function MyMp() {
           <li>Pick a seat from the list, or press the button.</li>
           <li>Read who speaks for the seat now, and what they speak about.</li>
         </ol>
-        <p className="my-mp-start__note">
-          A seat can have a different name from the town. The <Link to="/places">Places page</Link> lists every seat of each
-          state.
-        </p>
+        <p className="my-mp-start__note">A seat can have a different name from the town.</p>
         {featured.length > 0 && (
           <>
             <h3 className="my-mp-start__sub">Example seats</h3>
@@ -172,7 +168,7 @@ export default function MyMp() {
     body = (
       <EmptyState>
         No Lok Sabha seat has “{seatWords}” in its name{stateWords ? ` in a state that starts with “${stateWords}”` : ""}. Check
-        the spelling, or type a part of the name. You can also look in the list of <Link to="/places">places</Link>, or{" "}
+        the spelling, or type a part of the name. You can also{" "}
         <Link to={`/search?q=${encodeURIComponent(seatWords)}`}>search the speeches</Link>.
       </EmptyState>
     );

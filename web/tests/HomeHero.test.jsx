@@ -73,10 +73,9 @@ describe("HomeHero", () => {
     expect(container.querySelector(".home-hero__lede").textContent).toContain("sansad.in from 20 Oct 1999 to 18 Apr 2026.");
   });
 
-  it("links to the page that finds an MP, in the text and on the marked seat", () => {
+  it("has no link to Your MP until the page can find a seat from a PIN code", () => {
     renderHero({ corpus: homeAnswer.corpus });
-    expect(screen.getByRole("link", { name: "Find your MP by the name of your seat" }).getAttribute("href")).toBe("/my-mp");
-    expect(screen.getByRole("link", { name: "Find your MP: the marked seat" }).getAttribute("href")).toBe("/my-mp");
+    expect(screen.queryByRole("link", { name: /Find your MP/ })).toBeNull();
   });
 
   it("groups the search ideas by kind", () => {

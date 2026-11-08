@@ -1,5 +1,4 @@
 import React from "react";
-import { Link } from "react-router-dom";
 import Chip from "../../components/Chip.jsx";
 import SearchBox from "../../components/SearchBox.jsx";
 import { ErrorState, Loading } from "../../components/States.jsx";
@@ -72,9 +71,6 @@ export default function HomeHero({ corpus, corpusError, onRetryCorpus, ideas }) 
           </p>
           <div className="home-hero__search">
             <SearchBox />
-            <Link to="/my-mp" className="home-hero__find">
-              Find your MP by the name of your seat
-            </Link>
           </div>
           {groups.length > 0 && (
             <div className="home-hero__ideas">
@@ -92,7 +88,7 @@ export default function HomeHero({ corpus, corpusError, onRetryCorpus, ideas }) 
             </div>
           )}
         </div>
-        <HouseSeats markedHref="/my-mp" markedLabel="Find your MP: the marked seat" />
+        <HouseSeats />
       </div>
 
       {corpus ? (

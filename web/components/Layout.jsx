@@ -41,7 +41,6 @@ export default function Layout() {
             <Link to="/search">Search</Link>
             <Link to="/trends">Trends</Link>
             <Link to="/parties">Parties</Link>
-            <Link to="/places">Places</Link>
             <Link to="/method">Method</Link>
           </nav>
           <p className="site-footer__source">

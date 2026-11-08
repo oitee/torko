@@ -6,8 +6,6 @@ import Place from "../pages/place.jsx";
 import {
   formatMonthYear,
   formatSpan,
-  getKindLabel,
-  getStateFromDescription,
 } from "../pages/place/PlaceHead.jsx";
 import { tickYears } from "../pages/place/PlaceWhen.jsx";
 import * as api from "../assets/js/api.js";
@@ -190,29 +188,6 @@ describe("Place page helper functions", () => {
     expect(formatSpan(null, null)).toBe("–");
   });
 
-  it("extracts state from description only if it has 'in '", () => {
-    expect(
-      getStateFromDescription(
-        "District and Lok Sabha constituency in Maharashtra, India.",
-        "district_constituency"
-      )
-    ).toBe("Maharashtra");
-
-    expect(
-      getStateFromDescription("State in eastern India", "state")
-    ).toBeNull();
-
-    expect(
-      getStateFromDescription("A place with no state info", "district")
-    ).toBeNull();
-  });
-
-  it("formats kind label from subtype", () => {
-    expect(getKindLabel("district_constituency")).toBe("Seat and district");
-    expect(getKindLabel("state")).toBe("State");
-    expect(getKindLabel("district")).toBe("District");
-    expect(getKindLabel("constituency")).toBe("Seat");
-  });
 });
 
 describe("Place page integration", () => {
@@ -244,7 +219,8 @@ describe("Place page integration", () => {
     await waitFor(() => expect(document.title).toBe("Latur · Torko"));
 
     // Breadcrumb
-    expect(screen.getByRole("link", { name: "Places" }).getAttribute("href")).toBe("/places");
+    // No page links to the Places index for now (owner, 2026-11-08).
+    expect(screen.queryByRole("link", { name: "Places" })).toBeNull();
     expect(screen.getByRole("link", { name: "Maharashtra" }).getAttribute("href")).toBe("/place/maharashtra");
 
     // Heading & Description

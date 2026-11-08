@@ -2,17 +2,14 @@ import React, { useState } from "react";
 import { Link } from "react-router-dom";
 import Button from "../../components/Button.jsx";
 import Chip from "../../components/Chip.jsx";
-import { formatDateLong, formatNumber, termShort } from "../../assets/js/format.js";
+import { formatDateLong, formatNumber, termShort, termYears as yearsOfTerm } from "../../assets/js/format.js";
 import PartyLink from "../../components/PartyLink.jsx";
 
 const OLDER_SHOWN = 10;
 
-// The years of each Lok Sabha term. The last term has no end year yet.
-const TERM_YEARS = { 13: "1999–2004", 14: "2004–09", 15: "2009–14", 16: "2014–19", 17: "2019–24", 18: "2024–" };
-
 // The years of the terms of a member, for example "2014–19, 2019–24". A term with no known years is left out.
 export function termYears(terms) {
-  return (Array.isArray(terms) ? terms : []).map((t) => TERM_YEARS[t]).filter(Boolean).join(", ");
+  return (Array.isArray(terms) ? terms : []).map(yearsOfTerm).filter(Boolean).join(", ");
 }
 
 // One sentence about how often the member spoke, for example "Spoke 22 times in all terms. Latest speech 29 Jan 2026."
@@ -30,7 +27,6 @@ export function termsText(terms) {
 }
 
 // SeatCard shows one seat: the current member with the subjects of most of their speeches, then the older members.
-// The seat name links to the Place page when the API says the seat has one.
 export default function SeatCard({ seat, latestTerm }) {
   const [showAll, setShowAll] = useState(false);
   const current = Array.isArray(seat.current) ? seat.current : [];
@@ -43,7 +39,7 @@ export default function SeatCard({ seat, latestTerm }) {
     <section className="my-mp-seat" aria-labelledby={headingId}>
       <div className="section-header">
         <h2 id={headingId} className="my-mp-seat__title">
-          {seat.place_page ? <Link to={`/place/${seat.slug}`}>{seat.seat}</Link> : seat.seat}
+          {seat.seat}
         </h2>
         {state && <span className="my-mp-seat__meta mono">{state}</span>}
       </div>

@@ -95,7 +95,8 @@ describe("Your MP page", () => {
     expect(await screen.findByRole("heading", { level: 2, name: "Latur" })).toBeTruthy();
     expect(api.getJSON).toHaveBeenCalledWith("/api/my-mp", { q: "latur" }, { signal: expect.any(AbortSignal) });
     expect(screen.getByText("Found 1 seat: Latur, Maharashtra.")).toBeTruthy();
-    expect(screen.getByRole("link", { name: "Latur" }).getAttribute("href")).toBe("/place/latur");
+    // The seat name is plain text: Your MP does not link to the place pages for now (owner, 2026-11-08).
+    expect(screen.queryByRole("link", { name: "Latur" })).toBeNull();
     expect(screen.getByText("Spoke 22 times in all terms. Latest speech 29 Jan 2026.")).toBeTruthy();
     expect(screen.getByRole("link", { name: "Shivaji Bandappa Kalge" }).getAttribute("href")).toBe("/member/699");
     expect(screen.getAllByRole("link", { name: "INC" })[0].getAttribute("href")).toBe("/party/INC");

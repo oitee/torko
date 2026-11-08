@@ -38,46 +38,12 @@ export function formatSpan(first, last) {
   return d1 || d2 || "–";
 }
 
-// Extract state from description when it says " in <State>".
-export function getStateFromDescription(description, subtype) {
-  if (subtype === "state" || !description) return null;
-  const match = description.match(/\bin\s+([^,.]+)/i);
-  if (!match) return null;
-  const raw = match[1].trim();
-  if (raw.toLowerCase() === "india" || raw.toLowerCase().includes("india")) {
-    return null;
-  }
-  return raw;
-}
-
-// Human-readable place kind label from subtype.
-export function getKindLabel(subtype) {
-  if (!subtype) return "Place";
-  switch (subtype.toLowerCase()) {
-    case "district_constituency":
-      return "Seat and district";
-    case "state":
-      return "State";
-    case "district":
-      return "District";
-    case "constituency":
-    case "seat":
-      return "Seat";
-    case "city":
-      return "City";
-    default:
-      return subtype.replace(/_/g, " ").replace(/^\w/, (c) => c.toUpperCase());
-  }
-}
-
 // PlaceHead renders breadcrumbs, title, description, aliases, and four big numbers.
 export default function PlaceHead({ place }) {
   if (!place) return null;
 
-  // The API gives the state of the seat. The page does not read it from the description.
   const state = place.state && place.state.name ? place.state : null;
   const breadcrumbItems = [
-    { label: "Places", href: "/places" },
     ...(state ? [{ label: state.name, href: state.page ? `/place/${state.slug}` : undefined }] : []),
     { label: place.name },
   ];
