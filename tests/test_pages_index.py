@@ -26,3 +26,19 @@ def test_places_page_real(page_conn):
     featured = d["featured"]
     assert len(featured) == 5 and all(f["page"] for f in featured)
     assert [f["speeches"] for f in featured] == sorted((f["speeches"] for f in featured), reverse=True)
+
+
+def test_party_weights_real(page_conn):
+    d = parties.parties_page(page_conn, {})
+    w = d["weights"]
+    assert [s["code"] for s in w["series"]] == [r["code"] for r in d["parties"][: parties.WEIGHT_PARTIES]]
+    # A weight is the speeches for each member of the party, against the same for the House, in that term.
+    house = {t["term"]: t for t in w["terms"]}
+    for s in w["series"]:
+        for p in s["points"]:
+            if p["weight"] is None:
+                assert p["members"] < parties.WEIGHT_MIN_MEMBERS
+                continue
+            h = house[p["term"]]
+            assert abs(p["weight"] - (p["speeches"] / p["members"]) / (h["speeches"] / h["members"])) < 0.001
+    assert "weights_rule" in d

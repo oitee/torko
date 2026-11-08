@@ -1,5 +1,5 @@
 import React from "react";
-import { cleanup, fireEvent, render, screen } from "@testing-library/react";
+import { cleanup, fireEvent, render, screen, within } from "@testing-library/react";
 import { afterEach, describe, expect, it, vi } from "vitest";
 import { MemoryRouter } from "react-router-dom";
 import * as api from "../assets/js/api.js";
@@ -14,6 +14,12 @@ afterEach(() => {
 const PARTIES = {
   total: 1000,
   count: 2,
+  weights: {
+    terms: [{ term: 17, speeches: 100, members: 10 }, { term: 18, speeches: 50, members: 10 }],
+    series: [
+      { code: "BJP", points: [{ term: 17, speeches: 60, members: 3, weight: 2 }, { term: 18, speeches: 20, members: 2, weight: null }] },
+    ],
+  },
   parties: [
     { code: "BJP", name: "Bharatiya Janata Party", speeches: 600, members: 50, terms: [13, 14, 15] },
     { code: "BJD", name: "Biju Janata Dal", speeches: 1, members: 1, terms: [14, 16] },
@@ -47,12 +53,30 @@ describe("Parties", () => {
         <Parties />
       </MemoryRouter>
     );
-    expect((await screen.findByRole("link", { name: "Bharatiya Janata Party" })).getAttribute("href")).toBe("/party/BJP");
+    const table = await screen.findByRole("table");
+    expect(within(table).getByRole("link", { name: "Bharatiya Janata Party" }).getAttribute("href")).toBe("/party/BJP");
     expect(screen.getByText("60.0%")).toBeTruthy();
     expect(screen.getByText("13th–15th LS")).toBeTruthy();
     fireEvent.change(screen.getByLabelText("Find a party"), { target: { value: "biju" } });
-    expect(screen.queryByRole("link", { name: "Bharatiya Janata Party" })).toBeNull();
+    expect(within(screen.getByRole("table")).queryByRole("link", { name: "Bharatiya Janata Party" })).toBeNull();
     expect(screen.getByText("1 of 2 parties")).toBeTruthy();
+  });
+
+  it("draws the speaking weight with a table view and a method panel", async () => {
+    vi.spyOn(api, "getJSON").mockResolvedValue(PARTIES);
+    render(
+      <MemoryRouter>
+        <Parties />
+      </MemoryRouter>
+    );
+    expect(await screen.findByRole("heading", { name: "How much each party speaks for its size" })).toBeTruthy();
+    expect(screen.getByRole("heading", { name: "All parties" })).toBeTruthy();
+    fireEvent.click(screen.getByRole("button", { name: "Show as table" }));
+    // A term with too few members has no value. The table says so with a dash.
+    expect(screen.getByText("2.00×")).toBeTruthy();
+    expect(screen.getByText("–")).toBeTruthy();
+    fireEvent.click(screen.getByRole("button", { name: "How this is calculated" }));
+    expect(screen.getByRole("dialog").textContent).toContain("Weight = (speeches of the party / members of the party who spoke)");
   });
 
   it("writes small shares and broken term runs plainly", () => {
@@ -79,5 +103,17 @@ describe("Places", () => {
     expect(filterStates(PLACES.states, "kerala").map((s) => s.name)).toEqual(["Kerala"]);
     const pune = filterStates(PLACES.states, "pune");
     expect(pune.map((s) => [s.name, s.seats.map((x) => x.name)])).toEqual([["Maharashtra", ["Pune"]]]);
+  });
+});
+
+describe("PartyWeightChart rules", () => {
+  it("colours only the parties with a colour token, and starts the axis at 2 or above", async () => {
+    const { lineStyles, weightTop } = await import("../pages/parties/PartyWeightChart.jsx");
+    const styles = lineStyles(["BJP", "CPI(M)", "SP"]);
+    expect(styles[0].stroke).toBe("var(--party-bjp)");
+    expect(styles[1]).toEqual({ stroke: "var(--ink-2)", dash: "6 4" });
+    expect(styles[2].dash).toBe("2 4");
+    expect(weightTop([{ points: [{ weight: 1.9 }] }])).toBe(2);
+    expect(weightTop([{ points: [{ weight: 2.3 }] }])).toBe(2.5);
   });
 });

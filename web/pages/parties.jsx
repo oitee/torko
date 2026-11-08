@@ -2,7 +2,9 @@ import React, { useEffect, useMemo, useState } from "react";
 import { Link } from "react-router-dom";
 import { useAnswer } from "../assets/js/useApi.js";
 import { formatNumber, termShort } from "../assets/js/format.js";
-import HowTorkoCounts from "../components/HowTorkoCounts.jsx";
+import Button from "../components/Button.jsx";
+import MethodBlock from "./trends/MethodBlock.jsx";
+import PartyWeightChart, { PartyWeightTable } from "./parties/PartyWeightChart.jsx";
 import PageLayout from "../components/PageLayout.jsx";
 import { ErrorState, Loading } from "../components/States.jsx";
 import "./index_pages.css";
@@ -27,6 +29,7 @@ export function termsText(terms) {
 export default function Parties() {
   const { data, loading, error, retry } = useAnswer("/api/parties");
   const [filter, setFilter] = useState("");
+  const [weightTable, setWeightTable] = useState(false);
 
   useEffect(() => {
     document.title = "Parties · Torko";
@@ -41,22 +44,41 @@ export default function Parties() {
   const head = (
     <div className="index-head">
       <h1 className="index-head__title">Parties</h1>
-      <p className="head-description">
-        {data
-          ? `${formatNumber(data.count)} parties spoke in the Lok Sabha. Together they hold ${formatNumber(
-              data.parties.reduce((s, p) => s + p.speeches, 0)
-            )} of the ${formatNumber(data.total)} speeches with an identified member.`
-          : "Every party with at least one speech in the Lok Sabha."}
-      </p>
     </div>
   );
+
+  const names = Object.fromEntries((data?.parties || []).map((p) => [p.code, p.name]));
 
   let body;
   if (loading && !data) body = <Loading lines={8} />;
   else if (error) body = <ErrorState error={error} onRetry={retry} />;
   else
     body = (
-      <>
+      <div className="index-body">
+        {data.weights && (
+          <section className="party-weight-section" aria-labelledby="party-weight-title">
+            <h2 id="party-weight-title" className="index-section-title">How much each party speaks for its size</h2>
+            <p className="index-section-lede">
+              1× is the House: the members of the party spoke as often as the average member. 2× is twice as often.
+            </p>
+            {weightTable ? <PartyWeightTable weights={data.weights} /> : <PartyWeightChart weights={data.weights} names={names} />}
+            <div className="index-section-foot">
+              <Button variant="text" onClick={() => setWeightTable((v) => !v)}>{weightTable ? "Show as chart" : "Show as table"}</Button>
+              <MethodBlock>
+                <p>
+                  Weight = (speeches of the party / members of the party who spoke) / (speeches of the House / members of the House who
+                  spoke), in each Lok Sabha.
+                </p>
+                <p>
+                  The chart shows the 6 parties with the most speeches. The House counts the members with a known party. A term with fewer
+                  than 3 members of the party who spoke has no point, because one member can swing it.
+                </p>
+                <p>The party of a speech is the party of the member on the date of the debate.</p>
+              </MethodBlock>
+            </div>
+          </section>
+        )}
+        <h2 className="index-section-title">All parties</h2>
         <div className="index-tools">
         <div className="index-filter">
           <label htmlFor="parties-filter" className="index-filter__label">
@@ -107,20 +129,13 @@ export default function Parties() {
             </tbody>
           </table>
         </div>
-      </>
+      </div>
     );
 
   return (
     <PageLayout answer={head}>
       <div className="page-main">
         {body}
-        <section className="index-method">
-          <HowTorkoCounts>
-            The party of a speech is the party of the member on the date of the debate. Speeches counts all speeches of
-            the party, tagged or not. Share is the part of all speeches with an identified member. Members counts the
-            members who spoke for the party.
-          </HowTorkoCounts>
-        </section>
       </div>
     </PageLayout>
   );

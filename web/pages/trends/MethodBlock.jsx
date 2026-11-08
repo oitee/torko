@@ -1,5 +1,6 @@
 import React, { useId, useLayoutEffect, useRef, useState } from "react";
 import Popover from "../../components/Popover.jsx";
+import "./MethodBlock.css";
 
 // MethodBlock is a short text link that opens a small panel with the rule of a chart.
 // It works like "Add filter" on the Search page: the panel floats under the link, and it closes with its X button,
