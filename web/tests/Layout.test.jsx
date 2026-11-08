@@ -20,7 +20,9 @@ describe("Layout", () => {
     const footer = screen.getByRole("contentinfo");
     const nav = within(footer).getByRole("navigation", { name: "Footer" });
     expect(within(nav).getByRole("link", { name: "Trends" }).getAttribute("href")).toBe("/trends");
-    expect(within(nav).getByRole("link", { name: "API" }).getAttribute("href")).toBe("/api/docs/");
+    expect(within(nav).getByRole("link", { name: "Method" }).getAttribute("href")).toBe("/method");
+    // The API is private now, so the footer has no link to it.
+    expect(within(nav).queryByRole("link", { name: "API" })).toBeNull();
     expect(within(footer).getByRole("link", { name: "sansad.in" }).getAttribute("href")).toContain("sansad.in");
     expect(footer.textContent).toContain("Torko is not an official site.");
   });
