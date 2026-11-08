@@ -99,9 +99,6 @@ export default function Search() {
 
   // The start block reads two more answers: the years and members of the whole archive, and the member with the most speeches.
   const homeCall = useApi(landing ? "start:home" : null, (signal) => getJSON("/api/home", undefined, { signal }));
-  const topMemberCall = useApi(landing ? "start:member" : null, (signal) =>
-    getJSON("/api/speeches", { group: "member", sort: "most", per_page: 1 }, { signal })
-  );
 
   const matches = useApi(q || null, (signal) => getJSON("/api/search", { q }, { signal }));
   // The tag, place and member each load their own name, so that they can be on at the same time.
@@ -203,8 +200,6 @@ export default function Search() {
           members={homeCall.data?.corpus?.members}
           first={homeCall.data?.corpus?.first}
           last={homeCall.data?.corpus?.last}
-          tagRows={tagCall.data?.facets?.tag}
-          topMember={topMemberCall.data?.members?.[0]}
           busy={searched}
           status={ask ? "Reading your question…" : ""}
         />

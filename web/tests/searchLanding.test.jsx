@@ -36,7 +36,9 @@ describe("Search landing", () => {
     mockApi();
     renderAt("/search");
     expect(screen.getByRole("heading", { level: 1, name: "Search the speeches of the Lok Sabha" })).toBeTruthy();
-    expect((await screen.findByRole("link", { name: "Farmers" })).getAttribute("href")).toBe("/search?tag=farmers");
+    expect((await screen.findByRole("link", { name: "Constitution" })).getAttribute("href")).toBe("/search?tag=constitution");
+    // A suggestion can carry two or three filters.
+    expect(screen.getByRole("link", { name: "Farmers, 17th Lok Sabha, INC" }).getAttribute("href")).toBe("/search?tag=farmers&term=17&party=INC");
     expect(screen.getByRole("list", { name: "Suggested searches" })).toBeTruthy();
     expect(screen.queryByRole("button", { name: /Add filter/ })).toBeNull();
     expect(document.getElementById("latest-speeches")).toBeTruthy();

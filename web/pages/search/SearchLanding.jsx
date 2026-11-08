@@ -1,16 +1,23 @@
 import React from "react";
 import { Link } from "react-router-dom";
 import SearchBox from "../../components/SearchBox.jsx";
-import { dataLine, startExamples } from "./StartBlock.jsx";
+import { dataLine } from "./StartBlock.jsx";
 
-// The rule that picks the suggestions. The data picks the names, so no name is a hand pick.
-export const SUGGESTION_RULE =
-  "The suggestions follow one rule: the 5 tags with the most speeches, a tag of two words or more as an exact phrase, and the member with the most speeches.";
+// The suggested searches, picked by hand: four simple ones, and some with two or three filters that show
+// what Search can do. Each one returned speeches when it was chosen.
+export const SUGGESTIONS = [
+  { to: "/search?tag=constitution", label: "Constitution" },
+  { to: "/search?tag=railway-ministry", label: "Railway Ministry" },
+  { to: "/search?tag=scheduled-tribes", label: "Scheduled Tribes" },
+  { to: "/search?member=392", label: "Priya Ranjan Dasmunsi" },
+  { to: "/search?q=coastal%20irrigation", label: "coastal irrigation" },
+  { to: "/search?tag=farmers&term=17&party=INC", label: "Farmers, 17th Lok Sabha, INC" },
+  { to: "/search?tag=railway-connectivity&state=Kerala", label: "Railway connectivity in Kerala" },
+  { to: "/search?q=water%20shortage&kind=zero_hour", label: "water shortage in Zero Hour" },
+];
 
-// SearchLanding is the Search page before a search: a large box in the middle of the screen and a short row of suggestions.
-// The latest speeches start one screen below it. busy is true while the first results of a new search load.
-export default function SearchLanding({ initial = "", total, members, first, last, tagRows, topMember, busy = false, status = "" }) {
-  const examples = startExamples({ tagRows, topMember });
+// busy is true while the first results of a new search load.
+export default function SearchLanding({ initial = "", total, members, first, last, busy = false, status = "" }) {
   const line = dataLine({ total, members, first, last });
   return (
     <section className="search-landing" aria-labelledby="search-landing-title">
@@ -25,10 +32,10 @@ export default function SearchLanding({ initial = "", total, members, first, las
           {status || "Searching…"}
         </p>
       )}
-      {!busy && !status && examples.length > 0 && (
-        <ul className="search-landing__suggestions" aria-label="Suggested searches" title={SUGGESTION_RULE}>
-          {examples.map((e) => (
-            <li key={e.key}>
+      {!busy && !status && (
+        <ul className="search-landing__suggestions" aria-label="Suggested searches">
+          {SUGGESTIONS.map((e) => (
+            <li key={e.to}>
               <Link to={e.to}>{e.label}</Link>
             </li>
           ))}

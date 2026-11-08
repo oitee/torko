@@ -1416,7 +1416,7 @@ a.search-pager__num:hover {
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  gap: var(--space-5);
+  gap: var(--space-4);
   min-height: calc(100vh - var(--header-height) - var(--space-10));
   padding: var(--space-10) 0;
   text-align: center;
@@ -1452,7 +1452,7 @@ a.search-pager__num:hover {
   display: flex;
   flex-wrap: wrap;
   justify-content: center;
-  gap: var(--space-2) var(--space-5);
+  gap: 0 var(--space-4);
   max-width: 44rem;
   margin: 0;
   padding: 0;
@@ -1461,8 +1461,15 @@ a.search-pager__num:hover {
 .search-landing__suggestions a {
   display: inline-flex;
   align-items: center;
-  min-height: 44px;
+  min-height: 32px;
   font-weight: 500;
+}
+
+/* A finger needs a larger target than a mouse. */
+@media (pointer: coarse) {
+  .search-landing__suggestions a {
+    min-height: 44px;
+  }
 }
 
 .search-landing__status {
@@ -1479,7 +1486,7 @@ a.search-pager__num:hover {
 }
 
 .search-landing__down {
-  margin-top: var(--space-6);
+  margin-top: var(--space-2);
   font-size: var(--size-label);
   color: var(--ink-2);
 }
