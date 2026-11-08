@@ -1,4 +1,3 @@
-// The pure rules of the race of subjects on the Trends page.
 // The API gives, for each subject, its speeches in each 12-month window. A frame is one window.
 // t is a frame position. It can be between two frames while the race plays.
 
@@ -38,27 +37,10 @@ export function rankAt(subjects, tagged, t, top, minWindow) {
     .slice(0, top);
 }
 
-// Move label positions apart so that two labels are never closer than gap. ys must be in the order of the labels.
-// The labels stay in their order from top to bottom and stay between min and max when there is room.
-export function spreadLabels(ys, gap, min, max) {
-  const order = ys.map((y, i) => [y, i]).sort((a, b) => a[0] - b[0]);
-  const out = order.map(([y]) => Math.max(min, y));
-  for (let k = 1; k < out.length; k++) out[k] = Math.max(out[k], out[k - 1] + gap);
-  const over = out.length ? out[out.length - 1] - max : 0;
-  if (over > 0) {
-    out[out.length - 1] -= over;
-    for (let k = out.length - 2; k >= 0; k--) out[k] = Math.min(out[k], out[k + 1] - gap);
-  }
-  const result = new Array(ys.length);
-  order.forEach(([, i], k) => { result[i] = out[k]; });
-  return result;
-}
-
 // The one scale of the bars for every frame of the race.
 // max is the largest distance above typical of any subject in any frame that it qualifies in.
 // The scale is a whole number of steps, so the gridlines fall on simple numbers. It returns the top and the step.
 export function raceScale(subjects, tagged, minWindow, quantile = 0.9) {
-  // The leading value of each month: the largest number of points above usual among the subjects that qualify.
   const leads = [];
   for (let i = 0; i < tagged.length; i++) {
     let lead = 0;
@@ -67,7 +49,7 @@ export function raceScale(subjects, tagged, minWindow, quantile = 0.9) {
     }
     if (lead > 0) leads.push(lead);
   }
-  // The scale stops at the 90th percentile of those leads (+7.6 points in the data of 2026, so the top is +8). One peak, such as the year of COVID, does not shrink every other month.
+  // The scale stops at the 90th percentile of those leads, so one peak, such as the year of COVID, does not shrink every other month.
   // A bar above the top is drawn to the end of the track and marked as cut.
   leads.sort((a, b) => a - b);
   const max = Math.max(0.1, leads.length ? leads[Math.min(leads.length - 1, Math.floor(quantile * (leads.length - 1)))] : 0.1);

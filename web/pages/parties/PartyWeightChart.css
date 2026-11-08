@@ -1,0 +1,206 @@
+/* The six series colours passed a check of lightness, chroma, colour-blind separation and contrast, in both themes. */
+.party-weight {
+  --pw-1: #cd7407; /* BJP */
+  --pw-2: #0395c8; /* INC */
+  --pw-3: #c62a2a; /* CPI(M) */
+  --pw-4: #7a4fc2; /* SP */
+  --pw-5: #03a132; /* AITC */
+  --pw-6: #b5197a; /* BJD */
+  --pw-7: #3a4450;
+  --pw-8: #7a8796;
+  background: var(--sheet);
+  border: 1px solid var(--hairline);
+  padding: var(--space-4) var(--space-4) var(--space-3);
+}
+
+:root[data-theme="dark"] .party-weight {
+  --pw-1: #d4730f;
+  --pw-2: #0597cc;
+  --pw-3: #e5534b;
+  --pw-4: #9a77e8;
+  --pw-5: #18ad3c;
+  --pw-6: #d6408f;
+  --pw-7: #b9c2cc;
+  --pw-8: #8e99a6;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) .party-weight {
+    --pw-1: #d4730f;
+    --pw-2: #0597cc;
+    --pw-3: #e5534b;
+    --pw-4: #9a77e8;
+    --pw-5: #18ad3c;
+    --pw-6: #d6408f;
+    --pw-7: #b9c2cc;
+    --pw-8: #8e99a6;
+  }
+}
+
+.party-weight__series--c1 { color: var(--pw-1); }
+.party-weight__series--c2 { color: var(--pw-2); }
+.party-weight__series--c3 { color: var(--pw-3); }
+.party-weight__series--c4 { color: var(--pw-4); }
+.party-weight__series--c5 { color: var(--pw-5); }
+.party-weight__series--c6 { color: var(--pw-6); }
+.party-weight__series--c7 { color: var(--pw-7); }
+.party-weight__series--c8 { color: var(--pw-8); }
+
+.party-weight__story {
+  margin: 0 0 var(--space-3);
+  max-width: 72ch;
+  font-size: var(--size-body);
+  color: var(--ink);
+}
+
+.party-weight__plot {
+  width: 100%;
+}
+
+.party-weight__svg {
+  display: block;
+  max-width: 100%;
+  height: auto;
+  overflow: visible;
+}
+
+.party-weight__band--more {
+  fill: var(--ground);
+}
+
+.party-weight__band-label {
+  font-family: var(--font-sans);
+  font-size: 0.8125rem;
+  fill: var(--meta);
+}
+
+.party-weight__grid {
+  stroke: var(--hairline);
+}
+
+.party-weight__house {
+  stroke: var(--ink);
+  stroke-width: 1.5;
+}
+
+.party-weight__tick {
+  font-family: var(--font-mono);
+  font-size: 0.8125rem;
+  fill: var(--meta);
+}
+
+.party-weight__tick--house {
+  fill: var(--ink);
+}
+
+.party-weight__line {
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 2.5;
+  stroke-linejoin: round;
+}
+
+.party-weight__dot {
+  fill: currentColor;
+  stroke: var(--sheet);
+  stroke-width: 2;
+}
+
+.party-weight__label {
+  font-family: var(--font-sans);
+  font-size: 0.8125rem;
+  font-weight: 600;
+  fill: currentColor;
+}
+
+.party-weight__series {
+  transition: opacity 120ms ease-out;
+}
+
+.party-weight__series--faded {
+  opacity: 0.15;
+}
+
+.party-weight__cursor {
+  stroke: var(--control);
+}
+
+/* The legend works as in Grafana: a click shows one party alone, Ctrl or Cmd with a click adds or removes one. */
+.party-weight__legend-note {
+  margin: var(--space-2) 0 0;
+  font-family: var(--font-mono);
+  font-size: var(--size-count);
+  color: var(--meta);
+}
+
+.party-weight__legend {
+  list-style: none;
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-1) var(--space-2);
+  margin: var(--space-1) 0 0;
+  padding: 0;
+}
+
+.party-weight__key {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  min-height: 36px;
+  padding: 0 var(--space-3);
+  border: 1px solid var(--hairline);
+  border-radius: var(--radius);
+  background: var(--sheet);
+  font: inherit;
+  font-size: var(--size-label);
+  cursor: pointer;
+}
+
+.party-weight__key:hover {
+  border-color: var(--ink);
+}
+
+.party-weight__key:focus-visible {
+  outline: 2px solid var(--action);
+  outline-offset: 2px;
+}
+
+.party-weight__swatch {
+  width: 14px;
+  height: 3px;
+  background: currentColor;
+}
+
+.party-weight__key-name {
+  color: var(--ink);
+  font-weight: 500;
+}
+
+.party-weight__key-value {
+  font-family: var(--font-mono);
+  font-size: var(--size-count);
+  color: var(--meta);
+}
+
+.party-weight__key--off {
+  opacity: 0.45;
+}
+
+.party-weight__key--off .party-weight__swatch {
+  background: var(--control);
+}
+
+.party-weight__readout {
+  margin: var(--space-2) 0 0;
+  min-height: 2.6em;
+  font-family: var(--font-mono);
+  font-size: var(--size-count);
+  line-height: var(--lh-count);
+  color: var(--ink-2);
+}
+
+@media (pointer: coarse) {
+  .party-weight__key {
+    min-height: 44px;
+  }
+}

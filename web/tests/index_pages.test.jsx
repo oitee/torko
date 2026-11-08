@@ -107,13 +107,41 @@ describe("Places", () => {
 });
 
 describe("PartyWeightChart rules", () => {
-  it("colours only the parties with a colour token, and starts the axis at 2 or above", async () => {
-    const { lineStyles, weightTop } = await import("../pages/parties/PartyWeightChart.jsx");
-    const styles = lineStyles(["BJP", "CPI(M)", "SP"]);
-    expect(styles[0].stroke).toBe("var(--party-bjp)");
-    expect(styles[1]).toEqual({ stroke: "var(--ink-2)", dash: "6 4" });
-    expect(styles[2].dash).toBe("2 4");
-    expect(weightTop([{ points: [{ weight: 1.9 }] }])).toBe(2);
-    expect(weightTop([{ points: [{ weight: 2.3 }] }])).toBe(2.5);
+  it("keeps the colour of a party whatever its rank, and gives a spare colour to a new party", async () => {
+    const { colourSlots } = await import("../pages/parties/PartyWeightChart.jsx");
+    expect(colourSlots(["INC", "BJP", "RJD"])).toEqual([2, 1, 7]);
+  });
+
+  it("uses a log axis that always holds 0.5x to 2x", async () => {
+    const { weightDomain } = await import("../pages/parties/PartyWeightChart.jsx");
+    expect(weightDomain([{ points: [{ weight: 1.2 }] }])).toEqual([0.5, 2]);
+    const [lo, hi] = weightDomain([{ points: [{ weight: 0.37 }, { weight: 2.4 }] }]);
+    expect(lo).toBeLessThan(0.37);
+    expect(hi).toBeGreaterThan(2.4);
+  });
+
+  it("tells the story of the last full term by rule", async () => {
+    const { storyOf } = await import("../pages/parties/PartyWeightChart.jsx");
+    const weights = {
+      terms: [{ term: 16 }, { term: 17 }, { term: 18 }],
+      series: [
+        { code: "INC", points: [{}, { weight: 1.375 }, {}] },
+        { code: "SP", points: [{}, { weight: 0.37 }, {}] },
+      ],
+    };
+    const story = storyOf(weights, { INC: "Indian National Congress", SP: "Samajwadi Party" });
+    expect(story.term).toBe(17);
+    expect(story.text).toBe(
+      "In the 17th Lok Sabha, the last full term, a member of Indian National Congress spoke 1.4 times as often as the average member. A member of Samajwadi Party spoke 0.4 times as often."
+    );
+  });
+
+  it("shows one party alone on a click, all again on a second click, and adds one with Ctrl", async () => {
+    const { nextShown } = await import("../pages/parties/PartyWeightChart.jsx");
+    const all = ["BJP", "INC", "SP"];
+    const one = nextShown(new Set(all), "INC", all, false);
+    expect([...one]).toEqual(["INC"]);
+    expect([...nextShown(one, "INC", all, false)]).toEqual(all);
+    expect([...nextShown(one, "SP", all, true)]).toEqual(["INC", "SP"]);
   });
 });
