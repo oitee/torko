@@ -3,7 +3,7 @@ import { Link } from "react-router-dom";
 import { useAnswer } from "../assets/js/useApi.js";
 import { formatNumber, termShort } from "../assets/js/format.js";
 import Button from "../components/Button.jsx";
-import MethodBlock from "./trends/MethodBlock.jsx";
+import MethodBlock from "../components/MethodBlock.jsx";
 import PartyWeightChart, { PartyWeightTable } from "./parties/PartyWeightChart.jsx";
 import PageLayout from "../components/PageLayout.jsx";
 import { ErrorState, Loading } from "../components/States.jsx";
@@ -24,7 +24,6 @@ export function termsText(terms) {
   return run ? `${termShort(terms[0]).replace(" LS", "")}–${termShort(terms[terms.length - 1])}` : terms.map((t) => termShort(t).replace(" LS", "")).join(", ") + " LS";
 }
 
-// The Parties page lists every party with at least one speech. Each row links to the page of the party.
 // The order is the order of the API: speeches, most first. A box filters the list by name or code.
 export default function Parties() {
   const { data, loading, error, retry } = useAnswer("/api/parties");
@@ -58,9 +57,6 @@ export default function Parties() {
         {data.weights && (
           <section className="party-weight-section" aria-labelledby="party-weight-title">
             <h2 id="party-weight-title" className="index-section-title">How much each party speaks for its size</h2>
-            <p className="index-section-lede">
-              1× is the House: the members of the party spoke as often as the average member. 2× is twice as often.
-            </p>
             {weightTable ? <PartyWeightTable weights={data.weights} /> : <PartyWeightChart weights={data.weights} names={names} />}
             <div className="index-section-foot">
               <Button variant="text" onClick={() => setWeightTable((v) => !v)}>{weightTable ? "Show as chart" : "Show as table"}</Button>
