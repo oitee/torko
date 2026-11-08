@@ -12,9 +12,8 @@ import CopyButton from "../../components/CopyButton.jsx";
 
 const TAGS_SHOWN = 3;
 
-// One speech that matches: when, which debate, who, the words in their sentence, then the summary and the tags.
-// sameDebate is true when the row above is in the same debate. The title then gives way to a short line.
-export function SearchSpeechRow({ speech, sameDebate = false }) {
+// Every row shows the title of its debate, also when the row above is in the same debate.
+export function SearchSpeechRow({ speech }) {
   const title = tidyTitle(speech.debate) || "Speech";
   const meta = [
     formatDateISO(speech.date),
@@ -30,17 +29,10 @@ export function SearchSpeechRow({ speech, sameDebate = false }) {
     <li className="search-row">
       <div className="search-row__meta">
         <span>{meta.join(" · ")}</span>
-        {sameDebate && (
-          <Link to={`/speech/${speech.id}`} className="search-row__debate search-row__debate--same" title={title} aria-label={`Open the speech. ${title}`}>
-            Same debate
-          </Link>
-        )}
       </div>
-      {!sameDebate && (
-        <Link to={`/speech/${speech.id}`} className="search-row__debate" title={title}>
-          {title}
-        </Link>
-      )}
+      <Link to={`/speech/${speech.id}`} className="search-row__debate" title={title}>
+        {title}
+      </Link>
       <SpeakerLine speech={speech} />
       {parts.length > 0 && (
         <p className="search-row__excerpt" lang={scriptLang(speech.excerpt)}>
@@ -52,7 +44,6 @@ export function SearchSpeechRow({ speech, sameDebate = false }) {
       {speech.match === "meaning" && (
         <p className="search-row__why">The summary is near your search in meaning. The speech does not use all your words.</p>
       )}
-      {/* The TLDR says what the speech is about. It comes after the words of the member. */}
       {speech.summary && (
         <div className="search-row__tldr">
           <TLDR text={speech.summary} />
@@ -163,7 +154,6 @@ function Pager({ page, pages, pageHref }) {
   );
 }
 
-// The rule of the list in one sentence, with a link to the full method.
 function SearchRule({ query, sort, view, data }) {
   const link = <Link to="/method" className="search-results__rule-link">How the list is chosen</Link>;
   if (isPhrase(query)) return <p className="search-results__rule">These speeches hold these exact words in this order. {link}</p>;
@@ -253,8 +243,8 @@ export default function SearchResults({
             </>
           ) : (
             <ol className="search-results__list">
-              {rows.map((s, i) => (
-                <SearchSpeechRow key={s.id} speech={s} sameDebate={Boolean(s.debate) && i > 0 && rows[i - 1].debate === s.debate} />
+              {rows.map((s) => (
+                <SearchSpeechRow key={s.id} speech={s} />
               ))}
             </ol>
           )}

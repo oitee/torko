@@ -262,15 +262,15 @@ describe("rows of the same debate", () => {
     { id: 2, date: "2026-04-01", debate: "The Delimitation Bill?Contd..", member: "B", words: 20 },
     { id: 3, date: "2026-04-01", debate: "Other debate", member: "C", words: 30 },
   ];
-  it("shows the title on the first row of a run only", () => {
+  it("shows the title on every row, also when two rows share a debate", () => {
     render(
       <MemoryRouter>
         <SearchResults view="speeches" sort="latest" page={1} data={{ speeches: rows, total: 3, pages: 1, per_page: 20 }} loading={false}
           speechTotal={3} membersTotal={null} viewHref={() => "/search"} pageHref={() => "/search"} memberHref={() => "/"} onSort={() => {}} />
       </MemoryRouter>
     );
-    expect(screen.getAllByText("The Delimitation Bill (contd.)")).toHaveLength(1);
-    expect(screen.getAllByText("Same debate")).toHaveLength(1);
+    expect(screen.getAllByText("The Delimitation Bill (contd.)")).toHaveLength(2);
+    expect(screen.queryByText("Same debate")).toBeNull();
     expect(screen.getByText("Other debate")).toBeTruthy();
   });
 });
