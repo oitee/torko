@@ -2,7 +2,6 @@ import React, { useEffect, useMemo, useState } from "react";
 import { Link, useSearchParams } from "react-router-dom";
 import { useAnswer } from "../assets/js/useApi.js";
 import { formatNumber } from "../assets/js/format.js";
-import Breadcrumb from "../components/Breadcrumb.jsx";
 import Button from "../components/Button.jsx";
 import HowTorkoCounts from "../components/HowTorkoCounts.jsx";
 import PageLayout from "../components/PageLayout.jsx";
@@ -197,7 +196,7 @@ export default function MyMp() {
   }
 
   return (
-    <PageLayout breadcrumb={<Breadcrumb items={[{ label: "Your MP" }]} />} answer={head}>
+    <PageLayout answer={head}>
       <div className="page-main">
         {body}
         {q && (

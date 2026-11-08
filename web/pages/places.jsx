@@ -2,7 +2,6 @@ import React, { useEffect, useMemo, useState } from "react";
 import { Link } from "react-router-dom";
 import { useAnswer } from "../assets/js/useApi.js";
 import { formatNumber } from "../assets/js/format.js";
-import Breadcrumb from "../components/Breadcrumb.jsx";
 import HowTorkoCounts from "../components/HowTorkoCounts.jsx";
 import PageLayout from "../components/PageLayout.jsx";
 import { ErrorState, Loading } from "../components/States.jsx";
@@ -17,7 +16,6 @@ export function filterStates(states, words) {
     .filter((s) => s.seats.length || s.name.toLowerCase().includes(w));
 }
 
-// One place: a link when it has a page, else plain text. The count is the speeches that carry its tag.
 function PlaceName({ place }) {
   const name = place.page ? <Link to={`/place/${place.slug}`}>{place.name}</Link> : <span>{place.name}</span>;
   return (
@@ -28,8 +26,6 @@ function PlaceName({ place }) {
   );
 }
 
-// The Places page lists the states and union territories, each with its Lok Sabha seats.
-// States and seats are in the order A to Z. A box filters them by name.
 export default function Places() {
   const { data, loading, error, retry } = useAnswer("/api/places");
   const [filter, setFilter] = useState("");
@@ -117,7 +113,7 @@ export default function Places() {
     );
 
   return (
-    <PageLayout breadcrumb={<Breadcrumb items={[{ label: "Places" }]} />} answer={head}>
+    <PageLayout answer={head}>
       <div className="page-main">
         {body}
         <section className="index-method">

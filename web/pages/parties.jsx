@@ -2,7 +2,6 @@ import React, { useEffect, useMemo, useState } from "react";
 import { Link } from "react-router-dom";
 import { useAnswer } from "../assets/js/useApi.js";
 import { formatNumber, termShort } from "../assets/js/format.js";
-import Breadcrumb from "../components/Breadcrumb.jsx";
 import HowTorkoCounts from "../components/HowTorkoCounts.jsx";
 import PageLayout from "../components/PageLayout.jsx";
 import { ErrorState, Loading } from "../components/States.jsx";
@@ -112,7 +111,7 @@ export default function Parties() {
     );
 
   return (
-    <PageLayout breadcrumb={<Breadcrumb items={[{ label: "Parties" }]} />} answer={head}>
+    <PageLayout answer={head}>
       <div className="page-main">
         {body}
         <section className="index-method">
