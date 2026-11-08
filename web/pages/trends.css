@@ -137,18 +137,14 @@
 /* The race of subjects, month by month */
 .trends-race { display: flex; flex-direction: column; gap: var(--space-4); grid-column: 1 / -1; }
 .race { display: flex; flex-direction: column; gap: var(--space-3); }
-.race__controls { display: flex; flex-wrap: wrap; align-items: center; gap: var(--space-3); }
-.race__slider { flex: 1 1 16rem; min-width: 0; height: 32px; margin: 0; accent-color: var(--ink); cursor: pointer; }
 .race__foot { display: flex; flex-wrap: wrap; align-items: center; gap: var(--space-1) var(--space-4); }
 .race-bars__name:hover { text-decoration: underline; }
-.race-bars__name:focus-visible, .race__slider:focus-visible { outline: 2px solid var(--action); outline-offset: 2px; }
+.race-bars__name:focus-visible { outline: 2px solid var(--action); outline-offset: 2px; }
 .race-lines-box { width: 100%; min-width: 0; }
-.race__when { display: flex; flex-direction: column; gap: var(--space-1); margin: 0; }
-.race__month { font-family: var(--font-mono); font-size: var(--size-title); line-height: var(--lh-title); font-weight: 600; color: var(--ink); font-variant-numeric: tabular-nums; }
 
 .race-bars-box { --race-row: 3.25rem; --race-value-w: 4rem; --race-name-w: 16rem; }
 .race-bars__unit { margin: 0 0 var(--space-1); font-family: var(--font-mono); font-size: var(--size-count); line-height: var(--lh-count); color: var(--meta); }
-.race-bars { position: relative; height: calc(var(--rows) * var(--race-row)); border-top: 1px solid var(--ink); }
+.race-bars { position: relative; height: calc(var(--rows) * var(--race-row)); }
 .race-bars__grid { position: absolute; top: 0; bottom: 0; left: calc(var(--race-name-w) + var(--space-3)); right: var(--race-value-w); }
 .race-bars__gridline { position: absolute; top: 0; bottom: 0; width: 1px; background: var(--hairline); }
 .race-bars__row { position: absolute; left: 0; right: 0; top: 0; height: var(--race-row); transform: translateY(calc(var(--rank) * var(--race-row))); display: grid; grid-template-columns: var(--race-name-w) minmax(0, 1fr); grid-template-areas: "name track" "meta track"; column-gap: var(--space-3); align-content: center; }
@@ -184,7 +180,6 @@
   .race-bars__name { display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; white-space: normal; text-align: left; }
   .race-bars__meta { text-align: left; }
   .race-bars__fill { height: 14px; }
-  .race__slider { height: 44px; }
 }
 
 /* The rule of a chart: a text link that opens a small panel, as "Add filter" does on Search. */
@@ -201,7 +196,40 @@
 .trends-method__body p:last-child { margin-bottom: 0; }
 
 /* The play button is an icon of the size of a touch target. */
-.race__play { width: var(--control-height); padding: 0; }
 .race-bars__unit { margin: var(--space-2) 0 0; }
 .race-lines__link { cursor: pointer; }
 .race-lines__link:hover .race-lines__label { text-decoration: underline; }
+
+/* The stage holds the chart and the month. The month is large and quiet in the lower right corner,
+   as in a bar chart race, so it needs no row of its own. */
+.race__stage { position: relative; }
+.race__month { position: absolute; right: 0; bottom: 2.25rem; z-index: 0; margin: 0; pointer-events: none;
+  font-family: var(--font-mono); font-size: clamp(1.75rem, 1rem + 3vw, 3.25rem); line-height: 1; font-weight: 500;
+  letter-spacing: -0.02em; color: var(--meta); opacity: 0.55; font-variant-numeric: tabular-nums; }
+.race-bars, .race-axis { position: relative; z-index: 1; }
+
+/* The timeline: a small play button and a thin track with the years under it. */
+.race__timeline { display: flex; align-items: flex-start; gap: var(--space-3); margin-top: var(--space-2); }
+.race__play { flex: none; display: inline-flex; align-items: center; justify-content: center; width: 36px; height: 36px;
+  border: 1px solid var(--control); border-radius: var(--radius); background: var(--sheet); color: var(--ink); cursor: pointer; }
+.race__play:hover { background: var(--ground); border-color: var(--ink); }
+.race__play:focus-visible { outline: 2px solid var(--action); outline-offset: 2px; }
+.race__track { position: relative; flex: 1 1 auto; min-width: 0; padding-bottom: 1.25rem; }
+.race__slider { --done: 0%; display: block; width: 100%; height: 36px; margin: 0; background: transparent; cursor: pointer; -webkit-appearance: none; appearance: none; }
+.race__slider:focus-visible { outline: 2px solid var(--action); outline-offset: 2px; }
+.race__slider::-webkit-slider-runnable-track { height: 2px; background: linear-gradient(to right, var(--ink) var(--done), var(--hairline) var(--done)); }
+.race__slider::-webkit-slider-thumb { -webkit-appearance: none; appearance: none; width: 4px; height: 18px; margin-top: -8px; border: 0; border-radius: 0; background: var(--ink); }
+.race__slider::-moz-range-track { height: 2px; background: var(--hairline); }
+.race__slider::-moz-range-progress { height: 2px; background: var(--ink); }
+.race__slider::-moz-range-thumb { width: 4px; height: 18px; border: 0; border-radius: 0; background: var(--ink); }
+.race__ticks { position: absolute; left: 0; right: 0; top: 26px; height: 1rem; }
+.race__tick { position: absolute; transform: translateX(-50%); font-family: var(--font-mono); font-size: var(--size-count); line-height: 1; color: var(--meta); white-space: nowrap; }
+.race__tick::before { content: ""; position: absolute; left: 50%; top: -9px; width: 1px; height: 5px; background: var(--control); }
+@media (pointer: coarse) { .race__play { width: 44px; height: 44px; } .race__slider { height: 44px; } .race__ticks { top: 30px; } .race__timeline { align-items: center; } }
+
+/* A bar above the top of the scale ends in a cut: a notch of the ground colour across its end. */
+.race-bars__fill--cut { background: linear-gradient(105deg, var(--ink-2) calc(100% - 12px), var(--ground) calc(100% - 12px), var(--ground) calc(100% - 8px), var(--ink-2) calc(100% - 8px)); }
+.race__month { bottom: 3rem; }
+@media (max-width: 639px) {
+  .race__month { position: static; display: block; margin: 0 0 var(--space-2); font-size: var(--size-title); opacity: 1; color: var(--ink-2); }
+}

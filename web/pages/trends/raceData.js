@@ -65,13 +65,20 @@ export function windowStart(label, windowMonths = 12) {
 // The one scale of the bars for every frame of the race.
 // max is the largest distance above typical of any subject in any frame that it qualifies in.
 // The scale is a whole number of steps, so the gridlines fall on simple numbers. It returns the top and the step.
-export function raceScale(subjects, tagged, minWindow) {
-  let max = 0.1;
-  for (const s of subjects) {
-    for (let i = 0; i < tagged.length; i++) {
-      if (s.n[i] >= minWindow) max = Math.max(max, shareAt(s, tagged, i) - s.typical);
+export function raceScale(subjects, tagged, minWindow, quantile = 0.9) {
+  // The leading value of each month: the largest number of points above usual among the subjects that qualify.
+  const leads = [];
+  for (let i = 0; i < tagged.length; i++) {
+    let lead = 0;
+    for (const s of subjects) {
+      if (s.n[i] >= minWindow) lead = Math.max(lead, shareAt(s, tagged, i) - s.typical);
     }
+    if (lead > 0) leads.push(lead);
   }
+  // The scale stops at the 90th percentile of those leads (+7.6 points in the data of 2026, so the top is +8). One peak, such as the year of COVID, does not shrink every other month.
+  // A bar above the top is drawn to the end of the track and marked as cut.
+  leads.sort((a, b) => a - b);
+  const max = Math.max(0.1, leads.length ? leads[Math.min(leads.length - 1, Math.floor(quantile * (leads.length - 1)))] : 0.1);
   const raw = max / 3;
   const size = 10 ** Math.floor(Math.log10(raw));
   const step = [1, 2, 5, 10].map((k) => k * size).find((v) => v >= raw);

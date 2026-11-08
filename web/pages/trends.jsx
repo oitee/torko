@@ -158,9 +158,6 @@ export default function Trends() {
 
         <section className="trends-years" aria-labelledby="trends-years-title">
           <h2 id="trends-years-title" className="trends-section-title">Every year’s biggest subjects</h2>
-          <p className="trends-years__note">
-            The bar is the subject’s share of the tagged speeches of the year. The thin mark is its usual share. A name opens its speeches of that year.
-          </p>
           <MethodBlock>
             <p>
               A subject’s share must be at least {rules.min_lift} times its usual share. Usual is the median of the yearly shares of the subject.

@@ -1,5 +1,6 @@
 import { describe, expect, it } from "vitest";
-import { aboveAt, monthName, rankAt, shareAt, spreadLabels } from "../pages/trends/raceData.js";
+import { aboveAt, monthName, rankAt, shareAt } from "../pages/trends/raceData.js";
+import { spreadLabels } from "../assets/js/spreadLabels.js";
 
 const tagged = [1000, 1000, 0, 1000];
 const a = { name: "Alpha", typical: 2, n: [50, 30, 0, 20] };
@@ -35,5 +36,19 @@ describe("race data", () => {
     expect(spreadLabels([100, 102, 300], 15, 0, 400)).toEqual([100, 115, 300]);
     expect(spreadLabels([395, 398], 15, 0, 400)).toEqual([385, 400]);
     expect(spreadLabels([50, 10], 15, 0, 400)).toEqual([50, 10]);
+  });
+});
+
+describe("raceScale", () => {
+  it("stops the scale at the 90th percentile of the monthly leaders, so one peak does not shrink every month", async () => {
+    const { raceScale } = await import("../pages/trends/raceData.js");
+    // 20 months. One subject leads with 2 points above usual in 19 months and with 20 points in one month.
+    const tagged = Array(20).fill(100);
+    const n = Array(20).fill(5);
+    n[10] = 23;
+    const subject = { n, typical: 3 }; // shares are in percent: 5% usually 3%, and 23% in the peak month
+    const scale = raceScale([subject], tagged, 1);
+    expect(scale.top).toBeLessThan(5);
+    expect(scale.top).toBeGreaterThanOrEqual(2);
   });
 });

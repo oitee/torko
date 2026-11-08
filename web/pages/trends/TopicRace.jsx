@@ -46,7 +46,11 @@ function RaceBars({ rows, scale, tagged }) {
               <span className="race-bars__meta">{fmtShare(r.share)}, usually {fmtUsual(r.subject.typical)}</span>
             </div>
             <span className="race-bars__track">
-              <span className="race-bars__fill" style={{ width: `${Math.min(100, (100 * Math.max(0, r.value)) / scale.top)}%` }} />
+              <span
+                className={r.value > scale.top ? "race-bars__fill race-bars__fill--cut" : "race-bars__fill"}
+                style={{ width: `${Math.min(100, (100 * Math.max(0, r.value)) / scale.top)}%` }}
+                title={r.value > scale.top ? "The bar is longer than the scale, so it stops at the end of the track." : undefined}
+              />
               <span className="race-bars__value">{fmt(r.value)}</span>
             </span>
           </div>
@@ -160,6 +164,14 @@ function RaceLines({ rows, data, t, yMax }) {
   );
 }
 
+// The years that get a tick under the timeline: each January of a year that ends in 0 or 5.
+export function yearTicks(months) {
+  return months
+    .map((m, i) => ({ m, i }))
+    .filter(({ m }) => m.endsWith("-01") && Number(m.slice(0, 4)) % 5 === 0)
+    .map(({ m, i }) => ({ i, year: m.slice(0, 4) }));
+}
+
 // TopicRace plays the months from 2000 to now. Each frame ranks the subjects by how far their share of the last 12 months
 // is above their typical share. view is "bars" or "lines".
 // month ("2020-03" or null for the latest) and view come from the address of the page, so a link keeps them.
@@ -244,35 +256,54 @@ export default function TopicRace({ month = null, view: askedView = "bars", onCh
 
   return (
     <div className="race">
-      <div className="race__controls">
-        <Button
-          variant="primary"
+      <div className="race__stage">
+        {/* The month sits large and quiet in the corner of the chart, where the shortest bars leave room. */}
+        {!showTable && <p className="race__month" aria-hidden="true">{monthName(label)}</p>}
+        {showTable ? (
+          <RaceTable rows={rows} tagged={data.tagged[near]} windowLabel={windowLabel} />
+        ) : view === "bars" ? (
+          <RaceBars rows={rows} scale={scale} tagged={data.tagged[near]} />
+        ) : (
+          <RaceLines rows={rows} data={data} t={t} yMax={yMaxRef.current} />
+        )}
+      </div>
+      <div className="race__timeline">
+        <button
+          type="button"
           className="race__play"
           onClick={playing ? pause : play}
           aria-label={playing ? "Pause" : t >= last ? `Play from ${monthName(data.months[0])}` : "Play"}
         >
           {playing ? (
-            <svg viewBox="0 0 16 16" width="16" height="16" aria-hidden="true"><rect x="3" y="2" width="3.5" height="12" fill="currentColor" /><rect x="9.5" y="2" width="3.5" height="12" fill="currentColor" /></svg>
+            <svg viewBox="0 0 12 12" width="12" height="12" aria-hidden="true"><rect x="2" y="1" width="2.5" height="10" fill="currentColor" /><rect x="7.5" y="1" width="2.5" height="10" fill="currentColor" /></svg>
           ) : (
-            <svg viewBox="0 0 16 16" width="16" height="16" aria-hidden="true"><path d="M4 2 L14 8 L4 14 Z" fill="currentColor" /></svg>
+            <svg viewBox="0 0 12 12" width="12" height="12" aria-hidden="true"><path d="M2.5 1 L11 6 L2.5 11 Z" fill="currentColor" /></svg>
           )}
-        </Button>
-        <input
-          type="range"
-          className="race__slider"
-          min={0}
-          max={last}
-          step={1}
-          value={near}
-          aria-label="Month of the race"
-          aria-valuetext={windowLabel}
-          onChange={(e) => {
-            const i = Number(e.target.value);
-            setPlaying(false);
-            setT(i);
-            onChange({ month: monthParam(i) });
-          }}
-        />
+        </button>
+        <div className="race__track">
+          <input
+            type="range"
+            className="race__slider"
+            min={0}
+            max={last}
+            step={1}
+            value={near}
+            style={{ "--done": `${(100 * near) / Math.max(1, last)}%` }}
+            aria-label="Month of the race"
+            aria-valuetext={`${monthName(label)}. ${windowLabel}`}
+            onChange={(e) => {
+              const i = Number(e.target.value);
+              setPlaying(false);
+              setT(i);
+              onChange({ month: monthParam(i) });
+            }}
+          />
+          <div className="race__ticks" aria-hidden="true">
+            {yearTicks(data.months).map(({ i, year }) => (
+              <span key={year} className="race__tick" style={{ left: `${(100 * i) / Math.max(1, last)}%` }}>{year}</span>
+            ))}
+          </div>
+        </div>
         {SHOW_LINES_VIEW && (
           <div className="trends-measure" role="group" aria-label="View of the race">
             {[["bars", "Bars"], ["lines", "Lines"]].map(([v, l]) => (
@@ -281,16 +312,6 @@ export default function TopicRace({ month = null, view: askedView = "bars", onCh
           </div>
         )}
       </div>
-      <p className="race__when">
-        <span className="race__month">{monthName(label)}</span>
-      </p>
-      {showTable ? (
-        <RaceTable rows={rows} tagged={data.tagged[near]} windowLabel={windowLabel} />
-      ) : view === "bars" ? (
-        <RaceBars rows={rows} scale={scale} tagged={data.tagged[near]} />
-      ) : (
-        <RaceLines rows={rows} data={data} t={t} yMax={yMaxRef.current} />
-      )}
       <div className="race__foot">
         <Button variant="text" onClick={() => setShowTable((v) => !v)} aria-pressed={showTable}>{showTable ? "Show as chart" : "Show as table"}</Button>
         <CopyButton text={link}>Copy link</CopyButton>
@@ -299,7 +320,7 @@ export default function TopicRace({ month = null, view: askedView = "bars", onCh
             Each month shows the {rules.window_months} months up to it. Share = (the speeches with that subject) / (the total number of
             tagged speeches of those months). A speech is a tagged speech only if it has at least one subject label.
           </p>
-          <p>Usual = the median share of the subject over all months. The bar is the share minus the usual share, in percentage points.</p>
+          <p>Usual = the median share of the subject over all months. The bar is the share minus the usual share, in percentage points. A bar longer than the scale ends in a cut.</p>
           <p>
             A subject needs {formatNumber(rules.min_subject_speeches)} speeches over all years and {formatNumber(rules.min_window_speeches)} speeches
             in the window, to be considered.
