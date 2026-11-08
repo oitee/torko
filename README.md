@@ -87,6 +87,8 @@ A decision model is a model that cannot write free text. It picks from a fixed s
 
 The API description is at `/api/openapi.json`, and an interactive page is at `/api/docs/`. Both addresses exist only when `API_DOCS=true` is in `.env`. The default is off, so the public site does not show them.
 
+`/sitemap.xml` lists the pages that search engines may index: Home, Method, each party with members, each member with speeches, each place with at least 10 speeches, and the 250 tags with the most speeches. Speech and debate pages are not in it, because a rebuild of the database gives them new ids.
+
 ## Two engineering problems
 
 **Problem 1: the disguised Hindi font.** Old pages store Hindi text in a font that predates Unicode, the modern standard for text encoding. The stored bytes look like broken Latin characters, for example `gÉÉÒ`. A reader that ignores this stores meaningless text while it reports success. Torko builds a character map to convert the bytes into real Hindi text. Torko also builds a detector. The detector decides whether the conversion should run. The detector matters because one early version of the fix once converted correct Hindi text into damaged text.

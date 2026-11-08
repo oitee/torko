@@ -1,12 +1,14 @@
 import os
 import pathlib
 
-from flask import Flask, jsonify, request, send_from_directory
+from flask import Flask, Response, jsonify, request, send_from_directory
 
 import dashboard_db
 import openapi
 import pages_api
+import sitemap
 import tag_search
+from pages.common import cached
 from debate_fetch import fetch_debate, split_by_speaker, speaker_distribution
 from debate_fetch_legacy import looks_legacy, split_by_speaker_legacy
 
@@ -152,6 +154,15 @@ for rule in SITE_PAGES:
 def site_assets(name):
     """The built JavaScript and CSS. Each file name holds a hash of its content, so a browser can keep it for a year."""
     return send_from_directory(WEB_DIST / "assets", name, max_age=365 * 24 * 3600)
+
+
+@app.route("/sitemap.xml")
+def site_map():
+    """The page addresses that search engines may index. The list is built once an hour, because it reads every tag."""
+    def build():
+        with pages_api.get_engine().connect() as conn:
+            return sitemap.render(sitemap.site_url(), sitemap.page_paths(conn))
+    return Response(cached("sitemap_xml", build), mimetype="application/xml")
 
 
 @app.errorhandler(404)
