@@ -85,7 +85,7 @@ Two reader files turn HTML into speaking turns. `debate_fetch.py` reads the rece
 
 A decision model is a model that cannot write free text. It picks from a fixed set of answers and gives a probability for each answer. Torko uses these probabilities to keep a tag only when the model is confident.
 
-The API description is at `/api/openapi.json`, and an interactive page is at `/api/docs/`.
+The API description is at `/api/openapi.json`, and an interactive page is at `/api/docs/`. Both addresses exist only when `API_DOCS=true` is in `.env`. The default is off, so the public site does not show them.
 
 ## Two engineering problems
 

@@ -17,7 +17,8 @@ MAX_PAGE_SIZE = 100
 
 pages_api.register()
 app.register_blueprint(pages_api.bp)
-app.register_blueprint(openapi.bp)
+# The API docs (/api/openapi.json, /api/docs/) exist only when API_DOCS=true. Never set it on the public server.
+openapi.register(app)
 
 
 @app.route("/api/dashboard/debates")

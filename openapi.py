@@ -3,14 +3,30 @@
 /api/openapi.json is built from the route table of the app, so a new route appears in it with no extra work.
 The query arguments are not in the route table, so QUERY lists them by path.
 /api/docs/ serves Swagger UI from the package swagger_ui_bundle. The page loads no file from the internet.
+The two addresses are for local work only. The app has them only when API_DOCS=true is in the environment.
 """
 import importlib
+import os
 import re
 
 from flask import Blueprint, current_app, jsonify, send_from_directory
 from swagger_ui_bundle import swagger_ui_path
 
 bp = Blueprint("openapi", __name__)
+
+
+def enabled(env=None):
+    """True only when API_DOCS is "true". With no value, the docs are off, so a public server never shows them."""
+    env = os.environ if env is None else env
+    return env.get("API_DOCS", "false").strip().lower() == "true"
+
+
+def register(app, env=None):
+    """Add the docs addresses to the app when enabled(env) is true. Return True when it added them."""
+    if not enabled(env):
+        return False
+    app.register_blueprint(bp)
+    return True
 
 TYPES = {"IntegerConverter": "integer", "FloatConverter": "number"}
 
