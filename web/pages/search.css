@@ -125,23 +125,6 @@
   color: var(--meta);
 }
 
-.search-rail__csv {
-  align-self: flex-start;
-  display: inline-flex;
-  align-items: center;
-  min-height: var(--control-height);
-  font-family: var(--font-sans);
-  font-size: var(--size-label);
-  font-weight: 500;
-  color: var(--action);
-  text-decoration: underline;
-  text-underline-offset: 3px;
-}
-
-.search-rail__csv:hover {
-  color: var(--action-hover);
-}
-
 .search-leave {
   display: flex;
   flex-direction: column;
@@ -1298,7 +1281,6 @@ a.search-pager__num:hover {
   color: var(--meta);
 }
 
-/* The one-sentence rule above the results */
 .search-results__rule-link {
   color: var(--action);
   text-underline-offset: 3px;
@@ -1313,7 +1295,6 @@ a.search-pager__num:hover {
   color: var(--ink);
 }
 
-/* The start of the page when nothing is searched */
 .search-start {
   display: flex;
   flex-direction: column;
@@ -1465,7 +1446,6 @@ a.search-pager__num:hover {
   font-weight: 500;
 }
 
-/* A finger needs a larger target than a mouse. */
 @media (pointer: coarse) {
   .search-landing__suggestions a {
     min-height: 44px;

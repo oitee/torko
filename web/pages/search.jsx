@@ -10,6 +10,7 @@ import Count from "../components/Count.jsx";
 import HowTorkoCounts from "../components/HowTorkoCounts.jsx";
 import PageLayout from "../components/PageLayout.jsx";
 import SearchBox from "../components/SearchBox.jsx";
+import { Loading } from "../components/States.jsx";
 import SearchMatches from "./search/SearchMatches.jsx";
 import SearchResults from "./search/SearchResults.jsx";
 import SearchScopeCard from "./search/SearchScopeCard.jsx";
@@ -50,7 +51,6 @@ export default function Search() {
   }, [ask, askCall.data, askCall.dataKey, askCall.error, askCall.loading]);
   const q = scope.q || "";
   const hasFilters = Object.keys(params).some((k) => k !== "q");
-  // Nothing is searched: no words, no scope and no filter. The page then shows its start block.
   const searched = Object.keys(params).length > 0;
 
   const listParams = { ...scope, ...filters, sort, page, per_page: PER_PAGE };
@@ -65,8 +65,9 @@ export default function Search() {
   // until its results arrive, so the page changes once, from the box to the results. A direct link to a search
   // opens the results view at once.
   const resultsReady = list.dataKey === listKey && !list.loading;
-  const landingRef = useRef(!searched);
-  if (!searched) landingRef.current = true;
+  const landingRef = useRef(!searched && !ask);
+  // A question waits in ?ask= while it is read. That address has no filters yet, but it is a search, not an empty page.
+  if (!searched && !ask) landingRef.current = true;
   else if (landingRef.current && !ask && (resultsReady || list.error)) landingRef.current = false;
   const landing = landingRef.current;
 
@@ -157,9 +158,6 @@ export default function Search() {
   const chips = chipsFrom(params, names);
 
   const heading = headingParts({ scope, count: speechTotal, names: scopeNames, members: view === "members" ? membersTotal : null });
-  const csvHref = `/api/speeches?${new URLSearchParams(
-    Object.entries({ ...scope, ...filters, sort, format: "csv" })
-  ).toString()}`;
 
   // The breadcrumb names the scope of the search. With no scope to name, the page has no breadcrumb.
   const crumbLabel = q || scopeNames.tag || scopeNames.place || scopeNames.member || "";
@@ -186,7 +184,6 @@ export default function Search() {
       <div className="search-head__summary">
         {speechTotal !== null && <Count n={speechTotal} total={hasFilters ? unfilteredTotal ?? undefined : undefined} noun={searched ? "speeches" : "speeches in total"} />}
         {searched && <CopyButton text={() => window.location.href}>Copy link</CopyButton>}
-        {searched && <a className="search-rail__csv" href={csvHref} download>Download CSV</a>}
       </div>
     </div>
   );
@@ -233,6 +230,14 @@ export default function Search() {
 
   return (
     <PageLayout breadcrumb={crumbLabel ? <Breadcrumb items={[{ label: "Search", href: "/search" }, { label: crumbLabel }]} /> : null} answer={answer}>
+      {ask && (
+        <div className="search-body search-body--waiting" aria-busy="true">
+          <div className="search-rail search-rail--waiting" aria-hidden="true" />
+          <div className="search-main">
+            <Loading lines={8} />
+          </div>
+        </div>
+      )}
       {!ask && <div className="search-body">
         <aside className="search-rail" aria-label="Filters and method">
           <FilterRail
