@@ -19,7 +19,8 @@ describe("YearStrip", () => {
     const order = [...container.querySelectorAll(".year-strip__number")].map((e) => e.textContent);
     expect(order).toEqual(["2003", "2002", "2001"]);
     expect(screen.getAllByText(/3,000 tagged speeches/).length).toBe(3);
-    expect(screen.getByText(/Part year: 1 Jan to 1 May 2003 only/)).toBeTruthy();
+    // The latest year has no part-year note now. The list stays short.
+    expect(screen.queryByText(/Part year/)).toBeNull();
   });
 });
 

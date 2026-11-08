@@ -43,24 +43,20 @@ function SubjectBar({ subject, year, max, lead, slugs, onAdd }) {
 }
 
 // YearStrip lists the years, latest year first. Each year shows the subjects that stood out, as bars on one shared scale.
-// lastDate is the last date of the data. The latest year is a part year when it is set.
-export default function YearStrip({ years, slugs, onAdd, lastDate }) {
+export default function YearStrip({ years, slugs, onAdd }) {
   // The scale comes from full years only. A thin year, such as a year that has only begun, can pass the scale and fills its bar.
   const full = years.filter((y) => y.tagged >= THIN_YEAR);
   const max = Math.max(...(full.length ? full : years).flatMap((y) => y.subjects.map((s) => s.share)), 1);
-  const lastYear = years.length ? Math.max(...years.map((y) => y.year)) : null;
   const latestFirst = [...years].sort((a, b) => b.year - a.year);
   return (
     <ol className="year-strip">
       {latestFirst.map((y) => {
-        const part = y.year === lastYear && Boolean(lastDate);
         return (
           <li key={y.year} className="year-strip__year" id={`year-${y.year}`}>
             <div className="year-strip__when">
               <span className="year-strip__number">{y.year}</span>
               <span className="year-strip__base">
                 {formatNumber(y.tagged)} tagged speeches
-                {part && <span className="year-strip__part"> Part year: 1 Jan to {lastDate} only</span>}
               </span>
             </div>
             {y.subjects.length === 0 ? (

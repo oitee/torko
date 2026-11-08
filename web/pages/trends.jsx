@@ -3,11 +3,9 @@ import { Link, useSearchParams } from "react-router-dom";
 import { getJSON } from "../assets/js/api.js";
 import { formatDateLong, formatNumber } from "../assets/js/format.js";
 import { useAnswer, useApi } from "../assets/js/useApi.js";
-import Breadcrumb from "../components/Breadcrumb.jsx";
 import Button from "../components/Button.jsx";
 import Chip from "../components/Chip.jsx";
 import CopyButton from "../components/CopyButton.jsx";
-import PageAnswer from "../components/PageAnswer.jsx";
 import PageLayout from "../components/PageLayout.jsx";
 import { ErrorState, Loading } from "../components/States.jsx";
 import CompareChart from "./trends/CompareChart.jsx";
@@ -15,7 +13,7 @@ import CompareTable from "./trends/CompareTable.jsx";
 import MethodBlock from "./trends/MethodBlock.jsx";
 import TopicRace from "./trends/TopicRace.jsx";
 import YearStrip from "./trends/YearStrip.jsx";
-import { HEADLINE_MIN_TAGGED, MAX_COMPARE, addSlug, defaultCompare, displayName, headline, removeSlug, readSlugs } from "./trends/trendsData.js";
+import { MAX_COMPARE, addSlug, defaultCompare, displayName, headline, removeSlug, readSlugs } from "./trends/trendsData.js";
 import "./trends.css";
 
 // Hand-picked starting points for Compare. They only fill the chart. They do not rank anything.
@@ -93,7 +91,7 @@ export default function Trends() {
   );
 
   useEffect(() => {
-    document.title = "Trends · Torko";
+    document.title = "Trends over the years · Torko";
   }, []);
 
   // The sheet on a phone closes with Escape, and its close button takes the focus when it opens.
@@ -122,31 +120,20 @@ export default function Trends() {
   // A click in the list of years only adds the subject. The tray and the chart show it. The page does not scroll.
   const addFromTimeline = (slug) => setCompare(addSlug(slugs, slug));
 
-  if (loading && !data) return <main className="trends-page"><h1 className="sr-only">Trends</h1><Loading lines={8} /></main>;
+  if (loading && !data) return <main className="trends-page"><h1 className="sr-only">Trends over the years</h1><Loading lines={8} /></main>;
   if (error) return <main className="trends-page"><ErrorState error={error} onRetry={retry} /></main>;
   if (!data) return null;
 
   const top = headline(data.years);
   const answer = (
     <div className="trends-head">
-      <PageAnswer>
-        {top ? (
-          <>
-            In {top.year}, {top.phrase} tagged speeches in the Lok Sabha {top.phrase.startsWith("one") ? "was" : "were"} about{" "}
-            <Link className="trends-head__subject" to={`/tag/${top.slug}`}>{displayName(top.name)}</Link>
-            {top.n !== undefined && top.tagged ? <> <span className="trends-head__count">({formatNumber(top.n)} of {formatNumber(top.tagged)})</span></> : null}.
-          </>
-        ) : (
-          "What the Lok Sabha talked about, year by year"
-        )}
-      </PageAnswer>
-      <p className="trends-head__lede">
-        Below: the subjects that rose furthest, month by month. Then the top subjects of each year. Then a chart to compare subjects.
-        A tagged speech is a speech with at least one subject label.
-      </p>
-      <p className="trends-head__rule">
-        The sentence shows the largest share that any subject had in one year. Years with fewer than {formatNumber(HEADLINE_MIN_TAGGED)} tagged speeches are left out.
-      </p>
+      <h1 className="trends-head__title">Trends over the years</h1>
+      {top && (
+        <p className="trends-head__lede">
+          In {top.year}, {top.phrase} tagged speeches in the Lok Sabha {top.phrase.startsWith("one") ? "was" : "were"} about{" "}
+          <Link className="trends-head__subject" to={`/tag/${top.slug}`}>{displayName(top.name)}</Link>
+        </p>
+      )}
     </div>
   );
 
@@ -160,31 +147,26 @@ export default function Trends() {
   const names = loaded.map((t) => displayName(t.name));
 
   return (
-    <PageLayout breadcrumb={<Breadcrumb items={[{ label: "Trends" }]} />} answer={answer}>
+    <PageLayout answer={answer}>
       <div className="trends-body">
         <section className="trends-race" aria-labelledby="trends-race-title">
           <div className="trends-race__head">
-            <h2 id="trends-race-title" className="trends-section-title">The subjects rise and fall, month by month</h2>
+            <h2 id="trends-race-title" className="trends-section-title">Rise and fall of topics discussed</h2>
           </div>
           <TopicRace month={raceMonth} view={raceView} onChange={setRace} />
         </section>
 
         <section className="trends-years" aria-labelledby="trends-years-title">
-          <h2 id="trends-years-title" className="trends-section-title">The year’s subjects, latest year first</h2>
+          <h2 id="trends-years-title" className="trends-section-title">Every year’s biggest subjects</h2>
           <p className="trends-years__note">
             The bar is the subject’s share of the tagged speeches of the year. The thin mark is its usual share. A name opens its speeches of that year.
           </p>
-          <MethodBlock full={data.counts_note}>
+          <MethodBlock>
             <p>
-              Each year lists the top {rules.subjects_per_year} subjects. A subject needs {formatNumber(rules.min_year_speeches)} speeches in the year and
-              {" "}{formatNumber(rules.min_subject_speeches)} speeches over all years. Its share must be at least {rules.min_lift} times its usual share.
-            </p>
-            <p>
-              Usual is the median of the yearly shares of the subject. A year counts by the date of the debate.
-              Bars use one scale. The scale comes from years with at least {formatNumber(HEADLINE_MIN_TAGGED)} tagged speeches.
+              A subject’s share must be at least {rules.min_lift} times its usual share. Usual is the median of the yearly shares of the subject.
             </p>
           </MethodBlock>
-          <YearStrip years={data.years} slugs={slugs} onAdd={addFromTimeline} lastDate={partial ? lastDateLong : ""} />
+          <YearStrip years={data.years} slugs={slugs} onAdd={addFromTimeline} />
         </section>
 
         <section className={`trends-compare${sheetOpen ? " trends-compare--sheet" : ""}`} id="compare" aria-labelledby="trends-compare-title">
@@ -208,11 +190,6 @@ export default function Trends() {
             <Loading lines={4} />
           ) : (
             <>
-              {!chosen && fallback.years.length > 0 && (
-                <p className="trends-compare__first">
-                  Shown first: the leading subject of {fallback.years[0]}{fallback.years[1] ? ` and the leading subject of ${fallback.years[1]}` : ""}. Choose other subjects to replace them.
-                </p>
-              )}
               <div className="trends-compare__chips">
                 {loaded.map((t) => (
                   <Chip key={t.slug} label={displayName(t.name)} href={`/tag/${t.slug}`} onRemove={() => setCompare(removeSlug(slugs, slugs[loaded.indexOf(t)]))} />

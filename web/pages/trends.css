@@ -1,11 +1,10 @@
 /* Trends page styles. Every colour, font, size and space comes from tokens.css. */
 .trends-head { display: flex; flex-direction: column; gap: var(--space-3); }
+.trends-head__title { margin: var(--space-6) 0 0; }
 .trends-head__subject { color: var(--action); text-decoration: underline; text-underline-offset: 4px; text-decoration-thickness: 1px; }
 .trends-head__subject:hover { color: var(--action-hover); }
 .trends-head__subject:focus-visible { outline: 2px solid var(--action); outline-offset: 2px; }
-.trends-head__count { font-family: var(--font-mono); font-size: 0.55em; font-weight: 400; color: var(--meta); white-space: nowrap; }
 .trends-head__lede { margin: 0; max-width: 62ch; font-size: var(--size-speech); line-height: 1.55; color: var(--ink); }
-.trends-head__rule { margin: 0; max-width: 62ch; font-size: var(--size-count); line-height: var(--lh-count); color: var(--meta); }
 .trends-body { display: flex; flex-direction: column; gap: var(--space-10); }
 .trends-section-title { margin: 0; font-size: var(--size-title); line-height: var(--lh-title); font-weight: 600; color: var(--ink); }
 
@@ -65,13 +64,6 @@
 .trends-years { display: flex; flex-direction: column; gap: var(--space-3); }
 
 /* The method control under a chart */
-.trends-method { font-size: var(--size-body); line-height: var(--lh-body); color: var(--ink-2); border-top: 1px solid var(--hairline); border-bottom: 1px solid var(--hairline); }
-.trends-method__summary, .trends-method__full > summary { display: flex; align-items: center; min-height: 44px; font-size: var(--size-label); font-weight: 500; color: var(--action); cursor: pointer; }
-.trends-method__summary:focus-visible, .trends-method__full > summary:focus-visible { outline: 2px solid var(--action); outline-offset: 2px; }
-.trends-method__body { max-width: 66ch; padding-bottom: var(--space-3); }
-.trends-method__body p { margin: 0 0 var(--space-2); }
-.trends-method__full { margin-top: var(--space-2); }
-.trends-method__full p { font-size: var(--size-count); line-height: var(--lh-count); color: var(--meta); }
 
 @media (min-width: 1024px) {
   .trends-body { display: grid; grid-template-columns: minmax(0, 5fr) minmax(0, 6fr); gap: var(--space-8); align-items: start; }
@@ -97,7 +89,6 @@
 .year-strip__when { display: flex; flex-direction: column; gap: 2px; }
 .year-strip__number { font-family: var(--font-mono); font-size: var(--size-title); line-height: 1; font-weight: 500; letter-spacing: -0.03em; color: var(--ink); font-variant-numeric: tabular-nums; }
 .year-strip__base { font-family: var(--font-mono); font-size: var(--size-count); line-height: var(--lh-count); color: var(--meta); }
-.year-strip__part { display: block; font-family: var(--font-sans); color: var(--ink-2); }
 .year-strip__none { margin: 0; font-size: var(--size-label); color: var(--meta); }
 .year-strip__subjects { display: flex; flex-direction: column; gap: var(--space-3); margin: 0; padding: 0; list-style: none; }
 .year-strip__subject { display: grid; grid-template-columns: minmax(0, 1fr) auto; grid-template-areas: "label add" "track track"; align-items: baseline; column-gap: var(--space-3); row-gap: var(--space-1); }
@@ -139,7 +130,6 @@
 @media (max-width: 767px) {
   .year-strip__year { grid-template-columns: 1fr; gap: var(--space-2); }
   .year-strip__when { flex-direction: row; flex-wrap: wrap; align-items: baseline; gap: var(--space-1) var(--space-3); }
-  .year-strip__part { display: inline; }
   .year-strip__add { min-height: 44px; }
   .trends-measure__option { min-height: 44px; }
 }
@@ -155,7 +145,6 @@
 .race-lines-box { width: 100%; min-width: 0; }
 .race__when { display: flex; flex-direction: column; gap: var(--space-1); margin: 0; }
 .race__month { font-family: var(--font-mono); font-size: var(--size-title); line-height: var(--lh-title); font-weight: 600; color: var(--ink); font-variant-numeric: tabular-nums; }
-.race__window { font-size: var(--size-count); line-height: var(--lh-count); color: var(--meta); }
 
 .race-bars-box { --race-row: 3.25rem; --race-value-w: 4rem; --race-name-w: 16rem; }
 .race-bars__unit { margin: 0 0 var(--space-1); font-family: var(--font-mono); font-size: var(--size-count); line-height: var(--lh-count); color: var(--meta); }
@@ -197,3 +186,22 @@
   .race-bars__fill { height: 14px; }
   .race__slider { height: 44px; }
 }
+
+/* The rule of a chart: a text link that opens a small panel, as "Add filter" does on Search. */
+.trends-method { position: relative; display: inline-block; }
+.trends-method__link { min-height: 44px; padding: 0; border: 0; background: none; color: var(--action); font: inherit; font-size: var(--size-label); font-weight: 500; text-decoration: underline; text-underline-offset: 3px; cursor: pointer; }
+.trends-method__link:hover { color: var(--action-hover); }
+.trends-method__pop { position: absolute; z-index: 20; top: calc(100% + var(--space-1)); left: 0; width: min(28rem, calc(100vw - 2 * var(--page-pad))); padding: var(--space-3) var(--space-4) var(--space-4); }
+.trends-method__head { display: flex; align-items: center; justify-content: space-between; gap: var(--space-3); }
+.trends-method__title { margin: 0; font-size: var(--size-label); font-weight: 600; }
+.trends-method__close { min-width: 44px; min-height: 44px; margin-right: calc(-1 * var(--space-3)); border: 0; background: none; color: var(--ink-2); font-size: var(--size-label); cursor: pointer; }
+.trends-method__close:hover { color: var(--ink); }
+.trends-method__body { font-size: var(--size-body); line-height: var(--lh-body); color: var(--ink-2); }
+.trends-method__body p { margin: 0 0 var(--space-2); }
+.trends-method__body p:last-child { margin-bottom: 0; }
+
+/* The play button is an icon of the size of a touch target. */
+.race__play { width: var(--control-height); padding: 0; }
+.race-bars__unit { margin: var(--space-2) 0 0; }
+.race-lines__link { cursor: pointer; }
+.race-lines__link:hover .race-lines__label { text-decoration: underline; }

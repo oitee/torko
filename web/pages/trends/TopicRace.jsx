@@ -1,17 +1,20 @@
 import React, { useEffect, useMemo, useRef, useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { formatNumber } from "../../assets/js/format.js";
 import { useAnswer } from "../../assets/js/useApi.js";
 import Button from "../../components/Button.jsx";
 import CopyButton from "../../components/CopyButton.jsx";
 import { ErrorState, Loading } from "../../components/States.jsx";
-import { displayName, downloadCsv, fmtShare, fmtUsual, niceMax } from "./trendsData.js";
-import { aboveAt, monthName, rankAt, raceCsvRows, raceScale, spreadLabels, windowStart } from "./raceData.js";
+import { displayName, fmtShare, fmtUsual, niceMax } from "./trendsData.js";
+import { aboveAt, monthName, rankAt, raceScale, spreadLabels } from "./raceData.js";
 import MethodBlock from "./MethodBlock.jsx";
 import { useWidth } from "./useWidth.js";
 
-const MS_PER_FRAME = 400; // one month of the race takes this time to play
+const MS_PER_FRAME = 900; // one month of the race takes this time to play
 const TRAIL = 60;         // the line view shows the last 60 months
+
+// The race has two views: bars and lines. Only the bars show now. Set this flag to true to show the switch to lines again.
+export const SHOW_LINES_VIEW = false;
 const PAD = { left: 40, right: 4, top: 30, bottom: 28 };
 
 const fmt = (v) => `${v >= 0 ? "+" : "−"}${Math.abs(v).toFixed(1)}`;
@@ -27,7 +30,6 @@ function RaceBars({ rows, scale, tagged }) {
   const at = (v) => `${(100 * v) / scale.top}%`;
   return (
     <div className="race-bars-box" style={{ "--rows": rows.length }}>
-      <p className="race-bars__unit">Points above the usual share. The scale is the same in every month.</p>
       <div className="race-bars">
         <div className="race-bars__grid" aria-hidden="true">
           {ticks.map((v) => <span key={v} className="race-bars__gridline" style={{ left: at(v) }} />)}
@@ -55,6 +57,7 @@ function RaceBars({ rows, scale, tagged }) {
           {ticks.map((v) => <span key={v} className="race-axis__tick" style={{ left: at(v) }}>{axisLabel(v)}</span>)}
         </div>
       </div>
+      <p className="race-bars__unit">Points above the usual share</p>
     </div>
   );
 }
@@ -95,6 +98,7 @@ function RaceTable({ rows, tagged, windowLabel }) {
 // The line view: the last five years of each subject of the top, with its name at the head of its line.
 // The drawing width is the real width of the box, so the text keeps its real size on a phone.
 function RaceLines({ rows, data, t, yMax }) {
+  const navigate = useNavigate();
   const [box, W] = useWidth(900);
   const H = W < 600 ? 360 : 420;
   const labelW = Math.round(Math.min(250, Math.max(130, W * 0.4)));
@@ -135,9 +139,19 @@ function RaceLines({ rows, data, t, yMax }) {
             <polyline points={pts.join(" ")} />
             <circle cx={x(t)} cy={heads[rank]} r={3} />
             <line x1={x(t) + 4} y1={heads[rank]} x2={plotRight + 10} y2={labels[rank]} className="race-lines__leader" />
-            <text x={plotRight + 14} y={labels[rank] + 4} className="race-lines__label">
-              {short(displayName(r.subject.name), nameMax)} <tspan className="race-lines__value">{fmt(r.value)}</tspan>
-            </text>
+            {/* The name opens the page of the subject, as the name of a bar does. */}
+            <a
+              href={`/tag/${r.subject.slug}`}
+              className="race-lines__link"
+              onClick={(e) => {
+                e.preventDefault();
+                navigate(`/tag/${r.subject.slug}`);
+              }}
+            >
+              <text x={plotRight + 14} y={labels[rank] + 4} className="race-lines__label">
+                {short(displayName(r.subject.name), nameMax)} <tspan className="race-lines__value">{fmt(r.value)}</tspan>
+              </text>
+            </a>
           </g>
         );
       })}
@@ -150,7 +164,8 @@ function RaceLines({ rows, data, t, yMax }) {
 // is above their typical share. view is "bars" or "lines".
 // month ("2020-03" or null for the latest) and view come from the address of the page, so a link keeps them.
 // onChange({ month, view }) tells the page to write a new value. A value that is absent stays as it is.
-export default function TopicRace({ month = null, view = "bars", onChange = () => {} }) {
+export default function TopicRace({ month = null, view: askedView = "bars", onChange = () => {} }) {
+  const view = SHOW_LINES_VIEW ? askedView : "bars";
   const { data, loading, error, retry } = useAnswer("/api/trends/race");
   const [t, setT] = useState(null);
   const [playing, setPlaying] = useState(false);
@@ -230,7 +245,18 @@ export default function TopicRace({ month = null, view = "bars", onChange = () =
   return (
     <div className="race">
       <div className="race__controls">
-        <Button variant="primary" onClick={playing ? pause : play}>{playing ? "Pause" : t >= last ? "Play from September 2000" : "Play"}</Button>
+        <Button
+          variant="primary"
+          className="race__play"
+          onClick={playing ? pause : play}
+          aria-label={playing ? "Pause" : t >= last ? `Play from ${monthName(data.months[0])}` : "Play"}
+        >
+          {playing ? (
+            <svg viewBox="0 0 16 16" width="16" height="16" aria-hidden="true"><rect x="3" y="2" width="3.5" height="12" fill="currentColor" /><rect x="9.5" y="2" width="3.5" height="12" fill="currentColor" /></svg>
+          ) : (
+            <svg viewBox="0 0 16 16" width="16" height="16" aria-hidden="true"><path d="M4 2 L14 8 L4 14 Z" fill="currentColor" /></svg>
+          )}
+        </Button>
         <input
           type="range"
           className="race__slider"
@@ -247,15 +273,16 @@ export default function TopicRace({ month = null, view = "bars", onChange = () =
             onChange({ month: monthParam(i) });
           }}
         />
-        <div className="trends-measure" role="group" aria-label="View of the race">
-          {[["bars", "Bars"], ["lines", "Lines"]].map(([v, l]) => (
-            <button key={v} type="button" className="trends-measure__option" aria-pressed={view === v} onClick={() => onChange({ view: v === "bars" ? null : v })}>{l}</button>
-          ))}
-        </div>
+        {SHOW_LINES_VIEW && (
+          <div className="trends-measure" role="group" aria-label="View of the race">
+            {[["bars", "Bars"], ["lines", "Lines"]].map(([v, l]) => (
+              <button key={v} type="button" className="trends-measure__option" aria-pressed={view === v} onClick={() => onChange({ view: v === "bars" ? null : v })}>{l}</button>
+            ))}
+          </div>
+        )}
       </div>
       <p className="race__when">
-        <span className="race__month">{windowLabel}</span>
-        <span className="race__window">{monthName(windowStart(label, rules.window_months))} to {monthName(label)}. Each subject has its share of the {formatNumber(data.tagged[near])} tagged speeches of this window.</span>
+        <span className="race__month">{monthName(label)}</span>
       </p>
       {showTable ? (
         <RaceTable rows={rows} tagged={data.tagged[near]} windowLabel={windowLabel} />
@@ -267,21 +294,18 @@ export default function TopicRace({ month = null, view = "bars", onChange = () =
       <div className="race__foot">
         <Button variant="text" onClick={() => setShowTable((v) => !v)} aria-pressed={showTable}>{showTable ? "Show as chart" : "Show as table"}</Button>
         <CopyButton text={link}>Copy link</CopyButton>
-        <Button variant="text" onClick={() => downloadCsv("torko-race-of-subjects.csv", raceCsvRows(data))}>Download CSV of all months</Button>
+        <MethodBlock>
+          <p>
+            Each month shows the {rules.window_months} months up to it. Share = (the speeches with that subject) / (the total number of
+            tagged speeches of those months). A speech is a tagged speech only if it has at least one subject label.
+          </p>
+          <p>Usual = the median share of the subject over all months. The bar is the share minus the usual share, in percentage points.</p>
+          <p>
+            A subject needs {formatNumber(rules.min_subject_speeches)} speeches over all years and {formatNumber(rules.min_window_speeches)} speeches
+            in the window, to be considered.
+          </p>
+        </MethodBlock>
       </div>
-      <MethodBlock full={data.counts_note}>
-        <p>
-          Each month shows the {rules.window_months} months up to it. Share is the speeches that carry the subject, out of the tagged speeches of those
-          months. A tagged speech has at least one subject label.
-        </p>
-        <p>
-          Usual is the median share of the subject over all months. The bar is the share minus the usual share, in percentage points.
-        </p>
-        <p>
-          A subject needs {formatNumber(rules.min_subject_speeches)} speeches over all years and {formatNumber(rules.min_window_speeches)} speeches in the window.
-          Each month shows the top {rules.top}. Related subjects can share the same speeches, and a speech counts once for each subject.
-        </p>
-      </MethodBlock>
       {!playing && !showTable && (
         <ol className="sr-only">
           {rows.map((r) => (
