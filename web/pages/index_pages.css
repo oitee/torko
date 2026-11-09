@@ -43,6 +43,11 @@
   background: var(--sheet);
 }
 
+/* A term range stays on one line. The frame scrolls sideways on a narrow screen. */
+.index-table__terms {
+  white-space: nowrap;
+}
+
 .index-table {
   width: 100%;
   border-collapse: collapse;

@@ -119,7 +119,7 @@ export default function Parties() {
                   <td className="index-table__num mono">{formatNumber(p.speeches)}</td>
                   <td className="index-table__num index-table__wide mono">{shareText(p.speeches, data.total)}</td>
                   <td className="index-table__num mono">{formatNumber(p.members)}</td>
-                  <td className="index-table__wide mono">{termsText(p.terms)}</td>
+                  <td className="index-table__wide index-table__terms mono">{termsText(p.terms)}</td>
                 </tr>
               ))}
             </tbody>
