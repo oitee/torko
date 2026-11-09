@@ -10,7 +10,7 @@ export default function TagRecentSpeeches({ speeches = [], slug = "", selectedTe
       speeches={speeches}
       meta={`latest · ${termLabel}`}
       href={`/search?tag=${slug}`}
-      empty="No sample speeches for this term yet."
+      empty="No speeches with this tag in this term."
     />
   );
 }

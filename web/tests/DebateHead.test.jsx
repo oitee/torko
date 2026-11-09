@@ -4,7 +4,6 @@ import { afterEach, describe, expect, it } from "vitest";
 import { MemoryRouter } from "react-router-dom";
 import DebateHead, {
   buildDebateCitation,
-  formatDateWithWeekday,
 } from "../pages/debate/DebateHead.jsx";
 
 afterEach(cleanup);
@@ -22,21 +21,14 @@ describe("DebateHead", () => {
     source_url: "https://sansad.in/debate/683",
   };
 
-  it("computes weekday date using Date.UTC correctly", () => {
-    // 2024-03-12 is a Tuesday
-    expect(formatDateWithWeekday("2024-03-12")).toBe("Tuesday, 12 March 2024");
-    // 2025-12-17 is a Wednesday
-    expect(formatDateWithWeekday("2025-12-17")).toBe("Wednesday, 17 December 2025");
-  });
-
   it("builds debate citation string correctly", () => {
-    const cit = buildDebateCitation(sampleDebate);
+    const cit = buildDebateCitation(sampleDebate, new Date(2026, 10, 7));
     expect(cit).toBe(
-      "Lok Sabha Debates, 17 Dec 2025. “Viksit Bharat Gurantee Bill”. 18th Lok Sabha, Winter 2025. Source: https://sansad.in/debate/683"
+      "Lok Sabha Debates, 17 Dec 2025. “Viksit Bharat Gurantee Bill”. 18th Lok Sabha, Winter 2025. Torko: https://torko.in/debate/683. Source: https://sansad.in/debate/683. Accessed 7 Nov 2026."
     );
   });
 
-  it("renders breadcrumb, kicker, title, date, laid notice, and actions", () => {
+  it("renders breadcrumb, date line, title, laid notice, and actions", () => {
     render(
       <MemoryRouter>
         <DebateHead debate={sampleDebate} />
@@ -46,13 +38,13 @@ describe("DebateHead", () => {
     expect(screen.getByRole("navigation", { name: "Breadcrumb" })).toBeTruthy();
     expect(screen.getByText("18th Lok Sabha")).toBeTruthy();
     expect(screen.getByText("Winter 2025")).toBeTruthy();
+    // The crumb holds the short date and the kind. The line under the title holds the long date.
     expect(screen.getByText("17 Dec 2025")).toBeTruthy();
-
     expect(screen.getByText("Bill")).toBeTruthy();
+    expect(screen.getByText("Wednesday, 17 December 2025")).toBeTruthy();
     expect(screen.getByRole("heading", { level: 1 }).textContent).toBe(
       "Viksit Bharat Gurantee Bill"
     );
-    expect(screen.getByText("Wednesday, 17 December 2025")).toBeTruthy();
     expect(
       screen.getByText("Laid on the table. The text was not read aloud.")
     ).toBeTruthy();
@@ -70,9 +62,10 @@ describe("DebateHead", () => {
 
     expect(
       screen.getByText(
-        "Cite the record on sansad.in. Torko is the place you found it."
+        "Cite the official record. The Torko link helps readers find this page."
       )
     ).toBeTruthy();
+    expect(screen.queryByRole("button", { name: "Copy link" })).toBeNull();
   });
 });
 

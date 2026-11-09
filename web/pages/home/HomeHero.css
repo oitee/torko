@@ -7,21 +7,21 @@
   box-shadow: 0 0 0 100vmax var(--header-bg);
   clip-path: inset(0 -100vmax);
   border-top: 1px solid var(--hairline);
-  padding-top: clamp(32px, 6vw, 80px);
+  padding-top: clamp(24px, 4vw, 48px);
 }
 
 .home-hero__grid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(min(100%, 420px), 1fr));
-  gap: clamp(32px, 4vw, 56px);
+  gap: clamp(24px, 4vw, 56px);
   align-items: center;
-  padding-bottom: clamp(32px, 5vw, 64px);
+  padding-bottom: clamp(20px, 3vw, 32px);
 }
 
 .home-hero__text {
   display: flex;
   flex-direction: column;
-  gap: var(--space-5);
+  gap: var(--space-4);
   min-width: 0;
 }
 
@@ -48,13 +48,38 @@
 
 .home-hero__search {
   max-width: 640px;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+}
+
+/* The text link under the search box. It keeps a 44px hit height. */
+.home-hero__find {
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+  font-size: var(--size-label);
+  font-weight: 500;
 }
 
 .home-hero__ideas {
   display: flex;
   flex-wrap: wrap;
+  align-items: baseline;
+  gap: var(--space-2) var(--space-4);
+}
+
+.home-hero__group {
+  display: flex;
+  flex-wrap: wrap;
   align-items: center;
   gap: var(--space-2);
+}
+
+.home-hero__group-label {
+  font-size: var(--size-count);
+  line-height: var(--lh-count);
+  color: var(--ink-2);
 }
 
 .home-hero__ideas-label {

@@ -19,6 +19,17 @@ body {
   line-height: var(--lh-body);
 }
 
+/* Numbers in a table line up in columns. In running text and headings they keep their own width. */
+td,
+th {
+  font-variant-numeric: tabular-nums;
+}
+
+::selection {
+  background: var(--ink);
+  color: var(--sheet);
+}
+
 h1 {
   font-size: var(--size-display);
   line-height: var(--lh-display);
@@ -66,6 +77,22 @@ button {
   line-height: var(--lh-ur);
 }
 
+/* The footer stays at the bottom of a short page. */
+#root {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+}
+
+.site-main {
+  flex: 1 0 auto;
+  width: 100%;
+}
+
+.site-main:focus {
+  outline: none;
+}
+
 .container {
   max-width: var(--page-max);
   margin: 0 auto;
@@ -87,5 +114,37 @@ button {
   color: var(--meta);
   font-size: var(--size-label);
   margin-top: var(--space-14);
-  padding: var(--space-6) 0;
+  padding: var(--space-8) 0;
+}
+
+.site-footer__inner {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: var(--space-4) var(--space-8);
+}
+
+.site-footer__nav {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2) var(--space-6);
+}
+
+.site-footer__nav a {
+  color: var(--ink-2);
+  font-weight: 500;
+  text-decoration: none;
+  min-height: 44px;
+  display: inline-flex;
+  align-items: center;
+}
+
+.site-footer__nav a:hover {
+  color: var(--ink);
+  text-decoration: underline;
+}
+
+.site-footer__source {
+  margin: 0;
 }

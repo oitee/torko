@@ -2,18 +2,14 @@ import React, { useEffect, useRef, useState } from "react";
 import { formatDateLong, termLong } from "../../assets/js/format.js";
 import Breadcrumb from "../../components/Breadcrumb.jsx";
 import Button from "../../components/Button.jsx";
+import CopyButton from "../../components/CopyButton.jsx";
+import { accessedToday } from "../../components/HeadActions.jsx";
 import Popover from "../../components/Popover.jsx";
+import { tidyTitle } from "../../assets/js/titles.js";
+import { SITE_URL } from "../../assets/js/site.js";
 import "./DebateHead.css";
 
-const WEEKDAYS = [
-  "Sunday",
-  "Monday",
-  "Tuesday",
-  "Wednesday",
-  "Thursday",
-  "Friday",
-  "Saturday",
-];
+const WEEKDAYS = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
 
 const MONTHS_LONG = [
   "January",
@@ -30,6 +26,7 @@ const MONTHS_LONG = [
   "December",
 ];
 
+// A date of the form 2025-12-17 as "Wednesday, 17 December 2025".
 export function formatDateWithWeekday(dateStr) {
   if (!dateStr) return "";
   const parts = String(dateStr).split("-");
@@ -38,23 +35,26 @@ export function formatDateWithWeekday(dateStr) {
   const month = parseInt(parts[1], 10) - 1;
   const day = parseInt(parts[2], 10);
   const d = new Date(Date.UTC(year, month, day));
-  const weekday = WEEKDAYS[d.getUTCDay()];
-  const monthName = MONTHS_LONG[month];
-  return `${weekday}, ${day} ${monthName} ${year}`;
+  return `${WEEKDAYS[d.getUTCDay()]}, ${day} ${MONTHS_LONG[month]} ${year}`;
 }
 
-export function buildDebateCitation(debate) {
+export function debateUrl(debate) {
+  return `${SITE_URL}/debate/${debate.id}`;
+}
+
+export function buildDebateCitation(debate, now = new Date()) {
   if (!debate) return "";
   const dateStr = formatDateLong(debate.date);
   const termStr = termLong(debate.term);
   const sess = debate.session_label || `Session ${debate.session}`;
-  const src = debate.source_url || "";
-  return `Lok Sabha Debates, ${dateStr}. “${debate.title}”. ${termStr}, ${sess}. Source: ${src}`;
+  const torko = debate.id ? ` Torko: ${debateUrl(debate)}.` : "";
+  const src = debate.source_url ? ` Source: ${debate.source_url}.` : "";
+  return `Lok Sabha Debates, ${dateStr}. “${tidyTitle(debate.title)}”. ${termStr}, ${sess}.${torko}${src} Accessed ${accessedToday(now)}.`;
 }
 
 export default function DebateHead({ debate }) {
   const [citeOpen, setCiteOpen] = useState(false);
-  const [copied, setCopied] = useState(false);
+  const [copyFailed, setCopyFailed] = useState(false);
   const citeButtonWrapRef = useRef(null);
   const titleRef = useRef(null);
   const [titleOpen, setTitleOpen] = useState(false);
@@ -78,18 +78,11 @@ export default function DebateHead({ debate }) {
     { label: termLong(debate.term) },
     { label: debate.session_label || `Session ${debate.session}` },
     { label: formatDateLong(debate.date) },
+    { label: debate.kind_label || "Debate" },
   ];
 
-  const weekdayDate = formatDateWithWeekday(debate.date);
+  const title = tidyTitle(debate.title);
   const citationText = buildDebateCitation(debate);
-
-  const handleCopyCitation = () => {
-    if (navigator?.clipboard?.writeText) {
-      navigator.clipboard.writeText(citationText);
-    }
-    setCopied(true);
-    setTimeout(() => setCopied(false), 2000);
-  };
 
   return (
     <section className="debate-head">
@@ -97,9 +90,6 @@ export default function DebateHead({ debate }) {
         <Breadcrumb items={breadcrumbItems} />
 
         <div className="debate-head__title-group">
-          <span className="debate-head__kicker mono">
-            {debate.kind_label || "Debate"}
-          </span>
           <h1
             ref={titleRef}
             id="debate-title"
@@ -107,7 +97,7 @@ export default function DebateHead({ debate }) {
               titleOpen ? "debate-head__title--open" : "debate-head__title--cut"
             }`}
           >
-            {debate.title}
+            {title}
           </h1>
           {(titleCut || titleOpen) && (
             <button
@@ -120,7 +110,7 @@ export default function DebateHead({ debate }) {
               {titleOpen ? "Show less of the title" : "Show full title"}
             </button>
           )}
-          <span className="debate-head__date mono">{weekdayDate}</span>
+          <p className="debate-head__date">{formatDateWithWeekday(debate.date)}</p>
         </div>
 
         {debate.laid && (
@@ -130,21 +120,11 @@ export default function DebateHead({ debate }) {
         )}
 
         <div className="debate-head__actions">
-          {debate.source_url && (
-            <a
-              href={debate.source_url}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="button button--secondary"
-            >
-              Read the original on sansad.in
-            </a>
-          )}
-
           <div ref={citeButtonWrapRef} className="debate-head__cite-wrap">
             <Button
               variant="secondary"
               onClick={() => setCiteOpen(!citeOpen)}
+              aria-expanded={citeOpen}
             >
               Cite this debate
             </Button>
@@ -160,17 +140,29 @@ export default function DebateHead({ debate }) {
               <div className="debate-citation">
                 <p className="debate-citation__text">{citationText}</p>
                 <div className="debate-citation__actions">
-                  <Button variant="secondary" onClick={handleCopyCitation}>
-                    {copied ? "Copied" : "Copy citation"}
-                  </Button>
-                  <span className="debate-citation__note meta">
-                    Cite the record on sansad.in. Torko is the place you found
-                    it.
+                  <CopyButton
+                    text={citationText}
+                    variant="secondary"
+                    className="debate-citation__copy"
+                    copiedLabel="Citation copied"
+                    onResult={(ok) => setCopyFailed(!ok)}
+                  >
+                    Copy citation
+                  </CopyButton>
+                  <span className="debate-citation__note meta" role="status">
+                    {copyFailed
+                      ? "The copy failed. Select the text above and copy it."
+                      : "Cite the official record. The Torko link helps readers find this page."}
                   </span>
                 </div>
               </div>
             </Popover>
           </div>
+          {debate.source_url && (
+            <Button variant="text" href={debate.source_url}>
+              Read the original on sansad.in
+            </Button>
+          )}
         </div>
       </div>
     </section>

@@ -64,3 +64,19 @@ describe("PageLayout", () => {
     expect(screen.getByText("Custom content")).toBeTruthy();
   });
 });
+
+describe("PageLayout notes", () => {
+  it("puts the notes of a data page in one band after the main column, with no margin", () => {
+    const { container } = render(
+      <PageLayout answer={<p>Answer</p>} notes={<p>How Torko counts</p>}>
+        <p>Main</p>
+      </PageLayout>
+    );
+    const notes = screen.getByRole("region", { name: "Counts, method and source" });
+    expect(notes.textContent).toBe("How Torko counts");
+    expect(container.querySelector(".page-layout__margin")).toBeNull();
+    // The notes come after the grid of the main column.
+    const grid = container.querySelector(".page-layout__grid");
+    expect(grid.compareDocumentPosition(notes) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
+  });
+});

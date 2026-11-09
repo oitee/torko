@@ -77,6 +77,15 @@
 }
 
 @media (min-width: 1024px) {
+  /* The rail stays in view while the results scroll. It scrolls on its own when it is taller than the window. */
+  .search-rail {
+    position: sticky;
+    top: var(--space-4);
+    max-height: calc(100vh - var(--space-8));
+    overflow-y: auto;
+    padding: 2px;
+  }
+
   .search-body {
     grid-template-columns: 280px minmax(0, 1fr);
     column-gap: calc(var(--space-6) * 2);
@@ -114,23 +123,6 @@
   font-size: var(--size-body);
   line-height: var(--lh-body);
   color: var(--meta);
-}
-
-.search-rail__csv {
-  align-self: flex-start;
-  display: inline-flex;
-  align-items: center;
-  min-height: var(--control-height);
-  font-family: var(--font-sans);
-  font-size: var(--size-label);
-  font-weight: 500;
-  color: var(--action);
-  text-decoration: underline;
-  text-underline-offset: 3px;
-}
-
-.search-rail__csv:hover {
-  color: var(--action-hover);
 }
 
 .search-leave {
@@ -449,6 +441,7 @@ a.search-matches__name:hover {
   color: var(--ink-2);
   font-variant-numeric: tabular-nums;
   text-align: right;
+  white-space: nowrap;
 }
 
 .search-matches__note {
@@ -615,6 +608,7 @@ a.search-matches__name:hover {
 
 /* One speech */
 .search-row {
+  position: relative;
   display: flex;
   flex-direction: column;
   gap: var(--space-1);
@@ -631,10 +625,27 @@ a.search-matches__name:hover {
   background: var(--ground);
 }
 
+/* The whole row opens the speech. The link of the title covers the row. Other links stay above it. */
+.search-row:focus-within {
+  outline: 2px solid var(--action);
+  outline-offset: -2px;
+}
+
+.search-row__debate::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+}
+
+.search-row a:not(.search-row__debate),
+.search-row button {
+  position: relative;
+  z-index: 1;
+}
+
 .search-row__meta {
   display: flex;
   flex-wrap: wrap;
-  justify-content: space-between;
   gap: var(--space-1) var(--space-4);
   font-family: var(--font-mono);
   font-size: var(--size-count);
@@ -664,8 +675,67 @@ a.search-matches__name:hover {
 }
 
 .search-row__debate:focus-visible {
-  outline: 2px solid var(--action);
-  outline-offset: 2px;
+  outline: none;
+}
+
+.search-row__tags {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: var(--space-1) var(--space-3);
+  margin: var(--space-2) 0 0;
+  font-size: var(--size-count);
+  line-height: var(--lh-count);
+}
+
+.search-row__tag {
+  position: relative;
+  z-index: 1;
+  color: var(--ink);
+  text-decoration: none;
+  padding: 2px var(--space-2);
+  border: 1px solid var(--hairline);
+  border-radius: var(--radius);
+  background: var(--sheet);
+}
+
+.search-row__tag:hover {
+  color: var(--ink);
+  border-color: var(--ink);
+}
+
+.search-row__more {
+  color: var(--meta);
+}
+
+.search-row__actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0 var(--space-4);
+  margin: var(--space-1) 0 0;
+}
+
+.search-row__action,
+.search-row .search-row__action.button {
+  display: inline-flex;
+  align-items: center;
+  min-height: var(--control-height);
+  padding: 0;
+  font-family: var(--font-sans);
+  font-size: var(--size-count);
+  line-height: var(--lh-count);
+  font-weight: 400;
+  color: var(--action);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  background: transparent;
+  border: 0;
+  cursor: pointer;
+}
+
+.search-row__action:hover {
+  color: var(--action-hover);
 }
 
 .search-row .speaker-line {
@@ -678,7 +748,7 @@ a.search-matches__name:hover {
   font-family: var(--font-sans);
   font-size: var(--size-body);
   line-height: var(--lh-body);
-  color: var(--ink-2);
+  color: var(--ink);
   overflow-wrap: anywhere;
 }
 
@@ -984,7 +1054,10 @@ a.search-pager__num:hover {
 }
 
 .search-ticks__name {
-  overflow-wrap: anywhere;
+  min-width: 0;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
 }
 
 .search-ticks__n {
@@ -1023,11 +1096,15 @@ a.search-pager__num:hover {
   accent-color: var(--ink);
 }
 
-/* The bar for waiting changes stays in view while the panel scrolls. */
+/* The bar for waiting changes is fixed to the bottom of the window, so it shows at once wherever the box is.
+   The panel scrolls on its own, and at the top of the page its bottom edge is below the window.
+   On a wide screen the bar has the width of the panel and sits under it. */
 .search-apply {
-  position: sticky;
+  position: fixed;
   bottom: var(--space-4);
-  z-index: 5;
+  left: var(--page-pad);
+  right: var(--page-pad);
+  z-index: 30;
   display: flex;
   flex-direction: column;
   gap: var(--space-2);
@@ -1040,6 +1117,14 @@ a.search-pager__num:hover {
 .search-apply__text {
   font-size: var(--size-label);
   color: var(--ink-2);
+}
+
+@media (min-width: 1024px) {
+  .search-apply {
+    right: auto;
+    width: 276px;
+    left: max(var(--page-pad), calc((100vw - var(--page-max)) / 2 + var(--page-pad)));
+  }
 }
 
 .search-apply__actions {
@@ -1194,4 +1279,199 @@ a.search-pager__num:hover {
   font-size: var(--size-label);
   line-height: var(--lh-label);
   color: var(--meta);
+}
+
+.search-results__rule-link {
+  color: var(--action);
+  text-underline-offset: 3px;
+}
+
+.search-results__title {
+  margin: 0;
+  font-family: var(--font-sans);
+  font-size: var(--size-heading);
+  line-height: var(--lh-heading);
+  font-weight: 600;
+  color: var(--ink);
+}
+
+.search-start {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+  padding: var(--space-6);
+  background: var(--sheet);
+  border: 1px solid var(--hairline);
+  border-top: 1px solid var(--ink);
+}
+
+.search-start__title {
+  margin: 0;
+  font-family: var(--font-sans);
+  font-size: var(--size-heading);
+  line-height: var(--lh-heading);
+  font-weight: 600;
+  color: var(--ink);
+}
+
+.search-start__line {
+  margin: 0;
+  font-family: var(--font-mono);
+  font-size: var(--size-body);
+  line-height: var(--lh-body);
+  color: var(--ink);
+  font-variant-numeric: tabular-nums;
+}
+
+.search-start__hint,
+.search-start__rule {
+  margin: 0;
+  color: var(--ink-2);
+  font-size: var(--size-body);
+  line-height: var(--lh-body);
+}
+
+.search-start__rule {
+  color: var(--meta);
+  font-size: var(--size-count);
+  line-height: var(--lh-count);
+}
+
+.search-start__group {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+.search-start__kind {
+  margin: 0;
+  font-family: var(--font-sans);
+  font-size: var(--size-label);
+  line-height: var(--lh-label);
+  font-weight: 600;
+  color: var(--ink-2);
+}
+
+.search-start__list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2) var(--space-6);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.search-start__list li {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 0 var(--space-2);
+  min-width: 0;
+}
+
+.search-start__link {
+  color: var(--action);
+  text-underline-offset: 3px;
+  overflow-wrap: anywhere;
+}
+
+.search-start__n,
+.search-start__note {
+  font-family: var(--font-mono);
+  font-size: var(--size-count);
+  line-height: var(--lh-count);
+  color: var(--meta);
+  font-variant-numeric: tabular-nums;
+}
+
+@media (max-width: 767px) {
+  .search-start {
+    padding: var(--space-4);
+  }
+}
+
+/* The landing view of Search: the box in the middle of the first screen, the suggestions under it,
+   and the latest speeches one screen below. */
+.search-landing {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-4);
+  min-height: calc(100vh - var(--header-height) - var(--space-10));
+  padding: var(--space-10) 0;
+  text-align: center;
+}
+
+.search-landing__title {
+  margin: 0;
+  max-width: 18ch;
+}
+
+.search-landing__box {
+  width: min(44rem, 100%);
+  text-align: left;
+}
+
+.search-landing__box .search-box__input {
+  height: 60px;
+}
+
+@media (min-width: 640px) {
+  .search-landing__box .search-box__input {
+    font-size: 1.125rem;
+  }
+}
+
+.search-landing__box .search-box__button-wrap .button {
+  min-height: 60px;
+  padding: 0 var(--space-6);
+}
+
+.search-landing__suggestions {
+  list-style: none;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 0 var(--space-4);
+  max-width: 44rem;
+  margin: 0;
+  padding: 0;
+}
+
+.search-landing__suggestions a {
+  display: inline-flex;
+  align-items: center;
+  min-height: 32px;
+  font-weight: 500;
+}
+
+@media (pointer: coarse) {
+  .search-landing__suggestions a {
+    min-height: 44px;
+  }
+}
+
+.search-landing__status {
+  margin: 0;
+  color: var(--ink-2);
+}
+
+.search-landing__line {
+  margin: 0;
+  font-family: var(--font-mono);
+  font-size: var(--size-count);
+  line-height: var(--lh-count);
+  color: var(--meta);
+}
+
+.search-landing__down {
+  margin-top: var(--space-2);
+  font-size: var(--size-label);
+  color: var(--ink-2);
+}
+
+.search-latest {
+  scroll-margin-top: var(--space-6);
+  padding-bottom: var(--space-10);
 }

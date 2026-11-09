@@ -51,17 +51,16 @@ describe("HomeQuote", () => {
     expect(screen.getByText("17 Dec 2025")).toBeTruthy();
   });
 
-  it("shows the chosen tags as links, with the count of all tags of the speech", () => {
+  it("shows the chosen tags as links, with no count line under them", () => {
     renderQuote(quote);
     expect(screen.getByRole("link", { name: "Arrears" }).getAttribute("href")).toBe("/tag/arrears");
     expect(screen.queryByRole("link", { name: "Supreme Court" })).toBeNull();
-    expect(screen.getByText("3 of 13 tags of this speech")).toBeTruthy();
+    expect(screen.queryByText(/tags of this speech/)).toBeNull();
   });
 
   it("links a place tag to its place page", () => {
     renderQuote({ ...quote, tags: [{ name: "Delhi", slug: "delhi", type: "place" }] });
     expect(screen.getByRole("link", { name: "Delhi" }).getAttribute("href")).toBe("/place/delhi");
-    expect(screen.getByText("1 of 1 tags of this speech")).toBeTruthy();
   });
 
   it("hides the tag row when the speech has no tags", () => {
@@ -71,6 +70,15 @@ describe("HomeQuote", () => {
 
   it("links to the whole speech", () => {
     renderQuote(quote);
-    expect(screen.getByRole("link", { name: "Read the speech" }).getAttribute("href")).toBe("/speech/178379");
+    expect(
+      screen.getByRole("link", { name: "Read the full speech by Mahua Moitra" }).getAttribute("href")
+    ).toBe("/speech/178379");
+  });
+
+  it("names the term next to the date, with no source link in the card", () => {
+    const { container } = renderQuote(quote);
+    expect(container.querySelector(".home-quote__meta").textContent).toContain("17 Dec 2025 · 18th Lok Sabha · ");
+    expect(screen.queryByRole("link", { name: "Source on sansad.in" })).toBeNull();
+    expect(screen.queryByRole("link", { name: /See all/ })).toBeNull();
   });
 });

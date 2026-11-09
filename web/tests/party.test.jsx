@@ -3,7 +3,7 @@ import { waitFor, cleanup, fireEvent, render, screen } from "@testing-library/re
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { MemoryRouter, Route, Routes } from "react-router-dom";
 import Party from "../pages/party.jsx";
-import { scaleTop, termSentence } from "../pages/party/PartyShareChart.jsx";
+import { scaleTop, shortYears, termSentence } from "../pages/party/PartyShareChart.jsx";
 import { headNumbers, partyColourVars, percent, perThousand, subjectSentence, timesText } from "../pages/party/partyData.js";
 import * as api from "../assets/js/api.js";
 
@@ -85,7 +85,7 @@ describe("party helpers", () => {
 
   it("counts the share of the House and the terms with speeches", () => {
     const values = headNumbers(cpim).map((n) => n.value);
-    expect(values).toEqual(["6,050", "5.6%", "2", "35"]);
+    expect(values).toEqual(["6,050", "5.6%", "2", "0"]);
   });
 });
 
@@ -102,9 +102,12 @@ describe("Party page", () => {
     expect(api.getJSON).toHaveBeenCalledWith("/api/party/CPI(M)", undefined, { signal: expect.any(AbortSignal) });
     await waitFor(() => expect(document.title).toBe("Communist Party of India (Marxist) · Torko"));
     expect(screen.getByRole("heading", { name: "Share of the House, by term" })).toBeTruthy();
+    // The term with the most members who spoke (13th, 35 members) is green. The share chart keeps the party colour.
+    expect(screen.getByTestId("party-members-13").className).toContain("party-share__col--green");
+    expect(screen.getByTestId("party-members-17").className).not.toContain("party-share__col--green");
     expect(screen.getByRole("heading", { name: "Subjects the party raises more than the House" })).toBeTruthy();
-    expect(screen.getByRole("heading", { name: "Places the party raises more than the House" })).toBeTruthy();
-    expect(screen.getByRole("link", { name: "Sunil Khan 6" }).getAttribute("href")).toBe("/member/12");
+    expect(screen.getByRole("heading", { name: "Places the party talks about more than the House" })).toBeTruthy();
+    expect(screen.getByRole("link", { name: /^Sunil Khan.* 6$/ }).getAttribute("href")).toBe("/member/12");
     expect(screen.getByRole("link", { name: /^Kannur:/ }).getAttribute("href")).toBe("/place/kannur");
   });
 
@@ -155,6 +158,41 @@ describe("Party page", () => {
     expect(text).toContain("The list orders the subjects by the extra speeches above that number.");
     expect(text).toContain("A subject needs at least 3 members");
     expect(text).not.toContain("the first rate divided by the second");
+  });
+
+  it("links Parties to the index, and shows the recent speeches with a link to the search", async () => {
+    vi.spyOn(api, "getJSON").mockResolvedValueOnce({
+      ...cpim,
+      recent: [{ id: 5, member: "Sunil Khan", party: "CPI(M)", seat: "Kannur", date: "2026-01-02", debate: "Rail line-Laid", summary: "Asks for a line.", tags: [] }],
+    });
+    renderParty();
+    await screen.findByRole("heading", { level: 1, name: "Communist Party of India (Marxist)" });
+    expect(screen.getByRole("link", { name: "Parties" }).getAttribute("href")).toBe("/parties");
+    expect(screen.getByText("Rail line")).toBeTruthy();
+    expect(screen.getByRole("link", { name: /Read all CPI\(M\) speeches/ }).getAttribute("href")).toBe("/search?party=CPI(M)");
+  });
+
+  it("shows the sentence of a term in a pop-up on its bar, and the years in two digits", async () => {
+    vi.spyOn(api, "getJSON").mockResolvedValueOnce(cpim);
+    const { container } = renderParty();
+    await screen.findByRole("heading", { level: 1, name: "Communist Party of India (Marxist)" });
+    // At rest there is no pop-up: every bar already prints its value.
+    expect(container.querySelector(".bar-tip")).toBeNull();
+    fireEvent.mouseEnter(screen.getByTestId("party-share-17"));
+    expect(container.querySelector(".bar-tip").textContent).toMatch(/^17th Lok Sabha, 2019–2024: 0\.9%/);
+    // The term under the pointer is the green bar of the members chart, not the term with the most members.
+    expect(screen.getByTestId("party-members-17").className).toContain("party-share__col--green");
+    expect(screen.getByTestId("party-members-13").className).not.toContain("party-share__col--green");
+    expect(shortYears("1999–2004")).toBe("99–04");
+    expect(shortYears("2024–")).toBe("24–");
+  });
+
+  it("writes the denominator of the share in the head, and does not colour the number", async () => {
+    vi.spyOn(api, "getJSON").mockResolvedValueOnce(cpim);
+    renderParty();
+    await screen.findByRole("heading", { level: 1, name: "Communist Party of India (Marxist)" });
+    expect(screen.getByText("of all 107,949 tagged speeches in the House")).toBeTruthy();
+    expect(document.querySelector(".party-head__stat--lead")).toBeNull();
   });
 
   it("shows Page not found for an unknown party", async () => {

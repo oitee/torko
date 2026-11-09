@@ -26,10 +26,6 @@
   color: var(--ink);
 }
 
-.tag-when-chart__readout {
-  color: var(--ink-2);
-}
-
 .tag-when-chart__box {
   background: var(--sheet);
   border: 1px solid var(--hairline);
@@ -45,7 +41,60 @@
   gap: var(--space-2);
 }
 
+.tag-when-chart__year-link {
+  align-self: flex-start;
+  color: var(--action);
+  font-size: var(--size-label);
+  text-underline-offset: 3px;
+}
+
+.tag-when-chart__frame {
+  display: grid;
+  grid-template-columns: 3rem minmax(0, 1fr);
+  gap: var(--space-2);
+  /* Room above the bars for the pop-up on the highest bar. */
+  margin-top: var(--space-10);
+}
+
+.tag-when-chart__y {
+  position: relative;
+  height: 240px;
+}
+
+.tag-when-chart__y-tick {
+  position: absolute;
+  right: 0;
+  transform: translateY(50%);
+  font-size: var(--size-count);
+  line-height: 1;
+  color: var(--ink-2);
+}
+
+.tag-when-chart__plot-wrap {
+  position: relative;
+  min-width: 0;
+}
+
+.tag-when-chart__gridlines {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 240px;
+  pointer-events: none;
+}
+
+.tag-when-chart__gridline {
+  position: absolute;
+  left: 0;
+  right: 0;
+  height: 1px;
+  background: var(--hairline);
+}
+
+
 .tag-when-chart__plot {
+  position: relative;
   height: 240px;
   display: grid;
   gap: 3px;
@@ -55,10 +104,11 @@
 }
 
 .tag-when-chart__col {
+  position: relative;
+  cursor: pointer;
   display: flex;
   flex-direction: column-reverse;
   min-height: 0;
-  cursor: default;
   transition: opacity 0.15s ease, outline 0.1s ease;
 }
 
@@ -67,9 +117,9 @@
   outline-offset: 1px;
 }
 
-.tag-when-chart__col--hovered {
-  outline: 2px solid var(--ink);
-  outline-offset: 1px;
+/* One bar is green: the year under the pointer, else the highest year. */
+.tag-when-chart__col--active .tag-when-chart__bar {
+  background-color: var(--action);
 }
 
 .tag-when-chart__col--faded {
@@ -87,17 +137,16 @@
   display: grid;
   gap: 3px;
   font-size: var(--size-count);
+  line-height: var(--lh-count);
   color: var(--ink-2);
   margin-top: var(--space-1);
 }
 
-.tag-when-chart__axis-min {
+.tag-when-chart__axis-year {
+  display: flex;
+  justify-content: center;
   white-space: nowrap;
-}
-
-.tag-when-chart__axis-max {
-  white-space: nowrap;
-  justify-self: end;
+  overflow: visible;
 }
 
 .tag-when-chart__table {

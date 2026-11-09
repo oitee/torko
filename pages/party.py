@@ -9,7 +9,7 @@ from collections import Counter, defaultdict
 
 from sqlalchemy import text
 
-from pages.common import PARTY_AT_DATE, SPEECH_TAGS_CTE, cached, slug, speech_tags_cte
+from pages.common import PARTY_AT_DATE, SPEECH_TAGS_CTE, cached, slug, speech_rows, speech_tags_cte
 
 TERMS = {13: "1999–2004", 14: "2004–2009", 15: "2009–2014", 16: "2014–2019", 17: "2019–2024", 18: "2024–"}
 SUBJECT_KINDS = {"topic", "scheme", "law", "institution", "group", "person"}
@@ -22,6 +22,7 @@ MIN_MEMBERS = 3         # least members of the party who spoke on a subject, so 
 MIN_MEMBERS_PLACE = 2   # the same for places. A seat often has one member per term
 GENERAL_SHARE = 0.03    # a subject on more than 3% of all tagged speeches of the term is general
 TOP = 8
+RECENT = 6              # the latest speeches of the party shown on its page
 PROCEDURE = "Parliament and Procedure"
 
 
@@ -196,8 +197,15 @@ def party_page(conn, code, args=None):
             {"id": pid, "name": people[pid]["name"], "n": n, "terms": terms}
             for pid, n, terms in best if n >= 3]})
 
+    recent_ids = [r[0] for r in conn.execute(text(f"""
+        WITH {PARTY_SPEECHES_CTE}
+        SELECT ps.id FROM party_speeches ps JOIN speeches s ON s.id = ps.id JOIN debates d ON d.id = s.debate_id
+        ORDER BY d.debate_date DESC NULLS LAST, s.word_count DESC, s.id LIMIT :n"""),
+        {"pid": party["id"], "code": code, "n": RECENT}).all()]
+
     return {
         "code": code, "name": party["name"], "colour": party["colour"], "total_tagged": n_party, "all_tagged": n_all,
+        "recent": speech_rows(conn, recent_ids),
         "terms": terms, "typical_all": typ_all, "places": places, "top3": top3,
         "rules": {"min_party_tagged": MIN_PARTY_TAGGED, "min_n_term": MIN_N_TERM, "min_n_all": MIN_N_ALL,
                   "min_n_place": MIN_N_PLACE, "min_members": MIN_MEMBERS, "min_members_place": MIN_MEMBERS_PLACE,
@@ -211,6 +219,7 @@ def party_page(conn, code, args=None):
             "n counts the party's tagged speeches with the tag, share is n divided by the party's tagged speeches "
             "(of the term, or of all terms), base is the same share over all parties, and lift is share divided by base. "
             "extra is n minus the speeches the party would give at the rate of all parties (party tagged speeches times base). "
+            "recent is the latest speeches of the party (at most 6, by debate date, then word count), with the fields of a speech row. "
             "members counts the members of the party who spoke on the tag. The lists keep tags with extra above 0 and "
             "order them by extra, most first. "
             "In top3, n counts the member's tagged speeches with the tag, all in the party's time. "

@@ -2,6 +2,8 @@ import React, { useEffect, useState } from "react";
 import { Link, useParams } from "react-router-dom";
 import { useAnswer } from "../assets/js/useApi.js";
 import { formatNumber, termShort } from "../assets/js/format.js";
+import { tidyTitle } from "../assets/js/titles.js";
+import SpeechGrid from "../components/SpeechGrid.jsx";
 import Breadcrumb from "../components/Breadcrumb.jsx";
 import Chip from "../components/Chip.jsx";
 import HowTorkoCounts from "../components/HowTorkoCounts.jsx";
@@ -12,6 +14,13 @@ import PartyCompare from "./party/PartyCompare.jsx";
 import PartyShareChart from "./party/PartyShareChart.jsx";
 import { activeTerms, headNumbers, partyColourVars } from "./party/partyData.js";
 import "./party.css";
+
+// The first and last term of a member, for example "14th–18th LS". One term gives "17th LS".
+export function termsRange(terms) {
+  const list = [...terms].sort((a, b) => a - b);
+  const first = termShort(list[0]);
+  return list.length === 1 ? first : `${first.replace(" LS", "")}–${termShort(list[list.length - 1])}`;
+}
 
 // The Party page shows the voice of one party in the Lok Sabha: its share of the tagged speeches in each term,
 // the subjects and places it raises more than all parties do, and the members who lead on its top subjects.
@@ -30,13 +39,15 @@ export default function Party() {
       document.title = `${party.name} · Torko`;
     } else if (error?.status === 404) {
       document.title = "Page not found · Torko";
+    } else {
+      document.title = `${String(code || "Party").toUpperCase()} · Torko`;
     }
-  }, [party, error]);
+  }, [party, error, code]);
 
   if (loading) {
     return (
       <main className="party-page party-page--loading">
-        <h1 className="sr-only">Party</h1>
+        <h1 className="head-title">{String(code || "Party").toUpperCase()}</h1>
         <Loading lines={4} />
       </main>
     );
@@ -58,6 +69,7 @@ export default function Party() {
   const picked = term === "all" ? null : party.terms.find((t) => String(t.term) === term);
   const subjects = picked ? picked.typical : party.typical_all;
   const rules = party.rules || {};
+  const recent = (party.recent || []).map((r) => ({ ...r, debate: tidyTitle(r.debate) }));
 
   const head = (
     <div className="party-head">
@@ -67,7 +79,7 @@ export default function Party() {
       </div>
       <dl className="head-numbers">
         {numbers.map((item) => (
-          <div key={item.label} className={`party-head__stat${item.lead ? " party-head__stat--lead" : ""}`}>
+          <div key={item.label} className="party-head__stat">
             <dt className="head-stat-label">{item.label}</dt>
             <dd className="party-head__stat-value head-stat-value">{item.value}</dd>
           </div>
@@ -95,13 +107,23 @@ export default function Party() {
 
   return (
     <div className="party-page" style={partyColourVars(pcode, party.colour)}>
-      <PageLayout breadcrumb={<Breadcrumb items={[{ label: "Parties" }, { label: party.name }]} />} answer={head}>
+      <PageLayout breadcrumb={<Breadcrumb items={[{ label: "Parties", href: "/parties" }, { label: party.name }]} />} answer={head}>
         <div className="page-main">
           <PartyShareChart terms={party.terms} code={pcode} />
+
+          <SpeechGrid
+            id="party-speeches"
+            speeches={recent}
+            meta={`latest of ${pcode} · all terms`}
+            href={`/search?party=${encodeURIComponent(pcode)}`}
+            action={`Read all ${pcode} speeches`}
+            empty={`No ${pcode} speech to show.`}
+          />
 
           <PartyCompare
             id="party-subjects-heading"
             title="Subjects the party raises more than the House"
+            keyText="Dot: the party. Ring: all parties. vs House: how many times more often the party speaks on the subject. Above expected: speeches the party made beyond the number at the rate of all parties."
             meta={picked ? `${termShort(picked.term)} · ${picked.years}` : "all terms"}
             rows={subjects}
             code={pcode}
@@ -112,7 +134,8 @@ export default function Party() {
 
           <PartyCompare
             id="party-places-heading"
-            title="Places the party raises more than the House"
+            title="Places the party talks about more than the House"
+            keyText="A speech counts for a place when the speech has the tag of the place. The list shows places that the party mentions. It does not show places that the party holds."
             meta="all terms"
             rows={party.places}
             code={pcode}
@@ -124,9 +147,9 @@ export default function Party() {
             <section className="party-section" aria-labelledby="party-leaders-heading">
               <div className="section-header">
                 <h2 id="party-leaders-heading" className="party-section__title">
-                  Who speaks on these subjects
+                  Members with most speeches on the top 3 subjects
                 </h2>
-                <span className="party-section__meta mono">tagged speeches · all terms</span>
+                <span className="party-section__meta mono">number of tagged speeches · all terms</span>
               </div>
               <div className="party-leaders">
                 {party.top3
@@ -140,7 +163,12 @@ export default function Party() {
                         {t.members.map((m) => (
                           <li key={m.id}>
                             <Link to={`/member/${m.id}`} className="party-leaders__row">
-                              <span className="party-leaders__name">{m.name}</span>
+                              <span className="party-leaders__name">
+                                {m.name}
+                                {Array.isArray(m.terms) && m.terms.length > 0 && (
+                                  <span className="party-leaders__terms mono"> {termsRange(m.terms)}</span>
+                                )}
+                              </span>
                               <span className="party-leaders__count mono">{formatNumber(m.n)}</span>
                             </Link>
                           </li>
@@ -154,16 +182,25 @@ export default function Party() {
 
           <section className="party-section party-section--method">
             <HowTorkoCounts>
-              The party of a speech is the party of the member on the date of the debate. A tagged speech is a speech with
-              at least one tag of any kind. For each subject, Torko compares two rates: the speeches with the subject in
-              every 1,000 tagged speeches of the party, and the same rate for all parties. From the rate of all parties,
-              Torko finds how many speeches the party would give on the subject. The list orders the subjects by the
-              extra speeches above that number. A subject needs at least {formatNumber(rules.min_members)} members of the
-              party, and {formatNumber(rules.min_n_term)} speeches of the party in one term or{" "}
-              {formatNumber(rules.min_n_all)} in all terms. A place needs {formatNumber(rules.min_members_place)} members.
-              Torko leaves out subjects that
-              are in more than {Math.round((rules.general_share || 0) * 100)}% of all tagged speeches, procedure
-              subjects, and the names of parties.
+              <span className="party-method__line">
+                <strong>Party of a speech.</strong> The party of the member on the date of the debate.
+              </span>
+              <span className="party-method__line">
+                <strong>Tagged speech.</strong> A speech with at least one tag of any kind.
+              </span>
+              <span className="party-method__line">
+                <strong>Order of the subjects.</strong> For each subject, Torko compares two rates: the speeches with the
+                subject in every 1,000 tagged speeches of the party, and the same rate for all parties. At the rate of all
+                parties, Torko finds how many speeches the party would give on the subject. The list orders the subjects by
+                the extra speeches above that number.
+              </span>
+              <span className="party-method__line">
+                <strong>Which subjects count.</strong> A subject needs at least {formatNumber(rules.min_members)} members of
+                the party, and {formatNumber(rules.min_n_term)} speeches of the party in one term or{" "}
+                {formatNumber(rules.min_n_all)} in all terms. A place needs {formatNumber(rules.min_members_place)} members.
+                Torko leaves out subjects that are in more than {Math.round((rules.general_share || 0) * 100)}% of all tagged
+                speeches, procedure subjects, and the names of parties.
+              </span>
             </HowTorkoCounts>
           </section>
         </div>

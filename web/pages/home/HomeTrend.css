@@ -29,19 +29,17 @@
   color: var(--ink);
 }
 
-.home-trend__readout {
-  font-size: var(--size-count);
-  line-height: var(--lh-count);
-  color: var(--meta);
-}
-
 .home-trend__visual {
   display: flex;
   flex-direction: column;
   gap: var(--space-2);
 }
 
+/* Room above the bars for the pop-up on the highest bar. */
 .home-trend__plot {
+  position: relative;
+  margin-top: var(--space-8);
+  touch-action: pan-y;
   height: 160px;
   display: grid;
   gap: 2px;
@@ -49,21 +47,14 @@
   border-bottom: 1px solid var(--ink);
 }
 
-/* Control bars pass 3:1 on the sheet. The highest year is ink, so the eye finds the peak first.
-   No bar is green: green is only for actions. */
+/* Control bars pass 3:1 on the sheet. One bar is green: the year under the pointer, else the highest year. */
 .home-trend__col {
   background: var(--control);
   min-height: 0;
 }
 
-.home-trend__col--peak {
-  background: var(--ink);
-}
-
 .home-trend__col--active {
-  background: var(--ink);
-  outline: 2px solid var(--ink);
-  outline-offset: 1px;
+  background: var(--action);
 }
 
 .home-trend__col:focus-visible {

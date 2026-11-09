@@ -663,3 +663,32 @@
     min-height: var(--control-height);
   }
 }
+
+/* A heading of the record, such as the title of the bill. It has no speaker. */
+.debate-transcript__heading-line {
+  margin: 0;
+  padding: var(--space-2) 0;
+  font-size: var(--size-label);
+  line-height: var(--lh-label);
+  font-style: italic;
+  color: var(--ink-2);
+  overflow-wrap: anywhere;
+}
+
+.debate-speech-card__more {
+  align-self: center;
+  font-size: var(--size-count);
+}
+
+@media (max-width: 767px) {
+  .debate-transcript__turn-body,
+  .debate-transcript__para {
+    overflow-wrap: anywhere;
+    min-width: 0;
+  }
+
+  .debate-transcript__read-more {
+    min-height: 2.75rem;
+    text-align: left;
+  }
+}

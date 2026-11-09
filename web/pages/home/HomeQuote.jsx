@@ -2,11 +2,13 @@ import React from "react";
 import { Link } from "react-router-dom";
 import Button from "../../components/Button.jsx";
 import Chip from "../../components/Chip.jsx";
-import { countOf, formatDateLong } from "../../assets/js/format.js";
+import { tidyTitle } from "../../assets/js/titles.js";
+import { formatDateLong, termLong } from "../../assets/js/format.js";
 import "./HomeQuote.css";
 
 // The most chips that the quote shows.
 export const MAX_QUOTE_TAGS = 3;
+
 
 // The tag types that come first. A topic or a scheme tells the reader what the speech is about.
 // A place, a person or an institution only says what the speech names.
@@ -36,6 +38,8 @@ export default function HomeQuote({ quote }) {
   const tags = Array.isArray(quote.tags) ? quote.tags : [];
   const shown = pickQuoteTags(tags);
 
+  const speechPath = `/speech/${quote.speech_id}`;
+
   return (
     <section className="home-feature" aria-labelledby="home-quote-title">
       <div className="home-feature__text">
@@ -47,8 +51,8 @@ export default function HomeQuote({ quote }) {
           the words of the tag.
         </p>
         <div className="home-feature__action">
-          <Button variant="text" href={`/speech/${quote.speech_id}`}>
-            Read the speech
+          <Button variant="text" href={speechPath} className="home-feature__stretch">
+            Read the full speech by {quote.member}
           </Button>
         </div>
       </div>
@@ -61,7 +65,8 @@ export default function HomeQuote({ quote }) {
           </Link>
           <span className="home-quote__meta">
             <span className="home-quote__date">{formatDateLong(quote.date)}</span>
-            {quote.debate && <> · {quote.debate}</>}
+            {quote.term != null && <> · {termLong(quote.term)}</>}
+            {quote.debate && <> · {tidyTitle(quote.debate)}</>}
           </span>
         </figcaption>
         {shown.length > 0 && (
@@ -71,7 +76,6 @@ export default function HomeQuote({ quote }) {
                 <Chip key={tag.slug} label={tag.name} href={tagHref(tag)} />
               ))}
             </div>
-            <p className="home-quote__count">{countOf(shown.length, tags.length, "tags of this speech")}</p>
           </div>
         )}
       </figure>

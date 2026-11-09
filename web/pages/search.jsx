@@ -1,5 +1,5 @@
-import React, { useEffect, useState } from "react";
-import { useNavigate, useSearchParams } from "react-router-dom";
+import React, { useEffect, useRef, useState } from "react";
+import { Link, useNavigate, useSearchParams } from "react-router-dom";
 import { getJSON } from "../assets/js/api.js";
 import { useApi } from "../assets/js/useApi.js";
 import { formatNumber, termShort } from "../assets/js/format.js";
@@ -10,11 +10,14 @@ import Count from "../components/Count.jsx";
 import HowTorkoCounts from "../components/HowTorkoCounts.jsx";
 import PageLayout from "../components/PageLayout.jsx";
 import SearchBox from "../components/SearchBox.jsx";
+import { Loading } from "../components/States.jsx";
 import SearchMatches from "./search/SearchMatches.jsx";
 import SearchResults from "./search/SearchResults.jsx";
 import SearchScopeCard from "./search/SearchScopeCard.jsx";
 import AskLine, { askAnswers } from "./search/AskLine.jsx";
 import FilterRail from "./search/FilterRail.jsx";
+import CopyButton from "../components/CopyButton.jsx";
+import SearchLanding from "./search/SearchLanding.jsx";
 import { chipsFrom, draftChanges, draftFrom, listOf } from "./search/filterRules.js";
 import { FILTER_KEYS, askHref, defaultSort, headingParts, readSearch } from "./search/searchParams.js";
 import "./search.css";
@@ -48,6 +51,7 @@ export default function Search() {
   }, [ask, askCall.data, askCall.dataKey, askCall.error, askCall.loading]);
   const q = scope.q || "";
   const hasFilters = Object.keys(params).some((k) => k !== "q");
+  const searched = Object.keys(params).length > 0;
 
   const listParams = { ...scope, ...filters, sort, page, per_page: PER_PAGE };
   const listKey = JSON.stringify({ listParams, view });
@@ -56,6 +60,16 @@ export default function Search() {
   );
   // The other calls wait for the list. The list stores the vector and the nearest speeches of a new search for them.
   const listDone = !ask && !list.loading;
+
+  // The landing view shows while nothing is searched. A search that starts from it keeps the landing view
+  // until its results arrive, so the page changes once, from the box to the results. A direct link to a search
+  // opens the results view at once.
+  const resultsReady = list.dataKey === listKey && !list.loading;
+  const landingRef = useRef(!searched && !ask);
+  // A question waits in ?ask= while it is read. That address has no filters yet, but it is a search, not an empty page.
+  if (!searched && !ask) landingRef.current = true;
+  else if (landingRef.current && !ask && (resultsReady || list.error)) landingRef.current = false;
+  const landing = landingRef.current;
 
   // The facets are a call of their own, so the speeches do not wait for them.
   const facetParams = { ...scope, ...filters, facets: 1, per_page: 1 };
@@ -83,6 +97,9 @@ export default function Search() {
   const membersCall = useApi(view === "speeches" && listDone ? JSON.stringify(membersParams) : null, (signal) =>
     getJSON("/api/speeches", membersParams, { signal })
   );
+
+  // The start block reads two more answers: the years and members of the whole archive, and the member with the most speeches.
+  const homeCall = useApi(landing ? "start:home" : null, (signal) => getJSON("/api/home", undefined, { signal }));
 
   const matches = useApi(q || null, (signal) => getJSON("/api/search", { q }, { signal }));
   // The tag, place and member each load their own name, so that they can be on at the same time.
@@ -141,9 +158,9 @@ export default function Search() {
   const chips = chipsFrom(params, names);
 
   const heading = headingParts({ scope, count: speechTotal, names: scopeNames, members: view === "members" ? membersTotal : null });
-  const csvHref = `/api/speeches?${new URLSearchParams(
-    Object.entries({ ...scope, ...filters, sort, format: "csv" })
-  ).toString()}`;
+
+  // The breadcrumb names the scope of the search. With no scope to name, the page has no breadcrumb.
+  const crumbLabel = q || scopeNames.tag || scopeNames.place || scopeNames.member || "";
 
   const answer = (
     <div className="search-head">
@@ -165,15 +182,62 @@ export default function Search() {
         </div>
       )}
       <div className="search-head__summary">
-        {speechTotal !== null && <Count n={speechTotal} total={hasFilters ? unfilteredTotal ?? undefined : undefined} noun="speeches" />}
-        <Button variant="text" onClick={() => navigator.clipboard?.writeText(window.location.href)}>Copy link</Button>
-        <a className="search-rail__csv" href={csvHref} download>Download CSV</a>
+        {speechTotal !== null && <Count n={speechTotal} total={hasFilters ? unfilteredTotal ?? undefined : undefined} noun={searched ? "speeches" : "speeches in total"} />}
+        {searched && <CopyButton text={() => window.location.href}>Copy link</CopyButton>}
       </div>
     </div>
   );
 
+  if (landing) {
+    return (
+      <main className="search-page search-page--landing">
+        <SearchLanding
+          initial={asked || ask || q}
+          total={searched ? null : speechTotal}
+          members={homeCall.data?.corpus?.members}
+          first={homeCall.data?.corpus?.first}
+          last={homeCall.data?.corpus?.last}
+          busy={searched}
+          status={ask ? "Reading your question…" : ""}
+        />
+        {!searched && !ask && (
+          <section id="latest-speeches" className="search-latest" aria-label="Latest speeches">
+            <SearchResults
+              view={view}
+              sort={sort}
+              page={page}
+              data={list.data}
+              loading={list.loading}
+              error={list.error}
+              onRetry={list.retry}
+              speechTotal={speechTotal}
+              membersTotal={membersTotal}
+              viewHref={(v) => hrefWith({ view: v === "speeches" ? null : v })}
+              pageHref={(p) => hrefWith({ page: p > 1 ? p : null })}
+              memberHref={(id) => hrefWith({ member: id, view: null })}
+              onSort={(s) => setWith({ sort: s === defaultSort(q) ? null : s })}
+              query=""
+              tagCount={0}
+              heading="Latest speeches"
+              hasFilters={false}
+              onReset={resetFilters}
+            />
+          </section>
+        )}
+      </main>
+    );
+  }
+
   return (
-    <PageLayout breadcrumb={<Breadcrumb items={[{ label: "Search" }]} />} answer={answer}>
+    <PageLayout breadcrumb={crumbLabel ? <Breadcrumb items={[{ label: "Search", href: "/search" }, { label: crumbLabel }]} /> : null} answer={answer}>
+      {ask && (
+        <div className="search-body search-body--waiting" aria-busy="true">
+          <div className="search-rail search-rail--waiting" aria-hidden="true" />
+          <div className="search-main">
+            <Loading lines={8} />
+          </div>
+        </div>
+      )}
       {!ask && <div className="search-body">
         <aside className="search-rail" aria-label="Filters and method">
           <FilterRail
@@ -193,7 +257,8 @@ export default function Search() {
               {q
                 ? "A speech matches when its own turns and the name of the member hold all the words, or when its summary is near the search in meaning. Words that another member says in an interruption do not count. An exact repeat by the same member is left out. "
                 : ""}
-              Each speech counts once. The counts by party leave out the speeches with no identified member. A filter of party or state leaves them out too, also with “is not”.
+              Each speech counts once. Speeches with no identified member are not in the party counts. A party or state filter leaves them out.{" "}
+              <Link to="/method">Read the full method</Link>
             </HowTorkoCounts>
           </div>
         </aside>
@@ -226,6 +291,7 @@ export default function Search() {
             onSort={(s) => setWith({ sort: s === defaultSort(q) ? null : s })}
             query={q}
             tagCount={tags.length}
+            heading={searched ? "" : "Latest speeches"}
             hasFilters={hasFilters}
             onReset={resetFilters}
           />

@@ -6,12 +6,13 @@ import Home from "../pages/home.jsx";
 import * as api from "../assets/js/api.js";
 import homeAnswer from "./fixtures/home/home.json";
 import featuredAnswer from "./fixtures/home/home_featured.json";
+import methodAnswer from "./fixtures/method/method.json";
 
 afterEach(cleanup);
 
 // Answer each API address with its saved real answer.
 function mockAnswers(overrides = {}) {
-  const answers = { "/api/home": homeAnswer, "/api/home/featured": featuredAnswer, ...overrides };
+  const answers = { "/api/home": homeAnswer, "/api/home/featured": featuredAnswer, "/api/method": methodAnswer, ...overrides };
   return vi.spyOn(api, "getJSON").mockImplementation((path) => {
     const answer = answers[path];
     if (answer instanceof Error || (answer && answer.status)) return Promise.reject(answer);
@@ -71,9 +72,38 @@ describe("Home page", () => {
     expect(await screen.findByText("SUSHRI MAHUA MOITRA (KRISHNANAGAR)")).toBeTruthy();
     expect(screen.getByRole("link", { name: "Krishnanagar" }).getAttribute("href")).toBe("/place/krishnanagar");
     expect(screen.getByText(/allocation-based scheme which the Central Government can alter at whim/)).toBeTruthy();
-    expect(screen.getByText("3 of 13 tags of this speech")).toBeTruthy();
     expect(screen.getByText("205 speeches carry the tag Arrears in all years.")).toBeTruthy();
     expect(screen.getByRole("link", { name: "Latur" }).getAttribute("href")).toBe("/place/latur");
+  });
+
+  it("shows the topics trending this session, with a count for each", async () => {
+    mockAnswers();
+    renderHome();
+    const first = homeAnswer.typical[0];
+    const link = await screen.findByRole("link", { name: new RegExp(`^${first.name.replace(/[()]/g, "\\$&")}, trending`) });
+    expect(link.getAttribute("href")).toBe(`/tag/${first.slug}`);
+    expect(screen.getByRole("heading", { level: 2, name: "Topics trending this session" })).toBeTruthy();
+  });
+
+  it("shows the steps of Torko with their counts, from the Method answer", async () => {
+    mockAnswers();
+    renderHome();
+    const link = await screen.findByRole("link", { name: /turns read from the debates/ });
+    expect(link.getAttribute("href")).toBe("/method");
+  });
+
+  it("keeps the text of the Method part when the Method answer fails", async () => {
+    mockAnswers({ "/api/method": { status: 500, message: "The server could not answer. Try again." } });
+    renderHome();
+    await screen.findByText("SUSHRI MAHUA MOITRA (KRISHNANAGAR)");
+    expect(screen.getByRole("link", { name: "Read how Torko works" })).toBeTruthy();
+    expect(screen.queryByLabelText("The steps of Torko, with their counts")).toBeNull();
+  });
+
+  it("shows three blocks of a fixed size while the examples load", () => {
+    vi.spyOn(api, "getJSON").mockReturnValue(new Promise(() => {}));
+    const { container } = renderHome();
+    expect(container.querySelectorAll(".home-skeleton__block")).toHaveLength(3);
   });
 
   it("keeps the search and the figures when the featured answer fails, and can retry it", async () => {
@@ -114,7 +144,8 @@ describe("Home page", () => {
     expect(screen.queryByText(/Start here/i)).toBeNull();
     const hrefs = screen.getAllByRole("link").map((a) => a.getAttribute("href"));
     for (const href of hrefs) {
-      expect(href).toMatch(/^\/(member|place|speech|tag|my-mp|search|method)/);
+      // The one outside link is the source page of the quote on sansad.in.
+      expect(href).toMatch(/^(\/(member|place|speech|tag|my-mp|search|method)|https:\/\/sansad\.in\/)/);
     }
   });
 

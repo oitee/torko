@@ -81,3 +81,26 @@ def score(s, title_words):
     n = len(s.split())
     sw = {w.lower().strip(",.") for w in s.split()}
     return min(2, len(sw & title_words)) + (2 if 15 <= n <= 28 else 0)
+
+
+def pick_quote(turn_texts, title):
+    """Return (sentence, language) for the best good sentence in the turn texts, or (None, None).
+
+    Same rule as the page "On this day": an English sentence first, and a Hindi sentence only when no English one is good.
+    """
+    title_words = {w.lower() for w in re.findall(r"[A-Za-z]{5,}", title or "")}
+    sents = [sent for t in turn_texts for sent in sentences(clean(t or ""))]
+    best = None
+    for sent in sents:
+        if good(sent):
+            key = (score(sent, title_words), -abs(len(sent.split()) - 24))
+            if best is None or key > best[0]:
+                best = (key, sent)
+    if best:
+        return best[1], "en"
+    for sent in sents:
+        if good_hi(sent):
+            key = -abs(len(sent.split()) - 18)
+            if best is None or key > best[0]:
+                best = (key, sent)
+    return (best[1], "hi") if best else (None, None)

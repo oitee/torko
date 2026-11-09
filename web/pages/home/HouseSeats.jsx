@@ -1,4 +1,5 @@
 import React from "react";
+import { Link } from "react-router-dom";
 import "./HouseSeats.css";
 
 // The size of the House: the Lok Sabha has 543 elected seats. This is a fixed fact, not a figure from the data.
@@ -41,11 +42,17 @@ export function seatLayout(total = HOUSE_SEATS) {
 
 const SEATS = seatLayout();
 
+const MARKED = SEATS.find((s) => s.marked);
+const VIEW_W = 200;
+const VIEW_H = 196;
+
 // HouseSeats draws the seats of the Lok Sabha from above, with one seat marked.
 // The marked seat is a picture of "your seat". It does not stand for a real constituency.
-export default function HouseSeats() {
+// With markedHref, the marked seat is also a link, for example to the page that finds the member of a seat.
+export default function HouseSeats({ markedHref, markedLabel = "Find your MP" }) {
   return (
     <figure className="house-seats">
+      <div className="house-seats__frame">
       <svg
         viewBox="0 0 200 196"
         role="img"
@@ -62,6 +69,15 @@ export default function HouseSeats() {
           />
         ))}
       </svg>
+      {markedHref && (
+        <Link
+          to={markedHref}
+          className="house-seats__marked-link"
+          aria-label={markedLabel}
+          style={{ left: `${(MARKED.x / VIEW_W) * 100}%`, top: `${(MARKED.y / VIEW_H) * 100}%` }}
+        />
+      )}
+      </div>
       <figcaption className="house-seats__caption">
         <span className="house-seats__key" aria-hidden="true" />
         <span>

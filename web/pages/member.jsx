@@ -62,34 +62,47 @@ export default function Member() {
     return null;
   }
 
+  // Every part of the path is a link. The name of the member is the title under it, so the path stops at the seat.
   const breadcrumbItems = [
-    { label: "Members" },
-    ...(member.state ? [{ label: member.state }] : []),
-    {
-      label: member.seat_slug ? (
-        <Link to={`/place/${member.seat_slug}`}>{member.seat || "Seat"}</Link>
-      ) : (
-        member.seat || "Member"
-      ),
-      href: member.seat_slug ? `/place/${member.seat_slug}` : undefined,
-    },
+    { label: "Members", href: "/search?view=members" },
+    ...(member.state
+      ? [{ label: member.state, href: member.state_slug ? `/place/${member.state_slug}` : undefined }]
+      : []),
+    // The seat is the last item. The breadcrumb never links its last item, so the label itself is the link.
+    ...(member.seat
+      ? [
+          {
+            label: member.seat_slug ? (
+              <Link to={`/place/${member.seat_slug}`} className="breadcrumb__link">
+                {member.seat}
+              </Link>
+            ) : (
+              member.seat
+            ),
+          },
+        ]
+      : []),
   ];
 
+  const total = member.speeches || 0;
+  const gridSpeeches = member.recent || [];
+  const gridMeta = `${gridSpeeches.length} of ${formatNumber(total)} speeches · newest first`;
+  const allSpeechesHref = `/search?member=${id}`;
 
   return (
     <div className="member-page">
       <PageLayout
         breadcrumb={<Breadcrumb items={breadcrumbItems} />}
         answer={<MemberHead member={member} />}
-        margin={<MemberMargin member={member} speechesData={speechesData} />}
+        notes={<MemberMargin member={member} speechesData={speechesData} />}
       >
         <div className="member-main">
           <SpeechGrid
             id="speeches"
-            speeches={member.recent}
-            meta="latest · all terms"
-            href={`/search?member=${id}`}
-            action={`See all ${formatNumber(member.speeches || 0)} speeches`}
+            speeches={gridSpeeches}
+            meta={gridMeta}
+            href={allSpeechesHref}
+            action={`See all ${formatNumber(total)} speeches in Search`}
             showSpeaker={false}
           />
 
@@ -104,7 +117,8 @@ export default function Member() {
           {member.typical && member.typical.length > 0 && (
             <MemberSubjects
               typical={member.typical}
-              totalSpeeches={member.speeches || 0}
+              tagged={member.tagged_speeches || 0}
+              memberId={id}
             />
           )}
 

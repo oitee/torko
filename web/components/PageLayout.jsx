@@ -4,7 +4,9 @@ import "./PageLayout.css";
 
 // PageLayout provides the shared grid structure for all content pages.
 // It lays out the breadcrumb, answer, main column, and margin.
-export default function PageLayout({ breadcrumb, answer, margin, children }) {
+// A text page (a speech, a debate) puts its counts, method and source in the margin, next to the text.
+// A data page puts them in notes: one band under the main column, just above the footer.
+export default function PageLayout({ breadcrumb, answer, margin, notes, children }) {
   let marginElement = null;
   if (margin) {
     const isMarginElement =
@@ -35,6 +37,11 @@ export default function PageLayout({ breadcrumb, answer, margin, children }) {
         )}
         <div className="page-layout__main">{children}</div>
       </div>
+      {notes && (
+        <section className="page-layout__notes" aria-label="Counts, method and source">
+          {notes}
+        </section>
+      )}
     </div>
   );
 }

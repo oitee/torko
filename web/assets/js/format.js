@@ -103,6 +103,23 @@ export function termShort(n) {
   return `${n}${ordinalSuffix(n)} LS`;
 }
 
+// A count of speeches with its noun, for example "1 speech" or "1,234 speeches".
+export function speechCount(n) {
+  return n === 1 ? "1 speech" : `${formatNumber(n)} speeches`;
+}
+
+// The first and last year of each Lok Sabha term. The newest term has no last year yet.
+export const TERM_SPANS = { 13: [1999, 2004], 14: [2004, 2009], 15: [2009, 2014], 16: [2014, 2019], 17: [2019, 2024], 18: [2024, null] };
+
+// The years of a term, for example "1999–2004", "2004–09" or "2024–". An unknown term gives "".
+export function termYears(term) {
+  const span = TERM_SPANS[term];
+  if (!span) return "";
+  const [from, to] = span;
+  if (!to) return `${from}–`;
+  return `${from}–${Math.floor(from / 100) === Math.floor(to / 100) ? String(to).slice(2) : to}`;
+}
+
 // Format a count of items out of a total (e.g. 41 of 1,318 speeches).
 export function countOf(n, total, noun) {
   const part = formatNumber(n);

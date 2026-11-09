@@ -47,10 +47,6 @@
   max-width: 16rem;
 }
 
-.party-head__stat--lead .party-head__stat-value {
-  color: var(--party-colour);
-}
-
 /* Main flow */
 
 .party-section {
@@ -88,7 +84,7 @@
 
 .party-box__readout {
   margin: 0;
-  min-height: calc(var(--size-count) * var(--lh-count) * 2);
+  min-height: calc(var(--size-count) * var(--lh-count) * 3);
   font-size: var(--size-count);
   line-height: var(--lh-count);
   color: var(--ink-2);
@@ -96,6 +92,14 @@
 
 .party-box__readout--hint {
   font-family: var(--font-sans);
+  color: var(--meta);
+}
+
+.party-box__hint {
+  margin: 0;
+  font-family: var(--font-sans);
+  font-size: var(--size-count);
+  line-height: var(--lh-count);
   color: var(--meta);
 }
 
@@ -138,20 +142,26 @@
 }
 
 .party-share__plot {
+  position: relative;
   height: 220px;
   display: grid;
   gap: var(--space-3);
   align-items: end;
   border-bottom: 1px solid var(--ink);
-  background-image: linear-gradient(var(--hairline), var(--hairline));
+  background-image: linear-gradient(var(--hairline), var(--hairline)), linear-gradient(var(--hairline), var(--hairline));
   background-size: 100% 1px;
   background-repeat: no-repeat;
-  background-position: top;
+  background-position: top, center;
 }
 
 .party-share__plot--members {
   height: 72px;
-  background-image: none;
+  background-image: linear-gradient(var(--hairline), var(--hairline));
+  background-position: top;
+}
+
+.party-share__scale--members {
+  height: 72px;
 }
 
 .party-share__members {
@@ -163,11 +173,11 @@
 }
 
 .party-share__members-title {
+  grid-column: 1 / -1;
   font-family: var(--font-sans);
   font-size: var(--size-count);
   line-height: var(--lh-count);
-  color: var(--meta);
-  align-self: center;
+  color: var(--ink-2);
 }
 
 .party-share__col {
@@ -182,7 +192,7 @@
 }
 
 .party-share__col:focus-visible {
-  outline: 2px solid var(--action);
+  outline: 2px solid var(--ink);
   outline-offset: 2px;
 }
 
@@ -207,9 +217,15 @@
   font-weight: 500;
 }
 
-.party-share__col--active .party-share__bar {
+.party-share__col--active .party-share__bar:not(.party-share__bar--members) {
   outline: 2px solid var(--ink);
   outline-offset: 1px;
+}
+
+/* The members chart has one grey for every term. One bar is green: the term under the pointer, else the term with the most
+   members. The share chart keeps the colour of the party. */
+.party-share__col--green .party-share__bar--members {
+  background-color: var(--action);
 }
 
 .party-share__axis {
@@ -219,6 +235,10 @@
   font-size: var(--size-count);
   line-height: var(--lh-count);
   color: var(--ink-2);
+}
+
+.party-share__tick-term {
+  white-space: nowrap;
 }
 
 .party-share__tick {
@@ -231,6 +251,10 @@
 
 .party-share__tick-years {
   color: var(--meta);
+}
+
+.party-share__tick-years--short {
+  display: none;
 }
 
 /* Tables */
@@ -328,6 +352,12 @@
   color: var(--meta);
   padding-bottom: var(--space-1);
   border-bottom: 1px solid var(--hairline);
+}
+
+.party-compare__order {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
 }
 
 .party-compare__scale {
@@ -491,13 +521,6 @@
     grid-template-columns: 2.5rem minmax(0, 1fr);
   }
 
-  .party-share__members-title {
-    grid-column: 1 / -1;
-  }
-
-  .party-share__plot--members {
-    grid-column: 2;
-  }
 
   .party-share__axis {
     margin-left: calc(2.5rem + var(--space-2));
@@ -508,7 +531,25 @@
     gap: var(--space-1);
   }
 
-  .party-share__tick-years {
+  .party-share__tick-years--full {
     display: none;
   }
+
+  .party-share__tick-years--short {
+    display: block;
+  }
+
+  .party-share__tick {
+    font-size: var(--size-count);
+  }
+}
+
+.party-leaders__terms {
+  font-size: var(--size-count);
+  color: var(--meta);
+}
+
+.party-method__line {
+  display: block;
+  margin-bottom: var(--space-2);
 }

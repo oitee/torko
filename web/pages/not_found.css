@@ -61,7 +61,7 @@
   stroke-width: 1;
   transform-box: fill-box;
   transform-origin: center;
-  animation: not-found-vacant 2.4s ease-in-out infinite;
+  animation: not-found-vacant 2.4s ease-in-out 3;
 }
 
 @keyframes not-found-vacant {
@@ -79,5 +79,12 @@
 @media (prefers-reduced-motion: reduce) {
   .not-found .house-seats__seat--marked {
     animation: none;
+  }
+}
+
+/* On a narrow phone the seats push the search below the first screen. The picture is decoration, so it goes. */
+@media (max-width: 479px) {
+  .not-found .home-hero__grid > [aria-hidden="true"] {
+    display: none;
   }
 }

@@ -6,9 +6,8 @@ import Place from "../pages/place.jsx";
 import {
   formatMonthYear,
   formatSpan,
-  getKindLabel,
-  getStateFromDescription,
 } from "../pages/place/PlaceHead.jsx";
+import { tickYears } from "../pages/place/PlaceWhen.jsx";
 import * as api from "../assets/js/api.js";
 
 afterEach(cleanup);
@@ -20,6 +19,7 @@ const mockLaturData = {
   domain: null,
   description: "District and Lok Sabha constituency in Maharashtra, India.",
   aliases: ["Lattur", "लातूर"],
+  state: { name: "Maharashtra", slug: "maharashtra", page: true },
   total: 135,
   debates: 126,
   n_members: 28,
@@ -188,29 +188,6 @@ describe("Place page helper functions", () => {
     expect(formatSpan(null, null)).toBe("–");
   });
 
-  it("extracts state from description only if it has 'in '", () => {
-    expect(
-      getStateFromDescription(
-        "District and Lok Sabha constituency in Maharashtra, India.",
-        "district_constituency"
-      )
-    ).toBe("Maharashtra");
-
-    expect(
-      getStateFromDescription("State in eastern India", "state")
-    ).toBeNull();
-
-    expect(
-      getStateFromDescription("A place with no state info", "district")
-    ).toBeNull();
-  });
-
-  it("formats kind label from subtype", () => {
-    expect(getKindLabel("district_constituency")).toBe("Seat and district");
-    expect(getKindLabel("state")).toBe("State");
-    expect(getKindLabel("district")).toBe("District");
-    expect(getKindLabel("constituency")).toBe("Seat");
-  });
 });
 
 describe("Place page integration", () => {
@@ -242,8 +219,9 @@ describe("Place page integration", () => {
     await waitFor(() => expect(document.title).toBe("Latur · Torko"));
 
     // Breadcrumb
-    expect(screen.getByText("Places")).toBeTruthy();
-    expect(screen.getAllByText("Maharashtra").length).toBeGreaterThan(0);
+    // No page links to the Places index for now (owner, 2026-11-08).
+    expect(screen.queryByRole("link", { name: "Places" })).toBeNull();
+    expect(screen.getByRole("link", { name: "Maharashtra" }).getAttribute("href")).toBe("/place/maharashtra");
 
     // Heading & Description
     expect(screen.getByRole("heading", { level: 1, name: "Latur" })).toBeTruthy();
@@ -258,7 +236,13 @@ describe("Place page integration", () => {
     expect(screen.getByText("135")).toBeTruthy();
     expect(screen.getByText("126")).toBeTruthy();
     expect(screen.getByText("28")).toBeTruthy();
-    expect(screen.getByText("Dec 1999 – Jan 2026")).toBeTruthy();
+    expect(screen.getByText("Dec 1999")).toBeTruthy();
+    expect(screen.getByText("Jan 2026")).toBeTruthy();
+    expect(screen.getByText("speeches about this place")).toBeTruthy();
+    // "Unusually common here": the count, a bar, and one sentence for each subject.
+    expect(screen.getAllByText("5 of 72").length).toBeGreaterThan(0);
+    expect(screen.getByText("5 of 72 speeches in the house on this subject are about Latur.")).toBeTruthy();
+    expect(document.querySelector(".place-associated__bar").style.width).toMatch(/^6\.94/);
 
     // When section
     expect(screen.getByRole("heading", { name: "When" })).toBeTruthy();
@@ -266,7 +250,7 @@ describe("Place page integration", () => {
 
     // MPs for this seat section
     expect(
-      screen.getByRole("heading", { name: "MPs for this seat" })
+      screen.getByRole("heading", { name: "MPs of this seat who spoke in the House" })
     ).toBeTruthy();
     expect(screen.getAllByText("Shivraj V. Patil").length).toBeGreaterThan(0);
     expect(screen.getAllByText("Sudhakar Tukaram Shrangare").length).toBeGreaterThan(0);
@@ -328,7 +312,7 @@ describe("Place page integration", () => {
 
     // Should NOT have "MPs for this seat" section
     expect(
-      screen.queryByRole("heading", { name: "MPs for this seat" })
+      screen.queryByRole("heading", { name: "MPs of this seat who spoke in the House" })
     ).toBeNull();
   });
 
@@ -384,8 +368,41 @@ describe("Place page integration", () => {
     });
 
     expect(
-      screen.getByText("No speech in the record names this place yet.")
+      screen.getByText(/Torko has no speech with the tag/)
     ).toBeTruthy();
     expect(screen.queryByRole("heading", { name: "When" })).toBeNull();
+  });
+
+  it("shows the counts of each year in the When chart, with no switch to a rate", async () => {
+    vi.spyOn(api, "getJSON").mockImplementation((url) =>
+      Promise.resolve(url.startsWith("/api/place/latur") ? mockLaturData : mockSpeechesFacets)
+    );
+    renderPlacePage("/place/latur");
+    await screen.findByRole("heading", { name: "When" });
+    // At rest the year with the most speeches is green, with no pop-up. No text says "peak".
+    expect(document.querySelector(".place-when .bar-tip")).toBeNull();
+    expect(screen.getByTestId("place-year-2019").className).toContain("place-when__col--active");
+    expect(screen.getByTestId("place-year-2019").firstChild.style.height).toBe("100%");
+    fireEvent.click(screen.getByTestId("place-year-2024"));
+    expect(screen.getByText("2024: 5 speeches")).toBeTruthy();
+    expect(screen.getByTestId("place-year-2024").className).toContain("place-when__col--active");
+    expect(screen.getByTestId("place-year-2019").className).not.toContain("place-when__col--active");
+    expect(screen.queryByRole("button", { name: /Number of speeches|In every 1,000/ })).toBeNull();
+    expect(screen.queryByText(/in every 1,000/)).toBeNull();
+  });
+});
+
+describe("Place helpers for the new parts", () => {
+  it("picks the labelled years", () => {
+    expect(tickYears([1999, 2000, 2004, 2005, 2026].map((year) => ({ year })))).toEqual([2000, 2005, 2026]);
+  });
+});
+
+describe("PlaceHolders spokeText", () => {
+  it("names the months of speech in short words, and one month once", async () => {
+    const { spokeText } = await import("../pages/place/PlaceHolders.jsx");
+    expect(spokeText("2014-12-03", "2019-02-11")).toBe("spoke Dec 2014 to Feb 2019");
+    expect(spokeText("2003-12-01", "2003-12-20")).toBe("spoke in Dec 2003");
+    expect(spokeText(null, "2003-12-20")).toBeNull();
   });
 });

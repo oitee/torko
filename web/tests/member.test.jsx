@@ -1,9 +1,9 @@
 import React from "react";
-import { cleanup, fireEvent, render, screen, waitFor } from "@testing-library/react";
+import { cleanup, fireEvent, render, screen, waitFor, within } from "@testing-library/react";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { MemoryRouter, Route, Routes } from "react-router-dom";
 import Member from "../pages/member.jsx";
-import { formatPartyPath, buildMemberAnswer } from "../pages/member/MemberHead.jsx";
+import { buildMemberAnswer } from "../pages/member/MemberHead.jsx";
 import * as api from "../assets/js/api.js";
 
 afterEach(cleanup);
@@ -14,6 +14,9 @@ const mockMemberData = {
   seat: "Krishnanagar",
   seat_slug: "krishnanagar",
   state: "West Bengal",
+  state_slug: "west-bengal",
+  rule: { min_member: 3, min_all: 20 },
+  counts_note: "Definitions of the counts.",
   party_path: [
     { code: "AITC", from: 2019, to: null },
   ],
@@ -29,6 +32,8 @@ const mockMemberData = {
       words: 34419,
       first: "2019-06-21",
       last: "2023-12-06",
+      house_median: 32,
+      house_members: 583,
     },
     {
       term: 18,
@@ -39,6 +44,8 @@ const mockMemberData = {
       words: 10200,
       first: "2024-07-01",
       last: "2026-03-10",
+      house_median: 16,
+      house_members: 558,
     },
   ],
   sessions: [
@@ -173,23 +180,13 @@ describe("Member Page", () => {
   });
 
   describe("Unit helpers", () => {
-    it("formatPartyPath formats single current party", () => {
-      const path = [{ code: "BJP", from: 2014, to: null }];
-      expect(formatPartyPath(path)).toBe("BJP since 2014");
-    });
-
-    it("formatPartyPath formats multiple parties in date order", () => {
-      const path = [
-        { code: "NCP", from: 2014, to: 2019 },
-        { code: "INC", from: 2019, to: null },
-      ];
-      expect(formatPartyPath(path)).toBe("INC since 2019 · NCP 2014–2019");
-    });
 
     it("buildMemberAnswer builds answer with top typical subject", () => {
       const text = buildMemberAnswer(mockMemberData);
-      expect(text).toContain("Mahua Moitra has made 66 speeches in the Lok Sabha over 2 terms.");
-      expect(text).toContain("The member speaks most often on right to privacy: 32.5 times the rate of the house.");
+      expect(text).toContain("Mahua Moitra spoke 66 times in 2 terms of the Lok Sabha.");
+      expect(text).not.toContain("median member");
+      expect(text).toContain("Most often on Right to Privacy: 4 of 63 tagged speeches (6%).");
+      expect(text).not.toContain("times the rate");
     });
   });
 
@@ -202,19 +199,30 @@ describe("Member Page", () => {
 
       expect(screen.queryByText("Member of the Lok Sabha")).toBeNull();
       expect(screen.getAllByRole("link", { name: "AITC" })[0].getAttribute("href")).toBe("/party/AITC");
-      expect(screen.getByText(/since 2019/)).toBeTruthy();
+      expect(document.querySelector(".member-head__line").textContent).toMatch(/^MP, Krishnanagar, West Bengal · AITC since 2019/);
+      // The years use the font of the line, not the mono font.
+      expect(document.querySelector(".member-head__line .mono")).toBeNull();
 
       // Answer sentence
       expect(
-        screen.getByText(/Mahua Moitra has made 66 speeches in the Lok Sabha over 2 terms/)
+        screen.getByText(/Mahua Moitra spoke 66 times in 2 terms of the Lok Sabha/)
       ).toBeTruthy();
 
       // Big numbers
-      expect(screen.getByText("2")).toBeTruthy();
+      expect(screen.getAllByText("2").length).toBeGreaterThan(0);
       expect(screen.getAllByText("terms").length).toBeGreaterThan(0);
       expect(screen.getAllByText("66").length).toBeGreaterThan(0);
-      expect(screen.getByText("first")).toBeTruthy();
-      expect(screen.getByText("latest")).toBeTruthy();
+      expect(screen.getByText("words spoken")).toBeTruthy();
+      expect(screen.getAllByText("44,619").length).toBeGreaterThan(0);
+      expect(screen.getByText("2019–2026")).toBeTruthy();
+      expect(screen.queryByText(/sessions with a speech/)).toBeNull();
+      // The head has two actions: Cite in a box, and Copy link as text. No CSV.
+      const cite = screen.getByRole("button", { name: "Cite this page" });
+      expect(cite.className).toContain("button--secondary");
+      expect(screen.getByRole("button", { name: "Copy link" }).className).toContain("button--text");
+      expect(screen.queryByRole("link", { name: /CSV|Download/ })).toBeNull();
+      fireEvent.click(cite);
+      expect(screen.getByRole("dialog", { name: "Citation" }).textContent).toContain("Mahua Moitra, 66 speeches in the Lok Sabha");
 
       // Document title
       await waitFor(() => expect(document.title).toBe("Mahua Moitra · Torko"));
@@ -227,8 +235,13 @@ describe("Member Page", () => {
 
       const nav = screen.getByRole("navigation", { name: "Breadcrumb" });
       expect(nav).toBeTruthy();
-      expect(screen.getByText("Members")).toBeTruthy();
-      expect(screen.getAllByText("West Bengal").length).toBeGreaterThan(0);
+      expect(screen.getByRole("link", { name: "Members" }).getAttribute("href")).toBe("/search?view=members");
+      expect(within(nav).getByRole("link", { name: "West Bengal" }).getAttribute("href")).toBe("/place/west-bengal");
+      // The path stops at the seat. The name is the title under it.
+      expect(nav.textContent).not.toContain("Mahua Moitra");
+      // The seat is a link in the path and in the line under the name.
+      expect(within(nav).getByRole("link", { name: "Krishnanagar" }).getAttribute("href")).toBe("/place/krishnanagar");
+      expect(document.querySelector(".member-head__line a.member-head__seat-link").getAttribute("href")).toBe("/place/krishnanagar");
 
       const seatLinks = screen.getAllByRole("link", { name: "Krishnanagar" });
       expect(seatLinks.some((l) => l.getAttribute("href") === "/place/krishnanagar")).toBe(true);
@@ -240,12 +253,13 @@ describe("Member Page", () => {
       await screen.findByRole("heading", { level: 1, name: "Mahua Moitra" });
 
       expect(screen.getByRole("heading", { name: "Speeches" })).toBeTruthy();
-      const allLink = screen.getByRole("link", { name: "See all 66 speeches" });
-      expect(allLink.getAttribute("href")).toMatch(/^\/search\?member=/);
-
+      expect(screen.getByText("2 of 66 speeches · newest first")).toBeTruthy();
+      const allLink = screen.getByRole("link", { name: "See all 66 speeches in Search" });
+      expect(allLink.getAttribute("href")).toBe("/search?member=1052");
       expect(
         screen.getAllByText("Resolution regarding removal of Speaker from Office").length
       ).toBeGreaterThan(0);
+      expect(screen.queryByRole("button", { name: /Longest/ })).toBeNull();
     });
 
     it("renders activity section with table toggle control", async () => {
@@ -254,7 +268,11 @@ describe("Member Page", () => {
       await screen.findByRole("heading", { level: 1, name: "Mahua Moitra" });
 
       expect(screen.getByRole("heading", { name: "Activity" })).toBeTruthy();
-      expect(screen.getByText(/Above the typical member in 3 of 3 sessions/)).toBeTruthy();
+      expect(screen.getByText(/More speeches than the median member in 3 of 3 sessions/)).toBeTruthy();
+      // The session with the most speeches (Monsoon 2019, 16) has the green bar.
+      const peakBars = document.querySelectorAll(".member-activity__bar--active, .member-activity__narrow-bar--active");
+      expect(peakBars.length).toBeGreaterThan(0);
+      expect(peakBars[0].closest("button").getAttribute("aria-label") || peakBars[0].closest("button").textContent).toMatch(/Monsoon 2019/);
 
       const toggleBtn = screen.getByRole("button", { name: "Show as table" });
       expect(toggleBtn).toBeTruthy();
@@ -278,7 +296,12 @@ describe("Member Page", () => {
       const privacyLink = screen.getByRole("link", { name: "Right to Privacy" });
       expect(privacyLink.getAttribute("href")).toBe("/tag/right-to-privacy");
 
-      expect(screen.getByText("32.5× the house")).toBeTruthy();
+      // Counts first. The ratio shows only from 10 speeches.
+      expect(screen.getByText("4 of 63 tagged (6%) · house 0.2%")).toBeTruthy();
+      expect(screen.queryByText(/× the house/)).toBeNull();
+      expect(screen.getByText("3 of 63 tagged (5%) · house 0.1%").getAttribute("href")).toBe(
+        "/search?member=1052&tag=political-funding"
+      );
 
       // Caret toggle for specific subjects
       const caretBtn = screen.getByRole("button", {
@@ -299,6 +322,8 @@ describe("Member Page", () => {
       expect(screen.getByRole("heading", { name: "Places" })).toBeTruthy();
       expect(screen.getByText("own seat")).toBeTruthy();
       expect(screen.getByText(/Krishnanagar is the place named most often/)).toBeTruthy();
+      // Each place is a tile with its count, its share and a bar.
+      expect(document.querySelectorAll(".member-places__card").length).toBeGreaterThan(0);
     });
 
     it("renders margin counts including Rule 377 count and HowTorkoCounts note", async () => {
@@ -306,14 +331,29 @@ describe("Member Page", () => {
 
       await screen.findByRole("heading", { level: 1, name: "Mahua Moitra" });
 
-      expect(screen.getByText("speeches over 2 terms")).toBeTruthy();
-      expect(screen.getByText("of 66 carry a tag")).toBeTruthy();
-      expect(screen.getByText("matters raised under Rule 377")).toBeTruthy();
+      expect(screen.getByText("speeches in 2 terms")).toBeTruthy();
+      expect(screen.getByText("of 66 speeches carry a tag")).toBeTruthy();
+      expect(screen.getByText("Rule 377").previousSibling.textContent).toBe("6");
+      expect(screen.getByRole("link", { name: "6" }).getAttribute("href")).toBe("/search?member=1052&kind=rule_377");
 
       expect(
         screen.getByText(/A speech is one time the member speaks/)
       ).toBeTruthy();
-      expect(screen.getByText(/Lok Sabha Debates, 2019–2026/)).toBeTruthy();
+      // The record is named, not linked: sansad.in has no page for all debates.
+      expect(screen.getByText("Lok Sabha Debates")).toBeTruthy();
+      expect(screen.queryByRole("link", { name: "Lok Sabha Debates" })).toBeNull();
+      expect(screen.queryByText("Exact definitions of each count")).toBeNull();
+    });
+
+    it("orders subjects by speeches first and by ratio on request", async () => {
+      renderMemberPage();
+      await screen.findByRole("heading", { level: 1, name: "Mahua Moitra" });
+      const order = () => screen.getAllByRole("link", { name: /Right to Privacy|Political Funding/ }).filter((a) => a.getAttribute("href").startsWith("/tag/")).map((a) => a.textContent);
+      expect(order()).toEqual(["Right to Privacy", "Political Funding"]);
+      fireEvent.click(screen.getByRole("button", { name: /Most unusual/ }));
+      expect(order()).toEqual(["Political Funding", "Right to Privacy"]);
+      expect(screen.getByRole("button", { name: "Most unusual" }).getAttribute("aria-pressed")).toBe("true");
+      expect(screen.queryByText(/Bar and first number/)).toBeNull();
     });
 
     it("handles 404 error correctly", async () => {

@@ -1,6 +1,6 @@
 import datetime
 
-from pages import tag
+from pages import quotes, tag
 from tests.pages_db import page_conn  # noqa: F401
 
 def test_shape_tag_keeps_keys_and_adds_named_counts():
@@ -52,19 +52,19 @@ def test_peak_year_tie_goes_to_earlier_year():
 def test_pick_quote_uses_good_sentence_only():
     texts = ["Thank you. This is short.",
              "Farmers in the country deserve a fair price for every single crop grown across the country every year."]
-    assert tag.pick_quote(texts, "Farmers welfare") == (texts[1], "en")
-    assert tag.pick_quote(["Hello."], "x") == (None, None)
-    assert tag.pick_quote([], "x") == (None, None)
+    assert quotes.pick_quote(texts, "Farmers welfare") == (texts[1], "en")
+    assert quotes.pick_quote(["Hello."], "x") == (None, None)
+    assert quotes.pick_quote([], "x") == (None, None)
 
 
 HI = "किसानों को फसल का उचित मूल्य मिलना चाहिए और सरकार को नई योजना लानी चाहिए ताकि गांव मजबूत हों।"
 
 
 def test_pick_quote_takes_hindi_only_when_no_english_sentence_is_good():
-    assert tag.pick_quote([HI], "x") == (HI, "hi")
+    assert quotes.pick_quote([HI], "x") == (HI, "hi")
     en = "Farmers across the country need a fair price for every crop that they grow on their small fields."
     good_en = "Farmers across the country need a fair price for every crop grown on small family fields today."
-    assert tag.pick_quote([HI + " " + good_en], "x") == (good_en, "en")
+    assert quotes.pick_quote([HI + " " + good_en], "x") == (good_en, "en")
 
 
 def test_shape_tag_header_members_and_peak():

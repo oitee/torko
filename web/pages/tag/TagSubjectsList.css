@@ -46,6 +46,17 @@
   flex-direction: column;
   gap: 10px;
   color: var(--ink);
+  text-decoration: none;
+  transition: border-color 0.15s ease;
+}
+
+.tag-subject-card:hover {
+  border-color: var(--ink);
+}
+
+.tag-subject-card:hover .tag-subject-card__label {
+  text-decoration: underline;
+  text-underline-offset: 3px;
 }
 
 .tag-subject-card__label {
@@ -65,7 +76,7 @@
 
 .tag-subject-card__bar {
   height: 100%;
-  background: var(--action);
+  background: var(--ink-2);
   transition: width 0.2s ease;
 }
 

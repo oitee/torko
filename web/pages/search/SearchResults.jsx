@@ -5,37 +5,35 @@ import Button from "../../components/Button.jsx";
 import SpeakerLine from "../../components/SpeakerLine.jsx";
 import TLDR from "../../components/TLDR.jsx";
 import { EmptyState, ErrorState, Loading } from "../../components/States.jsx";
-import { MEMBER_ONLY_SORTS, SORTS, defaultSort, excerptParts, isPhrase, pageWindow, yearSpan } from "./searchParams.js";
+import { tidyTitle } from "../../assets/js/titles.js";
+import { MEMBER_ONLY_SORTS, SORTS, citationText, defaultSort, excerptParts, isPhrase, pageWindow, yearSpan } from "./searchParams.js";
 import PartyLink from "../../components/PartyLink.jsx";
+import CopyButton from "../../components/CopyButton.jsx";
 
-// One speech that matches: when, which debate, who, and the words in their sentence.
+const TAGS_SHOWN = 3;
+
+// Every row shows the title of its debate, also when the row above is in the same debate.
 export function SearchSpeechRow({ speech }) {
+  const title = tidyTitle(speech.debate) || "Speech";
   const meta = [
     formatDateISO(speech.date),
     speech.term != null ? termShort(speech.term) : "",
     speech.kind_label || "",
+    speech.words != null ? `${formatNumber(speech.words)} words` : "",
   ].filter(Boolean);
   const { parts, cutStart, cutEnd } = excerptParts(speech.excerpt, speech.marks);
+  const tags = speech.tags || [];
+  const shownTags = tags.slice(0, TAGS_SHOWN);
 
   return (
     <li className="search-row">
       <div className="search-row__meta">
         <span>{meta.join(" · ")}</span>
-        {speech.words != null && <span className="search-row__words">{formatNumber(speech.words)} words</span>}
       </div>
-      <Link to={`/speech/${speech.id}`} className="search-row__debate">
-        {speech.debate || "Speech"}
+      <Link to={`/speech/${speech.id}`} className="search-row__debate" title={title}>
+        {title}
       </Link>
       <SpeakerLine speech={speech} />
-      {/* The TLDR says what the speech is about. The excerpt below it shows where the words occur. */}
-      {speech.summary && (
-        <div className="search-row__tldr">
-          <TLDR text={speech.summary} />
-        </div>
-      )}
-      {speech.match === "meaning" && (
-        <p className="search-row__why">The summary is near your search in meaning. The speech does not use all your words.</p>
-      )}
       {parts.length > 0 && (
         <p className="search-row__excerpt" lang={scriptLang(speech.excerpt)}>
           “{cutStart && "… "}
@@ -43,6 +41,32 @@ export function SearchSpeechRow({ speech }) {
           {cutEnd && " …"}”
         </p>
       )}
+      {speech.match === "meaning" && (
+        <p className="search-row__why">The summary is near your search in meaning. The speech does not use all your words.</p>
+      )}
+      {speech.summary && (
+        <div className="search-row__tldr">
+          <TLDR text={speech.summary} />
+        </div>
+      )}
+      {shownTags.length > 0 && (
+        <p className="search-row__tags">
+          {shownTags.map((t) => (
+            <Link key={t.slug} to={`/search?tag=${encodeURIComponent(t.slug)}`} className="search-row__tag">
+              {t.name}
+            </Link>
+          ))}
+          {tags.length > TAGS_SHOWN && <span className="search-row__more">+{tags.length - TAGS_SHOWN} more</span>}
+        </p>
+      )}
+      <p className="search-row__actions">
+        {speech.source_url && (
+          <a href={speech.source_url} className="search-row__action" target="_blank" rel="noreferrer">
+            Open on sansad.in
+          </a>
+        )}
+        <CopyButton className="search-row__action" text={() => citationText(speech, window.location.origin)}>Copy citation</CopyButton>
+      </p>
     </li>
   );
 }
@@ -130,18 +154,17 @@ function Pager({ page, pages, pageHref }) {
   );
 }
 
-// The rule of the list in plain words, so that a reader knows why a speech is here.
 function SearchRule({ query, sort, view, data }) {
-  if (isPhrase(query)) return <p className="search-results__rule">These speeches hold these exact words in this order.</p>;
+  const link = <Link to="/method" className="search-results__rule-link">How the list is chosen</Link>;
+  if (isPhrase(query)) return <p className="search-results__rule">These speeches hold these exact words in this order. {link}</p>;
   if (data.by_meaning === false) {
-    return <p className="search-results__rule">Search by meaning is not available now. These speeches hold all your words.</p>;
+    return <p className="search-results__rule">Search by meaning is not available now. These speeches hold all your words. {link}</p>;
   }
   const shortened = view === "speeches" && sort === "best" && data.pages * data.per_page < data.total;
   return (
     <p className="search-results__rule">
-      A speech is here when it holds all your words or its one-sentence summary is near your search in meaning.
-      Put text in quote marks for an exact phrase.
-      {shortened && " Best match orders the top of the list. Choose Latest first to read all of it."}
+      These speeches hold all your words, or are near them in meaning.
+      {shortened && " Best match orders only the top of the list. Choose Latest first to read all of it."} {link}
     </p>
   );
 }
@@ -165,6 +188,7 @@ export default function SearchResults({
   onReset,
   query,
   tagCount = 0,
+  heading = "",
 }) {
   const tabs = [
     { value: "speeches", label: "Speeches", n: speechTotal },
@@ -232,7 +256,7 @@ export default function SearchResults({
 
   return (
     <section className="search-results" aria-labelledby="search-results-title" aria-busy={loading}>
-      <h2 id="search-results-title" className="search-sr">Results</h2>
+      <h2 id="search-results-title" className={heading ? "search-results__title" : "search-sr"}>{heading || "Results"}</h2>
       <div className="search-results__bar">
         <nav className="search-tabs" aria-label="Show">
           {tabs.map((t) => (

@@ -1,11 +1,31 @@
-import React, { useEffect, useRef } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { Link } from "react-router-dom";
 import {
   SPEAKER_NOT_IDENTIFIED,
   SPEAKER_NOT_IDENTIFIED_LINE,
+  formatDateLong,
   scriptLang,
 } from "../../assets/js/format.js";
+import { prefersReducedMotion } from "../../assets/js/motion.js";
+import CopyButton, { speechCitation } from "../../components/CopyButton.jsx";
 import "./SpeechText.css";
+
+// The paragraph id that a hash names, for example "#p7" gives "p7". Other hashes give null.
+export function paragraphIdFromHash(hash) {
+  const m = /^#?(p\d+)$/.exec(hash || "");
+  return m ? m[1] : null;
+}
+
+// The text that the reader selected inside the speech, and the paragraph id where the selection starts.
+function readSelection(root) {
+  const sel = typeof window !== "undefined" ? window.getSelection?.() : null;
+  if (!sel || sel.isCollapsed || !root || !sel.anchorNode || !root.contains(sel.anchorNode)) return null;
+  const quote = sel.toString().replace(/\s+/g, " ").trim();
+  if (!quote) return null;
+  const node = sel.anchorNode.nodeType === 1 ? sel.anchorNode : sel.anchorNode.parentElement;
+  const para = node?.closest?.("[id^='p']");
+  return { quote, paragraph: para && paragraphIdFromHash(para.id) ? para.id : null };
+}
 
 // Split text into paragraphs separated by blank lines, keeping character offsets.
 export function splitParagraphs(fullText) {
@@ -112,6 +132,57 @@ export default function SpeechText({
 }) {
   const markIdRef = useRef(false);
   markIdRef.current = false;
+  const bodyRef = useRef(null);
+  const [selected, setSelected] = useState(null);
+  const [targetId, setTargetId] = useState(() => paragraphIdFromHash(typeof window !== "undefined" ? window.location.hash : ""));
+  const [linkCopied, setLinkCopied] = useState(null);
+
+  // A hash such as #p7 marks that paragraph and brings it into view, also when the data came after the page.
+  useEffect(() => {
+    const read = () => setTargetId(paragraphIdFromHash(window.location.hash));
+    window.addEventListener("hashchange", read);
+    return () => window.removeEventListener("hashchange", read);
+  }, []);
+  useEffect(() => {
+    if (!targetId) return;
+    const el = document.getElementById(targetId);
+    if (el && typeof el.scrollIntoView === "function") {
+      el.scrollIntoView({ behavior: prefersReducedMotion() ? "auto" : "smooth", block: "start" });
+    }
+    // Only the first load and a new hash move the page.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [targetId, turns.length]);
+
+  useEffect(() => {
+    const read = () => setSelected(readSelection(bodyRef.current));
+    document.addEventListener("selectionchange", read);
+    return () => document.removeEventListener("selectionchange", read);
+  }, []);
+
+  // The paragraph sign puts the paragraph in the address and copies the link.
+  const copyParagraphLink = async (event, id) => {
+    event.preventDefault();
+    window.history.replaceState(null, "", `#${id}`);
+    setTargetId(id);
+    let ok = false;
+    try {
+      await navigator.clipboard.writeText(`${window.location.origin}${window.location.pathname}#${id}`);
+      ok = true;
+    } catch {
+      // The browser blocks the clipboard. The address bar holds the link.
+    }
+    setLinkCopied(ok ? id : null);
+  };
+
+  const quoteCitation = () =>
+    `${speechCitation({
+      quote: selected?.quote,
+      member: speaker?.member,
+      party: speaker?.party,
+      seat: speaker?.seat,
+      date: speaker?.date ? formatDateLong(speaker.date) : "",
+      id: speaker?.id,
+    })}${selected?.paragraph ? `#${selected.paragraph}` : ""}`;
 
   // Scroll to the first mark when activeMarks is updated
   useEffect(() => {
@@ -149,7 +220,17 @@ export default function SpeechText({
         The speech
       </h2>
 
-      <div className="speech-text__body">
+      <div className="speech-text__select-bar meta" aria-live="polite">
+        {selected ? (
+          <CopyButton text={quoteCitation} copiedLabel="Copied with source">
+            Copy the selected words with the source
+          </CopyButton>
+        ) : (
+          <span>Select words in the speech to copy them with the source. Select the ¶ sign to copy a link to a paragraph.</span>
+        )}
+      </div>
+
+      <div className="speech-text__body" ref={bodyRef}>
         {!hasMember && (
           <div className="speech-text__unidentified">
             <div className="speech-text__unidentified-name">
@@ -178,15 +259,19 @@ export default function SpeechText({
                   return (
                     <p
                       key={pIdx}
-                      className="speech-text__paragraph"
+                      id={`p${paraNum}`}
+                      className={`speech-text__paragraph${targetId === `p${paraNum}` ? " speech-text__paragraph--target" : ""}`}
                       lang={scriptLang(p.text)}
                     >
-                      <span
-                        className="speech-text__para-num mono meta"
-                        aria-label={`Paragraph ${paraNum}`}
+                      <a
+                        href={`#p${paraNum}`}
+                        className="speech-text__para-num mono"
+                        title={`Copy the link to paragraph ${paraNum}`}
+                        aria-label={`Paragraph ${paraNum}. Copy the link.`}
+                        onClick={(e) => copyParagraphLink(e, `p${paraNum}`)}
                       >
                         ¶{paraNum}
-                      </span>
+                      </a>
                       <span className="speech-text__para-body">
                         {renderParagraphContent(
                           p,
@@ -258,6 +343,11 @@ export default function SpeechText({
         Text from the Lok Sabha debates on sansad.in. Interruptions are kept as
         printed.
       </p>
+      {linkCopied && (
+        <p className="speech-text__footer meta" role="status">
+          The link to paragraph {linkCopied.slice(1)} is copied.
+        </p>
+      )}
     </section>
   );
 }

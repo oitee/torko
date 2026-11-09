@@ -1,0 +1,189 @@
+
+.index-head__title {
+  margin: var(--space-6) 0 var(--space-2);
+}
+
+.index-tools {
+  display: flex;
+  flex-direction: column;
+}
+
+.index-filter {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+  max-width: 28rem;
+  margin: 0 0 var(--space-3);
+}
+
+.index-filter__label {
+  font-size: var(--size-label);
+  font-weight: 500;
+}
+
+.index-filter__input {
+  height: var(--input-height);
+  padding: 0 var(--space-3);
+  border: 1px solid var(--control);
+  border-radius: var(--radius);
+  background: var(--sheet);
+  color: var(--ink);
+  font: inherit;
+  font-size: 1rem;
+}
+
+.index-count {
+  color: var(--meta);
+  margin: 0 0 var(--space-3);
+}
+
+.index-table-frame {
+  overflow-x: auto;
+  border: 1px solid var(--hairline);
+  background: var(--sheet);
+}
+
+.index-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: var(--size-body);
+}
+
+.index-table th,
+.index-table td {
+  padding: var(--space-2) var(--space-4);
+  border-bottom: 1px solid var(--hairline);
+  text-align: left;
+  vertical-align: baseline;
+}
+
+.index-table thead th {
+  font-size: var(--size-label);
+  font-weight: 500;
+  color: var(--meta);
+}
+
+.index-table tbody th {
+  font-weight: 400;
+}
+
+.index-table tbody tr:hover {
+  background: var(--ground);
+}
+
+.index-table__num {
+  text-align: right !important;
+  white-space: nowrap;
+}
+
+.index-table__name {
+  font-weight: 500;
+}
+
+.index-table__code {
+  color: var(--meta);
+}
+
+.index-section-title {
+  font-size: var(--size-heading);
+  line-height: var(--lh-heading);
+  margin: var(--space-6) 0 var(--space-3);
+}
+
+.index-featured__list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(14rem, 1fr));
+  gap: var(--space-3);
+}
+
+.index-featured__list li {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+  padding: var(--space-3) var(--space-4);
+  border: 1px solid var(--hairline);
+  background: var(--sheet);
+}
+
+.index-featured__list a {
+  font-weight: 500;
+}
+
+.index-featured__state {
+  color: var(--meta);
+  font-size: var(--size-label);
+}
+
+.index-featured__list .mono {
+  color: var(--ink-2);
+}
+
+.index-places {
+  columns: 3 16rem;
+  column-gap: var(--space-8);
+}
+
+.index-places__state {
+  break-inside: avoid;
+  margin: 0 0 var(--space-6);
+}
+
+.index-places__title {
+  font-size: var(--size-heading);
+  line-height: var(--lh-heading);
+  margin: 0 0 var(--space-2);
+  padding-bottom: var(--space-1);
+  border-bottom: 1px solid var(--hairline);
+}
+
+.index-places__seats {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.index-places__seats li {
+  display: flex;
+  justify-content: space-between;
+  gap: var(--space-3);
+  min-height: 32px;
+  align-items: baseline;
+  padding: var(--space-1) 0;
+}
+
+.index-places__n {
+  color: var(--meta);
+}
+
+.index-places__seats span:not(.index-places__n) {
+  color: var(--ink-2);
+}
+
+.index-method {
+  margin-top: var(--space-10);
+}
+
+.index-section-lede {
+  margin: calc(-1 * var(--space-2)) 0 var(--space-3);
+  color: var(--ink-2);
+  max-width: 66ch;
+}
+
+.index-section-foot {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-1) var(--space-4);
+}
+
+.party-weight-section {
+  margin-bottom: var(--space-6);
+}
+
+/* One block for the body of an index page, so the large gap of .page-main does not sit between its parts. */
+.index-body > .index-section-title:first-child {
+  margin-top: 0;
+}

@@ -36,7 +36,10 @@ describe("TagMembersList component", () => {
     );
 
     expect(screen.getByRole("heading", { name: "Who spoke" })).toBeTruthy();
-    expect(screen.getByText("most speeches · 17th Lok Sabha")).toBeTruthy();
+    expect(screen.getByText("most speeches on this tag · 17th Lok Sabha")).toBeTruthy();
+    // No header row: each count already says what it counts.
+    expect(screen.queryByText(/^Speeches on this tag/)).toBeNull();
+    expect(screen.queryByText("Member")).toBeNull();
 
     const link1 = screen.getByRole("link", { name: /Kunwar Danish Ali/ });
     expect(link1.getAttribute("href")).toBe("/member/844");
@@ -49,7 +52,7 @@ describe("TagMembersList component", () => {
     expect(screen.getByText("6")).toBeTruthy();
 
     expect(
-      screen.getByText("Members with 3 or more speeches on this tag.")
+      screen.getByText(/at least 3 speeches on this tag/)
     ).toBeTruthy();
   });
 
@@ -61,7 +64,7 @@ describe("TagMembersList component", () => {
     );
 
     expect(
-      screen.getByText("No sample members for this term yet.")
+      screen.getByText(/No member has 3 or more speeches on this tag/)
     ).toBeTruthy();
   });
 });

@@ -88,3 +88,9 @@
     max-width: 67%;
   }
 }
+
+/* The notes of a data page: counts, method and source, under the main column and above the footer.
+   Each block of the notes is one column of a grid, so the band stays short on a wide screen. */
+.page-layout__notes {
+  min-width: 0;
+}

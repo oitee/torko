@@ -1,10 +1,19 @@
 import React from "react";
 import { cleanup, render, screen } from "@testing-library/react";
 import { afterEach, describe, expect, it } from "vitest";
+import { MemoryRouter } from "react-router-dom";
 import HomeFigures, { termRange } from "../pages/home/HomeFigures.jsx";
 import homeAnswer from "./fixtures/home/home.json";
 
 afterEach(cleanup);
+
+function renderFigures(corpus) {
+  return render(
+    <MemoryRouter>
+      <HomeFigures corpus={corpus} />
+    </MemoryRouter>
+  );
+}
 
 describe("termRange", () => {
   it("names the first and the last term", () => {
@@ -23,7 +32,7 @@ describe("termRange", () => {
 
 describe("HomeFigures", () => {
   it("shows each figure of the saved corpus answer with its label", () => {
-    render(<HomeFigures corpus={homeAnswer.corpus} />);
+    renderFigures(homeAnswer.corpus);
     expect(screen.getByTestId("figure-debates").textContent).toContain("64,921");
     expect(screen.getByTestId("figure-members").textContent).toContain(
       "members with at least one speech, in 6 terms (13th–18th Lok Sabha)"
@@ -31,21 +40,26 @@ describe("HomeFigures", () => {
     expect(screen.getByTestId("figure-tags").textContent).toContain("7,027");
     const err = screen.getByTestId("figure-error").textContent;
     expect(err).toContain("0.24%");
-    expect(err).toContain("of named turns with the wrong member name, an estimate");
+    expect(err).toContain("of named turns with the wrong member name, an estimate from a manual sample.");
     // The source of the error rate is not shown on the page.
     expect(err).not.toContain(homeAnswer.corpus.error_rate.source);
     expect(err).not.toContain("Source");
   });
 
+  it("gives the error rate no link", () => {
+    renderFigures(homeAnswer.corpus);
+    expect(screen.getByTestId("figure-error").querySelector("a")).toBeNull();
+  });
+
   it("follows the API, not a number written into the page", () => {
-    render(<HomeFigures corpus={{ ...homeAnswer.corpus, debates: 70000, tags: 12 }} />);
+    renderFigures({ ...homeAnswer.corpus, debates: 70000, tags: 12 });
     expect(screen.getByText("70,000")).toBeTruthy();
     expect(screen.getByText("12")).toBeTruthy();
     expect(screen.queryByText("64,921")).toBeNull();
   });
 
   it("hides the row of a missing figure", () => {
-    render(<HomeFigures corpus={{ debates: 5 }} />);
+    renderFigures({ debates: 5 });
     expect(screen.getByTestId("figure-debates")).toBeTruthy();
     expect(screen.queryByTestId("figure-members")).toBeNull();
     expect(screen.queryByTestId("figure-tags")).toBeNull();
@@ -53,7 +67,7 @@ describe("HomeFigures", () => {
   });
 
   it("shows nothing without a corpus", () => {
-    const { container } = render(<HomeFigures corpus={null} />);
+    const { container } = renderFigures(null);
     expect(container.innerHTML).toBe("");
   });
 });

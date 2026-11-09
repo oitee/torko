@@ -22,6 +22,12 @@ def test_turn_kind_and_counts():
     assert turn_kind("A", None) == "member"
     assert turn_kind(None, "crowd") == "crowd"
     assert turn_kind(None, None) == "unattributed"
+    # A line with no speaker label outside every speech is a heading. A label, or a place in a speech, makes it a turn.
+    assert turn_kind(None, None, None, in_speech=False) == "heading"
+    assert turn_kind(None, None, "  ", in_speech=False) == "heading"
+    assert turn_kind(None, None, "SHRI L.K. ADVANI", in_speech=False) == "unattributed"
+    assert turn_kind(None, None, None, in_speech=True) == "unattributed"
+    assert turn_kind(None, "presiding", None, in_speech=False) == "presiding"
     assert kind_counts([{"kind": "member"}, {"kind": "member"}, {"kind": "crowd"}]) == {"member": 2, "crowd": 1}
 
 
@@ -31,6 +37,17 @@ def test_debate_route(page_conn):
     assert sum(r["turn_kinds"].values()) == r["turn_count"]
     assert any(not t["attributed"] for t in r["turn_list"])
     assert r["people"] and r["tags"]
+
+
+def test_debate_headings_from_real_debates(page_conn):
+    # Debate 63025 opens with a title line that has no label. It is a heading.
+    first = debate_page(page_conn, 63025, {})["turn_list"][0]
+    assert first["text"].startswith("Title: Ruling regarding notices of Adjournment Motion")
+    assert first["kind"] == "heading"
+    # In debate 16175 the label "SHRI L.K. ADVANI" matched no member. The turn stays a turn of an unknown speaker.
+    advani = next(t for t in debate_page(page_conn, 16175, {})["turn_list"] if t["seq"] == 16)
+    assert advani["label"] == "SHRI L.K. ADVANI"
+    assert advani["kind"] == "unattributed"
 
 
 def test_debate_unknown(page_conn):

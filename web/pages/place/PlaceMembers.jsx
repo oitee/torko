@@ -28,7 +28,7 @@ export default function PlaceMembers({
           Who spoke about it
         </h2>
         <span className="place-section__meta mono">
-          Across all terms · of {formatNumber(totalSpeeches)} speeches
+          Across all terms · bar: share of {formatNumber(totalSpeeches)} speeches about the place
         </span>
       </div>
 
@@ -51,20 +51,30 @@ export default function PlaceMembers({
               <div className="place-members__main">
                 <div className="place-members__title-line">
                   <span className="place-members__name">{m.name}</span>
-                  {m.own_seat && (
-                    <span className="place-members__own-badge mono">
-                      own seat
-                    </span>
-                  )}
                 </div>
-                {metaText && (
-                  <span className="place-members__meta">{metaText}</span>
+                {(metaText || m.own_seat) && (
+                  <span className="place-members__meta">
+                    {metaText}
+                    {m.own_seat && (
+                      <span className="place-members__own-badge mono">
+                        own seat
+                      </span>
+                    )}
+                  </span>
+                )}
+                {totalSpeeches > 0 && (
+                  <span className="place-members__share" aria-hidden="true">
+                    <span
+                      className="place-members__share-bar"
+                      style={{ display: "block", width: `${Math.min(100, (m.n / totalSpeeches) * 100)}%` }}
+                    />
+                  </span>
                 )}
               </div>
 
               <div className="place-members__stats">
                 <span className="place-members__count mono">
-                  {formatNumber(m.n)}
+                  {formatNumber(m.n)} {m.n === 1 ? "speech" : "speeches"}
                 </span>
                 {lastDate && (
                   <span className="place-members__last mono">

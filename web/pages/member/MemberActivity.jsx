@@ -28,7 +28,7 @@ export default function MemberActivity({
     sessions[0]
   );
 
-  const sentence = `Above the typical member in ${aboveCount} of ${sessions.length} sessions.${
+  const sentence = `More speeches than the median member in ${aboveCount} of ${sessions.length} sessions.${
     busiest && busiest.n > 0
       ? ` Busiest: ${busiest.label}, with ${formatNumber(busiest.n)} speeches.`
       : ""
@@ -48,6 +48,10 @@ export default function MemberActivity({
       ? 10
       : Math.ceil(topVal / 10) * 10;
   const yTicks = [yMax, Math.round(yMax / 2), 0];
+  // The session with the most speeches of the member. On a tie, the first session wins.
+  // The pop-up shows only on hover, because the sentence above the chart already names this session.
+  const peakSession = sessions.reduce((best, s) => ((s.n || 0) > (best?.n || 0) ? s : best), null);
+  const shownSession = activeSession || peakSession;
 
   // Group sessions by term
   const termMap = new Map();
@@ -100,7 +104,7 @@ export default function MemberActivity({
           <h3 className="member-activity__title">Speeches per session</h3>
           <div className="member-activity__legend mono">
             <span className="member-activity__legend-bar" aria-hidden="true" />
-            <span>Member</span>
+            <span>Speeches of the member</span>
             <span className="member-activity__legend-line" aria-hidden="true" />
             <span>typical MP in the house</span>
           </div>
@@ -176,7 +180,7 @@ export default function MemberActivity({
                             s.house_median != null
                               ? Math.min(100, Math.max(0, (s.house_median / yMax) * 100))
                               : 0;
-                          const isHovered = activeSession === s;
+                          const isShown = shownSession === s;
                           const isSelected = selectedSession === `${s.term}-${s.session}`;
                           const ariaLabel = `${s.label}: ${s.n} speeches, house median ${
                             s.house_median != null ? s.house_median : "none"
@@ -199,9 +203,7 @@ export default function MemberActivity({
                             >
                               {s.n > 0 && (
                                 <span
-                                  className={`member-activity__bar ${
-                                    isHovered ? "member-activity__bar--hovered" : ""
-                                  }`}
+                                  className={`member-activity__bar${isShown ? " member-activity__bar--active" : ""}`}
                                   style={{ height: `max(2px, ${p}%)` }}
                                 />
                               )}
@@ -211,8 +213,13 @@ export default function MemberActivity({
                                   style={{ bottom: `calc(${medP}% - 1px)` }}
                                 />
                               )}
-                              {isHovered && (
-                                <div className="member-activity__tooltip mono" role="tooltip">
+                              {activeSession === s && (
+                                <div
+                                  className="member-activity__tooltip mono"
+                                  role="status"
+                                  aria-live="polite"
+                                  style={{ bottom: `calc(${Math.max(p, medP)}% + var(--space-2))` }}
+                                >
                                   <strong>{s.label}</strong>
                                   <span>
                                     {s.n} speeches · median {s.house_median}
@@ -222,6 +229,14 @@ export default function MemberActivity({
                             </button>
                           );
                         })}
+                      </div>
+
+                      <div className="member-activity__years mono" aria-hidden="true">
+                        {group.sessions.map((s, sIdx) => (
+                          <span key={sIdx} className="member-activity__year">
+                            {yearStart(group.sessions, sIdx)}
+                          </span>
+                        ))}
                       </div>
 
                       <div className="member-activity__term-footer mono">
@@ -265,7 +280,9 @@ export default function MemberActivity({
                           <div className="member-activity__narrow-bar-track">
                             {s.n > 0 && (
                               <span
-                                className="member-activity__narrow-bar"
+                                className={`member-activity__narrow-bar${
+                                  s === peakSession ? " member-activity__narrow-bar--active" : ""
+                                }`}
                                 style={{ width: `max(2px, ${p}%)` }}
                               />
                             )}
@@ -290,11 +307,18 @@ export default function MemberActivity({
         )}
 
         <div className="member-activity__note meta">
-          Pick a session to read its speeches. The green line is the median member in that session.
+          Pick a session to read its speeches. The black line is the median member in that session.
         </div>
       </div>
     </section>
   );
+}
+
+// The year of a session from its label ("Monsoon 2019" gives 2019). It shows only on the first session of a year.
+export function yearStart(list, index) {
+  const year = (label) => (String(label || "").match(/(\d{4})\s*$/) || [])[1] || "";
+  const y = year(list[index].label);
+  return index === 0 || year(list[index - 1].label) !== y ? y : "";
 }
 
 // The label of a term, with each party as a link. A term with no party shows its long name.

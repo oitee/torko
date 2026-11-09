@@ -3,7 +3,7 @@ import re
 
 from sqlalchemy import text
 
-from pages.common import SPEECH_TAGS_CTE, slug
+from pages.common import SPEECH_TAGS_CTE, place_slugs, slug
 
 MAX_SEATS = 12
 MAX_TAGS = 5
@@ -114,9 +114,20 @@ def my_mp_page(conn, args):
             if len(lst) < MAX_TAGS:
                 lst.append({"name": r["tag"], "slug": slug(r["tag"]), "type": r["type"], "speeches": r["n"]})
 
+    totals = {}
+    if cur_ids:
+        totals = {r[0]: (r[1], r[2]) for r in conn.execute(text("""
+            SELECT s.person_id, count(*), max(d.debate_date) FROM speeches s JOIN debates d ON d.id = s.debate_id
+            WHERE s.person_id = ANY(:p) GROUP BY 1"""), {"p": list(cur_ids)}).all()}
+    pages = place_slugs(conn)
+
     for s in seats:
+        s["place_page"] = s["slug"] in pages
         for p in s["current"]:
             p["top_tags"] = tags.get(p["person_id"], [])
+            n, last = totals.get(p["person_id"], (0, None))
+            p["speeches"] = n
+            p["last_speech"] = str(last) if last else None
         for p in s["current"] + s["older"]:
             p["id"] = p.pop("person_id")
             del p["seat"]
@@ -124,6 +135,8 @@ def my_mp_page(conn, args):
                                if len(s["current"]) > 1 else None)
     return {
         "q": q, "latest_term": latest, "seat_count": len(seats), "seats": seats,
+        "seat_note": "place_page is true when the seat has a place page at /place/<slug>. speeches counts all speeches of the "
+                     "current member in all terms, and last_speech is the date of the latest one, or null.",
         "top_tags_note": f"top_tags: the {MAX_TAGS} tags that most speeches of this member carry. speeches counts "
                          "the speeches of this member with the tag, in all terms. Role, person, and place tags are hidden.",
         "match_note": "q matches any part of the seat name, case-insensitive. Seat names have no state.",

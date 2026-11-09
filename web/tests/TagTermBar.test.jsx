@@ -28,6 +28,8 @@ describe("TagTermBar component", () => {
 
     const allBtn = screen.getByRole("button", { name: "All terms" });
     expect(allBtn.getAttribute("aria-pressed")).toBe("true");
+    // The buttons say what they are. No label sits above them.
+    expect(screen.queryByText("Lok Sabha term")).toBeNull();
     expect(allBtn.classList.contains("tag-term-button--selected")).toBe(true);
 
     expect(screen.getByRole("button", { name: "13th · 1999–2004" })).toBeTruthy();

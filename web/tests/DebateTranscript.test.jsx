@@ -147,7 +147,7 @@ describe("DebateTranscript", () => {
     );
 
     // Turn 1 has 3 paragraphs (> 2), so it should have a …Read more toggle
-    const readMoreBtn = screen.getByRole("button", { name: "…Read more" });
+    const readMoreBtn = screen.getByRole("button", { name: /^Read more/ });
     expect(readMoreBtn).toBeTruthy();
 
     // Before clicking, paragraph 3 is not visible
@@ -160,7 +160,8 @@ describe("DebateTranscript", () => {
     expect(
       screen.getByText(/Paragraph three continues further with details and specifics\./)
     ).toBeTruthy();
-    expect(screen.queryByRole("button", { name: "…Read more" })).toBeNull();
+    expect(screen.queryByRole("button", { name: /^Read more/ })).toBeNull();
+    expect(screen.getByRole("button", { name: "Read less" })).toBeTruthy();
   });
 
   it("folds turns when a tag filter is active and toggles unfold", () => {
@@ -238,9 +239,75 @@ describe("DebateTranscript counts and filters", () => {
       </MemoryRouter>
     );
     expect(
-      screen.getByText("Showing the whole debate in order: 1 speech, 0 members identified.")
+      screen.getByText("Showing the whole debate in order.")
     ).toBeTruthy();
     expect(screen.queryByRole("combobox")).toBeNull();
     expect(screen.queryByText(/1 speeches/)).toBeNull();
+  });
+});
+
+import { commonTagSlugs, isHeadingTurn } from "../pages/debate/DebateTranscript.jsx";
+import { speechIdFromHash } from "../pages/debate/jump.js";
+
+describe("heading lines", () => {
+  const heading = {
+    seq: 0, kind: "heading", label: null, member: null, member_id: null, attributed: false,
+    role_in_debate: "between", speech: null, words: 4, text: "VB-G RAM G Bill",
+  };
+
+  it("follows the kind that the API sends", () => {
+    expect(isHeadingTurn(heading)).toBe(true);
+  });
+
+  it("never treats a turn of another kind as a heading, also an unknown speaker with a label", () => {
+    expect(isHeadingTurn({ ...heading, kind: "member", member: "A B", member_id: 5, attributed: true })).toBe(false);
+    expect(isHeadingTurn({ ...heading, kind: "unattributed", label: "SHRI L.K. ADVANI", text: "How can it be permitted?" })).toBe(false);
+  });
+
+  it("shows a heading with no speaker label", () => {
+    render(
+      <MemoryRouter>
+        <DebateTranscript speeches={mockSpeeches} turns={[heading, ...mockTurns]} people={mockPeople} tags={mockTags} />
+      </MemoryRouter>
+    );
+    expect(screen.getByText("VB-G RAM G Bill")).toBeTruthy();
+    expect(screen.queryByText("Speaker not identified")).toBeNull();
+  });
+});
+
+describe("speech cards and links", () => {
+  it("finds the tags that every speech carries", () => {
+    const sp = [
+      { tags: [{ slug: "a" }, { slug: "b" }] },
+      { tags: [{ slug: "a" }] },
+    ];
+    expect([...commonTagSlugs(sp)]).toEqual(["a"]);
+    expect(commonTagSlugs([{ tags: [{ slug: "a" }] }]).size).toBe(0);
+  });
+
+  it("reads the speech id from a hash", () => {
+    expect(speechIdFromHash("#speech-178368")).toBe("178368");
+    expect(speechIdFromHash("#other")).toBeNull();
+  });
+
+  it("names the card link, with no quote note and no Back to top link", () => {
+    const turns = mockTurns.map((t, i) => (i === 0 ? { ...t, text: "He said ?hello world? to them" } : t));
+    render(
+      <MemoryRouter>
+        <DebateTranscript speeches={mockSpeeches} turns={turns} people={mockPeople} tags={mockTags} />
+      </MemoryRouter>
+    );
+    expect(screen.getAllByRole("link", { name: "Open this speech" }).length).toBe(2);
+    expect(screen.queryByText(/lost some quote marks/)).toBeNull();
+    expect(screen.queryByRole("link", { name: "Back to top" })).toBeNull();
+  });
+
+  it("names the button Read more, with no counts", () => {
+    render(
+      <MemoryRouter>
+        <DebateTranscript speeches={mockSpeeches} turns={mockTurns} people={mockPeople} tags={mockTags} />
+      </MemoryRouter>
+    );
+    expect(screen.getByRole("button", { name: "Read more" })).toBeTruthy();
   });
 });

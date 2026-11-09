@@ -4,26 +4,90 @@
   display: flex;
   flex-direction: column;
   gap: clamp(32px, 4vw, 48px);
-  padding-top: clamp(40px, 6vw, 72px);
+  padding-top: clamp(32px, 5vw, 56px);
 }
 
-.home-main__title {
+/* The title, then the parts. The gap between the parts does not apply to the title. */
+.home-can-do {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-6);
+}
+
+.home-can-do__title {
   margin: 0;
   font-size: var(--size-title);
   line-height: var(--lh-title);
-  font-weight: 500;
+  font-weight: 600;
   color: var(--ink);
-  margin-bottom: calc(-1 * clamp(16px, 3vw, 40px));
 }
 
-/* One part of "What you can do": text on one side, an example on the other. */
+.home-can-do__list {
+  display: flex;
+  flex-direction: column;
+  gap: clamp(32px, 4vw, 48px);
+}
+
+.home-skeleton {
+  display: flex;
+  flex-direction: column;
+  gap: clamp(32px, 4vw, 48px);
+}
+
+.home-skeleton__block {
+  height: 14rem;
+  background: var(--hairline);
+}
+
+.home-skeleton__sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+/* One part of "What you can do": text on one side, an example on the other.
+   The link of the text spreads over the whole part, so the card is a target too. */
 .home-feature {
+  position: relative;
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(min(100%, 420px), 1fr));
   gap: clamp(24px, 4vw, 56px);
   align-items: start;
   border-top: 1px solid var(--hairline);
   padding-top: var(--space-6);
+}
+
+/* The link of the text covers the part. Every other link and button in the part stays above the cover. */
+.home-feature__stretch::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+}
+
+.home-feature a,
+.home-feature button {
+  position: relative;
+  z-index: 1;
+}
+
+.home-feature a.home-feature__stretch {
+  position: static;
+  z-index: auto;
+}
+
+@media (hover: hover) {
+  .home-feature:hover .home-member,
+  .home-feature:hover .home-quote,
+  .home-feature:hover .home-trend,
+  .home-feature:hover .home-method {
+    border-color: var(--ink);
+  }
 }
 
 .home-feature__text {
@@ -44,7 +108,7 @@
   margin: 0;
   font-size: var(--size-heading);
   line-height: var(--lh-heading);
-  font-weight: 500;
+  font-weight: 600;
   color: var(--ink);
 }
 

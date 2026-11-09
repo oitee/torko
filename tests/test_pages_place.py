@@ -41,3 +41,11 @@ def test_district_place_has_holders(page_conn):
 def test_unknown_and_non_place_give_none(page_conn):
     assert place_page(page_conn, "no-such-place-xyz", {}) is None
     assert place_page(page_conn, "jal-jeevan-mission", {}) is None  # a scheme, not a place
+
+
+def test_place_state_of_a_seat(page_conn):
+    from pages.place import place_page
+    d = place_page(page_conn, "latur", {})
+    assert d["state"]["name"] == "Maharashtra" and d["state"]["slug"] == "maharashtra"
+    assert isinstance(d["state"]["page"], bool)
+    assert place_page(page_conn, "maharashtra", {})["state"] is None

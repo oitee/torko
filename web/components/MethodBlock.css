@@ -1,0 +1,11 @@
+.method-block { position: relative; display: inline-block; }
+.method-block__link { min-height: 44px; padding: 0; border: 0; background: none; color: var(--action); font: inherit; font-size: var(--size-label); font-weight: 500; text-decoration: underline; text-underline-offset: 3px; cursor: pointer; }
+.method-block__link:hover { color: var(--action-hover); }
+.method-block__pop { position: absolute; z-index: 20; top: calc(100% + var(--space-1)); left: 0; width: min(28rem, calc(100vw - 2 * var(--page-pad))); padding: var(--space-3) var(--space-4) var(--space-4); }
+.method-block__head { display: flex; align-items: center; justify-content: space-between; gap: var(--space-3); }
+.method-block__title { margin: 0; font-size: var(--size-label); font-weight: 600; }
+.method-block__close { min-width: 44px; min-height: 44px; margin-right: calc(-1 * var(--space-3)); border: 0; background: none; color: var(--ink-2); font-size: var(--size-label); cursor: pointer; }
+.method-block__close:hover { color: var(--ink); }
+.method-block__body { font-size: var(--size-body); line-height: var(--lh-body); color: var(--ink-2); }
+.method-block__body p { margin: 0 0 var(--space-2); }
+.method-block__body p:last-child { margin-bottom: 0; }

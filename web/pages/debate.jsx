@@ -99,7 +99,6 @@ export default function Debate() {
   const hasDiscussed = debate.tags && debate.tags.length > 0;
   const hasWho =
     (debate.people && debate.people.length > 0) ||
-    (debate.unidentified && debate.unidentified.speeches > 0) ||
     (debate.silent && debate.silent.length > 0);
 
   return (
@@ -123,7 +122,6 @@ export default function Debate() {
               {hasWho && (
                 <DebateWho
                   people={debate.people}
-                  unidentified={debate.unidentified}
                   silent={debate.silent}
                   selectedMemberId={activeMemberId}
                   onSelectMember={handleMemberClick}

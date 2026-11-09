@@ -70,11 +70,6 @@ export function readSearch(searchParams) {
   return { scope, filters, view, sort, page, ask: get("ask"), asked: get("asked") };
 }
 
-// The terms that the address selects, as numbers.
-export function selectedTerms(filters) {
-  return (filters.term || "").split(",").map((s) => parseInt(s, 10)).filter(Number.isInteger);
-}
-
 // The heading of the page, in parts, so that the page can set the count in mono.
 // count is null while the speeches load. names holds the names of the tag, place and member.
 export function headingParts({ scope, count, names = {}, members = null }) {
@@ -144,7 +139,7 @@ export function excerptParts(excerpt, marks, width = 240) {
   }
   if (pos < end) parts.push({ text: text.slice(pos, end), mark: false });
 
-  const clean = parts.map((p) => ({ ...p, text: p.text.replace(/\s+/g, " ") }));
+  const clean = parts.map((p) => ({ ...p, text: p.text.replace(/\s+/g, " ").replace(/ +([.,])/g, "$1") }));
   if (clean.length) {
     clean[0].text = clean[0].text.replace(/^\s+/, "");
     const last = clean[clean.length - 1];
@@ -177,4 +172,19 @@ export function pageWindow(page, pages) {
     }
   }
   return out;
+}
+
+// The words of the excerpt as plain text, with "..." where the window cuts the speech.
+export function excerptText(excerpt, marks) {
+  const { parts, cutStart, cutEnd } = excerptParts(excerpt, marks);
+  if (parts.length === 0) return "";
+  return `${cutStart ? "... " : ""}${parts.map((p) => p.text).join("")}${cutEnd ? " ..." : ""}`;
+}
+
+// The words of the citation are the excerpt, or the summary when the row has no excerpt.
+export function citationText(speech, origin) {
+  const words = excerptText(speech.excerpt, speech.marks) || (speech.summary || "").trim();
+  const who = [speech.member || "Speaker not identified", speech.party, speech.seat, "Lok Sabha", speech.date].filter(Boolean).join(", ");
+  const quote = words ? `\u201c${words}\u201d - ` : "";
+  return `${quote}${who}. Torko: ${origin}/speech/${speech.id}`;
 }

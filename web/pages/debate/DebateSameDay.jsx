@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { Link } from "react-router-dom";
 import { formatDateLong, formatNumber } from "../../assets/js/format.js";
+import { tidyTitle } from "../../assets/js/titles.js";
 import "./DebateSameDay.css";
 
 // The list shows this many debates first, so that the page ends with the method text, not a long list.
@@ -36,8 +37,8 @@ export default function DebateSameDay({ sameDay = [], date }) {
 
           return (
             <li key={d.id} className="debate-same-day__item">
-              <Link to={`/debate/${d.id}`} className="debate-same-day__link" title={d.title}>
-                {d.title}
+              <Link to={`/debate/${d.id}`} className="debate-same-day__link" title={tidyTitle(d.title)}>
+                {tidyTitle(d.title)}
               </Link>
               <div className="debate-same-day__meta meta">
                 {d.kind_label ? `${d.kind_label} · ` : ""}

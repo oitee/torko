@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import BarTip from "../../components/BarTip.jsx";
 import Button from "../../components/Button.jsx";
 import { formatNumber, termLong, termShort } from "../../assets/js/format.js";
 import { percent } from "./partyData.js";
@@ -10,6 +11,11 @@ export function scaleTop(shares) {
   if (max === 0) return 0.01;
   const step = max < 0.02 ? 0.005 : max < 0.05 ? 0.01 : max < 0.2 ? 0.05 : 0.1;
   return Math.min(1, Math.round(Math.ceil((max + 1e-9) / step + 1e-9) * step * 1000) / 1000);
+}
+
+// The years of a term in two digits, for a small screen. "1999–2004" gives "99–04". "2024–" gives "24–".
+export function shortYears(years) {
+  return String(years || "").replace(/\b(\d{2})(\d{2})\b/g, "$2");
 }
 
 // One sentence for a term.
@@ -34,7 +40,14 @@ export default function PartyShareChart({ terms = [], code }) {
 
   const top = scaleTop(list.map((t) => t.share_of_tagged));
   const maxMembers = Math.max(1, ...list.map((t) => Number(t.members_speaking) || 0));
+  // The term with the most members who spoke. Its bar is green. The share chart keeps the colour of the party.
+  const peakMembers = list.find((t) => (Number(t.members_speaking) || 0) === maxMembers && maxMembers > 0) || null;
   const grid = { gridTemplateColumns: `repeat(${list.length}, minmax(0, 1fr))` };
+  // The term under the pointer carries a pop-up on the share chart. Every bar already prints its value, so at rest there is no pop-up.
+  const activeIndex = active ? list.indexOf(active) : -1;
+  const activeShare = active && top > 0 ? ((Number(active.share_of_tagged) || 0) / top) * 100 : 0;
+  // In the members chart one bar is green: the term under the pointer, else the term with the most members.
+  const greenMembers = active || peakMembers;
 
   const handlers = (t) => ({
     onMouseEnter: () => setActive(t),
@@ -48,18 +61,15 @@ export default function PartyShareChart({ terms = [], code }) {
         <h2 id="party-share-heading" className="party-section__title">
           Share of the House, by term
         </h2>
-        <span className="party-section__meta mono">of all tagged speeches</span>
+        <span className="party-section__meta mono">of all tagged speeches in the House</span>
       </div>
 
       <div className="party-box">
-        <p className={`party-box__readout${active ? " mono" : " party-box__readout--hint"}`} aria-live="polite">
-          {active ? termSentence(active, code) : "Point at a term"}
-        </p>
-
         <div className={showTable ? "sr-only" : "party-share"} aria-hidden={showTable ? "true" : undefined}>
           <div className="party-share__chart" onMouseLeave={() => setActive(null)}>
             <div className="party-share__scale mono" aria-hidden="true">
               <span>{`${+(top * 100).toFixed(1)}%`}</span>
+              <span>{`${+(top * 50).toFixed(1)}%`}</span>
               <span>0%</span>
             </div>
             <div className="party-share__plot" style={grid}>
@@ -73,6 +83,7 @@ export default function PartyShareChart({ terms = [], code }) {
                     role="img"
                     aria-label={termSentence(t, code)}
                     data-testid={`party-share-${t.term}`}
+                    onClick={() => setActive(t)}
                     {...handlers(t)}
                   >
                     {t.tagged > 0 && <span className="party-share__value mono">{percent(t.share_of_tagged)}</span>}
@@ -80,21 +91,33 @@ export default function PartyShareChart({ terms = [], code }) {
                   </div>
                 );
               })}
+              <BarTip index={activeIndex} count={list.length} heightPct={activeShare} wrap>
+                {active ? termSentence(active, code) : null}
+              </BarTip>
             </div>
           </div>
 
           <div className="party-share__members">
-            <span className="party-share__members-title">Members who spoke</span>
+            <span className="party-share__members-title">Members who spoke for {code}, in each term</span>
+            <div className="party-share__scale party-share__scale--members mono" aria-hidden="true">
+              <span>{formatNumber(maxMembers)}</span>
+              <span>0</span>
+            </div>
             <div className="party-share__plot party-share__plot--members" style={grid}>
               {list.map((t) => {
                 const h = ((Number(t.members_speaking) || 0) / maxMembers) * 100;
                 return (
                   <div
                     key={t.term}
-                    className={`party-share__col${active?.term === t.term ? " party-share__col--active" : ""}`}
-                    aria-hidden="true"
-                    onMouseEnter={() => setActive(t)}
+                    className={`party-share__col${active?.term === t.term ? " party-share__col--active" : ""}${
+                      t === greenMembers ? " party-share__col--green" : ""
+                    }`}
+                    tabIndex={0}
+                    role="img"
+                    aria-label={termSentence(t, code)}
+                    onClick={() => setActive(t)}
                     data-testid={`party-members-${t.term}`}
+                    {...handlers(t)}
                   >
                     {t.members_speaking > 0 && (
                       <span className="party-share__value mono">{formatNumber(t.members_speaking)}</span>
@@ -110,7 +133,8 @@ export default function PartyShareChart({ terms = [], code }) {
             {list.map((t) => (
               <span key={t.term} className="party-share__tick">
                 <span className="party-share__tick-term">{termShort(t.term)}</span>
-                <span className="party-share__tick-years">{t.years}</span>
+                <span className="party-share__tick-years party-share__tick-years--full">{t.years}</span>
+                <span className="party-share__tick-years party-share__tick-years--short">{shortYears(t.years)}</span>
               </span>
             ))}
           </div>
@@ -146,7 +170,7 @@ export default function PartyShareChart({ terms = [], code }) {
 
         <p className="party-box__note">
           A tagged speech is a speech with at least one tag of any kind. The party of a speech is the party of the member
-          on the date of the debate. The two charts have their own scales.
+          on the date of the debate. The two charts have their own scales. The top of each scale is in the labels at its left.
         </p>
 
         <div className="party-box__toggle">

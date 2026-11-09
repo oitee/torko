@@ -32,11 +32,28 @@
 }
 
 /* Main body flow */
+/* The sections sit close together. Each section already has a top rule and space under it, so they stay apart.
+   The page layout already has space under the main column, so the column adds none. */
 .place-main {
   display: flex;
   flex-direction: column;
-  gap: clamp(var(--space-8), 6vw, calc(var(--space-14) + var(--space-4)));
-  padding-bottom: var(--space-14);
+  gap: var(--space-8);
+}
+
+/* The head band ends in a line, so the first section draws no second line under it. */
+.place-main > :first-child {
+  border-top: 0;
+  padding-top: 0;
+}
+
+/* The section after the list draws its own line, so the last row needs none. */
+.place-associated__card:last-child {
+  border-bottom: 0;
+}
+
+/* The head needs less space under its numbers, as on the Tag page. */
+.page-layout__head:has(.place-head) {
+  padding-bottom: var(--space-4);
 }
 
 .place-empty-notice {
@@ -45,7 +62,7 @@
   font-size: var(--size-heading);
   line-height: var(--lh-heading);
   color: var(--ink-2);
-  border-top: 1px solid var(--ink);
+  border-top: 1px solid var(--hairline);
   padding-top: var(--space-6);
 }
 
@@ -54,17 +71,16 @@
   display: flex;
   flex-direction: column;
   gap: var(--space-4);
-  border-top: 1px solid var(--ink);
+  border-top: 1px solid var(--hairline);
   padding-top: var(--space-6);
 }
 
 .place-section__title {
   margin: 0;
   font-family: var(--font-sans);
-  font-size: clamp(1.375rem, 2.4vw, 1.875rem);
+  font-size: var(--size-title);
   line-height: var(--lh-title);
-  font-weight: 600;
-  letter-spacing: -0.01em;
+  font-weight: 500;
   color: var(--ink);
 }
 
@@ -88,23 +104,28 @@
   flex-direction: column;
 }
 
+/* One line for each term on a wide screen: the term and its years, then the members. */
 .place-holders__row {
   display: grid;
-  grid-template-columns: minmax(4rem, 7.5rem) minmax(0, 1fr);
+  grid-template-columns: 9.5rem minmax(0, 1fr);
   gap: var(--space-3);
-  padding: var(--space-3) 0;
+  padding: var(--space-2) 0;
   border-bottom: 1px solid var(--hairline);
-  align-items: start;
+  align-items: baseline;
+}
+
+/* The next section draws its own line, so the last row needs none. */
+.place-holders__row:last-child {
+  border-bottom: 0;
 }
 
 .place-holders__term-col {
-  display: flex;
-  flex-direction: column;
-  gap: 2px;
+  font-size: var(--size-count);
+  line-height: var(--lh-count);
+  white-space: nowrap;
 }
 
 .place-holders__term-name {
-  font-size: var(--size-label);
   font-weight: 600;
   color: var(--ink);
 }
@@ -117,20 +138,20 @@
 .place-holders__items-col {
   display: flex;
   flex-direction: column;
-  gap: var(--space-2);
+  gap: var(--space-1);
 }
 
 .place-holders__holder {
   display: flex;
   flex-wrap: wrap;
-  align-items: center;
-  gap: var(--space-1) var(--space-3);
+  align-items: baseline;
+  gap: 0 var(--space-3);
 }
 
 .place-holders__name {
   font-family: var(--font-sans);
   font-size: var(--size-body);
-  font-weight: 600;
+  font-weight: 400;
   color: var(--action);
   text-decoration: underline;
   text-underline-offset: 3px;
@@ -141,15 +162,9 @@
 }
 
 .place-holders__party {
-  display: inline-flex;
-  align-items: center;
-  font-family: var(--font-sans);
+  font-family: var(--font-mono);
   font-size: var(--size-count);
-  font-weight: 500;
-  line-height: 1;
-  padding: var(--space-1) var(--space-2);
-  border: 1px solid var(--control);
-  color: var(--ink);
+  line-height: var(--lh-count);
 }
 
 .place-holders__state {
@@ -213,10 +228,11 @@
 }
 
 .place-members__own-badge {
-  font-size: 0.6875rem;
+  margin-left: var(--space-2);
+  font-size: var(--size-count);
   line-height: 1;
   font-weight: 500;
-  padding: 3px 6px;
+  padding: 2px 6px;
   border: 1px solid var(--ink);
   color: var(--ink);
 }
@@ -241,7 +257,7 @@
 }
 
 .place-members__last {
-  font-size: 0.6875rem;
+  font-size: var(--size-count);
   color: var(--meta);
   white-space: nowrap;
 }
@@ -260,7 +276,7 @@
   display: grid;
   grid-template-columns: 4.5rem minmax(0, 1fr) auto auto;
   gap: 0 var(--space-3);
-  font-size: 0.6875rem;
+  font-size: var(--size-count);
   color: var(--meta);
   padding-bottom: var(--space-1);
 }
@@ -462,7 +478,7 @@
 }
 
 .place-related__chip-count {
-  font-size: 0.75rem;
+  font-size: var(--size-count);
   font-weight: 500;
   color: var(--ink-2);
 }
@@ -471,10 +487,9 @@
 .place-speeches__title {
   margin: 0;
   font-family: var(--font-sans);
-  font-size: clamp(1.375rem, 2.4vw, 1.875rem);
+  font-size: var(--size-title);
   line-height: var(--lh-title);
-  font-weight: 600;
-  letter-spacing: -0.01em;
+  font-weight: 500;
   color: var(--ink);
 }
 
@@ -495,7 +510,7 @@
 
 /* Method section */
 .place-method {
-  border-top: 1px solid var(--ink);
+  border-top: 1px solid var(--hairline);
   padding-top: var(--space-6);
 }
 
@@ -503,7 +518,7 @@
 @media (max-width: 600px) {
   .place-holders__row {
     grid-template-columns: 1fr;
-    gap: var(--space-1);
+    gap: 0;
   }
 
   .place-parties__table-head,
@@ -531,3 +546,143 @@
   accent-color: var(--ink);
 }
 
+
+.place-head__link {
+  color: var(--action);
+}
+
+.place-when {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+  border-top: 1px solid var(--hairline);
+  padding-top: var(--space-6);
+}
+
+.place-when__box {
+  background: var(--sheet);
+  border: 1px solid var(--hairline);
+  padding: var(--space-5);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  min-width: 0;
+}
+
+/* Room above the bars for the pop-up on the highest bar. */
+.place-when__chart {
+  display: grid;
+  grid-template-columns: 3rem minmax(0, 1fr);
+  gap: var(--space-2);
+  margin-top: var(--space-8);
+}
+
+.place-when__scale {
+  height: 200px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  align-items: flex-end;
+  font-size: var(--size-count);
+  line-height: 1;
+  color: var(--meta);
+}
+
+.place-when__plot {
+  position: relative;
+  height: 200px;
+  display: grid;
+  gap: 2px;
+  align-items: end;
+  border-bottom: 1px solid var(--ink);
+  background-image: linear-gradient(var(--hairline), var(--hairline)), linear-gradient(var(--hairline), var(--hairline));
+  background-size: 100% 1px;
+  background-repeat: no-repeat;
+  background-position: top, center;
+}
+
+.place-when__col {
+  height: 100%;
+  display: flex;
+  align-items: flex-end;
+  min-width: 0;
+}
+
+.place-when__col:focus-visible {
+  outline: 2px solid var(--ink);
+  outline-offset: 1px;
+}
+
+/* One bar is green: the year under the pointer, else the highest year. */
+.place-when__col--active .place-when__bar {
+  background-color: var(--action);
+}
+
+.place-when__bar {
+  width: 100%;
+  background-color: var(--ink-2);
+}
+
+.place-when__axis {
+  display: grid;
+  gap: 2px;
+  margin-left: calc(3rem + var(--space-2));
+  font-size: var(--size-count);
+  line-height: var(--lh-count);
+  color: var(--ink-2);
+}
+
+.place-when__tick {
+  grid-row: 1;
+  white-space: nowrap;
+  justify-self: start;
+}
+
+.place-when__hint {
+  margin: 0;
+  font-size: var(--size-count);
+  line-height: var(--lh-count);
+  color: var(--meta);
+}
+
+.place-when__table-wrap {
+  overflow-x: auto;
+}
+
+.place-when__table {
+  width: 100%;
+  border-collapse: collapse;
+  font-family: var(--font-mono);
+  font-size: var(--size-count);
+}
+
+.place-when__table th,
+.place-when__table td {
+  padding: var(--space-2);
+  border-bottom: 1px solid var(--hairline);
+  text-align: right;
+  white-space: nowrap;
+}
+
+.place-when__table th:first-child,
+.place-when__table td:first-child {
+  text-align: left;
+}
+
+.place-members__share {
+  height: 4px;
+  background: var(--hairline);
+  margin-top: var(--space-1);
+}
+
+.place-members__share-bar {
+  height: 100%;
+  background: var(--ink-2);
+}
+
+.place-subjects__caveat {
+  margin: 0;
+  font-size: var(--size-count);
+  line-height: var(--lh-count);
+  color: var(--meta);
+}

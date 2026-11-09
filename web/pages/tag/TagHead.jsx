@@ -1,5 +1,6 @@
 import React from "react";
 import { formatNumber } from "../../assets/js/format.js";
+import HeadActions, { accessedToday, pageCitation } from "../../components/HeadActions.jsx";
 import "./TagHead.css";
 
 // Formats a date range into a year span with an en-dash.
@@ -12,7 +13,15 @@ export function formatSpan(first, last) {
   return y1 || y2 || null;
 }
 
-// TagHead renders the tag title, description, and four summary counts.
+export function buildTagCitation(tag, now = new Date()) {
+  const span = formatSpan(tag.first, tag.last);
+  return pageCitation({
+    title: `Tag: ${tag.name}`,
+    detail: `${formatNumber(tag.total ?? 0)} speeches in the Lok Sabha${span ? `, ${span}` : ""}`,
+    today: accessedToday(now),
+  });
+}
+
 export default function TagHead({ tag }) {
   if (!tag) return null;
 
@@ -52,6 +61,8 @@ export default function TagHead({ tag }) {
           ))}
         </dl>
       )}
+
+      <HeadActions citation={buildTagCitation(tag)} />
     </div>
   );
 }

@@ -31,7 +31,7 @@ export default function HomeMember({ member }) {
           member keeps one identity in all terms.
         </p>
         <div className="home-feature__action">
-          <Button variant="text" href={`/member/${member.member_id}`}>
+          <Button variant="text" href={`/member/${member.member_id}`} className="home-feature__stretch">
             Read the {speeches} by {member.name}
           </Button>
         </div>
@@ -58,7 +58,7 @@ export default function HomeMember({ member }) {
             </p>
           )}
           <p className="home-member__counts">
-            {speeches}
+            <strong className="home-member__speeches">{speeches}</strong>
             {terms ? ` in the ${terms}` : ""}
           </p>
         </div>

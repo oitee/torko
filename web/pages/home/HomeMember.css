@@ -40,11 +40,27 @@
   overflow-wrap: anywhere;
 }
 
+/* The printed label is a quote of the record, so it shows in quote marks. */
+.home-member__printed::before {
+  content: "“";
+}
+
+.home-member__printed::after {
+  content: "”";
+}
+
 .home-member__arrow {
+  align-self: center;
   font-family: var(--font-mono);
-  font-size: var(--size-heading);
-  color: var(--meta);
-  padding: 0 var(--space-1);
+  font-size: 1.25rem;
+  line-height: 1;
+  color: var(--ink-2);
+  padding: 0 var(--space-3);
+}
+
+.home-member__speeches {
+  font-weight: 500;
+  color: var(--ink);
 }
 
 .home-member__name {
@@ -73,7 +89,10 @@
   }
 
   .home-member__arrow {
-    padding: 0 var(--space-5);
+    padding: var(--space-2) 0;
+    width: 1.25rem;
+    margin-left: var(--space-5);
+    text-align: center;
     transform: rotate(90deg);
     justify-self: start;
   }

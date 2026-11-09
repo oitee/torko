@@ -20,6 +20,23 @@ describe("SiteHeader", () => {
     expect(searchLink.getAttribute("aria-current")).toBeNull();
     expect(screen.getByRole("link", { name: "Method" }).getAttribute("href")).toBe("/method");
     expect(screen.queryByRole("link", { name: "Your MP" })).toBeNull();
+    expect(screen.getByRole("link", { name: "Skip to the content" }).getAttribute("href")).toBe("#main");
+  });
+
+  it("opens the menu with every page link and closes it again", () => {
+    render(
+      <MemoryRouter initialEntries={["/trends"]}>
+        <SiteHeader theme="system" />
+      </MemoryRouter>
+    );
+    const button = screen.getByRole("button", { name: "Menu" });
+    expect(button.getAttribute("aria-expanded")).toBe("false");
+    fireEvent.click(button);
+    const menu = screen.getByRole("navigation", { name: "Menu" });
+    expect(menu.querySelectorAll("a")).toHaveLength(4);
+    expect(menu.querySelector('a[aria-current="page"]').textContent).toBe("Trends");
+    fireEvent.click(screen.getByRole("button", { name: "Close" }));
+    expect(screen.queryByRole("navigation", { name: "Menu" })).toBeNull();
   });
 
   it("marks the Method link active on /method", () => {

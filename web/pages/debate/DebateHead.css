@@ -18,13 +18,6 @@
   gap: var(--space-2);
 }
 
-.debate-head__kicker {
-  font-size: var(--size-count);
-  line-height: 1;
-  font-weight: 500;
-  color: var(--meta);
-}
-
 .debate-head__title {
   margin: 0;
   font-size: var(--size-display);
@@ -54,6 +47,7 @@
 }
 
 .debate-head__date {
+  margin: 0;
   font-size: var(--size-label);
   line-height: var(--lh-label);
   color: var(--ink-2);
@@ -103,6 +97,11 @@
   line-height: var(--lh-body);
   color: var(--ink);
   overflow-wrap: anywhere;
+}
+
+/* The label changes from "Copy citation" to "Citation copied". A fixed width stops the button from moving. */
+.debate-citation__copy {
+  min-width: 11rem;
 }
 
 .debate-citation__actions {

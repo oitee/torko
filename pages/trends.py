@@ -5,13 +5,28 @@ speeches (all speeches of the session), tagged (speeches with at least one kept 
 The rate of a session is the speeches that carry the tag per 1,000 tagged speeches of that session.
 A session with fewer than MIN_TAGGED tagged speeches is marked thin. Its rate is given but it is not used for the peak.
 """
+from statistics import median
+
 from sqlalchemy import text
 
 from pages.common import slug as to_slug
-from pages.common import cached, resolve_tag, year_tagged
+from pages.common import SPEECH_TAGS_CTE, cached, resolve_tag, year_tagged
 from pages.place import speech_ids_for_tag
 
 MIN_TAGGED = 300
+MIN_LIFT = 5                # the share of a year must be at least this many times the typical share of the subject
+MIN_SUBJECT_SPEECHES = 150  # a subject with fewer speeches over all years does not qualify
+MIN_YEAR_SPEECHES = 20      # a subject with fewer speeches in the year does not qualify in that year
+SUBJECTS_PER_YEAR = 3
+LEFT_OUT_TYPES = {"role"}   # a role such as Prime Minister is a person who is named, not a subject of the year
+RACE_WINDOW = 12            # months in each frame of the race
+RACE_TOP = 10               # subjects shown in each frame of the race
+
+OVERVIEW_NOTE = (
+    "tagged counts the speeches of the year with at least one kept item of any tag. share is the percent of those speeches that carry "
+    "the subject. typical is the median of the yearly shares of the subject. Each speech counts once for each subject, so two subjects "
+    "can share speeches. A year counts by the date of the debate."
+)
 
 COUNTS_NOTE = (
     "n counts the speeches of the session that carry a kept tag of this tag, each speech once. "
@@ -144,4 +159,127 @@ def trends_page(conn, slug, args):
     }
 
 
-ROUTES = [("/trends/<slug>", trends_page)]
+def yearly_subjects(rows, tagged):
+    """Return one row for each year, with the subjects that stood out most in that year.
+
+    rows holds (tag, type, year, n). tagged is {year: tagged speeches}. Each subject has a typical share: the median of its
+    shares over all years. A subject qualifies in a year when its share is at least MIN_LIFT times typical, so a subject of
+    every year cannot win. The order is by the distance above typical, largest first, and a tie goes by name.
+    """
+    by_tag = {}
+    for tag, kind, year, n in rows:
+        if kind not in LEFT_OUT_TYPES and year in tagged:
+            by_tag.setdefault((tag, kind), {})[year] = n
+    found = {y: [] for y in tagged}
+    for (tag, kind), counts in by_tag.items():
+        if sum(counts.values()) < MIN_SUBJECT_SPEECHES:
+            continue
+        shares = {y: 100 * counts.get(y, 0) / t for y, t in tagged.items() if t}
+        typical = median(shares.values())
+        for y, share in shares.items():
+            if counts.get(y, 0) >= MIN_YEAR_SPEECHES and share >= MIN_LIFT * typical:
+                found[y].append({"name": tag, "slug": to_slug(tag), "type": kind, "n": counts[y], "share": round(share, 1),
+                                 "typical": round(typical, 2), "above": share - typical})
+    out = []
+    for y in sorted(tagged):
+        top = sorted(found[y], key=lambda r: (-r["above"], r["name"]))[:SUBJECTS_PER_YEAR]
+        out.append({"year": y, "tagged": tagged[y], "subjects": [{k: v for k, v in r.items() if k != "above"} for r in top]})
+    return out
+
+
+def trends_overview(conn, args):
+    def load():
+        rows = conn.execute(text(f"""
+            WITH {SPEECH_TAGS_CTE}
+            SELECT t.tag, t.type, extract(year FROM d.debate_date)::int, count(DISTINCT st.speech_id)
+            FROM speech_tags st JOIN tags t ON t.id = st.tag_id JOIN speeches s ON s.id = st.speech_id
+            JOIN debates d ON d.id = s.debate_id WHERE d.debate_date IS NOT NULL GROUP BY 1, 2, 3""")).all()
+        return yearly_subjects(rows, year_tagged(conn))
+    years = cached("trends_overview", load)
+    return {"years": years, "last_date": str(conn.execute(text("SELECT max(debate_date) FROM debates")).scalar()),
+            "rules": {"min_lift": MIN_LIFT, "min_subject_speeches": MIN_SUBJECT_SPEECHES, "min_year_speeches": MIN_YEAR_SPEECHES,
+                      "subjects_per_year": SUBJECTS_PER_YEAR},
+            "counts_note": OVERVIEW_NOTE}
+
+
+RACE_NOTE = (
+    "Each frame is a window of RACE_WINDOW calendar months that ends in the month of the frame. tagged is the denominator: "
+    "the speeches of the window with at least one kept item of any tag. subjects[].n counts the speeches of the window that "
+    "carry the subject, each speech once, by the date of the debate. share is 100 * n / tagged. typical is the median share "
+    "of the subject over all frames. above is share minus typical, in percentage points. A subject qualifies in a frame when it "
+    "has at least min_window_speeches speeches in the window and min_subject_speeches over all years. The top of each frame is "
+    "the qualifying subjects with the largest above, and a tie goes by name. subjects lists every subject that is in the top of at "
+    "least one frame, so a reader can rank each frame from this answer alone."
+)
+
+
+def month_index(year, month):
+    return year * 12 + month - 1
+
+
+def month_label(index):
+    return f"{index // 12}-{index % 12 + 1:02d}"
+
+
+def race_frames(rows, tagged, window=RACE_WINDOW, top=RACE_TOP):
+    """Return the frames of the race: for each month, the subjects furthest above their typical share in the window that ends there.
+
+    rows holds (tag, type, month index, n). tagged is {month index: tagged speeches}. A frame needs a full window, so the first
+    frame is window - 1 months after the first month with tagged speeches. Months with no sitting count as zero.
+    """
+    if not tagged:
+        return {"months": [], "tagged": [], "subjects": []}
+    first, last = min(tagged), max(tagged)
+    frames = list(range(first + window - 1, last + 1))
+
+    def windowed(counts):
+        out, run = [], sum(counts.get(m, 0) for m in range(first, first + window - 1))
+        for f in frames:
+            run += counts.get(f, 0)
+            out.append(run)
+            run -= counts.get(f - window + 1, 0)
+        return out
+
+    total = windowed(tagged)
+    by_tag = {}
+    for tag, kind, m, n in rows:
+        if kind not in LEFT_OUT_TYPES:
+            by_tag.setdefault((tag, kind), {})[m] = n
+    cand = []
+    for (tag, kind), counts in by_tag.items():
+        if sum(counts.values()) < MIN_SUBJECT_SPEECHES:
+            continue
+        n = windowed(counts)
+        shares = [100 * a / t if t else 0 for a, t in zip(n, total)]
+        cand.append({"name": tag, "kind": kind, "n": n, "shares": shares, "typical": median(shares)})
+    keep = set()
+    for i in range(len(frames)):
+        ok = [c for c in cand if c["n"][i] >= MIN_YEAR_SPEECHES]
+        ok.sort(key=lambda c: (-(c["shares"][i] - c["typical"]), c["name"]))
+        keep.update(c["name"] for c in ok[:top])
+    subjects = [{"name": c["name"], "slug": to_slug(c["name"]), "type": c["kind"], "typical": round(c["typical"], 3), "n": c["n"]}
+                for c in sorted(cand, key=lambda c: c["name"]) if c["name"] in keep]
+    return {"months": [month_label(f) for f in frames], "tagged": total, "subjects": subjects}
+
+
+def trends_race(conn, args):
+    def load():
+        rows = conn.execute(text(f"""
+            WITH {SPEECH_TAGS_CTE}
+            SELECT t.tag, t.type, (extract(year FROM d.debate_date) * 12 + extract(month FROM d.debate_date) - 1)::int,
+                   count(DISTINCT st.speech_id)
+            FROM speech_tags st JOIN tags t ON t.id = st.tag_id JOIN speeches s ON s.id = st.speech_id
+            JOIN debates d ON d.id = s.debate_id WHERE d.debate_date IS NOT NULL GROUP BY 1, 2, 3""")).all()
+        tagged = {int(m): n for m, n in conn.execute(text("""
+            SELECT (extract(year FROM d.debate_date) * 12 + extract(month FROM d.debate_date) - 1)::int, count(*)
+            FROM debates d JOIN speeches s ON s.debate_id = d.id
+            WHERE d.debate_date IS NOT NULL AND EXISTS (SELECT 1 FROM speech_items si WHERE si.speech_id = s.id AND si.kept)
+            GROUP BY 1"""))}
+        return race_frames(rows, tagged)
+    out = cached("trends_race", load)
+    return {**out, "rules": {"window_months": RACE_WINDOW, "top": RACE_TOP, "min_subject_speeches": MIN_SUBJECT_SPEECHES,
+                             "min_window_speeches": MIN_YEAR_SPEECHES},
+            "counts_note": RACE_NOTE.replace("RACE_WINDOW", str(RACE_WINDOW))}
+
+
+ROUTES = [("/trends", trends_overview), ("/trends/race", trends_race), ("/trends/<slug>", trends_page)]

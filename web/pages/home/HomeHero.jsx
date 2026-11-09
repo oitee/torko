@@ -21,8 +21,34 @@ export function ideaLabel(name) {
   return m && name.length > 24 ? m[1] : name;
 }
 
+// The name of each kind of search idea, in the plural. A kind with no name here shows its own word.
+const KIND_LABELS = {
+  place: "Places",
+  scheme: "Schemes",
+  topic: "Topics",
+  law: "Laws",
+  institution: "Institutions",
+  person: "People",
+};
+
+// Group the search ideas by kind. A group comes in the order of its first idea in the API answer,
+// and the ideas in a group keep the order of the answer.
+export function groupIdeas(ideas) {
+  const groups = [];
+  for (const idea of Array.isArray(ideas) ? ideas : []) {
+    const kind = idea.type || "other";
+    let group = groups.find((g) => g.kind === kind);
+    if (!group) {
+      group = { kind, label: KIND_LABELS[kind] || kind.charAt(0).toUpperCase() + kind.slice(1), ideas: [] };
+      groups.push(group);
+    }
+    group.ideas.push(idea);
+  }
+  return groups;
+}
+
 export default function HomeHero({ corpus, corpusError, onRetryCorpus, ideas }) {
-  const ideaList = Array.isArray(ideas) ? ideas : [];
+  const groups = groupIdeas(ideas);
 
   return (
     <section className="ink-band home-hero" aria-labelledby="home-title">
@@ -31,22 +57,33 @@ export default function HomeHero({ corpus, corpusError, onRetryCorpus, ideas }) 
           <h1 id="home-title" className="home-hero__title">
             Search what members said in the Lok Sabha
           </h1>
-          {corpus?.first && corpus?.last && (
-            <p className="home-hero__lede">
-              Torko reads the Lok Sabha debates on sansad.in from{" "}
-              <span className="home-hero__date">{formatDateLong(corpus.first)}</span> to{" "}
-              <span className="home-hero__date">{formatDateLong(corpus.last)}</span>. It finds the member who
-              spoke each turn. It tags each speech with its subjects. Each result links to the source page.
-            </p>
-          )}
+          <p className="home-hero__lede">
+            Torko reads the Lok Sabha debates on sansad.in
+            {corpus?.first && corpus?.last && (
+              <>
+                {" "}
+                from <span className="home-hero__date">{formatDateLong(corpus.first)}</span> to{" "}
+                <span className="home-hero__date">{formatDateLong(corpus.last)}</span>
+              </>
+            )}
+            . It finds the member who spoke each turn and tags each speech with its subjects. Each result links
+            to the source page.
+          </p>
           <div className="home-hero__search">
             <SearchBox />
           </div>
-          {ideaList.length > 0 && (
+          {groups.length > 0 && (
             <div className="home-hero__ideas">
               <span className="home-hero__ideas-label">Try</span>
-              {ideaList.map((idea) => (
-                <Chip key={idea.slug} label={ideaLabel(idea.name)} href={ideaHref(idea)} />
+              {groups.map((group) => (
+                <div key={group.kind} className="home-hero__group" role="group" aria-label={group.label}>
+                  <span className="home-hero__group-label" aria-hidden="true">
+                    {group.label}
+                  </span>
+                  {group.ideas.map((idea) => (
+                    <Chip key={idea.slug} label={ideaLabel(idea.name)} href={ideaHref(idea)} />
+                  ))}
+                </div>
               ))}
             </div>
           )}

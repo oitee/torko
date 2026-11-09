@@ -26,11 +26,19 @@ describe("termList", () => {
 
 describe("HomeMember", () => {
   it("shows the printed label and the member that Torko finds for it", () => {
-    renderMember(featuredAnswer.member);
+    const { container } = renderMember(featuredAnswer.member);
     expect(screen.getByText("SUSHRI MAHUA MOITRA (KRISHNANAGAR)")).toBeTruthy();
     const links = screen.getAllByRole("link", { name: /Mahua Moitra/ });
     for (const link of links) expect(link.getAttribute("href")).toBe("/member/1052");
-    expect(screen.getByText("66 speeches in the 17th and 18th Lok Sabha")).toBeTruthy();
+    expect(container.querySelector(".home-member__counts").textContent).toBe("66 speeches in the 17th and 18th Lok Sabha");
+    expect(container.querySelector(".home-member__speeches").textContent).toBe("66 speeches");
+  });
+
+  it("makes the whole part a target through the link of its text", () => {
+    renderMember(featuredAnswer.member);
+    const stretch = screen.getByRole("link", { name: /Read the 66 speeches by/ });
+    expect(stretch.className).toContain("home-feature__stretch");
+    expect(stretch.getAttribute("href")).toBe("/member/1052");
   });
 
   it("links the seat to its place page and names the state", () => {
@@ -51,8 +59,8 @@ describe("HomeMember", () => {
   });
 
   it("writes one speech in the singular", () => {
-    renderMember({ ...featuredAnswer.member, speeches: 1, terms: [18] });
-    expect(screen.getByText("1 speech in the 18th Lok Sabha")).toBeTruthy();
+    const { container } = renderMember({ ...featuredAnswer.member, speeches: 1, terms: [18] });
+    expect(container.querySelector(".home-member__counts").textContent).toBe("1 speech in the 18th Lok Sabha");
   });
 
   it("shows nothing without a member", () => {

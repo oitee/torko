@@ -43,13 +43,32 @@
   min-height: 56px;
   padding: 6px 0;
   border-bottom: 1px solid var(--hairline);
-  text-decoration: none;
   color: var(--ink);
   transition: background-color 0.15s ease;
 }
 
 .tag-member-row:hover {
   background: var(--ground);
+}
+
+.tag-members-list__note a {
+  color: var(--action);
+  text-underline-offset: 3px;
+}
+
+.tag-member-row__info {
+  text-decoration: none;
+  color: inherit;
+}
+
+.tag-member-row__count {
+  text-decoration: none;
+}
+
+.tag-member-row__count:hover {
+  color: var(--action);
+  text-decoration: underline;
+  text-underline-offset: 3px;
 }
 
 .tag-member-row__rank {

@@ -8,6 +8,8 @@ import {
 import Chip from "../../components/Chip.jsx";
 import Popover from "../../components/Popover.jsx";
 import TLDR from "../../components/TLDR.jsx";
+import { goToSpeech, setSpeechHash, speechIdFromHash } from "./jump.js";
+import { repairApostrophes } from "../speech/repairApostrophes.js";
 import "./DebateTranscript.css";
 
 export function countText(n, one, many) {
@@ -32,6 +34,25 @@ export function getSpeakerDetails(turn) {
   }
   return { name: SPEAKER_NOT_IDENTIFIED, isUnidentified: true };
 }
+
+// A heading line of the record, such as the title of the debate. The API decides it: kind "heading".
+export function isHeadingTurn(turn) {
+  return turn?.kind === "heading";
+}
+
+// The tags that every speech of the debate carries. They tell nothing on one card, so the card hides them.
+export function commonTagSlugs(speeches) {
+  if (!speeches || speeches.length < 2) return new Set();
+  const counts = {};
+  speeches.forEach((sp) => {
+    new Set((sp.tags || []).map((t) => t.slug)).forEach((slug) => {
+      counts[slug] = (counts[slug] || 0) + 1;
+    });
+  });
+  return new Set(Object.keys(counts).filter((slug) => counts[slug] === speeches.length));
+}
+
+export const CARD_TAGS_SHOWN = 3;
 
 // Helper to split turn text into paragraphs at blank lines
 export function splitParagraphs(text) {
@@ -69,6 +90,16 @@ export default function DebateTranscript({
   const jumpButtonRef = useRef(null);
   const sectionRef = useRef(null);
   const filterBarRef = useRef(null);
+  const lastHashRef = useRef(null);
+
+  // A link with a speech hash opens at that speech. The page draws the speeches after the data arrives, so the browser cannot do it.
+  useEffect(() => {
+    const id = speechIdFromHash(window.location.hash);
+    if (!id) return;
+    lastHashRef.current = id;
+    const el = document.getElementById(`speech-${id}`);
+    if (el && el.scrollIntoView) el.scrollIntoView({ block: "start" });
+  }, []);
 
   // The rail and the speech card stick below the filter bar, so the section holds the bar's height.
   useEffect(() => {
@@ -116,6 +147,10 @@ export default function DebateTranscript({
 
       if (currentId) {
         setActiveSpeechSeq(currentId);
+        if (lastHashRef.current !== currentId) {
+          lastHashRef.current = currentId;
+          setSpeechHash(currentId);
+        }
       }
     };
 
@@ -126,11 +161,8 @@ export default function DebateTranscript({
 
   // Jump to a speech
   const jumpToSpeech = (speechId) => {
-    const el = document.getElementById(`speech-${speechId}`);
-    if (el) {
-      const yOffset = -80;
-      const y = el.getBoundingClientRect().top + window.scrollY + yOffset;
-      window.scrollTo({ top: y, behavior: "smooth" });
+    lastHashRef.current = String(speechId);
+    if (goToSpeech(speechId)) {
       setActiveSpeechSeq(String(speechId));
       setPhoneSheetOpen(false);
     }
@@ -227,11 +259,7 @@ export default function DebateTranscript({
       ? `This debate has no speech. It has ${turns.length} ${
           turns.length === 1 ? "turn" : "turns"
         }.`
-      : `Showing the whole debate in order: ${countText(
-          speeches.length,
-          "speech",
-          "speeches"
-        )}, ${countText(people.length, "member", "members")} identified.`;
+      : "Showing the whole debate in order.";
   if (activeTag) {
     const count = activeTag.speeches;
     const spWord = count === 1 ? "1 speech" : `${count} speeches`;
@@ -245,6 +273,10 @@ export default function DebateTranscript({
     const intWord = memInt === 1 ? "1 interruption" : `${memInt} interruptions`;
     filterSentence = `Showing everything ${activeMember.name} said: ${spWord} and ${intWord}.`;
   }
+
+  const commonTags = commonTagSlugs(speeches);
+
+  const speechNumber = (id) => (speechMap[id] ? speechMap[id].speechIndex : id);
 
   // Count shown
   const shownSpeechesCount = speeches.filter((s) => {
@@ -262,11 +294,7 @@ export default function DebateTranscript({
       ? `${shownSpeechesCount} of ${countText(speeches.length, "speech", "speeches")} shown`
       : speeches.length === 0
       ? `${formatNumber(turns.length)} turns`
-      : `${countText(speeches.length, "speech", "speeches")} · ${countText(
-          people.length,
-          "member",
-          "members"
-        )} identified`;
+      : countText(speeches.length, "speech", "speeches");
 
   return (
     <section
@@ -280,15 +308,11 @@ export default function DebateTranscript({
           <h2 id="debate-heading" className="debate-transcript__title">
             The debate
           </h2>
-          <span className="debate-transcript__meta mono">
-            {speeches.length === 0
-              ? `${formatNumber(turns.length)} turns · in the order of the record`
-              : `${countText(speeches.length, "speech", "speeches")} · ${countText(
-                  people.length,
-                  "member",
-                  "members"
-                )} identified · in the order of the record`}
-          </span>
+          {speeches.length === 0 && (
+            <span className="debate-transcript__meta mono">
+              {formatNumber(turns.length)} turns · in the order of the record
+            </span>
+          )}
         </div>
 
         {/* Filter bar */}
@@ -377,8 +401,8 @@ export default function DebateTranscript({
                 <span>Jump to speech</span>
                 <span className="mono">
                   {activeSpeechSeq
-                    ? `${String(activeSpeechSeq).padStart(2, "0")} / ${speeches.length}`
-                    : `${speeches.length}`}
+                    ? `${speechNumber(activeSpeechSeq)} of ${speeches.length}`
+                    : `1 to ${speeches.length}`}
                 </span>
               </button>
 
@@ -586,6 +610,7 @@ export default function DebateTranscript({
                         <SpeechCard
                           speech={sp}
                           totalSpeeches={speeches.length}
+                          hideSlugs={commonTags}
                         />
                       </div>
                     )}
@@ -622,7 +647,7 @@ export default function DebateTranscript({
                 {/* Right Column: Speech Card (desktop sticky) */}
                 {isSpeech && (
                   <div className="debate-transcript__card-col">
-                    <SpeechCard speech={sp} totalSpeeches={speeches.length} />
+                    <SpeechCard speech={sp} totalSpeeches={speeches.length} hideSlugs={commonTags} />
                   </div>
                 )}
               </div>
@@ -636,11 +661,31 @@ export default function DebateTranscript({
 
 // Single Turn component
 function TurnItem({ turn, muted = false, expanded = false, onToggle }) {
+  const turnRef = useRef(null);
+  if (isHeadingTurn(turn)) {
+    return (
+      <p
+        className="debate-transcript__heading-line"
+        lang={scriptLang(turn.text)}
+      >
+        {repairApostrophes(turn.text)}
+      </p>
+    );
+  }
   const details = getSpeakerDetails(turn);
   const paragraphs = splitParagraphs(turn.text);
   const isInterruption = turn.role_in_debate === "interruption";
   const hasMore = paragraphs.length > 2;
   const visibleParas = expanded || !hasMore ? paragraphs : paragraphs.slice(0, 2);
+
+  // "Read less" closes the turn. When the top of the turn is above the screen, the page moves back to it, so the reader keeps the place.
+  const handleLess = () => {
+    onToggle();
+    const el = turnRef.current;
+    if (el && el.scrollIntoView && el.getBoundingClientRect().top < 0) {
+      el.scrollIntoView({ block: "start" });
+    }
+  };
 
   let headerSpeaker = null;
   if (details.id) {
@@ -674,6 +719,7 @@ function TurnItem({ turn, muted = false, expanded = false, onToggle }) {
 
   return (
     <div
+      ref={turnRef}
       className={`debate-transcript__turn ${
         isInterruption ? "debate-transcript__turn--interruption" : ""
       } ${muted ? "debate-transcript__turn--muted" : ""}`}
@@ -694,17 +740,20 @@ function TurnItem({ turn, muted = false, expanded = false, onToggle }) {
             className="debate-transcript__para"
             lang={scriptLang(p)}
           >
-            {p}
+            {repairApostrophes(p)}
           </p>
         ))}
 
-        {hasMore && !expanded && (
+        {hasMore && (
           <button
             type="button"
             className="debate-transcript__read-more"
-            onClick={onToggle}
+            aria-expanded={expanded}
+            onClick={expanded ? handleLess : onToggle}
           >
-            …Read more
+            {expanded
+              ? "Read less"
+              : "Read more"}
           </button>
         )}
       </div>
@@ -713,7 +762,10 @@ function TurnItem({ turn, muted = false, expanded = false, onToggle }) {
 }
 
 // Speech Card component shown on the right (desktop) and accordion (phone)
-function SpeechCard({ speech, totalSpeeches }) {
+function SpeechCard({ speech, totalSpeeches, hideSlugs = new Set() }) {
+  const ownTags = (speech.tags || []).filter((t) => !hideSlugs.has(t.slug));
+  const shownTags = ownTags.slice(0, CARD_TAGS_SHOWN);
+  const moreTags = ownTags.length - shownTags.length;
   const ints = speech.interruptions || 0;
   const intsText =
     ints === 0
@@ -745,11 +797,14 @@ function SpeechCard({ speech, totalSpeeches }) {
         </div>
       )}
 
-      {speech.tags && speech.tags.length > 0 && (
+      {shownTags.length > 0 && (
         <div className="debate-speech-card__chips">
-          {speech.tags.map((t) => (
+          {shownTags.map((t) => (
             <Chip key={t.slug || t.name} label={t.name} href={`/tag/${t.slug}`} />
           ))}
+          {moreTags > 0 && (
+            <span className="debate-speech-card__more meta">+{moreTags} more</span>
+          )}
         </div>
       )}
 
@@ -758,7 +813,7 @@ function SpeechCard({ speech, totalSpeeches }) {
           to={`/speech/${speech.id}`}
           className="debate-speech-card__link"
         >
-          Speech page
+          Open this speech
         </Link>
       </div>
     </aside>

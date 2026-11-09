@@ -1,17 +1,22 @@
 import React from "react";
 import Chip from "../../components/Chip.jsx";
+import { formatNumber } from "../../assets/js/format.js";
 import "./TagRelatedTags.css";
 
+// The order of the related tags: the most shared speeches first. On a tie, the higher ratio to chance comes first.
+export function bySharedSpeeches(a, b) {
+  return (b.n ?? b.speeches_shared ?? 0) - (a.n ?? a.speeches_shared ?? 0) || (b.lift || 0) - (a.lift || 0);
+}
+
 // TagRelatedTags displays the tags that appear with the current tag more often than chance gives.
-// The server orders them by lift. The count on each chip is the number of shared speeches.
-export default function TagRelatedTags({ related = [] }) {
+export default function TagRelatedTags({ related = [], total = null }) {
   const safeRelated = Array.isArray(related) ? related : [];
 
   if (safeRelated.length === 0) {
     return null;
   }
 
-  const displayTags = safeRelated.slice(0, 14);
+  const displayTags = [...safeRelated].sort(bySharedSpeeches).slice(0, 14);
 
   return (
     <section className="tag-related-tags" aria-labelledby="related-heading">
@@ -21,7 +26,7 @@ export default function TagRelatedTags({ related = [] }) {
         </h2>
       </div>
       <p className="tag-related-tags__note">
-        Tags that appear with this tag more often than chance. At least 8 shared speeches.
+        Tags that appear with this tag more often than chance. The number on each tag is the speeches that carry both tags{total != null ? `, of ${formatNumber(total)} speeches with this tag` : ""}. At least 8 shared speeches. The most shared come first.
       </p>
 
       <div className="tag-related-tags__chips">

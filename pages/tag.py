@@ -3,13 +3,10 @@
 A live tag has a status other than 'rejected' and 'merged'. A merged tag points to its kept tag
 through tags.merged_into. The slug of a merged tag therefore opens the page of its kept tag.
 """
-import re
-
 from sqlalchemy import text
 
-from pages.common import (PARTY_AT_DATE, SPEECH_TAGS_CTE, corpus_party_totals, party_colours, resolve_slug, resolve_tag, slug, tag_speeches,
+from pages.common import (PARTY_AT_DATE, SPEECH_TAGS_CTE, add_quotes, corpus_party_totals, party_colours, resolve_slug, resolve_tag, slug, tag_speeches,
                           speech_rows, speech_tags_cte, year_rows, year_tagged)
-from pages.quotes import clean, good, good_hi, score, sentences
 
 COUNTS_NOTE = (
     "total and by_source count speeches that carry this tag (each speech once). "
@@ -89,39 +86,11 @@ def peak_year(year_counts):
     return min(year_counts, key=lambda y: (-year_counts[y], y))
 
 
-def pick_quote(turn_texts, title):
-    """Return (sentence, language) for the best good sentence in the turn texts, or (None, None).
-
-    Same rule as the page "On this day": an English sentence first, and a Hindi sentence only when no English one is good.
-    """
-    title_words = {w.lower() for w in re.findall(r"[A-Za-z]{5,}", title or "")}
-    sents = [sent for t in turn_texts for sent in sentences(clean(t or ""))]
-    best = None
-    for sent in sents:
-        if good(sent):
-            key = (score(sent, title_words), -abs(len(sent.split()) - 24))
-            if best is None or key > best[0]:
-                best = (key, sent)
-    if best:
-        return best[1], "en"
-    for sent in sents:
-        if good_hi(sent):
-            key = -abs(len(sent.split()) - 18)
-            if best is None or key > best[0]:
-                best = (key, sent)
-    return (best[1], "hi") if best else (None, None)
-
-
 def add_quotes_and_subjects(c, rows, tag_id):
     """Add quote and subject to each speech row."""
     ids = [r["id"] for r in rows]
     if not ids:
         return rows
-    turns = {}
-    for sid, txt in c.execute(text("""
-        SELECT t.speech_id, t.text FROM turns t JOIN speeches s ON s.id = t.speech_id
-        WHERE t.speech_id = ANY(:ids) AND t.person_id = s.person_id AND t.person_id IS NOT NULL ORDER BY t.speech_id, t.seq"""), {"ids": ids}):
-        turns.setdefault(sid, []).append(txt)
     subj = {}
     for sid, label in c.execute(text("""
         SELECT si.speech_id, su.label FROM speech_items si
@@ -130,8 +99,8 @@ def add_quotes_and_subjects(c, rows, tag_id):
         WHERE si.kept AND si.speech_id = ANY(:ids) AND su.parent_tag_id IN (SELECT id FROM tags WHERE id = :id OR merged_into = :id)
         ORDER BY si.speech_id, su.n_speeches DESC, su.label"""), {"ids": ids, "id": tag_id}):
         subj.setdefault(sid, label)  # the first row has the most speeches
+    add_quotes(c, rows)
     for r in rows:
-        r["quote"], r["quote_lang"] = pick_quote(turns.get(r["id"], []), r["debate"])
         r["subject"] = subj.get(r["id"])
     return rows
 
