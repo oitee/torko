@@ -85,6 +85,11 @@ describe("HomeHero", () => {
     expect(screen.getByRole("group", { name: "Schemes" }).textContent).toContain("MNREGA");
     expect(screen.getByRole("group", { name: "Topics" }).textContent).toContain("Arrears");
   });
+
+  it("shows only the chips, with the name of each kind for a screen reader only", () => {
+    renderHero({ corpus: homeAnswer.corpus, ideas: featuredAnswer.search_ideas });
+    expect(screen.getByRole("group", { name: "Places" }).textContent).not.toContain("Places");
+  });
 });
 
 describe("groupIdeas", () => {

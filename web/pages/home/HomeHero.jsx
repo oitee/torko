@@ -21,7 +21,7 @@ export function ideaLabel(name) {
   return m && name.length > 24 ? m[1] : name;
 }
 
-// The name of each kind of search idea, in the plural. A kind with no name here shows its own word.
+// The name of each kind of search idea, in the plural. Only a screen reader says it. A kind with no name here uses its own word.
 const KIND_LABELS = {
   place: "Places",
   scheme: "Schemes",
@@ -77,9 +77,6 @@ export default function HomeHero({ corpus, corpusError, onRetryCorpus, ideas }) 
               <span className="home-hero__ideas-label">Try</span>
               {groups.map((group) => (
                 <div key={group.kind} className="home-hero__group" role="group" aria-label={group.label}>
-                  <span className="home-hero__group-label" aria-hidden="true">
-                    {group.label}
-                  </span>
                   {group.ideas.map((idea) => (
                     <Chip key={idea.slug} label={ideaLabel(idea.name)} href={ideaHref(idea)} />
                   ))}
