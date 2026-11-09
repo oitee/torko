@@ -34,6 +34,34 @@ function href(item) {
   return null;
 }
 
+// The page words of each kind of match, for the short link above the results.
+const PAGE_WORDS = { place: "place page", tag: "tag page", member: "member page" };
+
+// The match whose name is the same as the search words, in the order place, tag, member. A subject has no page.
+export function exactMatch(results, query) {
+  const want = (query || "").trim().toLowerCase();
+  if (!want) return null;
+  for (const kind of ["place", "tag", "member"]) {
+    const item = (results || []).find((r) => r.kind === kind && (r.name || "").trim().toLowerCase() === want);
+    if (item) return item;
+  }
+  return null;
+}
+
+// SearchTopMatch is one link above the results to the page with the same name as the search words.
+// On a phone the full list of matches comes after the results, so this link keeps the page in view.
+export function SearchTopMatch({ results, query }) {
+  const item = exactMatch(results, query);
+  if (!item) return null;
+  return (
+    <p className="search-top-match">
+      <Link to={href(item)} className="search-top-match__link">
+        Open the {PAGE_WORDS[item.kind]} for {item.name}
+      </Link>
+    </p>
+  );
+}
+
 // SearchMatches lists the tags, places, members and subjects whose names match the words.
 // A subject has no page of its own, so it links to its parent tag when it has one.
 export default function SearchMatches({ results, query }) {

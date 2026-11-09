@@ -11,7 +11,7 @@ import HowTorkoCounts from "../components/HowTorkoCounts.jsx";
 import PageLayout from "../components/PageLayout.jsx";
 import SearchBox from "../components/SearchBox.jsx";
 import { Loading } from "../components/States.jsx";
-import SearchMatches from "./search/SearchMatches.jsx";
+import SearchMatches, { SearchTopMatch } from "./search/SearchMatches.jsx";
 import SearchResults from "./search/SearchResults.jsx";
 import SearchScopeCard from "./search/SearchScopeCard.jsx";
 import AskLine, { askAnswers } from "./search/AskLine.jsx";
@@ -274,6 +274,7 @@ export default function Search() {
               ))}
             </div>
           )}
+          {q && matches.data && <SearchTopMatch results={matches.data.results} query={q} />}
           {q && matches.data && <SearchMatches results={matches.data.results} query={q} />}
           <SearchResults
             view={view}

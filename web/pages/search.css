@@ -978,6 +978,27 @@ a.search-pager__num:hover {
   }
 }
 
+/* The link to the page with the same name as the search. Only a phone shows it, because there the full list of matches is low on the page. */
+.search-top-match {
+  display: none;
+  margin: 0;
+}
+
+@media (max-width: 767px) {
+  .search-top-match {
+    display: block;
+  }
+}
+
+.search-top-match__link {
+  font-weight: 600;
+  color: var(--action);
+}
+
+.search-top-match__link::after {
+  content: " →";
+}
+
 @media (pointer: coarse) {
   .search-pager__num {
     min-width: var(--control-height);
