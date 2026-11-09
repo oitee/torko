@@ -4,7 +4,7 @@ Torko reads 64,921 Lok Sabha debates from 1999 to 2026. It finds which member of
 
 You can search the debates, open a member and read every speech by that member, and open a subject to see who spoke about it and when.
 
-![Debate search](docs/images/dashboard-search.png)
+![Search for "Kerala": the matching pages, the filters, and the speeches](docs/images/search.png)
 
 ## The problem
 
