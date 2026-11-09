@@ -89,6 +89,8 @@ The API description is at `/api/openapi.json`, and an interactive page is at `/a
 
 `/sitemap.xml` lists the pages that search engines may index: Home, Method, each party with members, each member with speeches, each place with at least 10 speeches, and the 250 tags with the most speeches. Speech and debate pages are not in it, because a rebuild of the database gives them new ids.
 
+`/robots.txt` lets search engines read the site, and `/api/` too, because each page reads its data there. It blocks the Search and Your MP pages, the calls that can use a paid model (`/api/ask`, `/api/search`), and the old dashboard. It blocks the crawlers that collect training data for AI models. It allows the agents of AI search tools, because they link to the page. The rules are in `robots.py`. robots.txt is a request, not a lock.
+
 ## Two engineering problems
 
 **Problem 1: the disguised Hindi font.** Old pages store Hindi text in a font that predates Unicode, the modern standard for text encoding. The stored bytes look like broken Latin characters, for example `gÉÉÒ`. A reader that ignores this stores meaningless text while it reports success. Torko builds a character map to convert the bytes into real Hindi text. Torko also builds a detector. The detector decides whether the conversion should run. The detector matters because one early version of the fix once converted correct Hindi text into damaged text.

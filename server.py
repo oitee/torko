@@ -6,6 +6,7 @@ from flask import Flask, Response, jsonify, request, send_from_directory
 import dashboard_db
 import openapi
 import pages_api
+import robots
 import sitemap
 import tag_search
 from pages.common import cached
@@ -154,6 +155,12 @@ for rule in SITE_PAGES:
 def site_assets(name):
     """The built JavaScript and CSS. Each file name holds a hash of its content, so a browser can keep it for a year."""
     return send_from_directory(WEB_DIST / "assets", name, max_age=365 * 24 * 3600)
+
+
+@app.route("/robots.txt")
+def robots_txt():
+    """Which crawlers may read which addresses. The policy is in robots.py."""
+    return Response(robots.render(sitemap.site_url()), mimetype="text/plain")
 
 
 @app.route("/sitemap.xml")
