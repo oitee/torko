@@ -204,3 +204,17 @@
     min-height: 44px;
   }
 }
+
+/* On a phone the line of numbers is too long under the chart. The legend gives the values, and a screen reader still hears the line. */
+@media (max-width: 767px) {
+  .party-weight__readout {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    min-height: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0 0 0 0);
+    white-space: nowrap;
+  }
+}
