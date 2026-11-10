@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState } from "react";
-import { Link, useNavigate, useSearchParams } from "react-router-dom";
+import { Link, useSearchParams } from "react-router-dom";
 import { getJSON } from "../assets/js/api.js";
 import { useApi } from "../assets/js/useApi.js";
 import { formatNumber, termShort } from "../assets/js/format.js";
@@ -10,16 +10,14 @@ import Count from "../components/Count.jsx";
 import HowTorkoCounts from "../components/HowTorkoCounts.jsx";
 import PageLayout from "../components/PageLayout.jsx";
 import SearchBox from "../components/SearchBox.jsx";
-import { Loading } from "../components/States.jsx";
-import SearchMatches, { SearchTopMatch } from "./search/SearchMatches.jsx";
+import SearchMatches from "./search/SearchMatches.jsx";
 import SearchResults from "./search/SearchResults.jsx";
 import SearchScopeCard from "./search/SearchScopeCard.jsx";
-import AskLine, { askAnswers } from "./search/AskLine.jsx";
 import FilterRail from "./search/FilterRail.jsx";
 import CopyButton from "../components/CopyButton.jsx";
 import SearchLanding from "./search/SearchLanding.jsx";
 import { chipsFrom, draftChanges, draftFrom, listOf } from "./search/filterRules.js";
-import { FILTER_KEYS, askHref, defaultSort, headingParts, readSearch } from "./search/searchParams.js";
+import { FILTER_KEYS, defaultSort, headingParts, readSearch } from "./search/searchParams.js";
 import "./search.css";
 
 const PER_PAGE = 20;
@@ -34,41 +32,27 @@ const SCOPE_NAME_URL = {
 // The Search page: the speeches that contain the words, the pages whose names match, and filters.
 export default function Search() {
   const [searchParams, setSearchParams] = useSearchParams();
-  const { scope, filters, view, sort, page, ask, asked } = readSearch(searchParams);
+  const { scope, filters, view, sort, page } = readSearch(searchParams);
   const params = { ...scope, ...filters };
-  const navigate = useNavigate();
-  // A question in the address (?ask=) is read as filters first. The page then replaces the address with the filters.
-  const askCall = useApi(ask ? `ask:${ask}` : null, (signal) => getJSON("/api/ask", { q: ask }, { signal }));
-  useEffect(() => {
-    if (!ask) return;
-    const mine = askCall.dataKey === `ask:${ask}`;
-    if (askCall.data && mine && !askCall.loading) {
-      askAnswers.set(ask, askCall.data);
-      navigate(askHref(askCall.data, ask), { replace: true });
-    } else if (askCall.error && mine) {
-      navigate(`/search?q=${encodeURIComponent(ask)}`, { replace: true });
-    }
-  }, [ask, askCall.data, askCall.dataKey, askCall.error, askCall.loading]);
   const q = scope.q || "";
   const hasFilters = Object.keys(params).some((k) => k !== "q");
   const searched = Object.keys(params).length > 0;
 
   const listParams = { ...scope, ...filters, sort, page, per_page: PER_PAGE };
   const listKey = JSON.stringify({ listParams, view });
-  const list = useApi(ask ? null : listKey, (signal) =>
+  const list = useApi(listKey, (signal) =>
     getJSON("/api/speeches", { ...listParams, ...(view === "members" ? { group: "member" } : {}) }, { signal })
   );
   // The other calls wait for the list. The list stores the vector and the nearest speeches of a new search for them.
-  const listDone = !ask && !list.loading;
+  const listDone = !list.loading;
 
   // The landing view shows while nothing is searched. A search that starts from it keeps the landing view
   // until its results arrive, so the page changes once, from the box to the results. A direct link to a search
   // opens the results view at once.
   const resultsReady = list.dataKey === listKey && !list.loading;
-  const landingRef = useRef(!searched && !ask);
-  // A question waits in ?ask= while it is read. That address has no filters yet, but it is a search, not an empty page.
-  if (!searched && !ask) landingRef.current = true;
-  else if (landingRef.current && !ask && (resultsReady || list.error)) landingRef.current = false;
+  const landingRef = useRef(!searched);
+  if (!searched) landingRef.current = true;
+  else if (landingRef.current && (resultsReady || list.error)) landingRef.current = false;
   const landing = landingRef.current;
 
   // The facets are a call of their own, so the speeches do not wait for them.
@@ -111,6 +95,10 @@ export default function Search() {
     Promise.all(tags.map((t) => getJSON(SCOPE_NAME_URL.tag(t), undefined, { signal })))
   );
   const scopeInfo = { place: useScope("place"), member: useScope("member") };
+  // The places and tags whose whole name is in the words get the same card as a search inside them. /api/search picks them.
+  const named = (matches.data?.named || []).filter((p) => !listOf(scope[p.kind]).includes(p.slug));
+  const namedKey = named.length ? `named:${named.map((p) => `${p.kind}:${p.slug}`).join(",")}` : null;
+  const namedInfo = useApi(namedKey, (signal) => Promise.all(named.map((p) => getJSON(SCOPE_NAME_URL[p.kind](p.slug), undefined, { signal }))));
   const scopeNames = {
     tag: tagInfo.data ? tagInfo.data.map((t) => t.name).join(" and ") : null,
     place: scopeInfo.place.data ? scopeInfo.place.data.map((t) => t.name).join(" or ") : null,
@@ -136,8 +124,6 @@ export default function Search() {
       else next.set(k, String(v));
     }
     if (!("page" in changes)) next.delete("page");
-    // A change of a filter ends the Read as line: the filters are no longer the reading of the question.
-    if (Object.keys(changes).some((k) => !["page", "view", "sort"].includes(k))) next.delete("asked");
     const qs = next.toString();
     return qs ? `/search?${qs}` : "/search";
   };
@@ -169,10 +155,8 @@ export default function Search() {
         {heading.rest}
       </h1>
       <div className="search-head__box">
-        <SearchBox key={asked || ask || q} initial={asked || ask || q} />
+        <SearchBox key={q} initial={q} />
       </div>
-      {ask && <p className="search-ask__line" role="status">Reading your question…</p>}
-      {asked && !ask && <AskLine question={asked} chips={chips} />}
       {chips.length > 0 && (
         <div className="search-head__active" aria-label="Filters that are on">
           {chips.map((c) => (
@@ -192,15 +176,14 @@ export default function Search() {
     return (
       <main className="search-page search-page--landing">
         <SearchLanding
-          initial={asked || ask || q}
+          initial={q}
           total={searched ? null : speechTotal}
           members={homeCall.data?.corpus?.members}
           first={homeCall.data?.corpus?.first}
           last={homeCall.data?.corpus?.last}
           busy={searched}
-          status={ask ? "Reading your question…" : ""}
         />
-        {!searched && !ask && (
+        {!searched && (
           <section id="latest-speeches" className="search-latest" aria-label="Latest speeches">
             <SearchResults
               view={view}
@@ -230,15 +213,7 @@ export default function Search() {
 
   return (
     <PageLayout breadcrumb={crumbLabel ? <Breadcrumb items={[{ label: "Search", href: "/search" }, { label: crumbLabel }]} /> : null} answer={answer}>
-      {ask && (
-        <div className="search-body search-body--waiting" aria-busy="true">
-          <div className="search-rail search-rail--waiting" aria-hidden="true" />
-          <div className="search-main">
-            <Loading lines={8} />
-          </div>
-        </div>
-      )}
-      {!ask && <div className="search-body">
+      <div className="search-body">
         <aside className="search-rail" aria-label="Filters and method">
           <FilterRail
             params={params}
@@ -264,6 +239,13 @@ export default function Search() {
         </aside>
 
         <div className="search-main">
+          {namedKey && namedInfo.dataKey === namedKey && namedInfo.data && (
+            <div className="search-scopes search-scopes--named">
+              {named.map((p, i) => (
+                <SearchScopeCard key={`${p.kind}:${p.slug}`} kind={p.kind} value={p.slug} info={namedInfo.data[i]} />
+              ))}
+            </div>
+          )}
           {(tags.length > 0 || scope.place) && (
             <div className="search-scopes">
               {tags.map((t, i) => (
@@ -274,7 +256,6 @@ export default function Search() {
               ))}
             </div>
           )}
-          {q && matches.data && <SearchTopMatch results={matches.data.results} query={q} />}
           {q && matches.data && <SearchMatches results={matches.data.results} query={q} />}
           <SearchResults
             view={view}
@@ -297,7 +278,7 @@ export default function Search() {
             onReset={resetFilters}
           />
         </div>
-      </div>}
+      </div>
     </PageLayout>
   );
 }

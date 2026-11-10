@@ -183,14 +183,14 @@ describe("SearchBox", () => {
     expect(screen.getByTestId("location").textContent).toBe("/search?q=budget");
   });
 
-  it("sends a question of three or more words, or in Hindi script, to /search?ask=<text>", () => {
-    render(<Harness initial="Kerala MPs on fishermen" />);
+  it("sends any number of words, and Hindi script, to the word search", () => {
+    render(<Harness initial="corruption by government officials" />);
     fireEvent.click(screen.getByRole("button", { name: "Search" }));
-    expect(screen.getByTestId("location").textContent).toBe("/search?ask=Kerala%20MPs%20on%20fishermen");
+    expect(screen.getByTestId("location").textContent).toBe("/search?q=corruption%20by%20government%20officials");
     cleanup();
     render(<Harness initial="बिहार में बाढ़" />);
     fireEvent.click(screen.getByRole("button", { name: "Search" }));
-    expect(screen.getByTestId("location").textContent).toBe(`/search?ask=${encodeURIComponent("बिहार में बाढ़")}`);
+    expect(screen.getByTestId("location").textContent).toBe(`/search?q=${encodeURIComponent("बिहार में बाढ़")}`);
   });
 
   it("navigates to /search?q=<text> when Search button is clicked", () => {

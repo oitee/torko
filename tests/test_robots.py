@@ -21,7 +21,7 @@ def test_search_engines_may_read_the_pages_and_the_data_that_the_pages_load():
 
 def test_search_pages_paid_calls_and_the_old_dashboard_are_blocked():
     p = parser()
-    for path in ["/search", "/search?q=water", "/my-mp?q=pune", "/api/ask?q=what", "/api/search?q=coal",
+    for path in ["/search", "/search?q=water", "/my-mp?q=pune", "/api/search?q=coal",
                  "/api/distribution?loksabha=18", "/api/dashboard/debates", "/analysis", "/dashboard.html",
                  "/search.html", "/index.html"]:
         assert not p.can_fetch("Googlebot", BASE + path), path

@@ -10,7 +10,7 @@ from flask import Blueprint, Response, abort, jsonify, request
 
 from pages.common import engine
 
-PAGES = ["home", "home_featured", "tag", "member", "place", "speech", "debate", "party", "parties", "places", "compare", "trends", "today", "my_mp", "speeches", "method", "ask"]
+PAGES = ["home", "home_featured", "tag", "member", "place", "speech", "debate", "party", "parties", "places", "compare", "trends", "today", "my_mp", "speeches", "method"]
 
 bp = Blueprint("pages", __name__, url_prefix="/api")
 _engine = None

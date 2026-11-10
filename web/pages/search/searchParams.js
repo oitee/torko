@@ -18,23 +18,6 @@ export const SORTS = [
 // A sort that only the Members view has.
 export const MEMBER_ONLY_SORTS = ["most"];
 
-// Text that reads as a question goes to /api/ask: three or more words, or Hindi script.
-export function isQuestion(text) {
-  const t = (text || "").trim();
-  if (!t || isPhrase(t)) return false;
-  return /[\u0900-\u097F]/.test(t) || t.split(/\s+/).length >= 3;
-}
-
-// The address of the Search page for an answer of /api/ask. asked keeps the question for the Read as line.
-export function askHref(answer, question) {
-  const next = new URLSearchParams();
-  for (const [k, v] of Object.entries(answer?.params || {})) {
-    if (v !== null && v !== undefined && v !== "") next.set(k, String(v));
-  }
-  next.set("asked", question);
-  return `/search?${next.toString()}`;
-}
-
 // Text in quote marks asks for an exact phrase. Best match is the default for any other search text.
 export function isPhrase(q) {
   return /^\s*["“].+["”]\s*$/.test(q || "");
@@ -59,6 +42,8 @@ export function readSearch(searchParams) {
   for (const k of SCOPE_KEYS) {
     if (get(k)) scope[k] = get(k);
   }
+  // An old link with ?ask= is a word search now.
+  if (!scope.q && get("ask")) scope.q = get("ask");
   const filters = {};
   for (const k of FILTER_KEYS) {
     if (get(k)) filters[k] = get(k);
@@ -67,7 +52,7 @@ export function readSearch(searchParams) {
   const sort = sortOf(get("sort"), scope.q, view);
   const pageNum = parseInt(get("page") || "1", 10);
   const page = Number.isInteger(pageNum) && pageNum > 0 ? pageNum : 1;
-  return { scope, filters, view, sort, page, ask: get("ask"), asked: get("asked") };
+  return { scope, filters, view, sort, page };
 }
 
 // The heading of the page, in parts, so that the page can set the count in mono.

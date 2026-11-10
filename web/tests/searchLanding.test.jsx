@@ -18,7 +18,6 @@ function mockApi(slow) {
   vi.spyOn(api, "getJSON").mockImplementation((path, params = {}) => {
     if (path === "/api/home") return Promise.resolve({ corpus: { members: 2, first: "1999-10-20", last: "2026-04-18" } });
     if (path === "/api/search") return Promise.resolve({ results: [] });
-    if (path === "/api/ask") return new Promise(() => {});
     if (params.q === "slow" && !params.facets && !params.group && params.per_page !== 1) return slow;
     if (params.facets === "tag") return Promise.resolve(TAGS);
     if (params.group === "member") return Promise.resolve({ total: 3, members: [{ id: 392, name: "Priya Ranjan Dasmunsi" }], members_total: 2 });
@@ -64,16 +63,27 @@ describe("Search landing", () => {
     expect(await screen.findByRole("button", { name: /Add filter/ })).toBeTruthy();
   });
 
-  it("stays on the results view while a question is read, with a skeleton, and never goes back to the blank page", async () => {
+  it("opens an old question link as a word search", async () => {
     mockApi();
-    const router = renderAt("/search?q=farmers");
+    renderAt("/search?ask=what%20did%20members%20say");
     expect(await screen.findByRole("button", { name: /Add filter/ })).toBeTruthy();
-    await act(async () => {
-      await router.navigate("/search?ask=what%20did%20members%20say");
+    expect(document.querySelector("input[type=search]").value).toBe("what did members say");
+  });
+
+  it("shows a card for each place and tag that the words name", async () => {
+    mockApi();
+    const real = api.getJSON.getMockImplementation();
+    api.getJSON.mockImplementation((path, params) => {
+      if (path === "/api/search")
+        return Promise.resolve({ results: [], named: [{ kind: "place", slug: "raipur", name: "Raipur" }, { kind: "tag", slug: "corruption", name: "Corruption" }] });
+      if (path === "/api/place/raipur") return Promise.resolve({ name: "Raipur", total: 232, n_members: 84, first: "1999-10-22", last: "2026-04-17" });
+      if (path === "/api/tag/corruption") return Promise.resolve({ name: "Corruption", total: 1302, n_members: 492, first: "1999-10-22", last: "2026-03-24" });
+      return real(path, params);
     });
-    expect(screen.queryByRole("list", { name: "Suggested searches" })).toBeNull();
-    expect(screen.getByText("Reading your question…")).toBeTruthy();
-    expect(document.querySelector(".search-body--waiting")).toBeTruthy();
+    renderAt("/search?q=raipur%20corruption");
+    expect((await screen.findByRole("link", { name: "Open the place page →" })).getAttribute("href")).toBe("/place/raipur");
+    expect(screen.getByRole("link", { name: "Open the tag page →" }).getAttribute("href")).toBe("/tag/corruption");
+    expect(document.querySelectorAll(".search-scopes--named .search-scope").length).toBe(2);
   });
 
   it("opens the results view at once for a direct link to a search", () => {

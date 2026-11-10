@@ -16,7 +16,6 @@ The policy:
 BLOCKED = [
     "/search",           # also /search.html of the old dashboard
     "/my-mp",
-    "/api/ask",
     "/api/search",
     "/api/distribution",
     "/api/dashboard/",
