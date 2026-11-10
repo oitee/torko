@@ -114,7 +114,8 @@ def search_index():
 
 @app.route("/api/search")
 def api_search():
-    """The tags, places, subjects and members that match a search text."""
+    """The tags, places, subjects and members that match a search text.
+    named lists the places and tags whose whole name is in the text, for the cards above the results."""
     q = request.args.get("q", "").strip()
     if not q:
         return jsonify({"error": "q is required"}), 400
@@ -124,7 +125,7 @@ def api_search():
         if r["kind"] in ("tag", "place"):
             r["subjects"] = [{"subject_id": s["subject_id"], "label": s["label"], "n_speeches": s["n_speeches"]}
                              for s in r["subjects"][:50]]
-    return jsonify({"query": q, "results": results})
+    return jsonify({"query": q, "results": results, "named": tag_search.named_pages(q, tags)})
 
 
 # The new public site: a single-page app that Vite builds into web/dist/.

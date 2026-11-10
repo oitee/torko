@@ -73,6 +73,51 @@ def tag_fields(t: dict) -> dict:
     return out
 
 
+MAX_NAMED = 3
+
+
+def name_key(text: str) -> tuple:
+    """The stems of all the words of a text, in order. Short function words stay, so that a run of words must be the whole name."""
+    return tuple(stem(w) for w in re.findall(r"[^\W_]+", text.replace("'", "")))
+
+
+def named_pages(query: str, tags: list, limit: int = MAX_NAMED) -> list:
+    """The places and tags whose whole name is a run of words in the query: the cards above the search results.
+
+    1. Walk the query from the left. At each word, take the longest run of words that is the name or an alias of a tag.
+       The words of that run are used. A word that starts no name is skipped.
+    2. A place wins over a tag with the same name. Two places or two tags with one name are left out,
+       because a wrong page is worse than no page.
+    3. Order: places first, then tags with the fewest speeches first, because a smaller tag is usually more specific.
+    Example: "raipur corruption" gives the place Raipur, then the tag Corruption.
+    """
+    index = defaultdict(list)
+    for t in tags:
+        if not t.get("n_speeches"):
+            continue
+        for x in [t["tag"]] + t.get("aliases", []):
+            key = name_key(x)
+            if key and not all(w in STOP for w in key) and t not in index[key]:
+                index[key].append(t)
+    longest = max((len(k) for k in index), default=0)
+    words_ = name_key(query)
+    found, i = [], 0
+    while i < len(words_):
+        for n in range(min(longest, len(words_) - i), 0, -1):
+            hits = index.get(words_[i:i + n])
+            if hits:
+                places = [t for t in hits if t.get("type") == "place"]
+                pick = places or hits
+                if len(pick) == 1 and pick[0] not in found:
+                    found.append(pick[0])
+                i += n
+                break
+        else:
+            i += 1
+    found.sort(key=lambda t: (t.get("type") != "place", t["n_speeches"]))
+    return [{**tag_fields(t), "name": t["tag"], "n_speeches": t["n_speeches"]} for t in found[:limit]]
+
+
 def search(query: str, tags: list, subjects: list, limit: int = 10, members: list = ()) -> list:
     """tags: dicts with tag, aliases (list), n_speeches, and optional type, domain, description.
     subjects: dicts with subject_id, label, names (list), parent_tag, n_speeches.

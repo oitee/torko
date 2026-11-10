@@ -1,3 +1,4 @@
+import tag_search
 from tag_search import matches, search, words
 
 TAGS = [{"tag": "Arrears", "aliases": [], "n_speeches": 10}, {"tag": "Tax Arrears", "aliases": [], "n_speeches": 1}]
@@ -110,3 +111,42 @@ def test_a_tag_found_through_its_subjects_keeps_its_own_count():
     subjects = [{"subject_id": "S1", "label": "MGNREGA wages", "names": [], "parent_tag": "Rural Employment Act (MNREGA)", "n_speeches": 4},
                 {"subject_id": "S2", "label": "MGNREGA funds", "names": [], "parent_tag": "Rural Employment Act (MNREGA)", "n_speeches": 3}]
     assert search("MGNREGA", tags, subjects)[0]["n_speeches"] == 5
+
+
+# named_pages: the cards above the search results.
+NAMED_TAGS = [
+    {"tag": "Raipur", "aliases": [], "n_speeches": 232, "type": "place", "description": "Raipur, a city in Chhattisgarh, India"},
+    {"tag": "Raipur", "aliases": [], "n_speeches": 3, "type": "topic"},
+    {"tag": "Corruption", "aliases": [], "n_speeches": 1302, "type": "topic"},
+    {"tag": "Government", "aliases": [], "n_speeches": 59, "type": "topic"},
+    {"tag": "Farmers", "aliases": [], "n_speeches": 17143, "type": "group"},
+    {"tag": "Government of Kerala", "aliases": [], "n_speeches": 153, "type": "institution"},
+    {"tag": "Kerala", "aliases": [], "n_speeches": 3926, "type": "place"},
+    {"tag": "Aurangabad", "aliases": [], "n_speeches": 40, "type": "place"},
+    {"tag": "Aurangabad", "aliases": [], "n_speeches": 30, "type": "place"},
+    {"tag": "Empty", "aliases": [], "n_speeches": 0, "type": "topic"},
+]
+
+
+def named(q):
+    return [(p["kind"], p["name"]) for p in tag_search.named_pages(q, NAMED_TAGS)]
+
+
+def test_named_pages_gives_each_name_in_the_words_places_first_then_smaller_tags():
+    assert named("raipur corruption") == [("place", "Raipur"), ("tag", "Corruption")]
+    assert named("Raipur Corruption Government Farmers") == [("place", "Raipur"), ("tag", "Government"), ("tag", "Corruption")]
+
+
+def test_named_pages_takes_the_longest_name_and_uses_its_words():
+    assert named("government of kerala") == [("tag", "Government of Kerala")]
+
+
+def test_named_pages_leaves_out_two_pages_with_one_name_and_tags_with_no_speeches():
+    assert named("aurangabad") == []
+    assert named("empty") == []
+    assert named("of the in") == []
+
+
+def test_named_pages_gives_the_link_fields_of_a_place():
+    page = tag_search.named_pages("Raipur", NAMED_TAGS)[0]
+    assert (page["kind"], page["slug"], page["n_speeches"]) == ("place", "raipur", 232)
