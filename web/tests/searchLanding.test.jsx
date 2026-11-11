@@ -70,12 +70,16 @@ describe("Search landing", () => {
     expect(document.querySelector("input[type=search]").value).toBe("what did members say");
   });
 
-  it("shows a card for each place and tag that the words name", async () => {
+  it("shows a card for each place and tag that the words name, and chips for the related tags", async () => {
     mockApi();
     const real = api.getJSON.getMockImplementation();
     api.getJSON.mockImplementation((path, params) => {
       if (path === "/api/search")
-        return Promise.resolve({ results: [], named: [{ kind: "place", slug: "raipur", name: "Raipur" }, { kind: "tag", slug: "corruption", name: "Corruption" }] });
+        return Promise.resolve({
+          results: [],
+          named: [{ kind: "place", slug: "raipur", name: "Raipur" }, { kind: "tag", slug: "corruption", name: "Corruption" }],
+          suggested: [{ kind: "tag", slug: "housing-scheme-corruption", name: "Housing Scheme Corruption" }],
+        });
       if (path === "/api/place/raipur") return Promise.resolve({ name: "Raipur", total: 232, n_members: 84, first: "1999-10-22", last: "2026-04-17" });
       if (path === "/api/tag/corruption") return Promise.resolve({ name: "Corruption", total: 1302, n_members: 492, first: "1999-10-22", last: "2026-03-24" });
       return real(path, params);
@@ -84,6 +88,11 @@ describe("Search landing", () => {
     expect((await screen.findByRole("link", { name: "Open the place page →" })).getAttribute("href")).toBe("/place/raipur");
     expect(screen.getByRole("link", { name: "Open the tag page →" }).getAttribute("href")).toBe("/tag/corruption");
     expect(document.querySelectorAll(".search-scopes--named .search-scope").length).toBe(2);
+    // A suggested tag narrows the same search to that tag, and keeps the words.
+    expect(screen.getByRole("heading", { name: "Suggested filters" })).toBeTruthy();
+    expect(screen.getByRole("link", { name: "Housing Scheme Corruption" }).getAttribute("href")).toBe(
+      "/search?q=raipur+corruption&tag=housing-scheme-corruption"
+    );
   });
 
   it("opens the results view at once for a direct link to a search", () => {

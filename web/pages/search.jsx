@@ -13,6 +13,7 @@ import SearchBox from "../components/SearchBox.jsx";
 import SearchMatches from "./search/SearchMatches.jsx";
 import SearchResults from "./search/SearchResults.jsx";
 import SearchScopeCard from "./search/SearchScopeCard.jsx";
+import SearchSuggested from "./search/SearchSuggested.jsx";
 import FilterRail from "./search/FilterRail.jsx";
 import CopyButton from "../components/CopyButton.jsx";
 import SearchLanding from "./search/SearchLanding.jsx";
@@ -157,6 +158,12 @@ export default function Search() {
       <div className="search-head__box">
         <SearchBox key={q} initial={q} />
       </div>
+      {q && matches.data && (
+        <SearchSuggested
+          items={(matches.data.suggested || []).filter((p) => !listOf(scope[p.kind]).includes(p.slug))}
+          hrefFor={(p) => hrefWith({ [p.kind]: [...listOf(scope[p.kind]), p.slug].join(",") })}
+        />
+      )}
       {chips.length > 0 && (
         <div className="search-head__active" aria-label="Filters that are on">
           {chips.map((c) => (

@@ -44,9 +44,13 @@ def test_a_query_that_misses_the_tag_name_still_finds_the_tag_through_its_subjec
 def test_the_search_endpoint_returns_the_tag_with_its_subjects(monkeypatch):
     import server
     monkeypatch.setattr(server, "_search_index", (TAGS, SUBJECTS, []))
+    monkeypatch.setattr(server.search_rank, "query_vector", lambda store, q: None)
     client = server.app.test_client()
-    body = client.get("/api/search?q=arrears").get_json()
+    resp = client.get("/api/search?q=arrears")
+    body = resp.get_json()
     assert body["results"][0]["name"] == "Arrears"
+    # With no vector of the words, there are no suggestions, and the answer is not cached.
+    assert body["suggested"] == [] and resp.headers["Cache-Control"] == "no-store"
     assert [s["subject_id"] for s in body["results"][0]["subjects"]] == ["S1", "S2"]
     assert client.get("/api/search").status_code == 400
 
@@ -150,3 +154,41 @@ def test_named_pages_leaves_out_two_pages_with_one_name_and_tags_with_no_speeche
 def test_named_pages_gives_the_link_fields_of_a_place():
     page = tag_search.named_pages("Raipur", NAMED_TAGS)[0]
     assert (page["kind"], page["slug"], page["n_speeches"]) == ("place", "raipur", 232)
+
+
+# suggested_tags: the chips of tags near the search in meaning.
+SUGGEST_TAGS = [
+    {"id": 1, "tag": "Farmers' Suicide", "aliases": [], "n_speeches": 1043, "type": "topic"},
+    {"id": 2, "tag": "Farmers' Debt", "aliases": [], "n_speeches": 827, "type": "topic"},
+    {"id": 3, "tag": "Agricultural Distress", "aliases": [], "n_speeches": 2805, "type": "topic"},
+    {"id": 4, "tag": "Empty Tag", "aliases": [], "n_speeches": 0, "type": "topic"},
+    {"id": 5, "tag": "Chennai", "aliases": [], "n_speeches": 1313, "type": "place", "description": "Chennai, a city in Tamil Nadu, India"},
+]
+
+
+def test_suggested_tags_keep_the_order_of_meaning_and_stop_at_the_distance_limit():
+    nearest = [(1, 0.248), (2, 0.335), (3, 0.359), (5, 0.375)]
+    assert [p["name"] for p in tag_search.suggested_tags(nearest, SUGGEST_TAGS)] == ["Farmers' Suicide", "Farmers' Debt", "Agricultural Distress"]
+
+
+def test_suggested_tags_leave_out_a_tag_with_a_card_a_tag_with_no_speeches_and_an_unknown_id():
+    nearest = [(1, 0.25), (4, 0.26), (99, 0.27), (2, 0.30)]
+    assert [p["name"] for p in tag_search.suggested_tags(nearest, SUGGEST_TAGS, skip={"farmers-suicide"})] == ["Farmers' Debt"]
+
+
+def test_suggested_tags_stop_at_the_limit_and_give_a_place_its_kind():
+    nearest = [(5, 0.30), (1, 0.31), (2, 0.32), (3, 0.33)]
+    out = tag_search.suggested_tags(nearest, SUGGEST_TAGS, limit=2)
+    assert [(p["kind"], p["slug"]) for p in out] == [("place", "chennai"), ("tag", "farmers-suicide")]
+
+
+def test_the_search_endpoint_suggests_the_near_tags_that_have_no_card(monkeypatch):
+    import contextlib
+    import server
+    monkeypatch.setattr(server, "_search_index", (SUGGEST_TAGS, [], []))
+    monkeypatch.setattr(server.search_rank, "query_vector", lambda store, q: "[0.1]")
+    monkeypatch.setattr(server.dashboard_db, "get_engine", lambda: type("E", (), {"connect": lambda self: contextlib.nullcontext()})())
+    monkeypatch.setattr(server.tag_search, "nearest_tag_ids", lambda conn, v, m: [(1, 0.25), (2, 0.33)])
+    body = server.app.test_client().get("/api/search?q=farmers suicide").get_json()
+    assert [p["name"] for p in body["named"]] == ["Farmers' Suicide"]
+    assert [p["name"] for p in body["suggested"]] == ["Farmers' Debt"]

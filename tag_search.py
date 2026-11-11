@@ -118,6 +118,40 @@ def named_pages(query: str, tags: list, limit: int = MAX_NAMED) -> list:
     return [{**tag_fields(t), "name": t["tag"], "n_speeches": t["n_speeches"]} for t in found[:limit]]
 
 
+MAX_SUGGESTED = 5
+# The largest cosine distance of a suggested tag. Real searches had their good tags at 0.25 to 0.36.
+# Text with no topic, such as "the" or "asdf qwerty", had its nearest tag at 0.387 or more.
+MAX_SUGGESTED_DISTANCE = 0.36
+
+
+def nearest_tag_ids(conn, vector: str, model: str, limit: int = 20) -> list:
+    """The ids and distances of the tags nearest in meaning to a search vector, nearest first."""
+    return [(r.tag_id, r.distance) for r in conn.execute(text("""
+        SELECT tag_id, embedding <=> CAST(:v AS vector) AS distance FROM tag_embeddings
+        WHERE task_type = 'RETRIEVAL_DOCUMENT' AND model = :m ORDER BY distance LIMIT :lim"""),
+        {"v": vector, "m": model, "lim": limit})]
+
+
+def suggested_tags(nearest: list, tags: list, skip=(), limit: int = MAX_SUGGESTED,
+                   max_distance: float = MAX_SUGGESTED_DISTANCE) -> list:
+    """The tags near the search in meaning, for the chips above the results. Example: "farmers suicide" suggests
+    Farmers' Suicide and Farmers' Debt. nearest is a list of (tag id, distance). A tag with no speeches, a tag
+    that is not live, and a tag in skip (slugs that have a card already) are left out."""
+    by_id = {t["id"]: t for t in tags if t.get("id") is not None}
+    out = []
+    for tag_id, distance in nearest:
+        t = by_id.get(tag_id)
+        if distance > max_distance or not t or not t["n_speeches"]:
+            continue
+        page = {**tag_fields(t), "name": t["tag"], "n_speeches": t["n_speeches"], "distance": round(distance, 3)}
+        if page["slug"] in skip:
+            continue
+        out.append(page)
+        if len(out) == limit:
+            break
+    return out
+
+
 def search(query: str, tags: list, subjects: list, limit: int = 10, members: list = ()) -> list:
     """tags: dicts with tag, aliases (list), n_speeches, and optional type, domain, description.
     subjects: dicts with subject_id, label, names (list), parent_tag, n_speeches.
@@ -181,11 +215,11 @@ def load_index(conn) -> tuple[list, list]:
     # n_speeches is the rule of the tag page: each speech once. A speech under a subject is also a speech of its tag.
     rows = conn.execute(text(f"""
         WITH {SPEECH_TAGS_CTE}, counts AS (SELECT tag_id, count(*) n FROM speech_tags GROUP BY tag_id)
-        SELECT t.tag, t.aliases, COALESCE(c.n, 0) n, t.type, t.domain, t.description
+        SELECT t.id, t.tag, t.aliases, COALESCE(c.n, 0) n, t.type, t.domain, t.description
         FROM tags t LEFT JOIN counts c ON c.tag_id = t.id
         WHERE t.status NOT IN ('rejected', 'merged')""")).fetchall()
-    tags = [{"tag": t, "aliases": list(a or []), "n_speeches": n, "type": ty, "domain": dom, "description": desc}
-            for t, a, n, ty, dom, desc in rows]
+    tags = [{"id": i, "tag": t, "aliases": list(a or []), "n_speeches": n, "type": ty, "domain": dom, "description": desc}
+            for i, t, a, n, ty, dom, desc in rows]
     return tags, subjects
 
 

@@ -8,7 +8,9 @@ import openapi
 import pages_api
 import robots
 import sitemap
+import tag_embed
 import tag_search
+from pages import search_rank
 from pages.common import cached
 from debate_fetch import fetch_debate, split_by_speaker, speaker_distribution
 from debate_fetch_legacy import looks_legacy, split_by_speaker_legacy
@@ -115,7 +117,8 @@ def search_index():
 @app.route("/api/search")
 def api_search():
     """The tags, places, subjects and members that match a search text.
-    named lists the places and tags whose whole name is in the text, for the cards above the results."""
+    named lists the places and tags whose whole name is in the text, for the cards above the results.
+    suggested lists up to 5 tags near the text in meaning, for the chips above the results."""
     q = request.args.get("q", "").strip()
     if not q:
         return jsonify({"error": "q is required"}), 400
@@ -125,7 +128,19 @@ def api_search():
         if r["kind"] in ("tag", "place"):
             r["subjects"] = [{"subject_id": s["subject_id"], "label": s["label"], "n_speeches": s["n_speeches"]}
                              for s in r["subjects"][:50]]
-    return jsonify({"query": q, "results": results, "named": tag_search.named_pages(q, tags)})
+    named = tag_search.named_pages(q, tags)
+    # The suggested tags need the vector of the search text. The speech search stores that vector, so a repeat
+    # search makes no model call. When the model call fails, the answer has no suggestions and is not cached.
+    vector = search_rank.query_vector(dashboard_db.get_engine(), q)
+    suggested = []
+    if vector:
+        with dashboard_db.get_engine().connect() as conn:
+            nearest = tag_search.nearest_tag_ids(conn, vector, tag_embed.MODEL)
+        suggested = tag_search.suggested_tags(nearest, tags, skip={p["slug"] for p in named})
+    resp = jsonify({"query": q, "results": results, "named": named, "suggested": suggested})
+    if not vector:
+        resp.headers["Cache-Control"] = "no-store"
+    return resp
 
 
 # The new public site: a single-page app that Vite builds into web/dist/.
