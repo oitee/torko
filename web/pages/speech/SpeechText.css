@@ -6,13 +6,30 @@
   gap: var(--space-4);
 }
 
-/* A line above the sheet: the hint, or the button that copies the selected words. */
+/* The button that copies the selected words sits in a bar fixed to the bottom of the window.
+   The bar takes no space in the page, so the text does not move when a selection starts.
+   With no selection the bar is empty and shows nothing. It stays in the page, so a screen reader hears the button. */
 .speech-text__select-bar {
+  position: fixed;
+  bottom: var(--space-4);
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 30;
   display: flex;
   align-items: center;
-  min-height: var(--control-height);
+  max-width: calc(100vw - 2 * var(--page-pad));
+  padding: var(--space-1) var(--space-3);
+  background: var(--sheet);
+  border: 1px solid var(--ink);
+  box-shadow: var(--shadow-popover);
   font-size: var(--size-count);
   line-height: var(--lh-count);
+}
+
+.speech-text__select-bar:empty {
+  padding: 0;
+  border: 0;
+  box-shadow: none;
 }
 
 .speech-text__heading {
@@ -122,13 +139,6 @@
 .speech-text__paragraph--target,
 .speech-text__paragraph:target {
   background: var(--ground);
-}
-
-.speech-text__mark {
-  background: color-mix(in srgb, var(--ink) 12%, transparent);
-  color: inherit;
-  text-decoration: underline 2px var(--ink);
-  text-underline-offset: 4px;
 }
 
 /* An interruption: indented to the text, on the ground colour, with a rule on its left. */

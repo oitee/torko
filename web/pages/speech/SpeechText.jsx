@@ -63,75 +63,13 @@ export function splitParagraphs(fullText) {
   return paras;
 }
 
-// Render paragraph text with <mark> elements for any active marks falling within it.
-function renderParagraphContent(para, turnSeq, marks, markIdRef) {
-  if (!marks || marks.length === 0) {
-    return para.text;
-  }
-
-  // Filter and clip marks that fall within this paragraph.
-  const relevantMarks = [];
-  for (const m of marks) {
-    if (m.seq !== turnSeq) continue;
-    const clipStart = Math.max(m.start, para.start);
-    const clipEnd = Math.min(m.end, para.end);
-    if (clipStart < clipEnd) {
-      relevantMarks.push({
-        start: clipStart - para.start,
-        end: clipEnd - para.start,
-        orig: m,
-      });
-    }
-  }
-
-  if (relevantMarks.length === 0) {
-    return para.text;
-  }
-
-  // Sort by start offset
-  relevantMarks.sort((a, b) => a.start - b.start);
-
-  const elements = [];
-  let lastIdx = 0;
-
-  relevantMarks.forEach((m, i) => {
-    if (m.start > lastIdx) {
-      elements.push(para.text.slice(lastIdx, m.start));
-    }
-    const isFirstMarkOverall = !markIdRef.current;
-    if (isFirstMarkOverall) {
-      markIdRef.current = true;
-    }
-
-    elements.push(
-      <mark
-        key={`m-${i}`}
-        id={isFirstMarkOverall ? "first-speech-mark" : undefined}
-        className="speech-text__mark"
-      >
-        {para.text.slice(m.start, m.end)}
-      </mark>
-    );
-    lastIdx = m.end;
-  });
-
-  if (lastIdx < para.text.length) {
-    elements.push(para.text.slice(lastIdx));
-  }
-
-  return elements;
-}
-
 // SpeechText renders the whole speech as one continuous reading text.
 // Paragraphs of own turns carry ¶1, ¶2 numbers. Interruptions are indented.
 export default function SpeechText({
   turns = [],
   hasMember = true,
-  activeMarks = null,
   speaker = null,
 }) {
-  const markIdRef = useRef(false);
-  markIdRef.current = false;
   const bodyRef = useRef(null);
   const [selected, setSelected] = useState(null);
   const [targetId, setTargetId] = useState(() => paragraphIdFromHash(typeof window !== "undefined" ? window.location.hash : ""));
@@ -184,16 +122,6 @@ export default function SpeechText({
       id: speaker?.id,
     })}${selected?.paragraph ? `#${selected.paragraph}` : ""}`;
 
-  // Scroll to the first mark when activeMarks is updated
-  useEffect(() => {
-    if (activeMarks && activeMarks.length > 0) {
-      const el = document.getElementById("first-speech-mark");
-      if (el && typeof el.scrollIntoView === "function") {
-        el.scrollIntoView({ behavior: "smooth", block: "center" });
-      }
-    }
-  }, [activeMarks]);
-
   let globalParaCount = 0;
   let afterInterruption = false;
 
@@ -221,12 +149,10 @@ export default function SpeechText({
       </h2>
 
       <div className="speech-text__select-bar meta" aria-live="polite">
-        {selected ? (
+        {selected && (
           <CopyButton text={quoteCitation} copiedLabel="Copied with source">
             Copy the selected words with the source
           </CopyButton>
-        ) : (
-          <span>Select words in the speech to copy them with the source. Select the ¶ sign to copy a link to a paragraph.</span>
         )}
       </div>
 
@@ -273,12 +199,7 @@ export default function SpeechText({
                         ¶{paraNum}
                       </a>
                       <span className="speech-text__para-body">
-                        {renderParagraphContent(
-                          p,
-                          turn.seq,
-                          activeMarks,
-                          markIdRef
-                        )}
+                        {p.text}
                       </span>
                     </p>
                   );
@@ -339,10 +260,6 @@ export default function SpeechText({
         })}
       </div>
 
-      <p className="speech-text__footer meta">
-        Text from the Lok Sabha debates on sansad.in. Interruptions are kept as
-        printed.
-      </p>
       {linkCopied && (
         <p className="speech-text__footer meta" role="status">
           The link to paragraph {linkCopied.slice(1)} is copied.

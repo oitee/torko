@@ -119,27 +119,15 @@ describe("SpeechText", () => {
     expect(screen.getByText("¶1")).toBeTruthy();
   });
 
-  it("marks exact ranges in paragraphs when activeMarks are supplied", () => {
-    const turns = [
-      {
-        seq: 10,
-        own: true,
-        text: "We demand rural employment guarantee for all workers.",
-      },
-    ];
-    // "rural employment guarantee" is from index 10 to 36
-    const marks = [{ seq: 10, start: 10, end: 36 }];
-
+  it("shows the text with no source line and no marks", () => {
+    const turns = [{ seq: 10, own: true, text: "We demand rural employment guarantee for all workers." }];
     const { container } = render(
       <MemoryRouter>
-        <SpeechText turns={turns} hasMember={true} activeMarks={marks} />
+        <SpeechText turns={turns} hasMember={true} />
       </MemoryRouter>
     );
-
-    const markEl = container.querySelector("mark");
-    expect(markEl).toBeTruthy();
-    expect(markEl.textContent).toBe("rural employment guarantee");
-    expect(markEl.getAttribute("id")).toBe("first-speech-mark");
+    expect(container.querySelector("mark")).toBeNull();
+    expect(screen.queryByText(/Interruptions are kept as printed/)).toBeNull();
   });
 });
 
@@ -183,7 +171,9 @@ describe("SpeechText paragraph links and copy with source", () => {
         <SpeechText turns={turns} hasMember={true} speaker={speaker} />
       </MemoryRouter>
     );
-    expect(screen.getByText(/Select words in the speech to copy them with the source/)).toBeTruthy();
+    // No hint before a selection: the copy button appears only with selected words.
+    expect(screen.queryByText(/Select words in the speech/)).toBeNull();
+    expect(screen.queryByRole("button", { name: /Copy the selected words/ })).toBeNull();
 
     const words = document.getElementById("p1").querySelector(".speech-text__para-body").firstChild;
     const range = document.createRange();
