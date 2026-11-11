@@ -7,7 +7,6 @@ import Button from "../components/Button.jsx";
 import Breadcrumb from "../components/Breadcrumb.jsx";
 import Chip from "../components/Chip.jsx";
 import Count from "../components/Count.jsx";
-import HowTorkoCounts from "../components/HowTorkoCounts.jsx";
 import PageLayout from "../components/PageLayout.jsx";
 import SearchBox from "../components/SearchBox.jsx";
 import SearchMatches from "./search/SearchMatches.jsx";
@@ -234,15 +233,6 @@ export default function Search() {
             onDiscard={() => setDraft(draftFrom(params))}
             onAdd={commit}
           />
-          <div className="search-rail__section">
-            <HowTorkoCounts>
-              {q
-                ? "A speech matches when its own turns and the name of the member hold all the words, or when its summary is near the search in meaning. Words that another member says in an interruption do not count. An exact repeat by the same member is left out. "
-                : ""}
-              Each speech counts once. Speeches with no identified member are not in the party counts. A party or state filter leaves them out.{" "}
-              <Link to="/method">Read the full method</Link>
-            </HowTorkoCounts>
-          </div>
         </aside>
 
         <div className="search-main">

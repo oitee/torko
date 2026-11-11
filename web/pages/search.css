@@ -280,14 +280,6 @@
   font-variant-numeric: tabular-nums;
 }
 
-.search-scope__offer {
-  margin: var(--space-2) 0 0;
-  max-width: 60ch;
-  font-size: var(--size-body);
-  line-height: var(--lh-body);
-  color: var(--ink-2);
-}
-
 .search-scope__action {
   flex: 0 0 auto;
 }
@@ -760,36 +752,6 @@ a.search-matches__name:hover {
 
 .search-row__more {
   color: var(--meta);
-}
-
-.search-row__actions {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  gap: 0 var(--space-4);
-  margin: var(--space-1) 0 0;
-}
-
-.search-row__action,
-.search-row .search-row__action.button {
-  display: inline-flex;
-  align-items: center;
-  min-height: var(--control-height);
-  padding: 0;
-  font-family: var(--font-sans);
-  font-size: var(--size-count);
-  line-height: var(--lh-count);
-  font-weight: 400;
-  color: var(--action);
-  text-decoration: underline;
-  text-underline-offset: 3px;
-  background: transparent;
-  border: 0;
-  cursor: pointer;
-}
-
-.search-row__action:hover {
-  color: var(--action-hover);
 }
 
 .search-row .speaker-line {

@@ -154,18 +154,3 @@ export function pageWindow(page, pages) {
   }
   return out;
 }
-
-// The words of the excerpt as plain text, with "..." where the window cuts the speech.
-export function excerptText(excerpt, marks) {
-  const { parts, cutStart, cutEnd } = excerptParts(excerpt, marks);
-  if (parts.length === 0) return "";
-  return `${cutStart ? "... " : ""}${parts.map((p) => p.text).join("")}${cutEnd ? " ..." : ""}`;
-}
-
-// The words of the citation are the excerpt, or the summary when the row has no excerpt.
-export function citationText(speech, origin) {
-  const words = excerptText(speech.excerpt, speech.marks) || (speech.summary || "").trim();
-  const who = [speech.member || "Speaker not identified", speech.party, speech.seat, "Lok Sabha", speech.date].filter(Boolean).join(", ");
-  const quote = words ? `\u201c${words}\u201d - ` : "";
-  return `${quote}${who}. Torko: ${origin}/speech/${speech.id}`;
-}

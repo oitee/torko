@@ -6,9 +6,8 @@ import SpeakerLine from "../../components/SpeakerLine.jsx";
 import TLDR from "../../components/TLDR.jsx";
 import { EmptyState, ErrorState, Loading } from "../../components/States.jsx";
 import { tidyTitle } from "../../assets/js/titles.js";
-import { MEMBER_ONLY_SORTS, SORTS, citationText, defaultSort, excerptParts, isPhrase, pageWindow, yearSpan } from "./searchParams.js";
+import { MEMBER_ONLY_SORTS, SORTS, defaultSort, excerptParts, isPhrase, pageWindow, yearSpan } from "./searchParams.js";
 import PartyLink from "../../components/PartyLink.jsx";
-import CopyButton from "../../components/CopyButton.jsx";
 
 const TAGS_SHOWN = 3;
 
@@ -59,14 +58,6 @@ export function SearchSpeechRow({ speech }) {
           {tags.length > TAGS_SHOWN && <span className="search-row__more">+{tags.length - TAGS_SHOWN} more</span>}
         </p>
       )}
-      <p className="search-row__actions">
-        {speech.source_url && (
-          <a href={speech.source_url} className="search-row__action" target="_blank" rel="noreferrer">
-            Open on sansad.in
-          </a>
-        )}
-        <CopyButton className="search-row__action" text={() => citationText(speech, window.location.origin)}>Copy citation</CopyButton>
-      </p>
     </li>
   );
 }
@@ -154,19 +145,13 @@ function Pager({ page, pages, pageHref }) {
   );
 }
 
-function SearchRule({ query, sort, view, data }) {
+function SearchRule({ query, data }) {
   const link = <Link to="/method" className="search-results__rule-link">How the list is chosen</Link>;
   if (isPhrase(query)) return <p className="search-results__rule">These speeches hold these exact words in this order. {link}</p>;
   if (data.by_meaning === false) {
     return <p className="search-results__rule">Search by meaning is not available now. These speeches hold all your words. {link}</p>;
   }
-  const shortened = view === "speeches" && sort === "best" && data.pages * data.per_page < data.total;
-  return (
-    <p className="search-results__rule">
-      These speeches hold all your words, or are near them in meaning.
-      {shortened && " Best match orders only the top of the list. Choose Latest first to read all of it."} {link}
-    </p>
-  );
+  return null;
 }
 
 // SearchResults shows the toggle between speeches and members, the sort, the rows and the pages.
@@ -284,14 +269,12 @@ export default function SearchResults({
           </select>
         </label>
       </div>
-      {tagCount > 1 && (
+      {tagCount > 1 && view === "members" && (
         <p className="search-results__rule">
-          {view === "members"
-            ? "Each member here raised each tag, in one speech or in different speeches. The numbers count the speeches for each tag."
-            : "Each speech here carries all these tags. The Members view also lists a member who raised them in different speeches."}
+          Each member here raised each tag, in one speech or in different speeches. The numbers count the speeches for each tag.
         </p>
       )}
-      {query && data && !loading && <SearchRule query={query} sort={sort} view={view} data={data} />}
+      {query && data && !loading && <SearchRule query={query} data={data} />}
       {body}
     </section>
   );

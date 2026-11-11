@@ -2,7 +2,7 @@ import React from "react";
 import { MemoryRouter } from "react-router-dom";
 import { act, cleanup, fireEvent, render, screen } from "@testing-library/react";
 import { afterEach, describe, expect, it, vi } from "vitest";
-import { citationText, excerptParts, headingParts, pageWindow, readSearch, yearSpan } from "../pages/search/searchParams.js";
+import { excerptParts, headingParts, pageWindow, readSearch, yearSpan } from "../pages/search/searchParams.js";
 import { FIELDS, addFilterChanges, chipsFrom, draftChanges, draftFrom, pendingCount } from "../pages/search/filterRules.js";
 import SearchResults, { SearchSpeechRow } from "../pages/search/SearchResults.jsx";
 import StartBlock, { dataLine, startExamples } from "../pages/search/StartBlock.jsx";
@@ -198,26 +198,10 @@ describe("search row details", () => {
     expect(screen.getByText("+2 more")).toBeTruthy();
   });
 
-  it("links to sansad.in and copies one line of citation for 2 seconds", async () => {
-    vi.useFakeTimers();
-    const writeText = vi.fn().mockResolvedValue();
-    Object.defineProperty(navigator, "clipboard", { value: { writeText }, configurable: true });
+  it("has no link to sansad.in and no copy button in the list", () => {
     render(<MemoryRouter><ul><SearchSpeechRow speech={SPEECH} /></ul></MemoryRouter>);
-    expect(screen.getByRole("link", { name: "Open on sansad.in" }).getAttribute("href")).toBe(SPEECH.source_url);
-    await act(async () => { fireEvent.click(screen.getByRole("button", { name: "Copy citation" })); });
-    expect(writeText).toHaveBeenCalledWith(
-      `\u201cPayment under MGNREGA is delayed.\u201d - Balabhadra Majhi, BJP, Nabarangpur, Lok Sabha, 2024-12-05. Torko: ${window.location.origin}/speech/293051`
-    );
-    expect(screen.getByRole("button", { name: "Copied" })).toBeTruthy();
-    await act(async () => { vi.advanceTimersByTime(2100); });
-    expect(screen.getByRole("button", { name: "Copy citation" })).toBeTruthy();
-    vi.useRealTimers();
-  });
-
-  it("cites the summary when there is no excerpt, and a speaker who is not identified", () => {
-    expect(citationText({ id: 5, date: "2020-01-02", summary: "Supports the Bill." }, "https://torko.in")).toBe(
-      "\u201cSupports the Bill.\u201d - Speaker not identified, Lok Sabha, 2020-01-02. Torko: https://torko.in/speech/5"
-    );
+    expect(screen.queryByRole("link", { name: "Open on sansad.in" })).toBeNull();
+    expect(screen.queryByRole("button", { name: /Copy/ })).toBeNull();
   });
 });
 

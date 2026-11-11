@@ -3,15 +3,13 @@ import { formatNumber } from "../../assets/js/format.js";
 import Button from "../../components/Button.jsx";
 import { yearSpan } from "./searchParams.js";
 
-// What each page offers, in one sentence, and the label of its link.
+// The label and the address of the link of each kind of page.
 const OFFERS = {
   tag: {
-    text: (name) => `See how members discussed ${name}: when it came up, which parties spoke, who spoke most, and its subjects.`,
     action: "Open the tag page",
     href: (v) => `/tag/${encodeURIComponent(v)}`,
   },
   place: {
-    text: (name) => `See how ${name} came up: when, its members of parliament, and the parties and subjects.`,
     action: "Open the place page",
     href: (v) => `/place/${encodeURIComponent(v)}`,
   },
@@ -38,7 +36,6 @@ export default function SearchScopeCard({ kind, value, info }) {
           {info.domain && <span className="search-scope__domain">{info.domain}</span>}
         </p>
         {figures.length > 0 && <p className="search-scope__figures">{figures.join(" · ")}</p>}
-        <p className="search-scope__offer">{offer.text(name)}</p>
       </div>
       <div className="search-scope__action">
         <Button variant="secondary" href={offer.href(value)}>
