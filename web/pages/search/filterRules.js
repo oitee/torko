@@ -87,7 +87,7 @@ export function chipsFrom(params, names = {}) {
     const words = values.length > 1 ? many : one;
     chips.push({ key, label: `${FIELD_LABELS[field]} ${words} ${shortList(shown)}`, negative, remove: { [key]: null } });
   };
-  push("tag", "tag", "is", "has all of");
+  push("tag", "tag", "is", "is");
   push("tag_any", "tag", "is", "is one of");
   push("tag_not", "tag", "is not", "is none of", true);
   for (const f of ["member", "party", "state", "seat", "term", "session", "subject", "place", "kind", "lang"]) {

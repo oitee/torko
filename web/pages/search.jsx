@@ -167,7 +167,7 @@ export default function Search() {
       {chips.length > 0 && (
         <div className="search-head__active" aria-label="Filters that are on">
           {chips.map((c) => (
-            <Chip key={c.key} label={c.label} selected={!c.negative} negative={c.negative} onRemove={() => commit(c.remove)} />
+            <Chip key={c.key} label={c.label} negative={c.negative} onRemove={() => commit(c.remove)} />
           ))}
           <Button variant="secondary" onClick={resetFilters}>Reset filters</Button>
         </div>

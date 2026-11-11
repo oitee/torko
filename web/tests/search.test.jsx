@@ -159,7 +159,7 @@ describe("filter rules", () => {
   it("makes one chip for each field and operator", () => {
     const labels = chipsFrom({ tag: "a,b", party: "INC", party_not: "BJP,DMK", date_from: "2014-01-01", date_to: "2024-12-31", min_words: "500" }, { slug: { a: "Farmers", b: "Union Budget" } });
     expect(labels.map((c) => c.label)).toEqual([
-      "Tag has all of Farmers, Union Budget", "Party is INC", "Party is none of BJP, DMK", "Date is between 2014 and 2024", "Words in the speech is at least 500",
+      "Tag is Farmers, Union Budget", "Party is INC", "Party is none of BJP, DMK", "Date is between 2014 and 2024", "Words in the speech is at least 500",
     ]);
     expect(labels[2].negative).toBe(true);
     expect(chipsFrom({ party: "A,B,C,D" })[0].label).toBe("Party is one of A, B +2");

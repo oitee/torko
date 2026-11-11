@@ -194,6 +194,22 @@
   color: var(--meta);
 }
 
+/* A filter that is on is a filled box in ink, so it stands apart from the dashed suggestions.
+   The label of an "is not" filter says "not", so it needs no other mark. */
+.search-head__active .chip {
+  background: var(--ink);
+  border: 1px solid var(--ink);
+  color: var(--sheet);
+}
+
+.search-head__active .chip .chip__content,
+.search-head__active .chip .chip__link,
+.search-head__active .chip .chip__check,
+.search-head__active .chip .chip__remove,
+.search-head__active .chip .chip__count {
+  color: var(--sheet);
+}
+
 /* A suggested tag is a choice, not a filter that is on, so its chip has a dashed border. */
 .search-suggested .chip {
   border-style: dashed;
