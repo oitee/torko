@@ -1195,6 +1195,15 @@ a.search-pager__num:hover {
   border-color: var(--ink);
 }
 
+/* On a wide screen the left panel scrolls on its own, and it cuts off anything wider than itself.
+   So the pop-up takes the width of the panel there, and the Apply button stays in view. */
+@media (min-width: 1024px) {
+  .search-add__pop {
+    width: 100%;
+    box-sizing: border-box;
+  }
+}
+
 .search-add__find {
   box-sizing: border-box;
   width: 100%;
