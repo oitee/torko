@@ -4,7 +4,8 @@
   display: flex;
   flex-direction: column;
   gap: var(--space-8);
-  padding: 0 0 var(--space-14);
+  /* No space at the bottom: the footer has its own top margin. */
+  padding: 0;
 }
 
 /* The head of the page: a sheet band across the whole window, with a hairline under it.
