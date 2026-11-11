@@ -2,6 +2,7 @@ import React, { useEffect, useRef, useState } from "react";
 import { Link, useSearchParams } from "react-router-dom";
 import { getJSON } from "../assets/js/api.js";
 import { formatDateLong, formatNumber } from "../assets/js/format.js";
+import { SITE_HOST } from "../assets/js/site.js";
 import { useAnswer, useApi } from "../assets/js/useApi.js";
 import Button from "../components/Button.jsx";
 import Chip from "../components/Chip.jsx";
@@ -138,7 +139,7 @@ export default function Trends() {
   const lastYear = Number(String(data.last_date).slice(0, 4));
   const partial = String(data.last_date).slice(5) !== "12-31" ? { year: lastYear, label: lastDateLong } : null;
   const firstYear = loaded.length && loaded[0].years.length ? loaded[0].years[0].year : "";
-  const chartTitle = `${measure === "count" ? "Speeches that carry each subject" : "Share of tagged speeches that carry each subject"}, by year. Lok Sabha, ${firstYear} to ${lastDateLong}. Source: torko.in`;
+  const chartTitle = `${measure === "count" ? "Speeches that carry each subject" : "Share of tagged speeches that carry each subject"}, by year. Lok Sabha, ${firstYear} to ${lastDateLong}. Source: ${SITE_HOST}`;
   const rules = data.rules || {};
   const names = loaded.map((t) => displayName(t.name));
 

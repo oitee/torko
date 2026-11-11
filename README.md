@@ -210,7 +210,7 @@ Open http://localhost:5050/search. The server does not send the new Home page ye
 
 The server runs in Flask debug mode by default. The debug mode lets a visitor run code on your machine. On any server that other people can reach, set `FLASK_DEBUG=false` in `.env`.
 
-The site reads two more values from `.env` when Vite builds it. `VITE_SITE_URL` is the public address of the site. `VITE_CONTACT_EMAIL` is the address for the "Report a wrong tag" link. Change both values when you run your own copy.
+The site reads three more values from `.env` when Vite builds it. `VITE_SITE_URL` is the public address of the site. `VITE_CONTACT_EMAIL` is the address for the "Report a wrong tag" link. `VITE_CF_ANALYTICS_TOKEN` is the token of Cloudflare Web Analytics. The site counts visits only when the token is set and the page runs on the host of `VITE_SITE_URL`. Change all three values when you run your own copy.
 
 For development, run the server and Vite at the same time. Vite reloads a page when a file changes. See [`web/README.md`](web/README.md).
 

@@ -6,6 +6,9 @@ import "./assets/css/tokens.css";
 import "./assets/css/base.css";
 import "./assets/css/page.css";
 import { router } from "./router.jsx";
+import { startAnalytics } from "./assets/js/analytics.js";
+
+startAnalytics();
 
 createRoot(document.getElementById("root")).render(
   <React.StrictMode>

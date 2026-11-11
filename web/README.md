@@ -22,7 +22,8 @@ This folder holds the new public site of Torko. The old dashboard in `static/` w
 | `assets/js/api.js` | One helper that calls `/api/...` and handles errors. |
 | `assets/js/format.js` | Shared text: dates, numbers, "Speaker not identified". |
 | `assets/js/colour.js` | The colour of each party. |
-| `assets/js/site.js` | The public address of the site and the contact email, from `VITE_SITE_URL` and `VITE_CONTACT_EMAIL` in the `.env` file of the repository root. |
+| `assets/js/site.js` | The public address of the site, the contact email, and the analytics token, from `VITE_SITE_URL`, `VITE_CONTACT_EMAIL`, and `VITE_CF_ANALYTICS_TOKEN` in the `.env` file of the repository root. |
+| `assets/js/analytics.js` | Adds the Cloudflare Web Analytics script, only when the token is set and the page runs on the host of `VITE_SITE_URL`. |
 | `tests/` | The tests, one file for each component and each page. They run with Vitest and Testing Library. |
 | `assets/vendor/` | Files from third parties. |
 
