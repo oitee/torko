@@ -48,10 +48,6 @@ export default function Speech() {
   const { id } = useParams();
   const { data: speech, loading, error, retry } = useAnswer(`/api/speech/${id}`);
 
-  // Active marks highlighted in the speech text from "Show the words".
-  const [activeMarks, setActiveMarks] = useState(null);
-  const [activeTagKey, setActiveTagKey] = useState(null);
-
   // Citation popover state
   const [citationOpen, setCitationOpen] = useState(false);
   const [copied, setCopied] = useState(false);
@@ -67,16 +63,6 @@ export default function Speech() {
       document.title = "Page not found · Torko";
     }
   }, [speech, error]);
-
-  const handleToggleMarks = (marks, tagKey) => {
-    if (activeMarks === marks && activeTagKey === tagKey) {
-      setActiveMarks(null);
-      setActiveTagKey(null);
-    } else {
-      setActiveMarks(marks);
-      setActiveTagKey(tagKey);
-    }
-  };
 
   const handleCopyCitation = () => {
     if (!speech) return;
@@ -269,19 +255,12 @@ export default function Speech() {
         {speech.summary && <TLDR text={speech.summary} />}
 
         {speech.tags && speech.tags.length > 0 && (
-          <SpeechTags
-            tags={speech.tags}
-            speechId={speech.id}
-            activeMarks={activeMarks}
-            activeTagKey={activeTagKey}
-            onToggleMarks={handleToggleMarks}
-          />
+          <SpeechTags tags={speech.tags} speechId={speech.id} />
         )}
 
         <SpeechText
           turns={speech.turn_list || []}
           hasMember={Boolean(speech.member)}
-          activeMarks={activeMarks}
           speaker={speech}
         />
 
