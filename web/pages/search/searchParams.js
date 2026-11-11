@@ -57,35 +57,31 @@ export function readSearch(searchParams) {
 
 // The heading of the page, in parts, so that the page can set the count in mono.
 // count is null while the speeches load. names holds the names of the tag, place and member.
-export function headingParts({ scope, count, names = {}, members = null }) {
+export function headingParts({ scope, count, members = null }) {
   const q = scope.q || "";
+  // The heading names only the words. The filters show as chips under the box, so the heading stays short.
   // With two or more tags, the Members view has its own rule, and it can hold members when no speech has all the tags.
   if (members !== null && (scope.tag || "").includes(",")) {
-    const who = members === 1 ? " member raised " : " members raised ";
-    return { lead: members, rest: `${who}${names.tag || scope.tag.replaceAll(",", " and ")}` };
+    return { lead: members, rest: members === 1 ? " member" : " members" };
   }
-  let on = "";
-  if (scope.tag) on += ` on ${names.tag || scope.tag}`;
-  if (scope.place) on += ` about ${names.place || scope.place}`;
-  if (scope.member) on += ` by ${names.member || "this member"}`;
-
-  if (!q && !on) {
+  const scoped = Boolean(scope.tag || scope.place || scope.member);
+  if (!q && !scoped) {
     return { lead: null, rest: "Search the speeches of the Lok Sabha" };
   }
   const phrase = isPhrase(q);
   const shown = phrase ? q.trim().replace(/^["“]|["”]$/g, "") : q;
   if (count === null || count === undefined) {
-    const words = q ? (phrase ? ` with the exact words “${shown}”` : ` for “${q}”`) : "";
-    return { lead: null, rest: `Speeches${on}${words}` };
+    if (!q) return { lead: null, rest: "Speeches" };
+    return { lead: null, rest: phrase ? `Speeches with the exact words “${shown}”` : `Speeches for “${q}”` };
   }
   if (count === 0) {
-    if (!q) return { lead: null, rest: `No speech${on} matches the filters` };
-    return { lead: null, rest: phrase ? `No speech${on} uses the exact words “${shown}”` : `No speech${on} matches “${q}”` };
+    if (!q) return { lead: null, rest: "No speech matches the filters" };
+    return { lead: null, rest: phrase ? `No speech uses the exact words “${shown}”` : `No speech matches “${q}”` };
   }
   const noun = count === 1 ? "speech" : "speeches";
-  if (!q) return { lead: count, rest: ` ${noun}${on}` };
-  if (phrase) return { lead: count, rest: ` ${noun}${on} ${count === 1 ? "uses" : "use"} the exact words “${shown}”` };
-  return { lead: count, rest: ` ${noun}${on} ${count === 1 ? "matches" : "match"} “${q}”` };
+  if (!q) return { lead: count, rest: ` ${noun}` };
+  if (phrase) return { lead: count, rest: ` ${noun} ${count === 1 ? "uses" : "use"} the exact words “${shown}”` };
+  return { lead: count, rest: ` ${noun} ${count === 1 ? "matches" : "match"} “${q}”` };
 }
 
 // Cut the excerpt to a short window around the first marked word.

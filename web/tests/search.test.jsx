@@ -40,10 +40,11 @@ describe("search heading", () => {
     expect(headingParts({ scope: { q: "arrears" }, count: 375 })).toEqual({ lead: 375, rest: " speeches match “arrears”" });
     expect(headingParts({ scope: { q: "sugar cane" }, count: 1 }).rest).toBe(" speech matches “sugar cane”");
     expect(headingParts({ scope: { q: '"sugar cane"' }, count: 2 }).rest).toBe(" speeches use the exact words “sugar cane”");
-    expect(headingParts({ scope: { tag: "arrears" }, count: 205, names: { tag: "Arrears" } }).rest).toBe(" speeches on Arrears");
-    expect(headingParts({ scope: { tag: "a,b" }, count: 4, names: { tag: "Coastal Erosion and Cyclone Relief" } }).rest).toBe(" speeches on Coastal Erosion and Cyclone Relief");
-    expect(headingParts({ scope: { tag: "a,b" }, count: 0, members: 16, names: { tag: "Sea Erosion and Cyclone Relief" } })).toEqual({ lead: 16, rest: " members raised Sea Erosion and Cyclone Relief" });
-    expect(headingParts({ scope: { tag: "farmers", member: "1288" }, count: 3, names: { tag: "Farmers", member: "Shivraj V. Patil" } }).rest).toBe(" speeches on Farmers by Shivraj V. Patil");
+    // The heading names no filter: the chips under the box show them.
+    expect(headingParts({ scope: { tag: "arrears" }, count: 205 }).rest).toBe(" speeches");
+    expect(headingParts({ scope: { q: "corruption", tag: "a,b,c", member: "1288" }, count: 3 }).rest).toBe(" speeches match “corruption”");
+    expect(headingParts({ scope: { tag: "a,b" }, count: 0, members: 16 })).toEqual({ lead: 16, rest: " members" });
+    expect(headingParts({ scope: { tag: "farmers" }, count: 0 }).rest).toBe("No speech matches the filters");
     expect(headingParts({ scope: { q: "xqzvwk" }, count: 0 }).rest).toBe("No speech matches “xqzvwk”");
     expect(headingParts({ scope: {}, count: 10 }).rest).toBe("Search the speeches of the Lok Sabha");
     expect(headingParts({ scope: { q: "arrears" }, count: null })).toEqual({ lead: null, rest: "Speeches for “arrears”" });

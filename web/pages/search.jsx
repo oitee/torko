@@ -144,7 +144,7 @@ export default function Search() {
   };
   const chips = chipsFrom(params, names);
 
-  const heading = headingParts({ scope, count: speechTotal, names: scopeNames, members: view === "members" ? membersTotal : null });
+  const heading = headingParts({ scope, count: speechTotal, members: view === "members" ? membersTotal : null });
 
   // The breadcrumb names the scope of the search. With no scope to name, the page has no breadcrumb.
   const crumbLabel = q || scopeNames.tag || scopeNames.place || scopeNames.member || "";
