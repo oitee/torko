@@ -218,3 +218,34 @@
     white-space: nowrap;
   }
 }
+
+/* On a phone the box has less padding and the band labels are smaller, so the lines get the width. */
+@media (max-width: 767px) {
+  .party-weight {
+    padding: var(--space-3) var(--space-3) var(--space-2);
+  }
+
+  .party-weight__band-label {
+    font-size: 0.6875rem;
+  }
+
+  /* Each party is one full row: the colour and the name on the left, the value on the right. */
+  .party-weight__legend {
+    flex-direction: column;
+    gap: var(--space-1);
+  }
+
+  .party-weight__legend > li {
+    display: flex;
+  }
+
+  .party-weight__key {
+    flex: 1;
+    padding: var(--space-1) var(--space-3);
+    text-align: left;
+  }
+
+  .party-weight__key-name {
+    flex: 1;
+  }
+}

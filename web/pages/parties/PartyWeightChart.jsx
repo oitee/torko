@@ -59,7 +59,9 @@ export function nextShown(shown, code, all, add) {
   return new Set([code]);
 }
 
-const PAD = { left: 64, right: 8, top: 24, bottom: 30 };
+// The left margin holds the axis labels, such as "0.5×". A narrow chart has narrow margins, so the lines get the width.
+const PAD_WIDE = { left: 48, right: 8, top: 24, bottom: 30 };
+const PAD_NARROW = { left: 40, right: 4, top: 24, bottom: 30 };
 
 // 1× is the House: the members of the party spoke as often as the average member. 2× is twice as often.
 export default function PartyWeightChart({ weights, names }) {
@@ -71,8 +73,10 @@ export default function PartyWeightChart({ weights, names }) {
   const [active, setActive] = useState(null);
   const terms = weights.terms.map((t) => t.term);
   const narrow = W < 600;
+  const PAD = narrow ? PAD_NARROW : PAD_WIDE;
   const H = narrow ? 300 : 360;
-  const labelW = narrow ? 70 : 220;
+  // A narrow chart labels each line with the party code, and the longest code is "CPI(M)".
+  const labelW = narrow ? 64 : 220;
   const plotRight = W - PAD.right - labelW;
   const [lo, hi] = weightDomain(series);
   const x = (i) => PAD.left + (i / Math.max(1, terms.length - 1)) * (plotRight - PAD.left);
@@ -108,7 +112,7 @@ export default function PartyWeightChart({ weights, names }) {
             <g key={v}>
               <line x1={PAD.left} x2={plotRight} y1={y(v)} y2={y(v)} className={v === 1 ? "party-weight__house" : "party-weight__grid"} />
               <text x={PAD.left - 6} y={y(v) + 4} textAnchor="end" className={v === 1 ? "party-weight__tick party-weight__tick--house" : "party-weight__tick"}>
-                {v === 1 ? "1× House" : `${v}×`}
+                {`${v}×`}
               </text>
             </g>
           ))}
