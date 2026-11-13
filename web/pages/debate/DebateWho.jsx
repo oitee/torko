@@ -6,7 +6,6 @@ import PartyLink from "../../components/PartyLink.jsx";
 
 export default function DebateWho({
   people = [],
-  silent = [],
   selectedMemberId = null,
   onSelectMember,
 }) {
@@ -97,48 +96,6 @@ export default function DebateWho({
         )}
       </div>
 
-      {silent && silent.length > 0 && (
-        <div className="debate-who__silent">
-          <h3 className="debate-who__silent-heading">
-            Listed but did not speak{" "}
-            <span className="debate-who__silent-count mono meta">
-              · {silent.length}
-            </span>
-          </h3>
-
-          <div className="debate-who__silent-grid">
-            {silent.map((s, idx) => {
-              return (
-                <span key={s.member_id || idx} className="debate-who__silent-item">
-                  {s.member_id ? (
-                    <Link
-                      to={`/member/${s.member_id}`}
-                      className="debate-who__silent-name"
-                    >
-                      {s.name}
-                    </Link>
-                  ) : (
-                    <span className="debate-who__silent-name">{s.name}</span>
-                  )}
-                  {(s.party || s.seat) && (
-                    <span className="debate-who__silent-meta meta">
-                      {" "}
-                      <PartyLink code={s.party} />
-                      {s.party && s.seat && " · "}
-                      {s.seat}
-                    </span>
-                  )}
-                </span>
-              );
-            })}
-          </div>
-
-          <p className="debate-who__silent-note meta">
-            Names on the official list of speakers for this debate. They may have
-            laid a written speech on the table.
-          </p>
-        </div>
-      )}
     </section>
   );
 }

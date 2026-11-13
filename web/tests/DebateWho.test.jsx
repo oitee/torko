@@ -70,13 +70,8 @@ describe("DebateWho", () => {
     // The list has no line for the speeches of unknown speakers.
     expect(screen.queryByText(/Speaker not identified/)).toBeNull();
 
-    expect(
-      screen.getByRole("heading", { name: /Listed but did not speak/ })
-    ).toBeTruthy();
-    expect(screen.getByText("Rajiv Pratap Rudy")).toBeTruthy();
-    expect(screen.getByText(/Saran/)).toBeTruthy();
-    expect(
-      screen.getByText(/Names on the official list of speakers for this debate/)
-    ).toBeTruthy();
+    // The members who were listed but did not speak are not shown.
+    expect(screen.queryByText(/Listed but did not speak/)).toBeNull();
+    expect(screen.queryByText("Rajiv Pratap Rudy")).toBeNull();
   });
 });

@@ -97,9 +97,7 @@ export default function Debate() {
   }
 
   const hasDiscussed = debate.tags && debate.tags.length > 0;
-  const hasWho =
-    (debate.people && debate.people.length > 0) ||
-    (debate.silent && debate.silent.length > 0);
+  const hasWho = debate.people && debate.people.length > 0;
 
   return (
     <div className="debate-page">
@@ -122,7 +120,6 @@ export default function Debate() {
               {hasWho && (
                 <DebateWho
                   people={debate.people}
-                  silent={debate.silent}
                   selectedMemberId={activeMemberId}
                   onSelectMember={handleMemberClick}
                 />

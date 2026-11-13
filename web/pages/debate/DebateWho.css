@@ -114,64 +114,13 @@
   color: var(--sheet);
 }
 
-.debate-who__silent {
-  display: flex;
-  flex-direction: column;
-  gap: var(--space-2);
-  margin-top: var(--space-2);
-}
-
-.debate-who__silent-heading {
-  margin: 0;
-  font-size: var(--size-label);
-  line-height: var(--lh-label);
-  font-weight: 600;
-  color: var(--ink);
-}
-
-.debate-who__silent-grid {
-  display: flex;
-  flex-wrap: wrap;
-  gap: var(--space-1) var(--space-4);
-  font-size: var(--size-count);
-  line-height: var(--lh-count);
-}
-
-.debate-who__silent-item {
-  display: inline-flex;
-  align-items: baseline;
-  gap: var(--space-1);
-}
-
-.debate-who__silent-name {
-  color: var(--ink-2);
-  text-decoration: none;
-  font-weight: 500;
-}
-
-a.debate-who__silent-name:hover {
-  color: var(--action);
-  text-decoration: underline;
-}
-
-.debate-who__silent-meta {
-  font-size: var(--size-count);
-}
-
-.debate-who__silent-note {
-  margin: 0;
-  font-size: var(--size-count);
-  line-height: var(--lh-count);
-}
-
 .debate-who__more {
   padding: var(--space-2) var(--space-4);
 }
 
 /* On a touch screen, each member link is at least 44px tall. */
 @media (pointer: coarse) {
-  .debate-who__name,
-  a.debate-who__silent-name {
+  .debate-who__name {
     display: inline-flex;
     align-items: center;
     min-height: var(--control-height);

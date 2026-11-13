@@ -191,8 +191,8 @@ describe("Debate page", () => {
 
     // Check Who Spoke section
     expect(screen.getByText("Who spoke")).toBeTruthy();
-    expect(screen.getByText("Listed but did not speak")).toBeTruthy();
-    expect(screen.getByText("Rajiv Pratap Rudy")).toBeTruthy();
+    expect(screen.queryByText(/Listed but did not speak/)).toBeNull();
+    expect(screen.queryByText("Rajiv Pratap Rudy")).toBeNull();
 
     // Check Transcript section
     expect(screen.getByText("The debate")).toBeTruthy();
