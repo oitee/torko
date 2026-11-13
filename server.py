@@ -7,6 +7,7 @@ import dashboard_db
 import openapi
 import pages_api
 import robots
+import site_exists
 import sitemap
 import tag_embed
 import tag_search
@@ -159,7 +160,12 @@ def site_index(status=200):
     return resp
 
 
-def site_page(**_):
+def site_page(**kw):
+    """The site, or the site with status 404 when the address names an item that does not exist."""
+    if kw:
+        with pages_api.get_engine().connect() as conn:
+            if not site_exists.exists(conn, request.url_rule.rule, kw):
+                return site_index(404)
     return site_index()
 
 

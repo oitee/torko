@@ -12,7 +12,20 @@ def client(tmp_path, monkeypatch):
     (tmp_path / "index.html").write_text(INDEX)
     (tmp_path / "assets" / "index-abc123.js").write_text("console.log(1)")
     monkeypatch.setattr(server, "WEB_DIST", tmp_path)
+    monkeypatch.setattr(server.site_exists, "exists", lambda conn, rule, kw: "99999999" not in str(kw.values()))
+    monkeypatch.setattr(server.pages_api, "get_engine", lambda: FakeEngine())
     return server.app.test_client()
+
+
+class FakeEngine:
+    def connect(self):
+        return self
+
+    def __enter__(self):
+        return self
+
+    def __exit__(self, *exc):
+        return False
 
 
 @pytest.mark.parametrize("path", ["/", "/tag/arrears", "/member/1052", "/speech/178379", "/debate/683", "/place/latur",
@@ -33,6 +46,14 @@ def test_built_assets_are_sent_and_kept_for_a_year(client):
 
 @pytest.mark.parametrize("path", ["/no/such/page", "/member/abc", "/dev/components"])
 def test_an_address_with_no_page_gets_the_site_with_status_404(client, path):
+    resp = client.get(path)
+    assert resp.status_code == 404
+    assert resp.get_data(as_text=True) == INDEX
+
+
+@pytest.mark.parametrize("path", ["/member/99999999", "/speech/99999999", "/debate/99999999", "/tag/99999999",
+                                  "/place/99999999", "/party/99999999"])
+def test_a_page_address_for_an_item_that_does_not_exist_gets_status_404(client, path):
     resp = client.get(path)
     assert resp.status_code == 404
     assert resp.get_data(as_text=True) == INDEX
