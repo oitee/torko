@@ -96,3 +96,12 @@ def test_a_speech_page_gets_its_own_title_and_description(tmp_path, monkeypatch)
     assert resp.status_code == 200
     assert "<title>A · 1 Jan 2020 · Torko</title>" in body
     assert 'name="description" content="D"' in body and 'property="og:description" content="D"' in body
+
+
+@pytest.mark.parametrize("name", ["favicon.svg", "favicon.ico", "apple-touch-icon.png"])
+def test_each_site_icon_is_sent_from_the_root(client, name):
+    server.WEB_DIST.joinpath(name).write_bytes(b"icon")
+    resp = client.get("/" + name)
+    assert resp.status_code == 200
+    assert resp.get_data() == b"icon"
+    assert "max-age=86400" in resp.headers["Cache-Control"]

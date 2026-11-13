@@ -197,6 +197,21 @@ def site_assets(name):
     return send_from_directory(WEB_DIST / "assets", name, max_age=365 * 24 * 3600)
 
 
+# The site icons. Vite copies them from web/public/ to the root of web/dist/. A browser asks for /favicon.ico
+# also when the page does not name it, so each file has its own address at the root.
+SITE_ICONS = ["favicon.svg", "favicon.ico", "apple-touch-icon.png"]
+
+
+def site_icon(name):
+    """One site icon. A browser can keep it for one day."""
+    return send_from_directory(WEB_DIST, name, max_age=24 * 3600)
+
+
+for icon in SITE_ICONS:
+    app.add_url_rule("/" + icon, endpoint="icon_" + icon.replace(".", "_").replace("-", "_"),
+                     view_func=lambda icon=icon: site_icon(icon))
+
+
 @app.route("/robots.txt")
 def robots_txt():
     """Which crawlers may read which addresses. The policy is in robots.py."""
