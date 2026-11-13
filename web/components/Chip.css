@@ -130,10 +130,23 @@
   padding: 2px var(--space-3);
   background: var(--tag-bg);
   border: 0;
-  border-radius: 999px;
+  /* Half the height of a one-line pill. A long name on two lines keeps round corners, not a stadium shape. */
+  border-radius: 14px;
   font-weight: 400;
 }
 
 .chip--tag:hover {
   background: var(--hairline);
+}
+
+/* A tag that filters the page and is on: a dark pill. */
+.chip--tag.chip--selected,
+.chip--tag.chip--selected:hover {
+  background: var(--ink);
+  color: var(--sheet);
+}
+
+.chip--tag.chip--selected .chip__check,
+.chip--tag.chip--selected .chip__count {
+  color: var(--sheet);
 }

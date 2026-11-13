@@ -47,7 +47,7 @@ export default function DebateDiscussed({
               <button
                 key={tag.slug || tag.name}
                 type="button"
-                className={`chip chip--button ${
+                className={`chip chip--button chip--tag ${
                   isSelected ? "chip--selected" : ""
                 }`}
                 aria-pressed={isSelected}
