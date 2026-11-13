@@ -8,6 +8,7 @@ import openapi
 import pages_api
 import robots
 import site_exists
+import site_head
 import sitemap
 import tag_embed
 import tag_search
@@ -161,12 +162,29 @@ def site_index(status=200):
 
 
 def site_page(**kw):
-    """The site, or the site with status 404 when the address names an item that does not exist."""
+    """The site, or the site with status 404 when the address names an item that does not exist.
+    A speech page also gets its own title and description in the HTML, for link previews and search engines."""
+    if "speech_id" in kw:
+        with pages_api.get_engine().connect() as conn:
+            head = site_head.speech_head(conn, kw["speech_id"])
+        if head is None:
+            return site_index(404)
+        return site_index_with_head(head)
     if kw:
         with pages_api.get_engine().connect() as conn:
             if not site_exists.exists(conn, request.url_rule.rule, kw):
                 return site_index(404)
     return site_index()
+
+
+def site_index_with_head(head):
+    """index.html of the built site, with the title and the description of one page written into it."""
+    index = WEB_DIST / "index.html"
+    if not index.is_file():
+        return "The site is not built. Run: cd web && npm run build", 404
+    resp = Response(site_head.render(index.read_text(encoding="utf-8"), head), mimetype="text/html")
+    resp.headers["Cache-Control"] = "no-cache"
+    return resp
 
 
 for rule in SITE_PAGES:

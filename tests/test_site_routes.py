@@ -14,6 +14,8 @@ def client(tmp_path, monkeypatch):
     monkeypatch.setattr(server, "WEB_DIST", tmp_path)
     monkeypatch.setattr(server.site_exists, "exists", lambda conn, rule, kw: "99999999" not in str(kw.values()))
     monkeypatch.setattr(server.pages_api, "get_engine", lambda: FakeEngine())
+    monkeypatch.setattr(server.site_head, "speech_head",
+                        lambda conn, i: None if i == 99999999 else {"title": "A · 1 Jan 2020 · Torko", "description": "D"})
     return server.app.test_client()
 
 
@@ -28,7 +30,7 @@ class FakeEngine:
         return False
 
 
-@pytest.mark.parametrize("path", ["/", "/tag/arrears", "/member/1052", "/speech/178379", "/debate/683", "/place/latur",
+@pytest.mark.parametrize("path", ["/", "/tag/arrears", "/member/1052", "/debate/683", "/place/latur",
                                   "/search", "/search?q=arrears", "/method", "/party/BJP", "/parties", "/places", "/trends",
                                   "/my-mp", "/my-mp?q=latur"])
 def test_each_page_address_gets_the_site(client, path):
@@ -80,3 +82,17 @@ def test_a_site_that_is_not_built_says_so(tmp_path, monkeypatch):
     resp = server.app.test_client().get("/tag/arrears")
     assert resp.status_code == 404
     assert "npm run build" in resp.get_data(as_text=True)
+
+
+def test_a_speech_page_gets_its_own_title_and_description(tmp_path, monkeypatch):
+    page = '<title>Torko</title><meta name="description" content="x" /><meta property="og:title" content="x" />' \
+           '<meta property="og:description" content="x" /><div id=root></div>'
+    (tmp_path / "index.html").write_text(page)
+    monkeypatch.setattr(server, "WEB_DIST", tmp_path)
+    monkeypatch.setattr(server.pages_api, "get_engine", lambda: FakeEngine())
+    monkeypatch.setattr(server.site_head, "speech_head", lambda conn, i: {"title": "A · 1 Jan 2020 · Torko", "description": "D"})
+    resp = server.app.test_client().get("/speech/178379")
+    body = resp.get_data(as_text=True)
+    assert resp.status_code == 200
+    assert "<title>A · 1 Jan 2020 · Torko</title>" in body
+    assert 'name="description" content="D"' in body and 'property="og:description" content="D"' in body
