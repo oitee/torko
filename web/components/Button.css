@@ -29,15 +29,15 @@
 }
 
 .button--secondary {
-  background: var(--sheet);
-  color: var(--ink);
-  border: 1px solid var(--control);
+  background: var(--ink-2);
+  color: var(--sheet);
+  border: 0;
   padding: 0 var(--space-4);
 }
 
 .button--secondary:hover {
-  background: var(--ground);
-  color: var(--ink);
+  background: var(--ink);
+  color: var(--sheet);
 }
 
 .button--text {

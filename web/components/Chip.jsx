@@ -4,6 +4,7 @@ import { formatNumber } from "../assets/js/format.js";
 import "./Chip.css";
 
 // The Chip component renders a single tag.
+// A plain link chip is a tag: a light pill with no border. A chip with a remove button is an active filter: a box with a border.
 // It supports counts, links, selected marks, and remove buttons.
 // prefix is an optional element before the name, for example the source glyph on the Speech page.
 // negative marks a filter that leaves speeches out: a dashed ink border, and the words of the label say "not".
@@ -23,6 +24,7 @@ export default function Chip({
     selected ? "chip--selected" : "",
     negative ? "chip--negative" : "",
     onRemove ? "chip--removable" : "",
+    href && !onRemove && !selected && !negative ? "chip--tag" : "",
   ]
     .filter(Boolean)
     .join(" ");

@@ -13,6 +13,7 @@
   --meta: #5a6573;
   --control: #7a8796;
   --hairline: #dde2e8;
+  --tag-bg: #e6ebf0;
 
   /* The site header is an ink band in both themes. */
   --header-bg: #12161b;
@@ -92,6 +93,7 @@
   --meta: #8e99a6;
   --control: #5f6b78;
   --hairline: #262d35;
+  --tag-bg: #252d36;
   --header-bg: #0e1216;
   --source-model: oklch(0.76 0.11 295);
   --source-word: oklch(0.76 0.11 240);
@@ -115,6 +117,7 @@
     --meta: #8e99a6;
     --control: #5f6b78;
     --hairline: #262d35;
+  --tag-bg: #252d36;
     --header-bg: #0e1216;
     --source-model: oklch(0.76 0.11 295);
     --source-word: oklch(0.76 0.11 240);
@@ -140,6 +143,7 @@
   --meta: #8e99a6;
   --control: #5f6b78;
   --hairline: #262d35;
+  --tag-bg: #252d36;
   background: var(--header-bg);
   color: var(--ink);
 }

@@ -123,3 +123,17 @@
   font-family: var(--font-mono);
   font-size: var(--size-count);
 }
+
+/* A tag that links to a page: a light pill with no border, so that it does not look like a button or a filter. */
+.chip--tag {
+  min-height: 0;
+  padding: 2px var(--space-3);
+  background: var(--tag-bg);
+  border: 0;
+  border-radius: 999px;
+  font-weight: 400;
+}
+
+.chip--tag:hover {
+  background: var(--hairline);
+}

@@ -211,10 +211,6 @@
 }
 
 /* A suggested tag is a choice, not a filter that is on, so its chip has a dashed border. */
-.search-suggested .chip {
-  border-style: dashed;
-}
-
 .search-suggested__list {
   display: flex;
   flex-wrap: wrap;
@@ -613,7 +609,6 @@ a.search-matches__name:hover {
   margin: 0;
   padding: 0;
   background: var(--sheet);
-  border: 1px solid var(--hairline);
 }
 
 .search-results__loading,
@@ -739,15 +734,14 @@ a.search-matches__name:hover {
   z-index: 1;
   color: var(--ink);
   text-decoration: none;
-  padding: 2px var(--space-2);
-  border: 1px solid var(--hairline);
-  border-radius: var(--radius);
-  background: var(--sheet);
+  padding: 2px var(--space-3);
+  border-radius: 999px;
+  background: var(--tag-bg);
 }
 
 .search-row__tag:hover {
   color: var(--ink);
-  border-color: var(--ink);
+  background: var(--hairline);
 }
 
 .search-row__more {
