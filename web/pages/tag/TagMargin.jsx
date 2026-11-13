@@ -1,7 +1,6 @@
 import React from "react";
 import { Link } from "react-router-dom";
 import { formatNumber } from "../../assets/js/format.js";
-import HowTorkoCounts from "../../components/HowTorkoCounts.jsx";
 
 export default function TagMargin({ tag }) {
   if (!tag) return null;
@@ -29,10 +28,6 @@ export default function TagMargin({ tag }) {
         {Array.isArray(tag.aliases) && tag.aliases.length > 0 && (
           <p className="tag-margin__text">Also called: {tag.aliases.join(", ")}.</p>
         )}
-        <HowTorkoCounts>
-          A speech carries this tag when the model named it in the speech, when a word of the tag matched, or when the
-          TLDR is near the tag in meaning. Each speech counts once. A member counts once.
-        </HowTorkoCounts>
       </section>
 
       <section className="tag-margin__section">

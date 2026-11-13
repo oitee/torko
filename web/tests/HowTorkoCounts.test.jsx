@@ -1,4 +1,5 @@
 import React from "react";
+import { MemoryRouter } from "react-router-dom";
 import { cleanup, render, screen } from "@testing-library/react";
 import { afterEach, describe, expect, it } from "vitest";
 import HowTorkoCounts from "../components/HowTorkoCounts.jsx";
@@ -6,21 +7,12 @@ import HowTorkoCounts from "../components/HowTorkoCounts.jsx";
 afterEach(cleanup);
 
 describe("HowTorkoCounts", () => {
-  it("renders heading and note text", () => {
+  it("is one link to the Method page", () => {
     render(
-      <HowTorkoCounts>
-        <p>A turn under 50 words is counted as a short remark.</p>
-      </HowTorkoCounts>
+      <MemoryRouter>
+        <HowTorkoCounts />
+      </MemoryRouter>
     );
-
-    expect(screen.getByText("How Torko counts")).toBeTruthy();
-    expect(
-      screen.getByText("A turn under 50 words is counted as a short remark.")
-    ).toBeTruthy();
-  });
-
-  it("returns null when children is missing", () => {
-    const { container } = render(<HowTorkoCounts />);
-    expect(container.firstChild).toBeNull();
+    expect(screen.getByRole("link", { name: "How counts work" }).getAttribute("href")).toBe("/method");
   });
 });

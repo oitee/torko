@@ -336,9 +336,7 @@ describe("Member Page", () => {
       expect(screen.getByText("Rule 377").previousSibling.textContent).toBe("6");
       expect(screen.getByRole("link", { name: "6" }).getAttribute("href")).toBe("/search?member=1052&kind=rule_377");
 
-      expect(
-        screen.getByText(/A speech is one time the member speaks/)
-      ).toBeTruthy();
+      expect(screen.queryByRole("link", { name: "How counts work" })).toBeNull();
       // The record is named, not linked: sansad.in has no page for all debates.
       expect(screen.getByText("Lok Sabha Debates")).toBeTruthy();
       expect(screen.queryByRole("link", { name: "Lok Sabha Debates" })).toBeNull();

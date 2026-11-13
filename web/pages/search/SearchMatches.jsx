@@ -89,7 +89,6 @@ export default function SearchMatches({ results, query }) {
           </div>
         ))}
       </div>
-      <p className="search-matches__note">Each number counts all speeches with that tag, subject, place or member, not only the speeches that match the words.</p>
     </section>
   );
 }

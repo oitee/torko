@@ -238,9 +238,7 @@ describe("DebateTranscript counts and filters", () => {
         />
       </MemoryRouter>
     );
-    expect(
-      screen.getByText("Showing the whole debate in order.")
-    ).toBeTruthy();
+    expect(screen.queryByText("Showing the whole debate in order.")).toBeNull();
     expect(screen.queryByRole("combobox")).toBeNull();
     expect(screen.queryByText(/1 speeches/)).toBeNull();
   });

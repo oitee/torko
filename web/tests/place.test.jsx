@@ -281,11 +281,7 @@ describe("Place page integration", () => {
     expect(screen.getByRole("heading", { name: "Speeches" })).toBeTruthy();
 
     // Method section
-    expect(
-      screen.getByText(
-        /A speech is about a place when one of its tags is the place\./
-      )
-    ).toBeTruthy();
+    expect(screen.queryByRole("link", { name: "How counts work" })).toBeNull();
   });
 
   it("handles state place correctly without seat holders or state breadcrumb", async () => {

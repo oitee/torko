@@ -117,7 +117,7 @@ describe("Tag page integration", () => {
     expect(screen.getByRole("heading", { name: "Speeches" })).toBeTruthy();
     expect(screen.getByRole("heading", { name: "Subjects under this tag" })).toBeTruthy();
     expect(screen.getByRole("heading", { name: "Related tags" })).toBeTruthy();
-    expect(screen.getByRole("heading", { name: "How Torko counts" })).toBeTruthy();
+    expect(screen.queryByRole("link", { name: "How counts work" })).toBeNull();
   });
 
   it("handles 404 error with Page not found and document title", async () => {

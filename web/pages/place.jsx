@@ -11,7 +11,6 @@ import PlaceMembers from "./place/PlaceMembers.jsx";
 import PlaceParties from "./place/PlaceParties.jsx";
 import PlaceSubjects from "./place/PlaceSubjects.jsx";
 import PlaceSpeeches from "./place/PlaceSpeeches.jsx";
-import PlaceMethod from "./place/PlaceMethod.jsx";
 import "./place.css";
 
 // The Place page shows one place (a seat, district or state) with historical trends,
@@ -102,7 +101,6 @@ export default function Place() {
 
             <PlaceSpeeches speeches={place.recent} slug={slug} total={place.total} />
 
-            <PlaceMethod />
           </>
         )}
       </div>

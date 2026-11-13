@@ -23,7 +23,6 @@ export default function SearchScopeCard({ kind, value, info }) {
   const name = info.name || value;
   const span = yearSpan(info.first, info.last);
   const figures = [
-    info.total != null ? `${formatNumber(info.total)} speeches` : null,
     info.n_members != null ? `${formatNumber(info.n_members)} members` : null,
     span || null,
   ].filter(Boolean);

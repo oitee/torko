@@ -252,7 +252,6 @@ export default function SearchResults({
               aria-current={view === t.value ? "page" : undefined}
             >
               {t.label}
-              {t.n != null && <span className="search-tabs__n">{formatNumber(t.n)}</span>}
             </Link>
           ))}
         </nav>

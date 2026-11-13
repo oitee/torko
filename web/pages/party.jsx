@@ -6,7 +6,6 @@ import { tidyTitle } from "../assets/js/titles.js";
 import SpeechGrid from "../components/SpeechGrid.jsx";
 import Breadcrumb from "../components/Breadcrumb.jsx";
 import Chip from "../components/Chip.jsx";
-import HowTorkoCounts from "../components/HowTorkoCounts.jsx";
 import PageLayout from "../components/PageLayout.jsx";
 import { ErrorState, Loading } from "../components/States.jsx";
 import NotFound from "./not_found.jsx";
@@ -180,29 +179,6 @@ export default function Party() {
             </section>
           )}
 
-          <section className="party-section party-section--method">
-            <HowTorkoCounts>
-              <span className="party-method__line">
-                <strong>Party of a speech.</strong> The party of the member on the date of the debate.
-              </span>
-              <span className="party-method__line">
-                <strong>Tagged speech.</strong> A speech with at least one tag of any kind.
-              </span>
-              <span className="party-method__line">
-                <strong>Order of the subjects.</strong> For each subject, Torko compares two rates: the speeches with the
-                subject in every 1,000 tagged speeches of the party, and the same rate for all parties. At the rate of all
-                parties, Torko finds how many speeches the party would give on the subject. The list orders the subjects by
-                the extra speeches above that number.
-              </span>
-              <span className="party-method__line">
-                <strong>Which subjects count.</strong> A subject needs at least {formatNumber(rules.min_members)} members of
-                the party, and {formatNumber(rules.min_n_term)} speeches of the party in one term or{" "}
-                {formatNumber(rules.min_n_all)} in all terms. A place needs {formatNumber(rules.min_members_place)} members.
-                Torko leaves out subjects that are in more than {Math.round((rules.general_share || 0) * 100)}% of all tagged
-                speeches, procedure subjects, and the names of parties.
-              </span>
-            </HowTorkoCounts>
-          </section>
         </div>
       </PageLayout>
     </div>

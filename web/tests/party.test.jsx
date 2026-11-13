@@ -149,15 +149,12 @@ describe("Party page", () => {
     expect(row.textContent).toContain("75");
   });
 
-  it("states the rule that orders the subjects", async () => {
+  it("shows no method link", async () => {
     vi.spyOn(api, "getJSON").mockResolvedValueOnce(cpim);
     renderParty();
     await screen.findByRole("heading", { level: 1, name: "Communist Party of India (Marxist)" });
 
-    const text = document.body.textContent;
-    expect(text).toContain("The list orders the subjects by the extra speeches above that number.");
-    expect(text).toContain("A subject needs at least 3 members");
-    expect(text).not.toContain("the first rate divided by the second");
+    expect(screen.queryByRole("link", { name: "How counts work" })).toBeNull();
   });
 
   it("links Parties to the index, and shows the recent speeches with a link to the search", async () => {

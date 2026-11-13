@@ -197,12 +197,7 @@ export default function MyMp() {
         {body}
         {q && (
           <section className="my-mp-method">
-            <HowTorkoCounts>
-              Torko matches the words to any part of a seat name. A seat name does not include its state, so a word after a
-              comma keeps only the seats of that state. The speeches counted are all speeches of the member in all terms.
-              The subjects are the 5 tags that most speeches of the member carry. The number on each tag counts those
-              speeches. Torko leaves out tags for roles, people and places.
-            </HowTorkoCounts>
+            <HowTorkoCounts />
           </section>
         )}
       </div>

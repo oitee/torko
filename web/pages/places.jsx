@@ -42,7 +42,7 @@ export default function Places() {
       <h1 className="index-head__title">Places</h1>
       <p className="head-description">
         {data
-          ? `${formatNumber(data.seat_count)} Lok Sabha seats in ${formatNumber(data.state_count)} states and union territories. Each number counts the speeches that carry the tag of the place.`
+          ? `${formatNumber(data.seat_count)} Lok Sabha seats in ${formatNumber(data.state_count)} states and union territories.`
           : "The Lok Sabha seats of each state and union territory."}
       </p>
     </div>
@@ -117,10 +117,7 @@ export default function Places() {
       <div className="page-main">
         {body}
         <section className="index-method">
-          <HowTorkoCounts>
-            A number counts the speeches that carry the tag of the place, each speech once. A speech that only names the
-            place in its words, with no tag, is not in the count. A name with no link has no page yet.
-          </HowTorkoCounts>
+          <HowTorkoCounts />
         </section>
       </div>
     </PageLayout>

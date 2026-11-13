@@ -11,7 +11,6 @@ import {
 } from "../assets/js/format.js";
 import Breadcrumb from "../components/Breadcrumb.jsx";
 import Button from "../components/Button.jsx";
-import HowTorkoCounts from "../components/HowTorkoCounts.jsx";
 import PageAnswer from "../components/PageAnswer.jsx";
 import PageLayout from "../components/PageLayout.jsx";
 import Popover from "../components/Popover.jsx";
@@ -217,12 +216,6 @@ export default function Speech() {
             </div>
           ))}
         </dl>
-        <HowTorkoCounts>
-          A speech is one range of the record that belongs to one member, from
-          their first words to their last. A short remark by another member or by
-          the chair inside it is an interruption. It is not part of the speech.
-          The TLDR is machine text. Cite the speech, not the TLDR.
-        </HowTorkoCounts>
       </section>
 
       <section className="speech-margin__section">

@@ -13,7 +13,7 @@ describe("SearchScopeCard for a place", () => {
         <SearchScopeCard kind="place" value="kerala" info={{ name: "Kerala", total: 3926, n_members: 337, first: "1999-10-22", last: "2026-04-17" }} />
       </MemoryRouter>
     );
-    expect(screen.getByText("3,926 speeches · 337 members · 1999–2026")).toBeTruthy();
+    expect(screen.getByText("337 members · 1999–2026")).toBeTruthy();
     expect(screen.getByRole("link", { name: "Open the place page →" }).getAttribute("href")).toBe("/place/kerala");
   });
 });

@@ -259,7 +259,7 @@ export default function DebateTranscript({
       ? `This debate has no speech. It has ${turns.length} ${
           turns.length === 1 ? "turn" : "turns"
         }.`
-      : "Showing the whole debate in order.";
+      : "";
   if (activeTag) {
     const count = activeTag.speeches;
     const spWord = count === 1 ? "1 speech" : `${count} speeches`;
@@ -318,7 +318,7 @@ export default function DebateTranscript({
         {/* Filter bar */}
         <div ref={filterBarRef} className="debate-transcript__filter-bar" role="status">
           <div className="debate-transcript__filter-status">
-            <p className="debate-transcript__filter-sentence">{filterSentence}</p>
+            {filterSentence && <p className="debate-transcript__filter-sentence">{filterSentence}</p>}
             {activeTag && (
               <button
                 type="button"
@@ -473,13 +473,13 @@ export default function DebateTranscript({
                 {speeches.length}
               </span>
             </div>
-            <p className="debate-transcript__rail-note meta">
-              {activeTag
-                ? `■ marks the ${activeTag.speeches} speeches tagged ${activeTag.name}.`
-                : activeMember
-                ? `■ marks the speeches by ${activeMember.name}.`
-                : "Pick a speech to go to it."}
-            </p>
+            {(activeTag || activeMember) && (
+              <p className="debate-transcript__rail-note meta">
+                {activeTag
+                  ? `■ marks the ${activeTag.speeches} speeches tagged ${activeTag.name}.`
+                  : `■ marks the speeches by ${activeMember.name}.`}
+              </p>
+            )}
             <ol ref={railListRef} className="debate-transcript__rail-list">
               {speeches.map((sp, idx) => {
                 const isCur = String(sp.id) === String(activeSpeechSeq);

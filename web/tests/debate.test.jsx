@@ -199,7 +199,7 @@ describe("Debate page", () => {
 
     // Check Same day and Method/Source
     expect(screen.getByText(/Other debates on\s+12 Mar 2024/)).toBeTruthy();
-    expect(screen.getByText("How Torko counts")).toBeTruthy();
+    expect(screen.getByRole("link", { name: "How counts work" }).getAttribute("href")).toBe("/method");
     expect(screen.getByText("Source")).toBeTruthy();
   });
 

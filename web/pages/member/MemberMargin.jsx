@@ -1,7 +1,6 @@
 import React from "react";
 import { Link } from "react-router-dom";
 import { formatNumber } from "../../assets/js/format.js";
-import HowTorkoCounts from "../../components/HowTorkoCounts.jsx";
 
 export default function MemberMargin({ member, speechesData }) {
   if (!member) return null;
@@ -55,9 +54,6 @@ export default function MemberMargin({ member, speechesData }) {
           </>
         )}
 
-        <HowTorkoCounts>
-          A speech is one time the member speaks, from their name to the next speaker's name. Short breaks from other members or the chair do not split it.
-        </HowTorkoCounts>
       </section>
 
       <section className="member-margin__section">

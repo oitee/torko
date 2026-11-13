@@ -439,9 +439,7 @@ export default function DevComponents() {
         <h2>Margin and HowTorkoCounts</h2>
         <h3>Margin: with a short note</h3>
         <Margin>
-          <HowTorkoCounts>
-            A turn under 50 words is counted as a short remark.
-          </HowTorkoCounts>
+          <HowTorkoCounts />
         </Margin>
       </section>
 
@@ -545,9 +543,7 @@ export default function DevComponents() {
               <div>
                 <span className="mono">12</span> speeches in this term
               </div>
-              <HowTorkoCounts>
-                Counts include all speeches in the record for this term.
-              </HowTorkoCounts>
+              <HowTorkoCounts />
             </>
           }
         >

@@ -221,7 +221,7 @@ describe("Speech Page", () => {
     expect(
       screen.getByText((_, el) => el?.tagName === "DD" && el.textContent === "interruptions inside this speech")
     ).toBeTruthy();
-    expect(screen.getByText("How Torko counts")).toBeTruthy();
+    expect(screen.queryByText("How counts work")).toBeNull();
     expect(screen.getByText("sansad.in")).toBeTruthy();
 
     // Check around speech

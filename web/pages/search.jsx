@@ -6,7 +6,6 @@ import { formatNumber, termShort } from "../assets/js/format.js";
 import Button from "../components/Button.jsx";
 import Breadcrumb from "../components/Breadcrumb.jsx";
 import Chip from "../components/Chip.jsx";
-import Count from "../components/Count.jsx";
 import PageLayout from "../components/PageLayout.jsx";
 import SearchBox from "../components/SearchBox.jsx";
 import SearchMatches from "./search/SearchMatches.jsx";
@@ -14,7 +13,6 @@ import SearchResults from "./search/SearchResults.jsx";
 import SearchScopeCard from "./search/SearchScopeCard.jsx";
 import SearchSuggested from "./search/SearchSuggested.jsx";
 import FilterRail from "./search/FilterRail.jsx";
-import CopyButton from "../components/CopyButton.jsx";
 import SearchLanding from "./search/SearchLanding.jsx";
 import { chipsFrom, draftChanges, draftFrom, listOf } from "./search/filterRules.js";
 import { FILTER_KEYS, defaultSort, headingParts, readSearch } from "./search/searchParams.js";
@@ -62,10 +60,6 @@ export default function Search() {
   );
   const speechData = view === "members" ? facetCall.data : list.data;
 
-  // The total with no filter, for "N of total".
-  const baseParams = q ? { q } : {};
-  const baseKey = hasFilters ? `base:${q}` : null;
-  const base = useApi(listDone ? baseKey : null, (signal) => getJSON("/api/speeches", { ...baseParams, per_page: 1 }, { signal }));
 
   // The tag counts are a call of their own, because they take the longest.
   const tagFacetParams = { ...params, facets: "tag", per_page: 1 };
@@ -110,7 +104,6 @@ export default function Search() {
   const speechTotal = speechData && !(view === "speeches" && list.loading) ? speechData.total : null;
   const membersTotal =
     view === "members" ? (list.loading ? null : list.data?.members_total ?? null) : membersCall.loading ? null : membersCall.data?.members_total ?? null;
-  const unfilteredTotal = hasFilters ? base.data?.total ?? null : speechTotal;
 
   useEffect(() => {
     document.title = q ? `${q} · Search · Torko` : "Search · Torko";
@@ -171,10 +164,6 @@ export default function Search() {
           <Button variant="secondary" onClick={resetFilters}>Reset filters</Button>
         </div>
       )}
-      <div className="search-head__summary">
-        {speechTotal !== null && <Count n={speechTotal} total={hasFilters ? unfilteredTotal ?? undefined : undefined} noun={searched ? "speeches" : "speeches in total"} />}
-        {searched && <CopyButton text={() => window.location.href}>Copy link</CopyButton>}
-      </div>
     </div>
   );
 
