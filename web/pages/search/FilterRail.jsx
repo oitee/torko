@@ -6,6 +6,13 @@ import { MAX_YEAR, MIN_YEAR, TERMS, listOf, pendingCount, yearsFrom } from "./fi
 
 const SHORT_LIST = 6;
 
+// The name that a screen reader reads for a tick box: the value, and its count when the row shows one.
+// Without it, the name joins the two spans with no space, as in "Students92".
+export function tickName(r, showCount = true) {
+  if (!showCount || r.n === null || r.n === undefined) return r.label;
+  return `${r.label}, ${formatNumber(r.n)} ${r.n === 1 ? "speech" : "speeches"}`;
+}
+
 // One group of tick boxes. A box whose value is in an "is none of" chip stays empty and locked.
 function TickGroup({ title, rows, field, draft, setDraft, locked }) {
   const [more, setMore] = useState(false);
@@ -23,7 +30,7 @@ function TickGroup({ title, rows, field, draft, setDraft, locked }) {
         const isLocked = locked.includes(r.value) || (r.n === 0 && !draft[field].includes(r.value));
         return (
           <label key={r.value} className={`search-ticks__row ${r.n === 0 || isLocked ? "search-ticks__row--off" : ""}`}>
-            <input type="checkbox" checked={!isLocked && draft[field].includes(r.value)} disabled={isLocked} onChange={() => toggle(r.value)} />
+            <input type="checkbox" value={r.value} aria-label={tickName(r, !draft[field].includes(r.value))} checked={!isLocked && draft[field].includes(r.value)} disabled={isLocked} onChange={() => toggle(r.value)} />
             <span className="search-ticks__name" title={r.label}>{r.label}</span>
             {r.n !== null && r.n !== undefined && !draft[field].includes(r.value) && <span className="search-ticks__n">{formatNumber(r.n)}</span>}
           </label>
