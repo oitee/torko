@@ -148,3 +148,26 @@ button {
 .site-footer__source {
   margin: 0;
 }
+
+/* Touch screens: each small link and tag gets a tap area at least 44px tall. The area is an empty ::before box, so
+   nothing on the page moves or changes colour. Links that already stretch over a whole card with ::after are left
+   out, because position: relative on them would shrink the card to the link. Where two small links sit closer than
+   44px, their tap areas overlap, and the later one in the page takes the tap in the overlap. */
+@media (pointer: coarse) {
+  a[href]:not(.button):not(.site-header__link):not(.search-row__debate):not(.debate-same-day__link):not(.around-speech__text-link):not(.home-feature__stretch),
+  .chip--tag {
+    position: relative;
+  }
+
+  a[href]:not(.button):not(.site-header__link):not(.search-row__debate):not(.debate-same-day__link):not(.around-speech__text-link):not(.home-feature__stretch)::before,
+  .chip--tag::before {
+    content: "";
+    position: absolute;
+    left: 0;
+    right: 0;
+    top: 50%;
+    min-height: 100%;
+    height: 44px;
+    transform: translateY(-50%);
+  }
+}
