@@ -1,0 +1,31 @@
+n	speech_id	bill_id	debate	member	words	bill	expected	got	ok	p_for	p_against	p_mixed	p_unclear	note
+1	221579	3569	LS15-10-7345	Bali Ram	979	Central Educational Institutions (Reservation in Admission) Amendment Bill, 2012	for	for	yes	0.76	0.08	0.16	0.00	
+2	248977	3392	LS15-4-2435	N.S.V. Chitthan	546	Tamil Nadu Legislative Council Bill, 2010	for	for	yes	1.00	0.00	0.00	0.00	
+3	293778	3908	LS16-9-7809	Shrikant Eknath Shinde	926	Dentists (Amendment), 2016	unclear	unclear	yes	0.02	0.00	0.00	0.98	Speaks on the other bill of the debate (IMC). Dentists bill not named.
+4	292766	4542	LS18-3-1620	Nityanand Rai	42	Disaster Management (Amendment) Bill, 2024	unclear	unclear	yes	0.46	0.01	0.00	0.53	
+5	402629	2466	LS13-4-1137	Arun Jaitley	162	Cable Television Networks (Regulation) Amendment Bill, 2000	for	for	yes	0.95	0.00	0.00	0.05	
+6	401449	2409	LS13-5-1546	Gulam Mehmood Banatwalla	24	Companies (Second Amendment) Bill, 1999	unclear	for	NO	0.52	0.12	0.06	0.30	Only moves amendments.
+7	317627	3744	LS16-3-2346	Sougata Ray	147	Coal Mines (Special Provisions) Bill, 2014	for	for	yes	0.97	0.03	0.00	0.00	Moves amendments, says 'we are in a hurry to pass the Bill'.
+8	178594	4623	LS18-6-4485	Damodar Agrawal	808	Repealing and Amending Bill, 2025	for	for	yes	1.00	0.00	0.00	0.00	
+9	259323	4108	LS16-16-15169	Boora Narsaiah Goud	925	DNA Technology (Use and Application) Regulation Bill, 2018	for	for	yes	1.00	0.00	0.00	0.00	
+10	289351	3929	LS16-12-9871	Arun Jaitley	63	Taxation Laws (Amendment) Bill, 2016	for	for	yes	0.94	0.00	0.00	0.06	Minister's clarification (rule: minister is for).
+11	219048	3513	LS15-12-8914	Lal Singh	62	Companies Bill, 2011	unclear	unclear	yes	0.00	0.01	0.00	0.99	
+12	176861	4643	LS18-7-5634	Naresh Ganpat Mhaske	1311	Union Territories Laws (Amendment) Bill, 2026	unclear	for	NO	0.92	0.00	0.00	0.08	Supports the women's reservation reform. The UT Laws bill is not named.
+13	248276	3080	LS14-9-6704	Ganesh Prasad Singh	465	Jallianwala Bagh National Memorial (Amendment) Bill, 2006	for	for	yes	1.00	0.00	0.00	0.00	
+14	345960	4171	LS17-1-1901	Ve Vaithilingam	232	Finance (No.2) Bill, 2019	unclear	unclear	yes	0.00	0.00	0.00	1.00	
+15	285365	3965	LS16-11-10454	Arun Jaitley	464	Integrated Goods and Service Tax Bill, 2017	for	for	yes	0.99	0.00	0.00	0.01	Minister's reply (rule: minister is for).
+16	403789	2453	LS13-4-729	Varkala Radhakrishnan	386	Freedom of Information Bill, 2000	against	against	yes	0.00	1.00	0.00	0.00	
+17	293772	3907	LS16-9-7809	K C Venugopal	17	Indian Medical Council (Amendment) Bill, 2016	unclear	unclear	yes	0.01	0.02	0.00	0.97	
+18	405541	2421	LS13-3-117	Kashi Ram Rana	43	Cotton Textiles Cess (Repeal) Bill, 2000	for	for	yes	0.99	0.00	0.00	0.01	
+19	178604	4623	LS18-6-4485	Patel Umeshbhai Babubhai	642	Repealing and Amending Bill, 2025	for	for	yes	1.00	0.00	0.00	0.00	
+20	345437	4179	LS17-1-939	Delkar, Shri Mohan S.	438	Unlawful Activities (Prevention) Amendment, 2019	for	for	yes	1.00	0.00	0.00	0.00	
+21	280956	2894	LS14-3-791	A. Krishnaswamy	35	Unlawful Activities (Prevention) Amendment, 2004	unclear	unclear	yes	0.00	0.01	0.00	0.99	
+22	256471	3330	LS15-3-1314	Harin Pathak	2030	Representation of the People (Amendment), 2009	for	against	NO	0.27	0.62	0.11	0.00	
+23	397955	2555	LS13-7-2666	Rattan Lal Kataria	806	Food Corporations (Amendment) Bill, 2001	for	for	yes	1.00	0.00	0.00	0.00	
+24	406156	2395	LS13-2-6875	Moinul Hassan Ahamed	1081	Small Industries Development Bank of India (Amendment) Bill, 1999	unclear	for	NO	0.98	0.00	0.02	0.00	Critical of SIDBI, no position found.
+25	297727	3887	LS16-7-7496	Ganesh Singh	1201	Mines and Minerals (Development and Regulation) Amendment Bill, 2016	for	for	yes	1.00	0.00	0.00	0.00	
+26	259395	4144	LS16-16-15173	A.P. Jithender Reddy	50	Constitution (One Hundred and Twenty-Fourth Amendment) Bill, 2019	unclear	unclear	yes	0.09	0.05	0.01	0.85	
+27	307169	3807	LS16-4-4654	Vara Prasadarao Velagapalli	441	Constitution (One Hundred and Nineteenth Amendment) Bill, 2013	for	for	yes	0.99	0.00	0.01	0.00	
+28	316770	3752	LS16-3-2033	Kinjarapu Rammohan Naidu	736	Motor Vehicles (Amendment) Bill, 2014	for	for	yes	1.00	0.00	0.00	0.00	
+29	342069	4234	LS17-2-3464	Pralhad Joshi	80	National Capital Territory of Delhi (Recognition of Property Rights of Residents in Unauthorised Colonies) Bill, 2019	unclear	unclear	yes	0.46	0.00	0.00	0.54	
+30	407783	2366	LS13-2-6751	Joachim Baxla	638	Insurance Regulatory and Development Authority Bill, 1999	against	against	yes	0.00	1.00	0.00	0.00	

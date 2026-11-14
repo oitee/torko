@@ -1,0 +1,43 @@
+speech_id	bill_id	bill	member	words	debate	expected	case	note
+380306	2854	Electricity (Amendment) Bill, 2003	Vijayendra Pal Singh	1169	LS13-14-7556	for	support_but	Supports wholeheartedly, asks to look at Standing Committee points.
+380311	2854	Electricity (Amendment) Bill, 2003	Basudeb Acharia	669	LS13-14-7556	against	clear	Opposes the amendments and the Act.
+380305	2854	Electricity (Amendment) Bill, 2003	Sudarsana E.M. Natchiappan	1227	LS13-14-7556	for	support_but	Opposition member. Welcomes the Bill, asks for better implementation.
+380315	2854	Electricity (Amendment) Bill, 2003	A. Krishnaswamy	481	LS13-14-7556	mixed	mixed	Welcomes the penalty amendments. Against privatisation of access and the Regulatory Commission.
+380314	2854	Electricity (Amendment) Bill, 2003	M. Jagannath	679	LS13-14-7556	for	support_but	With the changes suggested by me, I support the Bill.
+380312	2854	Electricity (Amendment) Bill, 2003	Uttamrao Nathuji Dhikale	1195	LS13-14-7556	for	hindi	Supports the Bill for the Shiv Sena.
+380308	2854	Electricity (Amendment) Bill, 2003	Vijayendra Pal Singh	34	LS13-14-7556	unclear	short	34-word retort to another member.
+380332	2854	Electricity (Amendment) Bill, 2003	Sheela Gautam	38	LS13-14-7556	unclear	short	Asks for repair money for a local power station.
+380327	2854	Electricity (Amendment) Bill, 2003	Ramkrishna Kusmaria	67	LS13-14-7556	unclear	short	Suggestion about farmers on the regulatory boards.
+380313	2854	Electricity (Amendment) Bill, 2003	Adhir Ranjan Chowdhury	848	LS13-14-7556	unclear	no_position	848 words on the power sector, no position on the Bill.
+380323	2854	Electricity (Amendment) Bill, 2003	Anant Gangaram Geete	1409	LS13-14-7556	for	hindi	Minister's reply, asks the House to pass the Bill.
+280955	2893	Prevention of Terrorism (Repeal) Bill, 2004	Lakshman Singh	1612	LS14-3-791	against	hindi	Opposes the repeal of POTA.
+280963	2893	Prevention of Terrorism (Repeal) Bill, 2004	Madhusudan Devram Mistry	994	LS14-3-791	for	hindi	Congratulates the Government on the repeal.
+280948	2893	Prevention of Terrorism (Repeal) Bill, 2004	Ramji Lal Suman	173	LS14-3-791	for	trap	Formally moves the disapproval resolution, but says the party supports the repeal.
+280956	2893	Prevention of Terrorism (Repeal) Bill, 2004	A. Krishnaswamy	35	LS14-3-791	unclear	short	35-word interruption: the point is irrelevant.
+250144	3355	Finance Bill, 2010	Prabodh Panda	879	LS15-4-2296	against	clear	I rise to oppose the Finance Bill 2010.
+250147	3355	Finance Bill, 2010	Narahari Mahato	654	LS15-4-2296	against	clear	On behalf of my party I oppose the Finance Bill.
+250139	3355	Finance Bill, 2010	Sanjay Nirupam	223	LS15-4-2296	for	hindi	Ends: supports the Finance Bill.
+250146	3355	Finance Bill, 2010	Bhakta Charan Das	1796	LS15-4-2296	for	hindi	Stands in support of the Finance Bill.
+250129	3355	Finance Bill, 2010	Lalu Prasad	28	LS15-4-2296	unclear	short	28-word political jibe.
+306535	3810	Whistle Blowers Protection (Amendment) Bill, 2015	Sougata Ray	1199	LS16-4-5017	against	clear	I am opposed to the Bill.
+306526	3810	Whistle Blowers Protection (Amendment) Bill, 2015	Adhir Ranjan Chowdhury	1718	LS16-4-5017	against	clear	Cannot but oppose, asks for the Standing Committee.
+306527	3810	Whistle Blowers Protection (Amendment) Bill, 2015	Sanjay Jaiswal	464	LS16-4-5017	for	hindi	Stands in support of the Bill.
+306538	3810	Whistle Blowers Protection (Amendment) Bill, 2015	K. Kamaraj	478	LS16-4-5017	for	clear	Appreciates the efforts of the Government.
+306531	3810	Whistle Blowers Protection (Amendment) Bill, 2015	Jitendra Singh	87	LS16-4-5017	unclear	procedural	Point of order on Rule 354.
+306546	3810	Whistle Blowers Protection (Amendment) Bill, 2015	P. Karunakaran	77	LS16-4-5017	against	rule_test	Asks to send the Bill to the Standing Committee (= not in this form).
+335941	4313	Industrial Relations Code, 2020	Jayadev Galla	1398	LS17-4-4867	for	support_but	With these observations, I support the Codes.
+335940	4313	Industrial Relations Code, 2020	Dilip Ghosh	1357	LS17-4-4867	for	hindi_clubbed	Speaks only on the Industrial Relations Code and praises it.
+335940	4314	Code on Social Security, 2020	Dilip Ghosh	1357	LS17-4-4867	unclear	clubbed_other	Same speech: says nothing about this Code.
+335936	4314	Code on Social Security, 2020	Pinaki Misra	2019	LS17-4-4867	for	support_but	Happy to support, issues need to be ironed out.
+295859	4549	Waqf (Amendment) Bill, 2024	K C Venugopal	727	LS18-2-880	against	clear	Objects to the introduction.
+295861	4549	Waqf (Amendment) Bill, 2024	Mohibbullah	620	LS18-2-880	against	urdu	Urdu script copy of the Hindi speech.
+295869	4549	Waqf (Amendment) Bill, 2024	G M Harish Balayogi	125	LS18-2-880	for	support_but	We support it, open to a Select Committee.
+295858	4549	Waqf (Amendment) Bill, 2024	Kiren Rijiju	18	LS18-2-880	for	short	18 words: the minister moves for leave to introduce.
+292188	4564	Constitution (One Hundred and Twenty-Ninth Amendment) Bill, 2024	Manish Tewari	333	LS18-3-1161	against	clubbed	Opposes the introduction of both Bills.
+292188	4565	Union Territories Laws (Amendment) Bill, 2024	Manish Tewari	333	LS18-3-1161	against	clubbed	Same speech, names this Bill too.
+292193	4564	Constitution (One Hundred and Twenty-Ninth Amendment) Bill, 2024	Chandra Sekhar Pemmasani	38	LS18-3-1161	for	short	38 words: unwavering support, cut off.
+292202	4564	Constitution (One Hundred and Twenty-Ninth Amendment) Bill, 2024	Supriya Sule	195	LS18-3-1161	against	trap	Opposes, would support only after a JPC.
+227514	3463	Regulation of Factor (Assignment of Receivables) Bill, 2011	Mahendra Kumar Roy	467	LS15-9-6137	mixed	mixed	Supports some provisions, reservations on the shortcomings.
+248833	3376	Wakf (Amendment) Bill, 2010	Sk. Saidul Haque	562	LS15-4-2342	mixed	mixed	Welcomes some amendments, says some curtail the power of States.
+295386	3871	Finance Bill, 2016	P V Midhun Reddy	1149	LS16-6-8697	mixed	mixed	Welcomes some tax initiatives, most of the speech is demands for Andhra Pradesh.
+299773	3873	Enemy Property (Amendment and Validation) Bill, 2016	N K Premachandran	1724	LS16-7-7640	for	trap	I support the Bill but I oppose the Ordinance route.
