@@ -60,7 +60,8 @@ CREATE TABLE IF NOT EXISTS bill_extractions (
 -- quote, role. A row with a failed check has no bill_id and is not kept.
 -- name_found is true when the printed name is in the input text.
 -- judge_role_p holds the probabilities of the decision model for moved,
--- mentioned, unsure. It is NULL until that step runs.
+-- mentioned, unsure. It is NULL until that step runs. judged_by names the
+-- model and the question version, for example 'jev-1.13.0 b1'.
 -- kept is the current decision: the checks passed and the role is moved. Later the decision
 -- model can change it. A kept row has a bill_id.
 CREATE TABLE IF NOT EXISTS debate_bills (
@@ -78,6 +79,7 @@ CREATE TABLE IF NOT EXISTS debate_bills (
     checks_failed     TEXT[]   NOT NULL DEFAULT '{}',
     name_found        BOOLEAN  NOT NULL,
     judge_role_p      REAL[],
+    judged_by         TEXT,
     kept              BOOLEAN  NOT NULL,
     CONSTRAINT debate_bills_position UNIQUE (loksabha, session, dbslno, position)
 );

@@ -134,7 +134,37 @@ python3 scripts/recheck_bills.py --commit
 
 **A known risk for the merge step.** Two different bills can have the same name and year when the name has no number, for example "Constitution (Amendment) Bill, 2000". Such bills get the same `bill_key`, so the exact-key merge joins them. 2 kept names have this form today.
 
+## Step 4: the decision model checks the role (2026-11-13)
+
+`scripts/judge_bills.py` asks the decision model one question for each name that passed the checks: is this bill before the House in this debate? The answers are `moved`, `mentioned`, and `unsure`. The model reads the same input text as the extraction. A name is kept when `moved` has a probability of 0.7 or more. `--rethreshold` computes `kept` again from the stored answers with no model call.
+
+```bash
+set -a && source .env && set +a
+python3 scripts/judge_bills.py --sample 12 --dry-run
+python3 scripts/judge_bills.py --all --workers 8
+python3 scripts/judge_bills.py --rethreshold --keep-p 0.6
+```
+
+**The wording of the question decides the result.** The test set was the 33 debates of prompt `v1`. They hold 34 moved bills and 22 `mentioned` names, mostly the Act that a bill amends. Four versions of the question gave these results (the probability of `moved`):
+
+| Version | Lowest value of a moved bill | Highest value of a mentioned name | Wrong decisions |
+|---|---|---|---|
+| `b1` | 0.52 | 0.94 | 3 |
+| `b2` | 0.17 | 0.50 | 2 |
+| `b3` | 0.60 | 0.98 | 8 |
+| `b4` (used) | 0.85 | 0.18 | 0 |
+
+`b2` dropped bills in a debate that continues from an earlier day, because nobody moves the motion again. `b3` counted the Act that a bill amends as moved. `b4` says both cases in plain words. On 13 other random debates, `b4` made no wrong decision. Its one drop was a bill whose year came from a wrong source title.
+
+**The full run.** 2,283 debates and 2,418 names, with 0 failed calls. 2,389 names are kept. The model dropped 7 of the 2,396 names that the extraction called `moved` (0.3%). A manual review found two kinds:
+
+- The motion text does not name the bill. For example, the introduction of the Tribunals Reforms Bill, 2021 lists only the Acts that the bill amends.
+- The source title gives a different year from the text. For example, the title says "Small and Medium Enterprises Development Bill, 2006", but the Speaker names the "Bill, 2005".
+
+These are accepted misses. 57 debates now have no kept bill, out of 2,379.
+
+The review files are `results/judge_2026-11-13*.md`. The files without a number up to `_4` hold the four versions on the test set. `_5` holds the 13 other debates, and `_6` holds the full run.
+
 ## What is next
 
-1. Step 4: the decision model checks each name for `moved`, `mentioned`, or `unsure`.
-2. Step 5: merge the spellings of one bill, then write one summary for each bill in `bills.summary`.
+1. Step 5: merge the spellings of one bill, then write one summary for each bill in `bills.summary`.
