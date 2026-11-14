@@ -27,7 +27,7 @@ export const FIELDS = [
 ];
 
 // An old link can still hold a seat or a language, so a chip can still name them. The pop-up does not offer them.
-const FIELD_LABELS = { ...Object.fromEntries(FIELDS.map((f) => [f.key, f.label])), seat: "Seat", lang: "Spoken in" };
+const FIELD_LABELS = { ...Object.fromEntries(FIELDS.map((f) => [f.key, f.label])), seat: "Seat", lang: "Spoken in", bill: "Bill" };
 
 export const listOf = (value) => String(value || "").split(",").map((s) => s.trim()).filter(Boolean);
 
@@ -77,6 +77,7 @@ export function chipsFrom(params, names = {}) {
     subject: (v) => names.subject?.[v] || `Subject ${v}`,
     kind: (v) => names.kind?.[v] || v,
     session: (v) => names.session?.[v] || v,
+    bill: (v) => names.bill?.[v] || `Bill ${v}`,
     lang: (v) => ({ en: "English", hi: "Hindi", mixed: "Mixed" }[v] || v),
   };
   const chips = [];
@@ -87,6 +88,7 @@ export function chipsFrom(params, names = {}) {
     const words = values.length > 1 ? many : one;
     chips.push({ key, label: `${FIELD_LABELS[field]} ${words} ${shortList(shown)}`, negative, remove: { [key]: null } });
   };
+  push("bill", "bill", "is", "is one of");
   push("tag", "tag", "is", "is");
   push("tag_any", "tag", "is", "is one of");
   push("tag_not", "tag", "is not", "is none of", true);

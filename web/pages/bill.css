@@ -1,0 +1,185 @@
+/* Bill page */
+
+.bill-page {
+  width: 100%;
+  --stance-for: #1d9e75;
+  --stance-against: #d85a30;
+  --stance-mixed: #888780;
+  --stance-unclear: var(--hairline);
+}
+
+.bill-main {
+  display: flex;
+  flex-direction: column;
+  gap: clamp(1.75rem, 3.5vw, 2.5rem);
+}
+
+.bill-head__title {
+  font-size: var(--size-display);
+  line-height: var(--lh-display);
+  margin: 0 0 var(--space-4);
+}
+
+.bill-meta {
+  color: var(--meta);
+  font-size: var(--size-label);
+  line-height: var(--lh-label);
+  margin: var(--space-2) 0;
+}
+
+.bill-num {
+  font-family: var(--font-mono);
+  font-size: var(--size-title);
+  color: var(--ink);
+}
+
+.bill-figures {
+  display: grid;
+  gap: var(--space-3);
+  margin: var(--space-3) 0;
+}
+
+.bill-figures--four {
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+}
+
+@media (max-width: 480px) {
+  .bill-figures--four {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+.bill-sec {
+  border-top: 1px solid var(--hairline);
+  padding-top: var(--space-4);
+}
+
+.bill-sec__title {
+  font-size: var(--size-heading);
+  line-height: var(--lh-heading);
+  margin: 0 0 var(--space-2);
+}
+
+.bill-summary {
+  font-size: var(--size-speech);
+  line-height: var(--lh-speech);
+  margin: var(--space-1) 0;
+}
+
+.bill-bar {
+  display: flex;
+  height: 14px;
+  min-width: 4px;
+  background: var(--ground);
+}
+
+.bill-bar__part {
+  display: block;
+  flex-basis: 0;
+}
+
+.bill-stance--for { background: var(--stance-for); }
+.bill-stance--against { background: var(--stance-against); }
+.bill-stance--mixed { background: var(--stance-mixed); }
+.bill-stance--unclear { background: var(--stance-unclear); }
+
+.bill-key {
+  display: inline-block;
+  width: 10px;
+  height: 10px;
+  margin-right: 6px;
+  vertical-align: baseline;
+}
+
+.bill-parties {
+  display: grid;
+  gap: var(--space-2);
+  margin: var(--space-3) 0;
+}
+
+.bill-party {
+  display: grid;
+  grid-template-columns: 5.5rem minmax(0, 1fr) minmax(0, 14rem);
+  gap: var(--space-3);
+  align-items: center;
+}
+
+.bill-party__counts {
+  font-family: var(--font-mono);
+  font-size: var(--size-count);
+  color: var(--meta);
+}
+
+@media (max-width: 600px) {
+  .bill-party {
+    grid-template-columns: 4.5rem minmax(0, 1fr);
+  }
+  .bill-party__counts {
+    grid-column: 2;
+  }
+}
+
+.bill-samples {
+  display: grid;
+  gap: var(--space-3);
+  margin: var(--space-3) 0;
+}
+
+.bill-sample {
+  border-left: 3px solid var(--stance-unclear);
+  padding: var(--space-2) var(--space-4);
+  background: var(--sheet);
+}
+
+.bill-sample--for { border-left-color: var(--stance-for); }
+.bill-sample--against { border-left-color: var(--stance-against); }
+.bill-sample--mixed { border-left-color: var(--stance-mixed); }
+
+.bill-sample__who {
+  font-weight: 500;
+}
+
+.bill-sample__summary {
+  margin: var(--space-1) 0 var(--space-2);
+}
+
+.bill-sample-groups {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 22rem), 1fr));
+  gap: var(--space-5);
+  align-items: start;
+}
+
+.bill-sample-group__title {
+  font-size: var(--size-body);
+  margin: var(--space-2) 0 0;
+}
+
+.bill-readall {
+  display: inline-flex;
+  align-items: center;
+  text-decoration: none;
+  min-height: var(--control-height);
+  padding: 0 var(--space-4);
+  border: 1px solid var(--action);
+  background: transparent;
+  color: var(--action);
+  font: inherit;
+  cursor: pointer;
+}
+
+.bill-readall:hover {
+  color: var(--action-hover);
+  border-color: var(--action-hover);
+}
+
+.bill-debates,
+.bill-together {
+  margin: var(--space-2) 0;
+  padding-left: var(--space-5);
+}
+
+.bill-debates li,
+.bill-together li {
+  margin: var(--space-1) 0;
+}

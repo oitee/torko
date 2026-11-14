@@ -148,7 +148,7 @@ def api_search():
 # The new public site: a single-page app that Vite builds into web/dist/.
 # Flask sends the one file index.html for every page address, and the browser picks the page.
 WEB_DIST = pathlib.Path(__file__).resolve().parent / "web" / "dist"
-SITE_PAGES = ["/", "/tag/<slug>", "/member/<int:member_id>", "/speech/<int:speech_id>", "/debate/<int:debate_id>",
+SITE_PAGES = ["/", "/tag/<slug>", "/member/<int:member_id>", "/speech/<int:speech_id>", "/debate/<int:debate_id>", "/bill/<int:bill_id>",
               "/place/<slug>", "/places", "/my-mp", "/party/<code>", "/parties", "/search", "/trends", "/method"]
 
 

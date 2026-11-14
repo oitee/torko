@@ -5,7 +5,7 @@ export const SCOPE_KEYS = ["q", "tag", "member", "place"];
 export const FILTER_KEYS = [
   "term", "term_not", "session", "session_not", "party", "party_not", "kind", "kind_not", "subject", "subject_not",
   "state", "state_not", "seat", "seat_not", "lang", "lang_not", "member_not", "place_not", "tag_any", "tag_not",
-  "date_from", "date_to", "min_words", "max_words", "title", "title_not",
+  "date_from", "date_to", "min_words", "max_words", "title", "title_not", "bill",
 ];
 export const SORTS = [
   { value: "best", label: "Best match" },

@@ -18,6 +18,7 @@ CHECKS = {
     "member_id": lambda conn, k: _row(conn, "SELECT 1 FROM persons WHERE id = :k", k),
     "speech_id": lambda conn, k: _row(conn, "SELECT 1 FROM speeches WHERE id = :k", k),
     "debate_id": lambda conn, k: _row(conn, "SELECT 1 FROM debates WHERE id = :k", k),
+    "bill_id": lambda conn, k: _row(conn, "SELECT 1 FROM bills WHERE id = :k", k),
     "code": lambda conn, k: find_party(conn, k) is not None,
 }
 

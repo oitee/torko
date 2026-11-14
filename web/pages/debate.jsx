@@ -1,5 +1,5 @@
 import React, { useEffect } from "react";
-import { useParams, useSearchParams } from "react-router-dom";
+import { Link, useParams, useSearchParams } from "react-router-dom";
 import { useAnswer } from "../assets/js/useApi.js";
 import { formatDateLong } from "../assets/js/format.js";
 import PageLayout from "../components/PageLayout.jsx";
@@ -125,6 +125,17 @@ export default function Debate() {
                 />
               )}
             </div>
+          )}
+
+          {debate.bills?.length > 0 && (
+            <section className="debate-bills" aria-label="Bills in this debate">
+              <h2 className="debate-bills__title">{debate.bills.length === 1 ? "Bill in this debate" : "Bills in this debate"}</h2>
+              <ul className="debate-bills__list">
+                {debate.bills.map((b) => (
+                  <li key={b.id}><Link to={`/bill/${b.id}`}>{b.name}, {b.year}</Link></li>
+                ))}
+              </ul>
+            </section>
           )}
 
           <DebateTranscript

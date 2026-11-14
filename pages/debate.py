@@ -199,6 +199,12 @@ def debate_page(conn, debate_id, args=None):
                     "words": sum(t["word_count"] or 0 for t in turns if not t["pid"]),
                     "speeches": speech_count.get(None, 0)}
 
+    bills = [{"id": r["id"], "name": r["name"], "year": r["year"]} for r in conn.execute(text("""
+        SELECT DISTINCT k.id, k.name, k.year FROM debate_bills db JOIN bills x ON x.id = db.bill_id
+        JOIN bills k ON k.id = COALESCE(x.merged_into, x.id)
+        WHERE db.kept AND (db.loksabha, db.session, db.dbslno) = (:t, :s, :n) ORDER BY k.year, k.name"""),
+        {"t": d["loksabha"], "s": d["session"], "n": d["dbslno"]}).mappings()]
+
     seen = set(people)
     silent = silent_members(conn, official, seen, d["loksabha"], d["debate_date"])
     same_day = same_day_debates(conn, d)
@@ -241,6 +247,8 @@ def debate_page(conn, debate_id, args=None):
         "silent_note": "Members of the official list who have no turn in this debate. member_id is null when the "
                        "code matches no member.",
         "same_day": same_day,
+        "bills": bills,
+        "bills_note": "The bills that the House considered in this debate, from the bill step. Each one has a bill page.",
         "people": sorted(people.values(), key=lambda p: p["first"]),
         "tags": tags,
         "tags_note": "speeches is the number of speeches of this debate that carry the tag. Top 40 tags only.",

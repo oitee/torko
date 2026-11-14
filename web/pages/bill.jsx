@@ -1,0 +1,204 @@
+import React, { useEffect } from "react";
+import { Link, useNavigate, useParams } from "react-router-dom";
+import { useAnswer } from "../assets/js/useApi.js";
+import { formatDateLong, formatNumber, termLong } from "../assets/js/format.js";
+import Breadcrumb from "../components/Breadcrumb.jsx";
+import PageLayout from "../components/PageLayout.jsx";
+import PartyLink from "../components/PartyLink.jsx";
+import { ErrorState, Loading } from "../components/States.jsx";
+import NotFound from "./not_found.jsx";
+import "./bill.css";
+
+export const STANCES = ["for", "against", "mixed", "unclear"];
+export const STANCE_LABELS = { for: "for", against: "against", mixed: "mixed", unclear: "not clear" };
+
+// The days of the debate as "16 to 17 April 2026", or one date.
+export function dateRange(first, last) {
+  if (!first) return "";
+  if (!last || first === last) return formatDateLong(first);
+  return `${formatDateLong(first)} to ${formatDateLong(last)}`;
+}
+
+// The counts of one row as text, for example "18 for, 1 against". A stance with no member is left out.
+export function countText(counts) {
+  return STANCES.filter((s) => counts[s]).map((s) => `${counts[s]} ${STANCE_LABELS[s]}`).join(", ");
+}
+
+// One bar in four parts. width is the share of the longest bar, in per cent.
+export function StanceBar({ counts, width = 100, label }) {
+  return (
+    <div className="bill-bar" style={{ width: `${width}%` }} role="img" aria-label={label || countText(counts)}>
+      {STANCES.map((s) =>
+        counts[s] ? <span key={s} className={`bill-bar__part bill-stance--${s}`} style={{ flexGrow: counts[s] }} /> : null
+      )}
+    </div>
+  );
+}
+
+function Section({ title, children, id }) {
+  return (
+    <section className="bill-sec" id={id}>
+      <h2 className="bill-sec__title">{title}</h2>
+      {children}
+    </section>
+  );
+}
+
+export function BillMembers({ bill }) {
+  const c = bill.member_counts;
+  return (
+    <Section title="Where the members stood">
+      <p className="bill-meta">
+        {formatNumber(bill.members)} members spoke on this bill. Each member counts one time. A spoken stance is not a vote.
+      </p>
+      <StanceBar counts={c} />
+      <div className="bill-figures bill-figures--four">
+        {STANCES.map((s) => (
+          <div key={s}>
+            <div className="bill-num">{formatNumber(c[s])}</div>
+            <div className="bill-meta"><span className={`bill-key bill-stance--${s}`} />{STANCE_LABELS[s]}</div>
+          </div>
+        ))}
+      </div>
+    </Section>
+  );
+}
+
+export function BillParties({ bill }) {
+  const rows = bill.parties || [];
+  if (rows.length === 0) return null;
+  const most = Math.max(...rows.map((p) => p.members));
+  const others = rows.find((p) => p.party === "Others");
+  return (
+    <Section title="By party">
+      <p className="bill-meta">Members who spoke, by their party on the day. Parties in order of members who spoke.</p>
+      <div className="bill-parties">
+        {rows.map((p) => (
+          <div className="bill-party" key={p.party}>
+            <div className="bill-party__name">{p.party === "Others" ? "Others" : <PartyLink code={p.party} />}</div>
+            <div><StanceBar counts={p.counts} width={Math.max(4, Math.round((p.members / most) * 100))} label={`${p.party}: ${countText(p.counts)}`} /></div>
+            <div className="bill-party__counts">{countText(p.counts)}</div>
+          </div>
+        ))}
+      </div>
+      {others?.no_party > 0 && (
+        <p className="bill-meta">
+          {others.no_party === 1 ? "1 member has" : `${others.no_party} members have`} no party in the data and {others.no_party === 1 ? "is" : "are"} in Others.
+        </p>
+      )}
+    </Section>
+  );
+}
+
+// The sample speeches in one group for each stance, in the order of SAMPLE_ORDER.
+const SAMPLE_ORDER = ["for", "against", "mixed"];
+
+export function BillSamples({ bill }) {
+  const groups = SAMPLE_ORDER.map((st) => [st, (bill.samples || []).filter((s) => s.stance === st)]).filter(([, l]) => l.length);
+  return (
+    <Section title="Speeches" id="speeches">
+      <p className="bill-meta">{bill.sample_rule}</p>
+      <div className="bill-sample-groups">
+        {groups.map(([stance, list]) => (
+          <div key={stance} className="bill-sample-group">
+            <h3 className="bill-sample-group__title"><span className={`bill-key bill-stance--${stance}`} />{STANCE_LABELS[stance][0].toUpperCase() + STANCE_LABELS[stance].slice(1)}</h3>
+            <div className="bill-samples">
+              {list.map((s) => (
+                <article key={s.id} className={`bill-sample bill-sample--${s.stance}`}>
+                  <div className="bill-sample__who">
+                    {s.member_id ? <Link to={`/member/${s.member_id}`}>{s.member}</Link> : s.printed}
+                    <span className="bill-meta"> · {[s.party, s.seat, s.date && formatDateLong(s.date)].filter(Boolean).join(" · ")}</span>
+                  </div>
+                  {s.summary && <p className="bill-sample__summary">{s.summary}</p>}
+                  <Link to={`/speech/${s.id}`}>Read the speech</Link>
+                </article>
+              ))}
+            </div>
+          </div>
+        ))}
+      </div>
+      <Link className="bill-readall" to={`/search?bill=${bill.id}&sort=oldest`}>
+        Read all {formatNumber(bill.speeches)} speeches on this bill
+      </Link>
+    </Section>
+  );
+}
+
+export default function Bill() {
+  const { id } = useParams();
+  const navigate = useNavigate();
+  const { data: bill, loading, error, retry } = useAnswer(`/api/bill/${id}`);
+
+  // A bill that the merge step folded into another bill has the address of the kept bill.
+  useEffect(() => {
+    if (bill && String(bill.id) !== String(id)) navigate(`/bill/${bill.id}`, { replace: true });
+  }, [bill, id, navigate]);
+
+  useEffect(() => {
+    if (bill) document.title = `${bill.name}, ${bill.year} · Torko`;
+    else if (error?.status === 404) document.title = "Page not found · Torko";
+  }, [bill, error]);
+
+  if (loading) {
+    return (
+      <main className="bill-page">
+        <h1 className="sr-only">Bill</h1>
+        <Loading lines={6} />
+      </main>
+    );
+  }
+  if (error?.status === 404) return <NotFound />;
+  if (error) return <main className="bill-page"><ErrorState error={error} onRetry={retry} /></main>;
+  if (!bill) return null;
+
+  const title = `${bill.name}, ${bill.year}`;
+  const head = (
+    <div className="bill-head">
+      <h1 className="bill-head__title">{title}</h1>
+      <div className="bill-figures bill-figures--four">
+        <div><div className="bill-num">{formatNumber(bill.debates.length)}</div><div className="bill-meta">{bill.debates.length === 1 ? "debate" : "debates"}</div></div>
+        <div><div className="bill-num">{formatNumber(bill.speeches)}</div><div className="bill-meta">speeches</div></div>
+        <div><div className="bill-num">{formatNumber(bill.members)}</div><div className="bill-meta">members spoke</div></div>
+        <div><div className="bill-num">{formatNumber(bill.days)}</div><div className="bill-meta">{bill.days === 1 ? "day of debate" : "days of debate"}</div></div>
+      </div>
+      <p className="bill-meta">{[bill.terms.map(termLong).join(", "), dateRange(bill.first_date, bill.last_date)].filter(Boolean).join(" · ")}</p>
+    </div>
+  );
+
+  return (
+    <div className="bill-page">
+      <PageLayout breadcrumb={<Breadcrumb items={[{ label: "Home", href: "/" }, { label: title }]} />} answer={head}>
+        <div className="bill-main">
+          {bill.summary && (
+            <Section title="What the bill does">
+              <p className="bill-summary">{bill.summary}</p>
+              <p className="bill-meta">{bill.summary_note}</p>
+            </Section>
+          )}
+          {bill.members > 0 && <BillMembers bill={bill} />}
+          <BillParties bill={bill} />
+          <BillSamples bill={bill} />
+          <Section title="The debates">
+            <ul className="bill-debates">
+              {bill.debates.map((d) => (
+                <li key={d.id}><Link to={`/debate/${d.id}`}>{d.title}</Link> <span className="bill-meta">· {d.date && formatDateLong(d.date)}</span></li>
+              ))}
+            </ul>
+          </Section>
+          {bill.together.length > 0 && (
+            <Section title="Debated together with">
+              <ul className="bill-together">
+                {bill.together.map((t) => (
+                  <li key={t.id}><Link to={`/bill/${t.id}`}>{t.name}, {t.year}</Link></li>
+                ))}
+              </ul>
+            </Section>
+          )}
+          <p className="bill-meta bill-method">
+            How Torko reads a stance: a model reads each speech with the summary of the bill and answers for, against, mixed, or not clear. <Link to="/method">Read the method</Link>
+          </p>
+        </div>
+      </PageLayout>
+    </div>
+  );
+}

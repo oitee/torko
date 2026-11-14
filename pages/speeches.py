@@ -148,6 +148,7 @@ def slug_ids(conn, value, tag_type=None):
 def parse_args(conn, args):
     """Return (filters, error). filters is a dict of the parsed arguments. error is 'tag' or 'place' for an unknown slug."""
     f = {
+        "bill": int_list(args.get("bill")),
         "member": int_list(args.get("member")), "member_not": int_list(args.get("member_not")),
         "term": int_list(args.get("term")), "session": session_pairs(args.get("session")),
         "kind": str_list(args.get("kind")), "party": [p.upper() for p in str_list(args.get("party"))],
@@ -199,6 +200,9 @@ def filter_names(conn, f):
     subjects = f["subject"] + f["subject_not"]
     if members:
         out["member"] = {str(i): n for i, n in conn.execute(text("SELECT id, name FROM persons WHERE id = ANY(:ids)"), {"ids": members})}
+    if f.get("bill"):
+        out["bill"] = {str(i): f"{n}, {y}" for i, n, y in conn.execute(
+            text("SELECT id, name, year FROM bills WHERE id = ANY(:ids)"), {"ids": f["bill"]})}
     if subjects:
         out["subject"] = {str(i): n for i, n in conn.execute(text("SELECT id, label FROM subjects WHERE id = ANY(:ids)"), {"ids": subjects})}
     return out
@@ -211,6 +215,8 @@ def conditions(f):
         c["member"] = ("s.person_id = ANY(:member)", {"member": f["member"]})
     if f["member_not"]:
         c["member_not"] = ("s.person_id IS NOT NULL AND s.person_id <> ALL(:member_not)", {"member_not": f["member_not"]})
+    if f.get("bill"):  # A speech with a stance on the bill. A merged bill row has no stances, so a page sends the kept id.
+        c["bill"] = ("s.id IN (SELECT speech_id FROM speech_stances WHERE bill_id = ANY(:bill))", {"bill": f["bill"]})
     if f["tag_ids"] is not None:
         c["tag"] = ("s.id = ANY(:tag_ids)", {"tag_ids": f["tag_ids"]})
     if f["place_ids"] is not None:
