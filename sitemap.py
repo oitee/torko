@@ -1,7 +1,7 @@
 """The sitemap of the public site: the page addresses that search engines may index, as XML.
 
 The sitemap holds:
-- the Home page and the Method page,
+- the Home page, the Method page and the Bills page,
 - each party that had at least one member in the Lok Sabha,
 - each member with at least one speech,
 - each place tag with at least MIN_PLACE_SPEECHES speeches,
@@ -64,7 +64,7 @@ def page_paths(conn):
         SELECT t.id, t.tag, t.type, t.status, COALESCE(n.n, 0) FROM tags t LEFT JOIN n ON n.tag_id = t.id
     """)).all()
     top, places = tag_paths(tags)
-    return (["/", "/method"]
+    return (["/", "/method", "/bills"]
             + [f"/party/{quote(code, safe='')}" for code in parties]
             + [f"/member/{pid}" for pid in members]
             + places + top)

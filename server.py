@@ -108,24 +108,25 @@ _search_index = None
 
 
 def search_index():
-    """The tags, subjects and members for /api/search. Read once per process: they change only when the pipeline runs."""
+    """The tags, subjects, members and bills for /api/search. Read once per process: they change only when the pipeline runs."""
     global _search_index
     if _search_index is None:
         with dashboard_db.get_engine().connect() as conn:
-            _search_index = (*tag_search.load_index(conn), tag_search.load_members(conn))
+            _search_index = (*tag_search.load_index(conn), tag_search.load_members(conn), tag_search.load_bills(conn))
     return _search_index
 
 
 @app.route("/api/search")
 def api_search():
-    """The tags, places, subjects and members that match a search text.
+    """The bills, tags, places, subjects and members that match a search text.
     named lists the places and tags whose whole name is in the text, for the cards above the results.
     suggested lists up to 5 tags near the text in meaning, for the chips above the results."""
     q = request.args.get("q", "").strip()
     if not q:
         return jsonify({"error": "q is required"}), 400
-    tags, subjects, members = search_index()
-    results = tag_search.search(q, tags, subjects, limit=20, members=members)
+    tags, subjects, members, bills = search_index()
+    # The bills come first: a search for a bill name wants the bill page before the tag of the same name.
+    results = tag_search.bill_matches(q, bills) + tag_search.search(q, tags, subjects, limit=20, members=members)
     for r in results:
         if r["kind"] in ("tag", "place"):
             r["subjects"] = [{"subject_id": s["subject_id"], "label": s["label"], "n_speeches": s["n_speeches"]}
@@ -148,7 +149,7 @@ def api_search():
 # The new public site: a single-page app that Vite builds into web/dist/.
 # Flask sends the one file index.html for every page address, and the browser picks the page.
 WEB_DIST = pathlib.Path(__file__).resolve().parent / "web" / "dist"
-SITE_PAGES = ["/", "/tag/<slug>", "/member/<int:member_id>", "/speech/<int:speech_id>", "/debate/<int:debate_id>", "/bill/<int:bill_id>",
+SITE_PAGES = ["/", "/tag/<slug>", "/member/<int:member_id>", "/speech/<int:speech_id>", "/debate/<int:debate_id>", "/bill/<int:bill_id>", "/bills",
               "/place/<slug>", "/places", "/my-mp", "/party/<code>", "/parties", "/search", "/trends", "/method"]
 
 

@@ -242,6 +242,8 @@ Add the `--summary-only` flag to hide the per-turn previews.
 
 **2. Bills, then the stance of each speech.** Torko will link each government-bill debate to the bill or bills that the House considered in it. There are 2,381 such debates. An LLM reads the start and the end of each debate. It copies each bill name from the text, and it writes 2 or 3 sentences on what the bill does. A script then checks each name and each year against the text. A name that is not in the text is not kept. The next step uses the bill summary as context to find whether each speech is for or against its bill. `tags/bills/README.md` describes the step and its first results.
 
+**Bill pages.** Each bill has a page at `/bill/<id>`. The page shows what the bill does, where the members stood, the stance by party, and sample speeches for each stance. The page `/bills` lists every bill with a debate. It has a find box, a chart of each bill by year and by the share of members who spoke against it, three short lists, and the full list. Search shows the matching bills first. A spoken stance is not a vote. The main arguments of each bill come after the argument step. A filter by stance on the full speech list of a bill is not built yet.
+
 **Ideas we may explore after these steps.** We may pick the following based on what the first two steps show.
 
 - **Connections between topics and members.** Torko already records which member spoke in which debate, and who interrupted whom. Speech-level tags will add a new layer to these links. Then Torko can answer questions such as "Which members raised both coastal erosion and cyclone relief?"

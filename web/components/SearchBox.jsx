@@ -8,6 +8,10 @@ import "./SearchBox.css";
 
 // Headings and link generators for each kind of suggestion.
 const KIND_CONFIG = {
+  bill: {
+    heading: "Bills",
+    getHref: (item) => `/bill/${item.id}`,
+  },
   tag: {
     heading: "Tags",
     // A tag opens the search for its speeches. That page links to the tag page.
@@ -27,7 +31,7 @@ const KIND_CONFIG = {
   },
 };
 
-const KIND_ORDER = ["tag", "place", "subject", "member"];
+const KIND_ORDER = ["bill", "tag", "place", "subject", "member"];
 
 // Group suggestions by kind, keeping up to 5 items in each group.
 function groupSuggestions(results) {

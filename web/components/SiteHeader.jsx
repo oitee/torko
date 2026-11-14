@@ -7,6 +7,7 @@ import "./SiteHeader.css";
 // The main pages, in the order of the header. Each item is active on its path and on the paths under it.
 export const NAV_ITEMS = [
   { to: "/search", label: "Search" },
+  { to: "/bills", label: "Bills" },
   { to: "/trends", label: "Trends" },
   { to: "/parties", label: "Parties" },
   { to: "/method", label: "Method" },

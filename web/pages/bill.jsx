@@ -167,7 +167,7 @@ export default function Bill() {
 
   return (
     <div className="bill-page">
-      <PageLayout breadcrumb={<Breadcrumb items={[{ label: "Home", href: "/" }, { label: title }]} />} answer={head}>
+      <PageLayout breadcrumb={<Breadcrumb items={[{ label: "Home", href: "/" }, { label: "Bills", href: "/bills" }, { label: title }]} />} answer={head}>
         <div className="bill-main">
           {bill.summary && (
             <Section title="What the bill does">

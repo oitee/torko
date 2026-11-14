@@ -43,7 +43,7 @@ def test_a_query_that_misses_the_tag_name_still_finds_the_tag_through_its_subjec
 
 def test_the_search_endpoint_returns_the_tag_with_its_subjects(monkeypatch):
     import server
-    monkeypatch.setattr(server, "_search_index", (TAGS, SUBJECTS, []))
+    monkeypatch.setattr(server, "_search_index", (TAGS, SUBJECTS, [], []))
     monkeypatch.setattr(server.search_rank, "query_vector", lambda store, q: None)
     client = server.app.test_client()
     resp = client.get("/api/search?q=arrears")
@@ -185,7 +185,7 @@ def test_suggested_tags_stop_at_the_limit_and_give_a_place_its_kind():
 def test_the_search_endpoint_suggests_the_near_tags_that_have_no_card(monkeypatch):
     import contextlib
     import server
-    monkeypatch.setattr(server, "_search_index", (SUGGEST_TAGS, [], []))
+    monkeypatch.setattr(server, "_search_index", (SUGGEST_TAGS, [], [], []))
     monkeypatch.setattr(server.search_rank, "query_vector", lambda store, q: "[0.1]")
     monkeypatch.setattr(server.dashboard_db, "get_engine", lambda: type("E", (), {"connect": lambda self: contextlib.nullcontext()})())
     monkeypatch.setattr(server.tag_search, "nearest_tag_ids", lambda conn, v, m: [(1, 0.25), (2, 0.33)])

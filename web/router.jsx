@@ -6,6 +6,7 @@ import Member from "./pages/member.jsx";
 import Speech from "./pages/speech.jsx";
 import Debate from "./pages/debate.jsx";
 import Bill from "./pages/bill.jsx";
+import Bills from "./pages/bills.jsx";
 import MyMp from "./pages/my_mp.jsx";
 import Party from "./pages/party.jsx";
 import Parties from "./pages/parties.jsx";
@@ -28,6 +29,7 @@ export const routes = [
       { path: "/speech/:id", element: <Speech /> },
       { path: "/debate/:id", element: <Debate /> },
       { path: "/bill/:id", element: <Bill /> },
+      { path: "/bills", element: <Bills /> },
       { path: "/place/:slug", element: <Place /> },
       { path: "/my-mp", element: <MyMp /> },
       { path: "/parties", element: <Parties /> },

@@ -1,0 +1,210 @@
+/* Bills landing page. The shared stance colours, bars and figures come from bill.css. */
+
+.bills-page {
+  --stance-for: #1d9e75;
+  --stance-against: #d85a30;
+  --stance-mixed: #888780;
+  --stance-unclear: var(--hairline);
+  max-width: var(--page-max);
+  margin: 0 auto;
+  padding: var(--space-8) var(--page-pad) var(--space-14);
+  display: flex;
+  flex-direction: column;
+  gap: clamp(1.75rem, 3.5vw, 2.5rem);
+}
+
+.bills-lead {
+  color: var(--ink-2);
+  margin: 0 0 var(--space-4);
+}
+
+.bills-find__row {
+  display: flex;
+  gap: var(--space-2);
+}
+
+.bills-find__input {
+  flex: 1;
+  min-width: 0;
+  height: var(--input-height);
+  padding: 0 var(--space-3);
+  border: 1px solid var(--control);
+  background: var(--sheet);
+  color: var(--ink);
+  font: inherit;
+}
+
+.bills-find__button {
+  height: var(--input-height);
+  padding: 0 var(--space-4);
+  border: 0;
+  background: var(--action);
+  color: var(--ground);
+  font: inherit;
+  cursor: pointer;
+}
+
+.bills-find__list {
+  list-style: none;
+  margin: var(--space-2) 0 0;
+  padding: var(--space-2) var(--space-3);
+  border: 1px solid var(--hairline);
+  background: var(--sheet);
+}
+
+.bills-find__list li {
+  padding: var(--space-1) 0;
+}
+
+.bills-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+  align-items: center;
+  margin: var(--space-2) 0;
+}
+
+.bills-chip {
+  min-height: var(--chip-height);
+  padding: 0 var(--space-3);
+  border: 1px solid var(--hairline);
+  background: transparent;
+  color: var(--ink-2);
+  font: inherit;
+  font-size: var(--size-label);
+  cursor: pointer;
+}
+
+.bills-chip--on {
+  border-color: var(--action);
+  color: var(--action);
+}
+
+.bills-sort select {
+  min-height: var(--chip-height);
+  background: var(--sheet);
+  color: var(--ink);
+  border: 1px solid var(--hairline);
+  font: inherit;
+  max-width: 16rem;
+}
+
+.bills-chart svg {
+  display: block;
+}
+
+.bills-chart__band {
+  fill: var(--ground);
+}
+
+.bills-chart__grid {
+  stroke: var(--hairline);
+  stroke-width: 0.5;
+}
+
+.bills-chart__axis {
+  fill: var(--meta);
+  font-size: 11px;
+  font-family: var(--font-sans);
+}
+
+.bills-chart__dot {
+  fill: var(--stance-mixed);
+  fill-opacity: 0.45;
+  cursor: pointer;
+}
+
+.bills-chart__dot--named {
+  fill: var(--ink-2);
+  fill-opacity: 0.85;
+  stroke: var(--sheet);
+  stroke-width: 1.5;
+}
+
+.bills-chart__dot--on,
+.bills-chart__dot:focus {
+  fill: var(--action);
+  fill-opacity: 1;
+  outline: none;
+}
+
+.bills-chart__label {
+  fill: var(--ink);
+  font-size: 11px;
+  font-family: var(--font-sans);
+  paint-order: stroke;
+  stroke: var(--sheet);
+  stroke-width: 3px;
+}
+
+.bills-chart {
+  position: relative;
+}
+
+/* The pop-up on a dot. It has the look of the pop-up of the bar charts, and it never takes the pointer. */
+.bills-chart__pop {
+  position: absolute;
+  z-index: 4;
+  padding: var(--space-1) var(--space-2);
+  background: var(--sheet);
+  border: 1px solid var(--ink);
+  font-family: var(--font-mono);
+  font-size: var(--size-count);
+  line-height: var(--lh-count);
+  color: var(--ink);
+  width: max-content;
+  max-width: min(22rem, 80%);
+  pointer-events: none;
+}
+
+.bills-chart__pop strong {
+  font-family: var(--font-sans);
+  font-weight: 500;
+}
+
+.bills-chart__pop--middle { transform: translate(-50%, -100%); }
+.bills-chart__pop--start { transform: translate(-12px, -100%); }
+.bills-chart__pop--end { transform: translate(calc(-100% + 12px), -100%); }
+
+.bills-shorts {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 16rem), 1fr));
+  gap: var(--space-5);
+}
+
+.bills-short__title {
+  font-size: var(--size-heading);
+  margin: 0;
+}
+
+.bills-short__row {
+  display: grid;
+  gap: var(--space-1);
+  padding: var(--space-2) 0;
+  border-top: 1px solid var(--hairline);
+}
+
+.bills-table__row {
+  display: grid;
+  grid-template-columns: minmax(0, 1.4fr) minmax(0, 1fr) 3rem;
+  gap: var(--space-3);
+  align-items: center;
+  padding: var(--space-2) 0;
+  border-top: 1px solid var(--hairline);
+}
+
+.bills-table__n {
+  text-align: right;
+  font-family: var(--font-mono);
+  margin: 0;
+}
+
+@media (max-width: 600px) {
+  .bills-table__row {
+    grid-template-columns: minmax(0, 1fr) 2.5rem;
+  }
+  .bills-table__row > .bill-bar {
+    grid-column: 1;
+    grid-row: 2;
+  }
+}

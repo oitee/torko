@@ -4,6 +4,7 @@ import { formatNumber, termShort } from "../../assets/js/format.js";
 
 // The kinds of match, in the order that the page shows them.
 const KINDS = [
+  { kind: "bill", heading: "Bills" },
   { kind: "tag", heading: "Tags" },
   { kind: "place", heading: "Places" },
   { kind: "member", heading: "Members" },
@@ -22,6 +23,8 @@ function context(item) {
       const terms = (item.terms || []).map(termShort).join(", ");
       return [item.seat_label || item.seat, terms].filter(Boolean).join(" · ");
     }
+    case "bill":
+      return `${formatNumber(item.members)} members spoke`;
     default:
       return "";
   }
@@ -31,10 +34,11 @@ function href(item) {
   if (item.kind === "tag") return `/search?tag=${encodeURIComponent(item.slug)}`;
   if (item.kind === "place") return `/place/${item.slug}`;
   if (item.kind === "member") return `/member/${item.id}`;
+  if (item.kind === "bill") return `/bill/${item.id}`;
   return null;
 }
 
-// SearchMatches lists the tags, places, members and subjects whose names match the words.
+// SearchMatches lists the bills, tags, places, members and subjects whose names match the words.
 // A subject has no page of its own, so it links to its parent tag when it has one.
 export default function SearchMatches({ results, query }) {
   const groups = KINDS.map(({ kind, heading }) => ({

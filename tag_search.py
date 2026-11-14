@@ -44,6 +44,7 @@ def matches(query: str, text: str) -> bool:
 
 STATE_IN_NOTE = re.compile(r" in ([A-Z][A-Za-z &]+), India")
 MAX_MEMBERS = 8
+MAX_BILLS = 5
 
 
 def place_state(description: str | None) -> str | None:
@@ -201,6 +202,29 @@ def search(query: str, tags: list, subjects: list, limit: int = 10, members: lis
     out += found[:MAX_MEMBERS]
     out.sort(key=lambda r: (not r["exact"], r["kind"] not in ("tag", "place") if r["exact"] else False, -r["n_speeches"]))
     return out[:limit]
+
+
+def bill_matches(query: str, bills: list, limit: int = MAX_BILLS) -> list:
+    """bills: dicts with id, name, year, members, n_speeches. A bill matches when the words of the query are in its
+    name and year. Exact matches first, then the bills with most members who spoke."""
+    q = " ".join(sorted(words(query)))
+    out = []
+    for b in bills:
+        full = f"{b['name']} {b['year']}"
+        if matches(query, full):
+            exact = q in (" ".join(sorted(words(b["name"]))), " ".join(sorted(words(full))))
+            out.append({"kind": "bill", "id": b["id"], "name": f"{b['name']}, {b['year']}", "year": b["year"],
+                        "members": b["members"], "n_speeches": b["n_speeches"], "exact": exact})
+    out.sort(key=lambda r: (not r["exact"], -r["members"], -r["year"]))
+    return out[:limit]
+
+
+def load_bills(conn) -> list:
+    """Read the kept bills that have at least one speech with a stance, for bill_matches()."""
+    return [{"id": i, "name": n, "year": y, "members": m, "n_speeches": c} for i, n, y, m, c in conn.execute(text("""
+        SELECT b.id, b.name, b.year, count(DISTINCT s.person_id), count(DISTINCT ss.speech_id)
+        FROM bills b JOIN speech_stances ss ON ss.bill_id = b.id JOIN speeches s ON s.id = ss.speech_id
+        WHERE b.merged_into IS NULL GROUP BY b.id"""))]
 
 
 def load_index(conn) -> tuple[list, list]:
