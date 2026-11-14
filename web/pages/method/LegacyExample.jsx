@@ -36,7 +36,7 @@ export default function LegacyExample({ example }) {
           {d.source_url && (
             <>
               {" "}
-              · <a href={d.source_url}>Read the original on sansad.in</a>
+              · <a href={d.source_url} target="_blank" rel="noopener noreferrer">Read the original on sansad.in</a>
             </>
           )}
         </p>

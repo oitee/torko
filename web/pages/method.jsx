@@ -172,7 +172,7 @@ export default function Method() {
           </h2>
           <ul className="method-page__list">
             <li>
-              Debates: the Lok Sabha debates on <a href="https://sansad.in/ls/debates/digitized">sansad.in</a>.
+              Debates: the Lok Sabha debates on <a href="https://sansad.in/ls/debates/digitized" target="_blank" rel="noopener noreferrer">sansad.in</a>.
             </li>
             <li>
               The party of each member on each date: sansad.in, the Wikipedia lists of the members of each term, and a

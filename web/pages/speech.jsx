@@ -229,7 +229,7 @@ export default function Speech() {
             <>
               <dt>Link</dt>
               <dd>
-                <a href={speech.source_url}>sansad.in</a>
+                <a href={speech.source_url} target="_blank" rel="noopener noreferrer">sansad.in</a>
               </dd>
             </>
           )}

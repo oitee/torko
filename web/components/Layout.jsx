@@ -45,7 +45,7 @@ export default function Layout() {
           </nav>
           <p className="site-footer__source">
             Source: Lok Sabha debates on{" "}
-            <a href="https://sansad.in/ls/debates/debates" rel="noreferrer">
+            <a href="https://sansad.in/ls/debates/debates" target="_blank" rel="noopener noreferrer">
               sansad.in
             </a>
             . Torko is not an official site.

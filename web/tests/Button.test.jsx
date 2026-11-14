@@ -59,4 +59,25 @@ describe("Button", () => {
     const button = screen.getByRole("button", { name: "Fallback" });
     expect(button.classList.contains("button--secondary")).toBe(true);
   });
+
+  it("opens an address on another site in a new tab", () => {
+    render(
+      <MemoryRouter>
+        <Button variant="text" href="https://sansad.in/ls/debates/58204">Read the original on sansad.in</Button>
+      </MemoryRouter>
+    );
+    const link = screen.getByRole("link", { name: "Read the original on sansad.in" });
+    expect(link.getAttribute("href")).toBe("https://sansad.in/ls/debates/58204");
+    expect(link.getAttribute("target")).toBe("_blank");
+    expect(link.getAttribute("rel")).toBe("noopener noreferrer");
+  });
+
+  it("keeps an address in Torko in the same tab", () => {
+    render(
+      <MemoryRouter>
+        <Button href="/method">Method</Button>
+      </MemoryRouter>
+    );
+    expect(screen.getByRole("link", { name: "Method" }).getAttribute("target")).toBeNull();
+  });
 });
