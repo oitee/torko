@@ -205,7 +205,7 @@ def search(query: str, tags: list, subjects: list, limit: int = 10, members: lis
 
 
 def bill_matches(query: str, bills: list, limit: int = MAX_BILLS) -> list:
-    """bills: dicts with id, name, year, members, n_speeches. A bill matches when the words of the query are in its
+    """bills: dicts with id, name, year, term, members, n_speeches. A bill matches when the words of the query are in its
     name and year. Exact matches first, then the bills with most members who spoke."""
     q = " ".join(sorted(words(query)))
     out = []
@@ -214,15 +214,17 @@ def bill_matches(query: str, bills: list, limit: int = MAX_BILLS) -> list:
         if matches(query, full):
             exact = q in (" ".join(sorted(words(b["name"]))), " ".join(sorted(words(full))))
             out.append({"kind": "bill", "id": b["id"], "name": f"{b['name']}, {b['year']}", "year": b["year"],
-                        "members": b["members"], "n_speeches": b["n_speeches"], "exact": exact})
+                        "term": b.get("term"), "members": b["members"], "n_speeches": b["n_speeches"], "exact": exact})
     out.sort(key=lambda r: (not r["exact"], -r["members"], -r["year"]))
     return out[:limit]
 
 
 def load_bills(conn) -> list:
     """Read the kept bills that have at least one speech with a stance, for bill_matches()."""
-    return [{"id": i, "name": n, "year": y, "members": m, "n_speeches": c} for i, n, y, m, c in conn.execute(text("""
-        SELECT b.id, b.name, b.year, count(DISTINCT s.person_id), count(DISTINCT ss.speech_id)
+    from bill_extract import key_term
+    return [{"id": i, "name": n, "year": y, "term": key_term(k), "members": m, "n_speeches": c}
+            for i, n, y, k, m, c in conn.execute(text("""
+        SELECT b.id, b.name, b.year, b.bill_key, count(DISTINCT s.person_id), count(DISTINCT ss.speech_id)
         FROM bills b JOIN speech_stances ss ON ss.bill_id = b.id JOIN speeches s ON s.id = ss.speech_id
         WHERE b.merged_into IS NULL GROUP BY b.id"""))]
 

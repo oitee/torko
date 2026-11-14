@@ -6,7 +6,10 @@
 
 -- bills: one row for each bill.
 -- bill_key is the name in lower case with only letters and digits, then '-',
--- then the year. Two bills with a different year never share a key.
+-- then the year, then '-ls' and the Lok Sabha number. Two bills with a different
+-- year or a different term never share a key. A bill does not continue into a
+-- new Lok Sabha.
+-- next_id links a kept bill to the kept bill of the same name in the next term.
 -- amendment_ordinal is the number of a Constitution amendment bill, as words in
 -- lower case, for example 'one hundred and thirty-first'.
 -- summary is the summary of the bill. The merge step writes it: it copies the
@@ -26,6 +29,7 @@ CREATE TABLE IF NOT EXISTS bills (
     act_name          TEXT,
     act_number        TEXT,
     merged_into       INT      REFERENCES bills(id),
+    next_id           INT      REFERENCES bills(id),
     created_at        TIMESTAMPTZ NOT NULL DEFAULT now()
 );
 

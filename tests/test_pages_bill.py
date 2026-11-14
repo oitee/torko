@@ -52,3 +52,16 @@ def test_bill_route_on_real_data(page_conn):
     assert sum(p["members"] for p in b["parties"]) == b["members"]
     assert sum(b["speech_counts"].values()) == b["speeches"]
     assert {s["stance"] for s in b["samples"]} <= {"for", "against", "mixed"}
+
+
+def test_a_bill_of_the_same_name_in_another_term_is_a_different_bill(page_conn):
+    # A real case: the 16th Lok Sabha debated a Citizenship (Amendment) Bill, 2019 in January 2019.
+    # The 17th Lok Sabha debated a new bill of that name in December 2019. Each one has its own page.
+    b = bill_page(page_conn, 4145)
+    if b is None:
+        return
+    assert b["terms"] == [17]
+    assert [(o["term"], o["side"]) for o in b["same_name"]] == [(16, "previous")]
+    old = bill_page(page_conn, b["same_name"][0]["id"])
+    assert old["terms"] == [16]
+    assert [(o["id"], o["term"], o["side"]) for o in old["same_name"]] == [(4145, 17, "next")]

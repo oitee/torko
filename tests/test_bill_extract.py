@@ -220,3 +220,11 @@ def test_the_amendment_number_is_read_from_the_printed_name(printed, number):
 ])
 def test_a_name_with_no_amendment_number_gives_none(printed):
     assert be.amendment_number_text(printed) is None
+
+
+def test_the_stored_key_ends_with_the_term():
+    key = be.term_key(be.bill_key("Citizenship (Amendment) Bill", 2019), 16)
+    assert key == "citizenshipamendmentbill-2019-ls16"
+    assert be.key_term(key) == 16
+    assert be.base_key(key) == "citizenshipamendmentbill-2019"
+    assert be.key_term("citizenshipamendmentbill-2019") is None

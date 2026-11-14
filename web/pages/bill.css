@@ -183,3 +183,11 @@
 .bill-together li {
   margin: var(--space-1) 0;
 }
+
+/* The note that a bill of the same name in another term is a different bill. */
+.bill-callout {
+  padding: var(--space-3) var(--space-4);
+  border-left: 3px solid var(--action);
+  background: var(--sheet);
+  color: var(--ink);
+}

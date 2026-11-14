@@ -193,6 +193,11 @@ def parse_args(conn, args):
     return f, None
 
 
+def term_suffix(n: int) -> str:
+    """The English ordinal ending of a term number: 1st, 2nd, 3rd, 11th, 17th."""
+    return "th" if 10 <= n % 100 <= 20 else {1: "st", 2: "nd", 3: "rd"}.get(n % 10, "th")
+
+
 def filter_names(conn, f):
     """Return the names of the values in the address, so that a page can show them: {member: {id: name}, subject: ..., slug: ...}."""
     out = {"slug": f.get("slug_names", {})}
@@ -201,8 +206,10 @@ def filter_names(conn, f):
     if members:
         out["member"] = {str(i): n for i, n in conn.execute(text("SELECT id, name FROM persons WHERE id = ANY(:ids)"), {"ids": members})}
     if f.get("bill"):
-        out["bill"] = {str(i): f"{n}, {y}" for i, n, y in conn.execute(
-            text("SELECT id, name, year FROM bills WHERE id = ANY(:ids)"), {"ids": f["bill"]})}
+        from bill_extract import key_term
+        out["bill"] = {str(i): f"{n}, {y} ({key_term(k)}{term_suffix(key_term(k))} LS)" if key_term(k) else f"{n}, {y}"
+                       for i, n, y, k in conn.execute(
+            text("SELECT id, name, year, bill_key FROM bills WHERE id = ANY(:ids)"), {"ids": f["bill"]})}
     if subjects:
         out["subject"] = {str(i): n for i, n in conn.execute(text("SELECT id, label FROM subjects WHERE id = ANY(:ids)"), {"ids": subjects})}
     return out

@@ -192,3 +192,11 @@ def test_the_search_endpoint_suggests_the_near_tags_that_have_no_card(monkeypatc
     body = server.app.test_client().get("/api/search?q=farmers suicide").get_json()
     assert [p["name"] for p in body["named"]] == ["Farmers' Suicide"]
     assert [p["name"] for p in body["suggested"]] == ["Farmers' Debt"]
+
+
+def test_two_bills_of_one_name_show_their_terms():
+    from tag_search import bill_matches
+    bills = [{"id": 1, "name": "Citizenship (Amendment) Bill", "year": 2019, "term": 16, "members": 20, "n_speeches": 30},
+             {"id": 2, "name": "Citizenship (Amendment) Bill", "year": 2019, "term": 17, "members": 50, "n_speeches": 90}]
+    out = bill_matches("citizenship amendment", bills)
+    assert [(r["id"], r["term"]) for r in out] == [(2, 17), (1, 16)]

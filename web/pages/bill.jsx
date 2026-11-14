@@ -44,6 +44,15 @@ function Section({ title, children, id }) {
   );
 }
 
+// A different bill of the same name in the term before or after. Each bill links to the other.
+export function SameNameCallout({ bill }) {
+  return (bill.same_name || []).map((o) => (
+    <aside key={o.id} className="bill-callout">
+      A different bill with the same name was debated in the {termLong(o.term)}. <Link to={`/bill/${o.id}`}>Read it here</Link>
+    </aside>
+  ));
+}
+
 export function BillMembers({ bill }) {
   const c = bill.member_counts;
   return (
@@ -169,6 +178,7 @@ export default function Bill() {
     <div className="bill-page">
       <PageLayout breadcrumb={<Breadcrumb items={[{ label: "Home", href: "/" }, { label: "Bills", href: "/bills" }, { label: title }]} />} answer={head}>
         <div className="bill-main">
+          <SameNameCallout bill={bill} />
           {bill.summary && (
             <Section title="What the bill does">
               <p className="bill-summary">{bill.summary}</p>

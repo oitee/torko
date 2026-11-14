@@ -8,6 +8,7 @@ The rules that the checks keep:
 - The model copies each bill name from the input. A name that is not in the input is not kept.
 - The year comes from the text near the name, never from the debate date.
 - Two bills with a different year never share a bill_key.
+- A bill does not continue into a new Lok Sabha. The stored bill_key ends with the term, so two terms never share a bills row.
 - Only a bill that the House considers in the debate ('moved') keeps a summary.
 """
 from __future__ import annotations
@@ -176,6 +177,22 @@ def bill_key(name: str, year: int) -> str:
     return "".join(ch for ch in norm(name) if ch.isalnum()) + f"-{year}"
 
 
+def term_key(key: str, loksabha: int) -> str:
+    """The stored key of a bill: the bill_key, then '-ls', then the Lok Sabha number of its debate."""
+    return f"{key}-ls{loksabha}"
+
+
+def key_term(key: str) -> int | None:
+    """The Lok Sabha number at the end of a stored key, or None for a key with no term."""
+    m = re.search(r"-ls(\d+)$", key or "")
+    return int(m.group(1)) if m else None
+
+
+def base_key(key: str) -> str:
+    """The stored key with no term: the name and the year only."""
+    return re.sub(r"-ls\d+$", "", key or "")
+
+
 def year_near(year, printed: str, body: str) -> bool:
     """True when the year is inside the printed name, or in the YEAR_WINDOW characters after one copy of it."""
     if not isinstance(year, int) or not 1800 <= year <= 2100:
@@ -307,12 +324,14 @@ def model_id(conn, name: str) -> int:
     return conn.execute(text("SELECT id FROM models WHERE name = :n"), {"n": name}).scalar()
 
 
-def bill_id(conn, bill: dict) -> int:
+def bill_id(conn, bill: dict, loksabha: int) -> int:
+    """The id of the bills row of this bill in this Lok Sabha. A new row is made when there is none."""
+    key = term_key(bill["bill_key"], loksabha)
     conn.execute(text("""
         INSERT INTO bills (name, year, bill_key, amendment_ordinal) VALUES (:n, :y, :k, :o)
         ON CONFLICT (bill_key) DO NOTHING
-    """), {"n": bill["name"], "y": bill["year"], "k": bill["bill_key"], "o": bill["amendment_ordinal"]})
-    return conn.execute(text("SELECT id FROM bills WHERE bill_key = :k"), {"k": bill["bill_key"]}).scalar()
+    """), {"n": bill["name"], "y": bill["year"], "k": key, "o": bill["amendment_ordinal"]})
+    return conn.execute(text("SELECT id FROM bills WHERE bill_key = :k"), {"k": key}).scalar()
 
 
 def check_and_store(conn, debate: dict, answer: dict, model: str, prompt_version: str,
@@ -343,7 +362,7 @@ def check_and_store(conn, debate: dict, answer: dict, model: str, prompt_version
             INSERT INTO debate_bills (extraction_id, loksabha, session, dbslno, position, bill_id, printed, quote,
                                       extracted_role, summary, checks_failed, name_found, kept)
             VALUES (:e, :ls, :s, :d, :pos, :bid, :printed, :quote, :role, :summary, :failed, :found, :kept)
-        """), {**key, "e": ext, "pos": pos, "bid": bill_id(conn, bill) if bill["kept"] else None,
+        """), {**key, "e": ext, "pos": pos, "bid": bill_id(conn, bill, debate["loksabha"]) if bill["kept"] else None,
                "printed": bill["printed"], "quote": bill["quote"], "role": bill["role"], "summary": bill["summary"],
                "failed": bill["checks_failed"], "found": bill["name_found"], "kept": bill["kept"]})
     return bills, warnings

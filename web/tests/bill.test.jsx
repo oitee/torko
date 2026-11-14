@@ -2,7 +2,7 @@ import React from "react";
 import { MemoryRouter } from "react-router-dom";
 import { cleanup, render, screen } from "@testing-library/react";
 import { afterEach, describe, expect, it } from "vitest";
-import { BillMembers, BillParties, BillSamples, countText, dateRange } from "../pages/bill.jsx";
+import { BillMembers, BillParties, BillSamples, SameNameCallout, countText, dateRange } from "../pages/bill.jsx";
 
 afterEach(cleanup);
 
@@ -48,5 +48,15 @@ describe("Bill page parts", () => {
     expect(screen.getByRole("heading", { name: "For" })).toBeTruthy();
     const all = screen.getByRole("link", { name: "Read all 9 speeches on this bill" });
     expect(all.getAttribute("href")).toBe("/search?bill=4644&sort=oldest");
+  });
+  it("links a bill of the same name in another term", () => {
+    wrap(<SameNameCallout bill={{ same_name: [{ id: 9456, name: "Citizenship (Amendment) Bill", year: 2019, term: 16, side: "previous" }] }} />);
+    expect(screen.getByText(/A different bill with the same name was debated in the 16th Lok Sabha/)).toBeTruthy();
+    expect(screen.getByRole("link", { name: "Read it here" }).getAttribute("href")).toBe("/bill/9456");
+  });
+
+  it("shows no callout when no bill shares the name", () => {
+    const { container } = wrap(<SameNameCallout bill={{ same_name: [] }} />);
+    expect(container.textContent).toBe("");
   });
 });

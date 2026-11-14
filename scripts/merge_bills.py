@@ -3,7 +3,7 @@
 The merge:
 1. Exact: the same bill_key is the same bill. bill_extract.py already makes one bills row for each key.
 2. Candidates: two bills of the same year whose names have a pg_trgm similarity of MIN_SIMILARITY or more.
-3. Hard rules in code: a pair is never a candidate when the years differ, when the amendment numbers differ,
+3. Hard rules in code: a pair is never a candidate when the Lok Sabha terms differ, when the years differ, when the amendment numbers differ,
    when the digits in the two names differ ("No. 2" and "No. 3"), or when the ordinal words differ
    ("Second Amendment" and "Amendment").
 4. The decision model reads both names, their debate titles, and their summaries, and answers: same bill,
@@ -38,6 +38,7 @@ sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 
 from sqlalchemy import text
 
+from bill_extract import base_key, key_term
 from db import get_engine
 
 ROOT = Path(__file__).resolve().parent.parent
@@ -72,7 +73,12 @@ def number_marks(name: str) -> tuple[tuple[str, ...], tuple[str, ...]]:
 
 
 def blocked(a: dict, b: dict) -> str | None:
-    """Why the pair can never merge, or None. a and b hold name, year, and amendment_ordinal."""
+    """Why the pair can never merge, or None. a and b hold bill_key, name, year, and amendment_ordinal.
+
+    A bill does not continue into a new Lok Sabha, so two keys of different terms are two bills.
+    """
+    if key_term(a.get("bill_key")) != key_term(b.get("bill_key")):
+        return "term"
     if a["year"] != b["year"]:
         return "year"
     if (a.get("amendment_ordinal") or None) != (b.get("amendment_ordinal") or None):
@@ -169,6 +175,8 @@ def pick_kept(group: set[str], debates: dict[str, int], ids: dict[str, int]) -> 
 
 def apply_merges(conn) -> dict[str, int]:
     rows = [row for row in read_merges() if row["decision"] == "merge"]
+    crossed = [row for row in rows if key_term(row["key_a"]) != key_term(row["key_b"])]
+    rows = [row for row in rows if row not in crossed]
     info = conn.execute(text("""
         SELECT b.bill_key, b.id, count(d.id) FILTER (WHERE d.kept) AS n
         FROM bills b LEFT JOIN debate_bills d ON d.bill_id = b.id GROUP BY b.id
@@ -185,7 +193,54 @@ def apply_merges(conn) -> dict[str, int]:
         for key in group - {target}:
             conn.execute(text("UPDATE bills SET merged_into = :t WHERE id = :id"), {"t": ids[target], "id": ids[key]})
             merged += 1
-    return {"merge rows": len(rows), "bills merged into another": merged, "groups with a missing key": missing}
+    linked = link_terms(conn)
+    return {"merge rows": len(rows), "merge rows of two terms (skipped)": len(crossed),
+            "bills merged into another": merged, "groups with a missing key": missing,
+            "bills linked to a bill of the next term": linked}
+
+
+def next_links(bills: list[dict], merge_pairs: list[tuple[str, str]]) -> dict[int, int]:
+    """{earlier kept id: later kept id} for two bills of the same name in adjacent terms.
+
+    bills holds one dict for each bills row: id, kept_id, bill_key, year. Two kept bills link when their terms
+    are adjacent, their years are equal, and one of their rows has the same name key as a row of the other,
+    or the merge file has a "merge" answer for a pair of their rows. A bill with two or more candidates in
+    the next term gets no link, because the link would be a guess.
+    """
+    kept = {}
+    for b in bills:
+        key = kept.setdefault(b["kept_id"], {"term": None, "year": b["year"], "keys": set()})
+        key["keys"].add(b["bill_key"])
+        if b["id"] == b["kept_id"]:
+            key["term"] = key_term(b["bill_key"])
+    owner = {b["bill_key"]: b["kept_id"] for b in bills}
+    same = set()
+    for a, b in merge_pairs:
+        if a in owner and b in owner:
+            same.add((owner[a], owner[b]))
+            same.add((owner[b], owner[a]))
+    found: dict[int, set[int]] = {}
+    for earlier_id, earlier in kept.items():
+        for later_id, later in kept.items():
+            if earlier["term"] is None or later["term"] != earlier["term"] + 1 or earlier["year"] != later["year"]:
+                continue
+            if {base_key(key) for key in earlier["keys"]} & {base_key(key) for key in later["keys"]} or (earlier_id, later_id) in same:
+                found.setdefault(earlier_id, set()).add(later_id)
+    return {earlier_id: next(iter(later_ids)) for earlier_id, later_ids in found.items() if len(later_ids) == 1}
+
+
+def link_terms(conn) -> int:
+    """Sets bills.next_id on each kept bill that next_links finds. It calls no model."""
+    rows = conn.execute(text("""
+        SELECT b.id, coalesce(b.merged_into, b.id) AS kept_id, b.bill_key, b.year
+        FROM bills b WHERE EXISTS (SELECT 1 FROM debate_bills d WHERE d.bill_id = b.id AND d.kept)
+    """)).mappings().all()
+    pairs = [(r["key_a"], r["key_b"]) for r in read_merges() if r["decision"] == "merge"]
+    links = next_links([dict(r) for r in rows], pairs)
+    conn.execute(text("UPDATE bills SET next_id = NULL WHERE next_id IS NOT NULL"))
+    for i, j in links.items():
+        conn.execute(text("UPDATE bills SET next_id = :j WHERE id = :i"), {"i": i, "j": j})
+    return len(links)
 
 
 def judge(conn, workers: int) -> dict[str, int]:

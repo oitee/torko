@@ -5,6 +5,7 @@ A stance is what a member said in a speech. It is not a vote.
 """
 from sqlalchemy import text
 
+from bill_extract import key_term
 from pages.common import PARTY_AT_DATE, party_colours, speech_rows, tidy_title
 
 STANCES = ["for", "against", "mixed", "unclear"]
@@ -132,6 +133,14 @@ def bill_page(conn, bill_id, args=None):
         WHERE db.kept AND d.id = ANY(:ids) AND k.id <> :b ORDER BY k.year, k.name"""),
         {"ids": debate_ids, "b": kept}).mappings().all() if debate_ids else []
 
+    # A bill does not continue into a new Lok Sabha. A bill of the same name in the term before or after is
+    # a different bill with its own page. bills.next_id links the two.
+    same_name = conn.execute(text("""
+        SELECT id, name, year, bill_key, 'next' AS side FROM bills WHERE id = (SELECT next_id FROM bills WHERE id = :b)
+        UNION ALL
+        SELECT id, name, year, bill_key, 'previous' FROM bills WHERE next_id = :b AND merged_into IS NULL
+        ORDER BY bill_key"""), {"b": kept}).mappings().all()
+
     dates = sorted({debate["debate_date"] for debate in debates if debate["debate_date"]})
     colours = party_colours(conn)
     parties = party_rows(members)
@@ -158,6 +167,9 @@ def bill_page(conn, bill_id, args=None):
         "samples": [{**sample_rows[sid], "stance": stance} for stance, sid in samples if sid in sample_rows],
         "sample_rule": SAMPLE_RULE,
         "together": [{"id": joint["id"], "name": joint["name"], "year": joint["year"]} for joint in together],
+        "same_name": [{"id": other["id"], "name": other["name"], "year": other["year"], "term": key_term(other["bill_key"]),
+                       "side": other["side"]} for other in same_name],
+        "same_name_note": "A different bill with the same name in the Lok Sabha term before or after this one.",
         "counts_note": "speeches counts the speeches with a stance on this bill. speech_counts splits them by stance. "
                        "members and member_counts count identified members. A stance is what a member said, not a vote.",
     }

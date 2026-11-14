@@ -87,7 +87,7 @@ function BillFind({ bills }) {
           {found.map((b) => (
             <li key={b.id}>
               <Link to={`/bill/${b.id}`}>{fullName(b)}</Link>
-              <span className="bill-meta"> · {formatNumber(b.members)} members spoke</span>
+              <span className="bill-meta"> · {termShort(b.term)} · {formatNumber(b.members)} members spoke</span>
             </li>
           ))}
         </ul>
@@ -169,7 +169,7 @@ export function BillsChart({ bills, labels, minMembers, term = null, narrow = fa
           <div className={`bills-chart__pop bills-chart__pop--${side}`} role="status" aria-live="polite"
             style={{ left: `${(cx / W) * 100}%`, top: `${(top / H) * 100}%` }}>
             <strong>{fullName(hover)}</strong>
-            <div>{formatNumber(hover.members)} members · {countText(hover.counts)}</div>
+            <div>{termShort(hover.term)} · {formatNumber(hover.members)} members · {countText(hover.counts)}</div>
           </div>
         );
       })()}
@@ -189,7 +189,7 @@ function ShortList({ title, rule, ids, byId }) {
           <div key={id} className="bills-short__row">
             <Link to={`/bill/${id}`}>{fullName(b)}</Link>
             <StanceBar counts={b.counts} />
-            <div className="bill-meta">{formatNumber(b.members)} members · {countText(b.counts)}</div>
+            <div className="bill-meta">{termShort(b.term)} · {formatNumber(b.members)} members · {countText(b.counts)}</div>
           </div>
         );
       })}

@@ -24,7 +24,7 @@ function context(item) {
       return [item.seat_label || item.seat, terms].filter(Boolean).join(" · ");
     }
     case "bill":
-      return `${formatNumber(item.members)} members spoke`;
+      return [item.term && termShort(item.term), `${formatNumber(item.members)} members spoke`].filter(Boolean).join(" · ");
     default:
       return "";
   }

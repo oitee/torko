@@ -1,7 +1,7 @@
 import React, { useEffect, useId, useRef, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { getJSON } from "../assets/js/api.js";
-import { formatNumber } from "../assets/js/format.js";
+import { formatNumber, termShort } from "../assets/js/format.js";
 import Button from "./Button.jsx";
 import Popover from "./Popover.jsx";
 import "./SearchBox.css";
@@ -253,6 +253,7 @@ export default function SearchBox({ initial = "", buttonVariant = "primary", lab
                     >
                       <span className="search-box__suggestion-name">
                         {item.label || item.name}
+                        {item.kind === "bill" && item.term ? ` · ${termShort(item.term)}` : ""}
                       </span>
                       <span className="search-box__suggestion-count">
                         {countText}
