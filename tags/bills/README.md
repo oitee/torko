@@ -165,6 +165,29 @@ These are accepted misses. 57 debates now have no kept bill, out of 2,379.
 
 The review files are `results/judge_2026-11-13*.md`. The files without a number up to `_4` hold the four versions on the test set. `_5` holds the 13 other debates, and `_6` holds the full run.
 
+## Step 5: one row for each bill, and one summary for each bill (2026-11-13)
+
+`scripts/merge_bills.py` joins the spellings of one bill.
+
+1. Candidates: two kept bills of the same year whose names have a `pg_trgm` similarity of 0.6 or more. There were 961 such pairs.
+2. Hard rules in code remove a pair when the amendment numbers differ (50 pairs), when the digits in the names differ (418 pairs, for example "Appropriation (No. 2) Bill" and "Appropriation (No. 3) Bill"), or when the ordinal words differ (84 pairs, for example "Second Amendment" and "Amendment").
+3. The decision model reads both names, their debate titles, and their summaries for the other 409 pairs. A pair merges when "same" has a probability of 0.7 or more. 239 pairs merged.
+4. `data/bill_merges.tsv` holds every answer. `--apply` reads it and sets `bills.merged_into`, so a rebuild needs no model call. 232 bills went into another bill. 1,415 distinct kept bills remain.
+
+A manual review of the edge cases found the merges correct. They join spelling faults ("Inforamtion"), names without "Bill", and small word changes. The model kept apart the Appropriation bills of different States, and each amendment bill from its parent bill. A few pairs that are one bill stayed apart, for example "Motor Vehicles (Amendment) Bill" and "Motor Vehicles (Amendment)" at 0.53. Such a pair only stays as two rows.
+
+`--summaries` gives each kept bill its summary. 789 bills have one distinct summary, and the script copies it. 490 bills have two or more summaries from different debates. An LLM joins them with the prompt `prompts/merge_summary_v1.md`, which uses only the given summaries. `--join-sample 12` tested the prompt with `gemini-3.8-flash` on 12 bills, and a manual review found each joined summary faithful to its inputs.
+
+```bash
+set -a && source .env && set +a
+python3 scripts/merge_bills.py --candidates
+python3 scripts/merge_bills.py --judge
+python3 scripts/merge_bills.py --apply
+python3 scripts/merge_bills.py --summaries
+python3 scripts/merge_bills.py --join-sample 12
+```
+
 ## What is next
 
-1. Step 5: merge the spellings of one bill, then write one summary for each bill in `bills.summary`.
+1. Join the summaries of the remaining bills with two or more summaries.
+2. The stance of each speech on its bill.
