@@ -50,7 +50,7 @@ python3 scripts/extract_bills.py --all --workers 8
 
 - **name**: the printed name is in the input. Case, white space, and the type of quote marks and dashes do not matter.
 - **year**: the year is inside the printed name, or in the 12 characters after it.
-- **ordinal**: for a Constitution amendment bill, the number in words is inside the printed name.
+- **ordinal**: for a numbered Constitution amendment bill, the number in the printed name is the number of `amendment_ordinal`. The number can be in words or in digits, for example "One Hundred and Fourth" or "104 th". A name such as "Constitution (Scheduled Castes) Order (Amendment) Bill" amends an order, not the Constitution, so it has no number to check.
 - **quote**: the quote is in the input, and it holds the printed name.
 - **role**: the role is `moved` or `mentioned`.
 
@@ -100,6 +100,39 @@ The same 12 debates, with `--no-store`:
 | `gemini-3.8-flash`, `v1` (stored) | 12 | 25,860 | One summary adds "to fund public services". |
 | `gemini-flash-lite-latest`, `v1` | the same 12 | 0 | It listed no `mentioned` name. Two summaries are weak: one is vague, and one gives the reason of the minister. |
 | `gemini-3.8-flash`, `v2` | the same 12 | 11,988 | The outcomes are the same. The Finance Bill, 2026 summary no longer adds a fact. |
+
+## All debates (2026-11-13)
+
+Each of the 2,379 debates with text has an answer. 2,345 answers use prompt `v2`, and 34 use prompt `v1`. All of them use `gemini-3.8-flash`.
+
+The counts after the checks:
+
+| Count | Value | Counted over |
+|---|---|---|
+| Debates with at least one kept bill | 2,329 | 2,379 debates |
+| Debates with two or more kept bills | 51 | 2,379 debates |
+| Kept pairs of a debate and a bill | 2,396 | all names in the answers |
+| Kept pairs with no summary | 451 | 2,396 kept pairs |
+| Distinct bills (`bills` rows, before any merge) | 1,652 | |
+| Bills with two or more debates | 578 | 1,652 bills |
+| Debates with no kept bill | 50 | 2,379 debates |
+
+These counts show what the checks kept. They do not show that each kept bill is correct. A hand check of 100 random kept pairs measures that.
+
+**The 50 debates with no kept bill** are in `results/no_bill_2026-11-13_all.tsv`. A manual review put them in two groups:
+
+- About half have no moved bill. Examples: a debate on Demands for Supplementary Grants, a bill that the House deferred, a bill that the Secretary-General only laid on the Table, and a debate with a wrong type in the source.
+- About half have a moved bill that the year check dropped, because the text near the name gives no year. Examples: "Introduction of Patents (Amendment) Bill", and the Appropriation bills that give only a financial year, for example "for the year 2000-2001". The rule "no bill is better than a wrong bill" keeps them out. An outside list of bills can give their year later.
+
+**A fix of the ordinal check.** The first version of the check treated each name with "Constitution" and "Amendment" as an amendment of the Constitution. It dropped 63 names such as "Constitution (Scheduled Castes) Order (Amendment) Bill, 2012", and 8 other names. 5 of them are "Sixth Schedule to the Constitution (Amendment) Bill", 2 are "Constitution (Amendment) Bill" with no number, and 1 has the number in digits ("107 th"). `scripts/recheck_bills.py` applied the new check to the stored answers with no model call. The kept pairs went from 2,325 to 2,396.
+
+```bash
+set -a && source .env && set +a
+python3 scripts/recheck_bills.py            # dry run
+python3 scripts/recheck_bills.py --commit
+```
+
+**A known risk for the merge step.** Two different bills can have the same name and year when the name has no number, for example "Constitution (Amendment) Bill, 2000". Such bills get the same `bill_key`, so the exact-key merge joins them. 2 kept names have this form today.
 
 ## What is next
 

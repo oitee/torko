@@ -174,3 +174,49 @@ def test_a_different_year_or_amendment_number_gives_a_different_key():
 
 def test_key_drops_a_leading_the_and_punctuation():
     assert be.bill_key("The Delimitation Bill", 2026) == be.bill_key("Delimitation  Bill", 2026) == "delimitationbill-2026"
+
+
+# ---------------------------------------------------------------- the amendment number
+
+ORDER_BODY = ("Title: Constitution (Scheduled Castes) Order (Amendment) Bill, 2012\n"
+              "Minister: I beg to move that the Constitution (Scheduled Castes) Order (Amendment) Bill, 2012 "
+              "be taken into consideration.\n"
+              "Minister: I beg to move that the Constitution (104 th Amendment ) Bill, 2005 be taken into consideration.\n")
+
+
+def test_an_amendment_of_a_presidential_order_needs_no_amendment_number():
+    # Real case: LS15-14-9972. The old rule dropped 63 such names because the name holds "Constitution".
+    b = bill(printed="Constitution (Scheduled Castes) Order (Amendment) Bill, 2012",
+             name="Constitution (Scheduled Castes) Order (Amendment) Bill", year=2012,
+             quote="the Constitution (Scheduled Castes) Order (Amendment) Bill, 2012 be taken")
+    bills, _ = be.check_answer(answer(b), ORDER_BODY)
+    assert bills[0]["kept"] and bills[0]["amendment_ordinal"] is None
+
+
+def test_an_amendment_number_in_digits_matches_the_words_of_the_answer():
+    b = bill(printed="Constitution (104 th Amendment ) Bill, 2005", name="Constitution (104th Amendment) Bill",
+             year=2005, amendment_ordinal="one hundred and fourth",
+             quote="the Constitution (104 th Amendment ) Bill, 2005 be taken")
+    bills, _ = be.check_answer(answer(b), ORDER_BODY)
+    assert bills[0]["kept"]
+    wrong, _ = be.check_answer(answer({**b, "amendment_ordinal": "one hundred and fifth"}), ORDER_BODY)
+    assert wrong[0]["checks_failed"] == ["ordinal"]
+
+
+@pytest.mark.parametrize("printed, number", [
+    ("Constitution (One Hundred and Twenty-Third) Amendment Bill, 2017", 123),
+    ("Constitution (One Hundredth Amendment) Act, 2015", 100),
+    ("Constitution (Second Amendment) Bill", 2),
+    ("The Constitution (One Hundred and Thirty-First Amendment) Bill, 2026", 131),
+])
+def test_the_amendment_number_is_read_from_the_printed_name(printed, number):
+    assert be.ordinal_number(be.amendment_number_text(printed)) == number
+
+
+@pytest.mark.parametrize("printed", [
+    "Constitution (Scheduled Tribes) Order (Second Amendment) Bill, 2022",
+    "Sixth Schedule to the Constitution (Amendment) Bill, 2003",
+    "Constitution (Jammu and Kashmir) Scheduled Tribes Order (Amendment) Bill, 2023",
+])
+def test_a_name_with_no_amendment_number_gives_none(printed):
+    assert be.amendment_number_text(printed) is None

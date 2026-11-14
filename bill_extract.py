@@ -195,9 +195,47 @@ def year_near(year, printed: str, body: str) -> bool:
     return False
 
 
-def is_constitution_amendment(name: str) -> bool:
-    n = norm(name)
-    return "constitution" in n and "amendment" in n
+# The text between "Constitution (" and "Amendment", for example "One Hundred and Twenty-Third" in
+# "Constitution (One Hundred and Twenty-Third Amendment) Bill" or "Constitution (104 th) Amendment Bill".
+# "Constitution (Scheduled Castes) Order (Amendment) Bill" does not match: it amends an order, not the Constitution.
+_AMENDMENT = re.compile(r"constitution\w*\s*\(\s*([^()]*?)\s*\)?\s*amendment\b", re.IGNORECASE)
+
+_NUMBER_WORDS = {}
+for _i, (_card, _ord) in enumerate(zip(
+        "one two three four five six seven eight nine ten eleven twelve thirteen fourteen fifteen sixteen "
+        "seventeen eighteen nineteen".split(),
+        "first second third fourth fifth sixth seventh eighth ninth tenth eleventh twelfth thirteenth fourteenth "
+        "fifteenth sixteenth seventeenth eighteenth nineteenth".split()), 1):
+    _NUMBER_WORDS[_card] = _NUMBER_WORDS[_ord] = _i
+for _i, (_card, _ord) in enumerate(zip("twenty thirty forty fifty sixty seventy eighty ninety".split(),
+                                       "twentieth thirtieth fortieth fiftieth sixtieth seventieth eightieth "
+                                       "ninetieth".split()), 2):
+    _NUMBER_WORDS[_card] = _NUMBER_WORDS[_ord] = _i * 10
+
+
+def ordinal_number(value: str | None) -> int | None:
+    """The number of an ordinal in words or digits: 'one hundred and fourth' and '104 th' give 104."""
+    text_ = norm(value).replace("-", " ")
+    digits = re.fullmatch(r"(\d+)\s*(st|nd|rd|th)?", text_)
+    if digits:
+        return int(digits.group(1))
+    total = 0
+    for word in text_.split():
+        if word == "and":
+            continue
+        if word in ("hundred", "hundredth"):
+            total = (total or 1) * 100
+        elif word in _NUMBER_WORDS:
+            total += _NUMBER_WORDS[word]
+        else:
+            return None
+    return total or None
+
+
+def amendment_number_text(printed: str) -> str | None:
+    """The number text of a numbered Constitution amendment in the printed name, or None."""
+    m = _AMENDMENT.search(printed or "")
+    return m.group(1).strip() if m and m.group(1).strip() else None
 
 
 def check_bill(bill: dict, body: str) -> tuple[dict, list[str]]:
@@ -216,10 +254,13 @@ def check_bill(bill: dict, body: str) -> tuple[dict, list[str]]:
         failed.append("name")
     if not name or not year_near(bill.get("year"), printed, body):
         failed.append("year")
-    if is_constitution_amendment(name) and (ordinal is None or ordinal not in norm(printed)):
-        failed.append("ordinal")
-    if not is_constitution_amendment(name):
+    # A numbered Constitution amendment needs the same number in the printed name and in the answer.
+    # Any other bill keeps no ordinal.
+    number_text = amendment_number_text(printed)
+    if number_text is None:
         ordinal = None
+    elif ordinal is None or ordinal_number(ordinal) is None or ordinal_number(ordinal) != ordinal_number(number_text):
+        failed.append("ordinal")
     if not quote or norm(quote) not in body_norm or norm(printed) not in norm(quote):
         failed.append("quote")
     if role not in ROLES:
@@ -306,3 +347,34 @@ def check_and_store(conn, debate: dict, answer: dict, model: str, prompt_version
                "printed": bill["printed"], "quote": bill["quote"], "role": bill["role"], "summary": bill["summary"],
                "failed": bill["checks_failed"], "found": bill["name_found"], "kept": bill["kept"]})
     return bills, warnings
+
+
+def recheck_stored(conn) -> dict[str, int]:
+    """Applies the checks again to every stored answer. It calls no model.
+
+    The model, the prompt version, and the tokens of each row stay the same. A debate whose input text
+    has another hash today is skipped, because the stored answer is for the old text.
+    After the run, a bills row that no debate_bills row uses any more is deleted.
+    """
+    rows = conn.execute(text("""
+        SELECT e.loksabha, e.session, e.dbslno, m.name AS model, e.prompt_version, e.input_sha256,
+               e.raw, e.tokens
+        FROM bill_extractions e JOIN models m ON m.id = e.model_id
+        ORDER BY e.loksabha, e.session, e.dbslno
+    """)).mappings().all()
+    counts = {"rechecked": 0, "input changed, skipped": 0, "kept before": 0, "kept after": 0}
+    counts["kept before"] = conn.execute(text("SELECT count(*) FROM debate_bills WHERE kept")).scalar()
+    for row in rows:
+        debate = build_input(conn, (row["loksabha"], row["session"], row["dbslno"]))
+        if debate is None or debate["input_sha256"] != row["input_sha256"]:
+            counts["input changed, skipped"] += 1
+            continue
+        check_and_store(conn, debate, row["raw"], row["model"], row["prompt_version"], row["tokens"], replace=True)
+        counts["rechecked"] += 1
+    counts["kept after"] = conn.execute(text("SELECT count(*) FROM debate_bills WHERE kept")).scalar()
+    counts["unused bills deleted"] = conn.execute(text("""
+        DELETE FROM bills b
+        WHERE NOT EXISTS (SELECT 1 FROM debate_bills d WHERE d.bill_id = b.id)
+          AND NOT EXISTS (SELECT 1 FROM bills x WHERE x.merged_into = b.id)
+    """)).rowcount
+    return counts
