@@ -240,6 +240,8 @@ Add the `--summary-only` flag to hide the per-turn previews.
 
 **1. Semantic search.** Today, search matches exact words. The next step after tags is search by meaning. A query such as "water scarcity in rural districts" will also find speeches that use other words for the same idea. Each speech of 100 words or more will be converted into an embedding. There are 97,043 such speeches. PostgreSQL will store the embeddings with the `pgvector` extension. One query will combine meaning, exact words, and filters such as party and year. Each result will link to the official source.
 
+**2. Bills, then the stance of each speech.** Torko will link each government-bill debate to the bill or bills that the House considered in it. There are 2,381 such debates. An LLM reads the start and the end of each debate. It copies each bill name from the text, and it writes 2 or 3 sentences on what the bill does. A script then checks each name and each year against the text. A name that is not in the text is not kept. The next step uses the bill summary as context to find whether each speech is for or against its bill. `tags/bills/README.md` describes the step and its first results.
+
 **Ideas we may explore after these steps.** We may pick the following based on what the first two steps show.
 
 - **Connections between topics and members.** Torko already records which member spoke in which debate, and who interrupted whom. Speech-level tags will add a new layer to these links. Then Torko can answer questions such as "Which members raised both coastal erosion and cyclone relief?"
