@@ -38,6 +38,9 @@ tags/near_duplicates/REVIEW_GUIDE.md
 # subject groups: scripts/subject_groups.py and scripts/subject_join.py rebuild the run outputs.
 # The LLM join answers that cost a model run live in tags/subject_groups/data/.
 tags/subject_groups/results/*
+
+# bills: the review files and the lists for a manual look. The database holds the answers.
+tags/bills/results/
 # labels and ratings of the blind reviews that chose the settings
 tags/subject_groups/eval/
 

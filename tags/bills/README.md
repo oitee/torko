@@ -77,6 +77,8 @@ A debate is named by its natural key (`loksabha`, `session`, `dbslno`), not by `
 | `results/review_<date>_<model>_not_stored.md` | The review file of a `--no-store` run. |
 | `results/no_bill_<date>.tsv` | The debates with no kept bill, for a manual look. |
 
+Git does not track `results/`. The scripts write the files again from the database or from a new run.
+
 ## The first sample (2026-11-13)
 
 `--sample 12` with `gemini-3.8-flash` and prompt `v1` asked 12 debates, 2 from each term. The run used about 77,500 input tokens, 3,700 output tokens, and 25,900 thinking tokens.
@@ -119,7 +121,7 @@ The counts after the checks:
 
 These counts show what the checks kept. They do not show that each kept bill is correct. A hand check of 100 random kept pairs measures that.
 
-**The 50 debates with no kept bill** are in `results/no_bill_2026-11-13_all.tsv`. A manual review put them in two groups:
+**The 50 debates with no kept bill** were in `results/no_bill_2026-11-13_all.tsv`. A manual review put them in two groups:
 
 - About half have no moved bill. Examples: a debate on Demands for Supplementary Grants, a bill that the House deferred, a bill that the Secretary-General only laid on the Table, and a debate with a wrong type in the source.
 - About half have a moved bill that the year check dropped, because the text near the name gives no year. Examples: "Introduction of Patents (Amendment) Bill", and the Appropriation bills that give only a financial year, for example "for the year 2000-2001". The rule "no bill is better than a wrong bill" keeps them out. An outside list of bills can give their year later.
@@ -163,7 +165,7 @@ python3 scripts/judge_bills.py --rethreshold --keep-p 0.6
 
 These are accepted misses. 57 debates now have no kept bill, out of 2,379.
 
-The review files are `results/judge_2026-11-13*.md`. The files without a number up to `_4` hold the four versions on the test set. `_5` holds the 13 other debates, and `_6` holds the full run.
+The review files were `results/judge_2026-11-13*.md`, which git does not track. The files without a number up to `_4` hold the four versions on the test set. `_5` holds the 13 other debates, and `_6` holds the full run.
 
 ## Step 5: one row for each bill, and one summary for each bill (2026-11-13)
 
