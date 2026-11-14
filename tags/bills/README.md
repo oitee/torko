@@ -187,7 +187,8 @@ python3 scripts/merge_bills.py --summaries
 python3 scripts/merge_bills.py --join-sample 12
 ```
 
+**The result.** All 490 bills with two or more summaries have a joined summary from `gemini-3.8-flash` with `merge_summary_v1`. 1,279 of the 1,415 distinct kept bills now have a summary: 789 copied, and 490 joined. 136 bills have no summary, because no debate of the bill says what it does. A manual review of 4 random joined summaries found each one faithful to its inputs.
+
 ## What is next
 
-1. Join the summaries of the remaining bills with two or more summaries.
-2. The stance of each speech on its bill.
+1. The stance of each speech on its bill.
