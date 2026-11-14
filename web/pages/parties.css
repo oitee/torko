@@ -1,0 +1,289 @@
+/* Parties index. One Lok Sabha shows at a time. The party colour is used only on the marks of the charts and on the top edge of a card. */
+
+.parties-pc {
+  --party-colour: var(--pc-light, var(--control));
+}
+
+:root[data-theme="dark"] .parties-pc {
+  --party-colour: var(--pc-dark, var(--control));
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) .parties-pc {
+    --party-colour: var(--pc-dark, var(--control));
+  }
+}
+
+.visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
+.parties-lede {
+  margin: 0 0 var(--space-4);
+  max-width: 62ch;
+  color: var(--ink-2);
+}
+
+/* The term block: one frame holds the term chips and the three charts that the term changes. */
+.parties-term {
+  border: 1px solid var(--control);
+}
+
+.parties-term__head {
+  padding: var(--space-4);
+  background: var(--sheet);
+  border-bottom: 1px solid var(--hairline);
+}
+
+.parties-term__head .index-section-title {
+  margin: 0 0 var(--space-3);
+}
+
+.parties-term__head .parties-note {
+  margin: 0;
+}
+
+.parties-term__years {
+  font-weight: 400;
+  color: var(--ink-2);
+}
+
+.parties-term__body {
+  padding: var(--space-4);
+}
+
+.parties-term__grid {
+  margin-top: var(--space-8);
+}
+
+.parties-terms {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+  margin-bottom: var(--space-3);
+}
+
+.parties-terms .chip--selected {
+  background: var(--ink);
+  color: var(--sheet);
+}
+
+.parties-note {
+  margin: 0 0 var(--space-3);
+  max-width: 66ch;
+  font-size: var(--size-label);
+  line-height: var(--lh-label);
+  color: var(--ink-2);
+}
+
+.index-body > section + section {
+  margin-top: var(--space-10);
+}
+
+.index-body section > .index-section-title,
+.parties-term__grid .index-section-title,
+.parties-two .index-section-title {
+  margin: 0 0 var(--space-1);
+}
+
+/* The House and the bars sit side by side on a wide screen. */
+.parties-two {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(290px, 100%), 1fr));
+  gap: var(--space-8);
+  align-items: start;
+}
+
+.parties-house {
+  display: block;
+  width: 100%;
+  max-width: 480px;
+}
+
+.parties-house__group circle {
+  fill: var(--party-colour);
+}
+
+.parties-house__group:hover circle,
+.parties-house__group:focus-visible circle {
+  stroke: var(--ink);
+  stroke-width: 1;
+}
+
+.parties-shares {
+  list-style: none;
+  margin: 0 0 var(--space-3);
+  padding: 0;
+}
+
+.parties-shares__row {
+  display: grid;
+  grid-template-columns: minmax(64px, max-content) minmax(0, 1fr) max-content;
+  gap: var(--space-3);
+  align-items: center;
+  padding: var(--space-1) 0;
+  font-size: var(--size-label);
+}
+
+.parties-shares__name {
+  max-width: 9rem;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.parties-shares__bars {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.parties-shares__bar {
+  height: 8px;
+  background: var(--party-colour);
+}
+
+.parties-shares__bar--speeches {
+  opacity: 0.5;
+}
+
+.parties-shares__num {
+  color: var(--ink-2);
+  font-size: var(--size-count);
+  text-align: right;
+}
+
+/* The grid scrolls sideways on a narrow screen, so each value stays readable. */
+/* The frame is the anchor of the hidden text of the cells, so that text scrolls with the grid. */
+.parties-grid-frame {
+  position: relative;
+  overflow-x: auto;
+}
+
+.parties-grid {
+  width: 100%;
+  min-width: 560px;
+  border-collapse: separate;
+  border-spacing: 2px;
+  table-layout: fixed;
+}
+
+.parties-grid th:first-child {
+  width: 9rem;
+}
+
+.parties-grid thead th {
+  padding: var(--space-1);
+  font-size: var(--size-count);
+  font-weight: 400;
+  color: var(--ink-2);
+  vertical-align: bottom;
+}
+
+.parties-grid tbody th {
+  padding-right: var(--space-2);
+  font-size: var(--size-label);
+  font-weight: 400;
+  text-align: left;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.parties-grid__cell {
+  padding: var(--space-2) var(--space-1);
+  text-align: center;
+  font-size: var(--size-count);
+  color: var(--ink-2);
+  background: var(--sheet);
+}
+
+.parties-key__box {
+  display: inline-block;
+  width: 10px;
+  height: 10px;
+  margin-right: var(--space-1);
+  vertical-align: -1px;
+  background: var(--sheet);
+  border: 1px solid var(--hairline);
+}
+
+.parties-grid__cell--more,
+.parties-key__box--more {
+  background: color-mix(in srgb, var(--action) 28%, var(--sheet));
+  color: var(--ink);
+}
+
+.parties-grid__cell--much,
+.parties-key__box--much {
+  background: var(--action);
+  color: var(--sheet);
+}
+
+.parties-grid__cell--empty,
+.parties-key__box--empty {
+  background: none;
+  border: 1px dashed var(--control);
+}
+
+.parties-key {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-1) var(--space-4);
+  margin-top: var(--space-2);
+  font-size: var(--size-count);
+  color: var(--ink-2);
+}
+
+.parties-cards {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(min(15rem, 100%), 1fr));
+  gap: var(--space-3);
+}
+
+.parties-card {
+  min-width: 0;
+  padding: var(--space-3) var(--space-4);
+  border: 1px solid var(--hairline);
+  border-top: 3px solid var(--party-colour);
+  background: var(--sheet);
+}
+
+.parties-card__name {
+  font-weight: 500;
+}
+
+.parties-card__meta {
+  margin: 0;
+  font-size: var(--size-count);
+  line-height: var(--lh-count);
+  color: var(--ink-2);
+}
+
+.parties-foot {
+  margin-top: var(--space-3);
+}
+
+/* The body is a flex item. Without this, the wide grid makes the whole page scroll sideways on a phone. */
+.index-body {
+  min-width: 0;
+}
+
+@media (max-width: 560px) {
+  .parties-grid th:first-child {
+    width: 6rem;
+  }
+
+  .parties-shares__name {
+    max-width: 6rem;
+  }
+}

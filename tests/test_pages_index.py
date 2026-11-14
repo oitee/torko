@@ -42,3 +42,31 @@ def test_party_weights_real(page_conn):
             h = house[p["term"]]
             assert abs(p["weight"] - (p["speeches"] / p["members"]) / (h["speeches"] / h["members"])) < 0.001
     assert "weights_rule" in d
+
+
+def test_party_terms_real(page_conn):
+    d = parties.parties_page(page_conn, {})
+    assert [t["term"] for t in d["terms"]] == [t["term"] for t in d["weights"]["terms"]]
+    for t in d["terms"]:
+        rows = t["parties"]
+        # The stated order: members of the term, most first.
+        assert [r["members"] for r in rows] == sorted((r["members"] for r in rows), reverse=True)
+        # The members and the speeches of the parties add up to the totals of the term.
+        assert sum(r["members"] for r in rows) == t["members"] and sum(r["speeches"] for r in rows) == t["speeches"]
+        # A by-election adds a member, so a term has 543 members or a few more. It never has far more.
+        assert 543 <= t["members"] < 620
+        assert all(len(r["typical"]) <= parties.CARD_SUBJECTS for r in rows)
+        grid = t["grid"]
+        assert [r["code"] for r in grid["rows"]] == [r["code"] for r in rows[: parties.GRID_PARTIES]]
+        assert len(grid["areas"]) == parties.GRID_DOMAINS and parties.PROCEDURE not in [a["name"] for a in grid["areas"]]
+        for r in grid["rows"]:
+            for area, c in zip(grid["areas"], r["cells"]):
+                assert (c["lift"] is None) == (c["n"] < parties.GRID_MIN_SPEECHES)
+                if c["lift"] is not None:
+                    assert abs(c["lift"] - (c["n"] / r["tagged"]) / (area["speeches"] / t["tagged"])) < 0.006
+
+
+def test_area_cell():
+    # 30 of 100 speeches of the party against 150 of 1,000 of the House: the party gives the area twice the share.
+    assert parties.area_cell(30, 100, 150, 1000) == {"n": 30, "lift": 2.0}
+    assert parties.area_cell(19, 100, 150, 1000) == {"n": 19, "lift": None}
