@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { peakYear, yearSeries } from "../assets/js/years.js";
-import { speechCount, termYears } from "../assets/js/format.js";
+import { memberCount, speechCount, termYears } from "../assets/js/format.js";
 
 describe("yearSeries", () => {
   it("sorts the years and divides the speeches by the tagged speeches", () => {
@@ -20,6 +20,8 @@ describe("format helpers", () => {
   it("names the count of speeches and the years of a term", () => {
     expect(speechCount(1)).toBe("1 speech");
     expect(speechCount(1234)).toBe("1,234 speeches");
+    expect(memberCount(1)).toBe("1 member");
+    expect(memberCount(1234)).toBe("1,234 members");
     expect([13, 14, 18, 99].map(termYears)).toEqual(["1999–2004", "2004–09", "2024–", ""]);
   });
 });

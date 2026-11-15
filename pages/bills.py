@@ -7,10 +7,10 @@ from collections import defaultdict
 
 from sqlalchemy import text
 
-from pages.bill import STANCES, member_stance, stance_counts
+from pages.bill import SMALL_BILL_MEMBERS, STANCES, member_stance, stance_counts
 from pages.common import cached, slug, speech_tags_cte
 
-CHART_MIN_MEMBERS = 5
+CHART_MIN_MEMBERS = SMALL_BILL_MEMBERS  # A bill page with fewer members shows no charts.
 OPPOSED_MIN_MEMBERS = 10
 SHORT_LIST = 5
 TAGS_PER_BILL = 5

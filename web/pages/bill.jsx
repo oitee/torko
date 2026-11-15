@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { Link, useNavigate, useParams } from "react-router-dom";
 import { useAnswer } from "../assets/js/useApi.js";
-import { formatDateLong, formatNumber, termLong } from "../assets/js/format.js";
+import { formatDateLong, formatNumber, memberCount, termLong } from "../assets/js/format.js";
 import Breadcrumb from "../components/Breadcrumb.jsx";
 import PageLayout from "../components/PageLayout.jsx";
 import PartyLink from "../components/PartyLink.jsx";
@@ -58,7 +58,7 @@ export function BillMembers({ bill }) {
   return (
     <Section title="Where the members stood">
       <p className="bill-meta">
-        {formatNumber(bill.members)} members spoke on this bill. Each member counts one time. A spoken stance is not a vote.
+        {memberCount(bill.members)} spoke on this bill. Each member counts one time. A spoken stance is not a vote.
       </p>
       <StanceBar counts={c} />
       <div className="bill-figures bill-figures--four">
@@ -199,6 +199,44 @@ export function BillReasons({ bill }) {
   );
 }
 
+// The link to the full list of speeches on the bill.
+export function readAllText(n) {
+  return n === 1 ? "Read the speech on this bill" : `Read all ${formatNumber(n)} speeches on this bill`;
+}
+
+function ReadAll({ bill }) {
+  return <Link className="bill-readall" to={`/search?bill=${bill.id}&sort=oldest`}>{readAllText(bill.speeches)}</Link>;
+}
+
+// One speech card: the member, the party, the seat, the date, the summary, and a link. stanceLabel adds the stance.
+function SpeechCard({ s, stanceLabel }) {
+  return (
+    <article className={`bill-sample bill-sample--${s.stance}`}>
+      <div className="bill-sample__who">
+        {s.member_id ? <Link to={`/member/${s.member_id}`}>{s.member}</Link> : s.printed}
+        <span className="bill-meta"> · {[stanceLabel && `${STANCE_LABELS[s.stance][0].toUpperCase()}${STANCE_LABELS[s.stance].slice(1)}`,
+          s.party, s.seat, s.date && formatDateLong(s.date)].filter(Boolean).join(" · ")}</span>
+      </div>
+      {s.summary && <p className="bill-sample__summary">{s.summary}</p>}
+      <Link to={`/speech/${s.id}`}>Read the speech</Link>
+    </article>
+  );
+}
+
+// A bill with few members: every speech in the order of the debate, with its stance. No charts.
+export function BillAllSpeeches({ bill }) {
+  const list = bill.samples || [];
+  if (!list.length) return null;
+  return (
+    <Section title={list.length === 1 ? "The speech" : "The speeches"} id="speeches">
+      <p className="bill-meta">{bill.sample_rule}</p>
+      <div className="bill-samples">
+        {list.map((s) => <SpeechCard key={s.id} s={s} stanceLabel />)}
+      </div>
+    </Section>
+  );
+}
+
 // The sample speeches in one group for each stance, in the order of SAMPLE_ORDER.
 const SAMPLE_ORDER = ["for", "against", "mixed"];
 
@@ -212,23 +250,12 @@ export function BillSamples({ bill }) {
           <div key={stance} className="bill-sample-group">
             <h3 className="bill-sample-group__title"><span className={`bill-key bill-stance--${stance}`} />{STANCE_LABELS[stance][0].toUpperCase() + STANCE_LABELS[stance].slice(1)}</h3>
             <div className="bill-samples">
-              {list.map((s) => (
-                <article key={s.id} className={`bill-sample bill-sample--${s.stance}`}>
-                  <div className="bill-sample__who">
-                    {s.member_id ? <Link to={`/member/${s.member_id}`}>{s.member}</Link> : s.printed}
-                    <span className="bill-meta"> · {[s.party, s.seat, s.date && formatDateLong(s.date)].filter(Boolean).join(" · ")}</span>
-                  </div>
-                  {s.summary && <p className="bill-sample__summary">{s.summary}</p>}
-                  <Link to={`/speech/${s.id}`}>Read the speech</Link>
-                </article>
-              ))}
+              {list.map((s) => <SpeechCard key={s.id} s={s} />)}
             </div>
           </div>
         ))}
       </div>
-      <Link className="bill-readall" to={`/search?bill=${bill.id}&sort=oldest`}>
-        Read all {formatNumber(bill.speeches)} speeches on this bill
-      </Link>
+      <ReadAll bill={bill} />
     </Section>
   );
 }
@@ -266,8 +293,8 @@ export default function Bill() {
       <h1 className="bill-head__title">{title}</h1>
       <div className="bill-figures bill-figures--four">
         <div><div className="bill-num">{formatNumber(bill.debates.length)}</div><div className="bill-meta">{bill.debates.length === 1 ? "debate" : "debates"}</div></div>
-        <div><div className="bill-num">{formatNumber(bill.speeches)}</div><div className="bill-meta">speeches</div></div>
-        <div><div className="bill-num">{formatNumber(bill.members)}</div><div className="bill-meta">members spoke</div></div>
+        <div><div className="bill-num">{formatNumber(bill.speeches)}</div><div className="bill-meta">{bill.speeches === 1 ? "speech" : "speeches"}</div></div>
+        <div><div className="bill-num">{formatNumber(bill.members)}</div><div className="bill-meta">{bill.members === 1 ? "member spoke" : "members spoke"}</div></div>
         <div><div className="bill-num">{formatNumber(bill.days)}</div><div className="bill-meta">{bill.days === 1 ? "day of debate" : "days of debate"}</div></div>
       </div>
       <p className="bill-meta">{[bill.terms.map(termLong).join(", "), dateRange(bill.first_date, bill.last_date)].filter(Boolean).join(" · ")}</p>
@@ -285,10 +312,16 @@ export default function Bill() {
               <p className="bill-meta">{bill.summary_note}</p>
             </Section>
           )}
-          {bill.members > 0 && <BillMembers bill={bill} />}
-          <BillParties bill={bill} />
-          <BillReasons bill={bill} />
-          <BillSamples bill={bill} />
+          {bill.small ? (
+            <BillAllSpeeches bill={bill} />
+          ) : (
+            <>
+              {bill.members > 0 && <BillMembers bill={bill} />}
+              <BillParties bill={bill} />
+              <BillReasons bill={bill} />
+              <BillSamples bill={bill} />
+            </>
+          )}
           <Section title="The debates">
             <ul className="bill-debates">
               {bill.debates.map((d) => (

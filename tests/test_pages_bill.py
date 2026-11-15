@@ -63,6 +63,18 @@ def test_a_sample_member_must_have_the_stance_of_the_speech_and_shows_one_time()
     assert sample_ids(rows, members) == [("for", 7), ("against", 3), ("mixed", 5)]
 
 
+def test_a_bill_with_few_members_lists_every_speech_with_no_charts(page_conn):
+    # The Indian Trusts (Amendment) Bill, 2009: one member made one speech.
+    b = bill_page(page_conn, 3279)
+    if b is None:
+        return
+    assert b["small"] and b["members"] < 5
+    assert len(b["samples"]) == b["speeches"]
+    big = bill_page(page_conn, 4642)
+    if big is not None:
+        assert not big["small"]
+
+
 def test_bill_filter_on_speech_list():
     f, bad = parse_args(None, {"bill": "4644"})
     assert bad is None and "bill" in conditions(f)

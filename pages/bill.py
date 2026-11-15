@@ -18,6 +18,7 @@ REASON_SIDES = ["for", "against"]
 TOP_REASONS = 5
 MIN_REASON_MEMBERS = 2
 OTHERS_ROW_MIN_SHARED = 4  # A side needs this many reasons of 2 or more members before its one-member points go to one row.
+SMALL_BILL_MEMBERS = 5  # The chart of the bills list uses the same limit.
 
 MEMBER_RULE = (
     "Each member counts one time. A member with a for speech and an against speech is mixed. "
@@ -34,6 +35,12 @@ SAMPLE_RULE = (
     "is the same as the stance of the speech. A for or against speech must make no point on the other side. "
     "The speeches with the most points on their side come first, then the longest. "
     "Mixed speeches have no points, so the longest come first."
+)
+
+
+SMALL_BILL_RULE = (
+    f"Fewer than {SMALL_BILL_MEMBERS} members spoke on this bill, so the page shows no charts. "
+    "It shows every speech with a stance on the bill, in the order of the debate."
 )
 
 
@@ -199,7 +206,8 @@ def bill_page(conn, bill_id, args=None):
                  other=row["n_for"] if row["stance"] == "against" else row["n_against"]) for row in rows]
 
     members = members_of(rows)
-    samples = sample_ids(rows, members)
+    small = len(members) < SMALL_BILL_MEMBERS
+    samples = [(row["stance"], row["speech_id"]) for row in rows] if small else sample_ids(rows, members)
     sample_rows = {row["id"]: row for row in speech_rows(conn, [sid for _, sid in samples], with_tags=False)}
 
     together = conn.execute(text("""
@@ -252,7 +260,8 @@ def bill_page(conn, bill_id, args=None):
         "parties": parties,
         "party_rule": PARTY_RULE,
         "samples": [{**sample_rows[sid], "stance": stance} for stance, sid in samples if sid in sample_rows],
-        "sample_rule": SAMPLE_RULE,
+        "sample_rule": SMALL_BILL_RULE if small else SAMPLE_RULE,
+        "small": small,
         "reasons": reasons,
         "reason_others": reason_others,
         "reason_rule": REASON_RULE,

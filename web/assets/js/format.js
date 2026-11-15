@@ -108,6 +108,11 @@ export function speechCount(n) {
   return n === 1 ? "1 speech" : `${formatNumber(n)} speeches`;
 }
 
+// A count of members with its noun, for example "1 member" or "12 members".
+export function memberCount(n) {
+  return n === 1 ? "1 member" : `${formatNumber(n)} members`;
+}
+
 // The first and last year of each Lok Sabha term. The newest term has no last year yet.
 export const TERM_SPANS = { 13: [1999, 2004], 14: [2004, 2009], 15: [2009, 2014], 16: [2014, 2019], 17: [2019, 2024], 18: [2024, null] };
 

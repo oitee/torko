@@ -3,7 +3,7 @@ import { MemoryRouter } from "react-router-dom";
 import { cleanup, render, screen } from "@testing-library/react";
 import { afterEach, describe, expect, it } from "vitest";
 import { fireEvent } from "@testing-library/react";
-import { BillMembers, BillParties, BillReasons, BillSamples, reasonCount, SameNameCallout, countText, dateRange } from "../pages/bill.jsx";
+import { BillAllSpeeches, BillMembers, BillParties, BillReasons, BillSamples, readAllText, reasonCount, SameNameCallout, countText, dateRange } from "../pages/bill.jsx";
 
 afterEach(cleanup);
 
@@ -90,6 +90,26 @@ describe("Bill page parts", () => {
     expect(screen.getByText("2 points")).toBeTruthy();
     expect(screen.getByText("Point 7")).toBeTruthy();
     expect(screen.getByText("Quote 8")).toBeTruthy();
+  });
+
+  it("lists every speech of a small bill with its stance", () => {
+    const samples = [{ ...bill.samples[0] }, { ...bill.samples[0], id: 12, stance: "unclear", member: "Member Two", member_id: 6 }];
+    wrap(<BillAllSpeeches bill={{ samples, sample_rule: "Every speech." }} />);
+    expect(screen.getByRole("heading", { name: "The speeches" })).toBeTruthy();
+    expect(screen.getByText(/For · BJP/)).toBeTruthy();
+    expect(screen.getByText(/Not clear · BJP/)).toBeTruthy();
+  });
+
+  it("names one speech in the singular", () => {
+    wrap(<BillAllSpeeches bill={{ samples: bill.samples, sample_rule: "Every speech." }} />);
+    expect(screen.getByRole("heading", { name: "The speech" })).toBeTruthy();
+    expect(readAllText(1)).toBe("Read the speech on this bill");
+    expect(readAllText(1200)).toBe("Read all 1,200 speeches on this bill");
+  });
+
+  it("writes one member in the singular", () => {
+    wrap(<BillMembers bill={{ ...bill, members: 1 }} />);
+    expect(screen.getByText(/^1 member spoke on this bill/)).toBeTruthy();
   });
 
   it("shows no reasons section when the bill has no reasons", () => {

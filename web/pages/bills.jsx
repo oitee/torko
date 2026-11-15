@@ -1,7 +1,7 @@
 import React, { useEffect, useMemo, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { useAnswer } from "../assets/js/useApi.js";
-import { TERM_SPANS, formatNumber, termShort } from "../assets/js/format.js";
+import { TERM_SPANS, formatNumber, termShort, memberCount } from "../assets/js/format.js";
 import { ErrorState, Loading } from "../components/States.jsx";
 import { StanceBar, countText } from "./bill.jsx";
 import "./bill.css";
@@ -87,7 +87,7 @@ function BillFind({ bills }) {
           {found.map((b) => (
             <li key={b.id}>
               <Link to={`/bill/${b.id}`}>{fullName(b)}</Link>
-              <span className="bill-meta"> · {termShort(b.term)} · {formatNumber(b.members)} members spoke</span>
+              <span className="bill-meta"> · {termShort(b.term)} · {memberCount(b.members)} spoke</span>
             </li>
           ))}
         </ul>
@@ -140,7 +140,7 @@ export function BillsChart({ bills, labels, minMembers, term = null, narrow = fa
             className={`bills-chart__dot${labelled.has(b.id) ? " bills-chart__dot--named" : ""}${hover?.id === b.id ? " bills-chart__dot--on" : ""}`}
             tabIndex={0}
             role="link"
-            aria-label={`${fullName(b)}: ${b.members} members, ${countText(b.counts)}`}
+            aria-label={`${fullName(b)}: ${memberCount(b.members)}, ${countText(b.counts)}`}
             onMouseEnter={() => setHover(b)}
             onMouseLeave={() => setHover(null)}
             onFocus={() => setHover(b)}
@@ -169,7 +169,7 @@ export function BillsChart({ bills, labels, minMembers, term = null, narrow = fa
           <div className={`bills-chart__pop bills-chart__pop--${side}`} role="status" aria-live="polite"
             style={{ left: `${(cx / W) * 100}%`, top: `${(top / H) * 100}%` }}>
             <strong>{fullName(hover)}</strong>
-            <div>{termShort(hover.term)} · {formatNumber(hover.members)} members · {countText(hover.counts)}</div>
+            <div>{termShort(hover.term)} · {memberCount(hover.members)} · {countText(hover.counts)}</div>
           </div>
         );
       })()}
@@ -189,7 +189,7 @@ function ShortList({ title, rule, ids, byId }) {
           <div key={id} className="bills-short__row">
             <Link to={`/bill/${id}`}>{fullName(b)}</Link>
             <StanceBar counts={b.counts} />
-            <div className="bill-meta">{termShort(b.term)} · {formatNumber(b.members)} members · {countText(b.counts)}</div>
+            <div className="bill-meta">{termShort(b.term)} · {memberCount(b.members)} · {countText(b.counts)}</div>
           </div>
         );
       })}
