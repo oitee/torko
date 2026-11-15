@@ -30,8 +30,10 @@ PARTY_RULE = (
     "The other parties, and the members with no known party, are in Others."
 )
 SAMPLE_RULE = (
-    f"Up to {SAMPLES_PER_STANCE} speeches for each stance: the longest speech of that stance from each of the "
-    f"{SAMPLES_PER_STANCE} parties with the most members of that stance. A party with no known code does not count."
+    f"Up to {SAMPLES_PER_STANCE} speeches for each stance, one for each member, by the members whose stance on the bill "
+    "is the same as the stance of the speech. A for or against speech must make no point on the other side. "
+    "The speeches with the most points on their side come first, then the longest. "
+    "Mixed speeches have no points, so the longest come first."
 )
 
 
@@ -80,19 +82,25 @@ def party_rows(members):
     return out
 
 
-def sample_ids(rows, per_stance=SAMPLES_PER_STANCE):
-    """[(stance, speech id)]: for each stance in SAMPLE_STANCES, the longest speech of that stance from each of
-    the parties with the most members of that stance, one speech for each party."""
+def sample_ids(rows, members, per_stance=SAMPLES_PER_STANCE):
+    """[(stance, speech id)]: for each stance in SAMPLE_STANCES, the clearest speeches, by the rule in SAMPLE_RULE.
+
+    Each row is one speech: speech_id, stance, person_id, words, and own, the count of its points on the side of
+    its stance, and other, the count of its points on the other side. members is the result of members_of().
+    """
     out = []
     for stance in SAMPLE_STANCES:
-        pick = [r for r in rows if r["stance"] == stance and r["party"]]
-        members = {}
+        pick = [r for r in rows if r["stance"] == stance and r["person_id"] is not None
+                and members[r["person_id"]]["stance"] == stance
+                and r["other"] == 0]
+        pick.sort(key=lambda r: (-r["own"], -(r["words"] or 0), r["speech_id"]))
+        seen = set()
         for r in pick:
-            members.setdefault(r["party"], set()).add(r["person_id"])
-        for party in sorted(members, key=lambda p: (-len(members[p]), p))[:per_stance]:
-            best = max((r for r in pick if r["party"] == party), key=lambda r: (r["words"] or 0, -r["speech_id"]))
-            out.append((stance, best["speech_id"]))
+            if r["person_id"] not in seen and len(seen) < per_stance:
+                seen.add(r["person_id"])
+                out.append((stance, r["speech_id"]))
     return out
+
 
 REASON_RULE = (
     "A model read each speech and wrote down each point that the speech made for or against the bill, with a quote "
@@ -178,14 +186,20 @@ def bill_page(conn, bill_id, args=None):
     debate_ids = [debate["id"] for debate in debates]
 
     rows = conn.execute(text(f"""
-        SELECT ss.speech_id, ss.stance, s.person_id, s.word_count AS words, pa.party, d.debate_date
+        SELECT ss.speech_id, ss.stance, s.person_id, s.word_count AS words, pa.party, d.debate_date,
+               COALESCE(pt.n_for, 0) AS n_for, COALESCE(pt.n_against, 0) AS n_against
         FROM speech_stances ss JOIN speeches s ON s.id = ss.speech_id JOIN debates d ON d.id = s.debate_id
+        LEFT JOIN (SELECT speech_id, count(*) FILTER (WHERE side = 'for') AS n_for,
+                          count(*) FILTER (WHERE side = 'against') AS n_against
+                   FROM speech_arguments WHERE bill_id = :b AND quote_found GROUP BY speech_id) pt
+          ON pt.speech_id = ss.speech_id
         {PARTY_AT_DATE}
         WHERE ss.bill_id = :b ORDER BY d.debate_date, s.seq_start"""), {"b": kept}).mappings().all()
-    rows = [dict(row) for row in rows]
+    rows = [dict(row, own=row["n_against"] if row["stance"] == "against" else row["n_for"],
+                 other=row["n_for"] if row["stance"] == "against" else row["n_against"]) for row in rows]
 
     members = members_of(rows)
-    samples = sample_ids(rows)
+    samples = sample_ids(rows, members)
     sample_rows = {row["id"]: row for row in speech_rows(conn, [sid for _, sid in samples], with_tags=False)}
 
     together = conn.execute(text("""

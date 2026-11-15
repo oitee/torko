@@ -38,11 +38,29 @@ def test_party_rows_put_small_parties_and_no_party_in_others():
     assert rows[-1]["counts"] == {"for": 2, "against": 1, "mixed": 0, "unclear": 0}
 
 
-def test_sample_is_longest_speech_of_leading_party():
-    rows = [row(1, 1, "A", "for", 900), row(2, 2, "B", "for", 50), row(3, 3, "B", "for", 60),
-            row(4, 4, "C", "against", 10), row(5, None, None, "against", 5000)]
-    assert sample_ids(rows, per_stance=1) == [("for", 3), ("against", 4)]
-    assert sample_ids(rows) == [("for", 3), ("for", 1), ("against", 4)]
+def _speech(sid, person, stance, words, own=0, other=0):
+    return {"speech_id": sid, "person_id": person, "party": "P", "stance": stance, "words": words,
+            "own": own, "other": other}
+
+
+def test_samples_are_the_clear_speeches_with_the_most_points():
+    rows = [_speech(1, 1, "for", 900, own=1), _speech(2, 2, "for", 50, own=4), _speech(3, 3, "for", 5000, own=0, other=3),
+            _speech(4, 4, "for", 70, own=4), _speech(5, 5, "for", 60, own=2, other=1), _speech(6, None, "for", 9000, own=9),
+            _speech(7, 7, "for", 8000)]
+    members = members_of(rows)
+    # 3 has only points against; 5 has a point against; 6 has no identified member. A tie in points goes to length.
+    assert sample_ids(rows, members) == [("for", 4), ("for", 2), ("for", 1)]
+    # A speech with no point comes after the speeches with points.
+    assert sample_ids(rows, members, per_stance=4)[-1] == ("for", 7)
+
+
+def test_a_sample_member_must_have_the_stance_of_the_speech_and_shows_one_time():
+    rows = [_speech(1, 1, "for", 100, own=3), _speech(2, 1, "against", 100, own=3),
+            _speech(3, 2, "against", 100, own=2), _speech(4, 2, "against", 900, own=1),
+            _speech(5, 3, "mixed", 300), _speech(6, 4, "mixed", 400), _speech(7, 4, "for", 10, own=1)]
+    members = members_of(rows)
+    # Member 1 is mixed (a for and an against speech), but has no mixed speech. Member 4 is for, not mixed.
+    assert sample_ids(rows, members) == [("for", 7), ("against", 3), ("mixed", 5)]
 
 
 def test_bill_filter_on_speech_list():
