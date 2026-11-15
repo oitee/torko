@@ -281,6 +281,16 @@
   line-height: var(--lh-speech);
 }
 
+.bill-quote__point {
+  display: block;
+  font-weight: 500;
+  margin-bottom: var(--space-1);
+}
+
+.bill-reason--others .bill-reason__label {
+  color: var(--meta);
+}
+
 .bill-quote .bill-meta {
   display: block;
   margin: var(--space-1) 0 0;

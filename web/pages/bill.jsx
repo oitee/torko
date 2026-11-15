@@ -106,6 +106,41 @@ export function reasonCount(r) {
   return `${formatNumber(r.members)} ${r.members === 1 ? "member" : "members"}, ${pts}`;
 }
 
+// One quote, with the member, the party, and a link to the speech. A heading names the point, when it has one.
+function Quote({ q, heading }) {
+  return (
+    <li className="bill-quote">
+      {heading && <span className="bill-quote__point">{heading}</span>}
+      <q className="bill-quote__text">{q.quote}</q>
+      <span className="bill-meta">
+        {q.member_id ? <Link to={`/member/${q.member_id}`}>{q.member}</Link> : "A member who is not identified"}
+        {q.party ? ` · ${q.party}` : ""} · <Link to={`/speech/${q.speech_id}`}>Read the speech</Link>
+      </span>
+    </li>
+  );
+}
+
+// The last row of a side: the points that a single member supported. Each point shows its label and its first quote.
+export function otherPointsCount(n) {
+  return `${formatNumber(n)} ${n === 1 ? "point" : "points"}`;
+}
+
+function OtherPoints({ list }) {
+  return (
+    <li className="bill-reason bill-reason--others">
+      <details>
+        <summary className="bill-reason__head">
+          <span className="bill-reason__label">Points supported by a single member</span>
+          <span className="bill-reason__count">{otherPointsCount(list.length)}</span>
+        </summary>
+        <ul className="bill-reason__quotes">
+          {list.map((r) => <Quote key={r.id} q={r.quotes[0]} heading={r.label} />)}
+        </ul>
+      </details>
+    </li>
+  );
+}
+
 // One reason: the label, a bar of the members who gave it, and the quotes, which open on a click.
 function Reason({ reason, side, most }) {
   const width = Math.max(2, Math.round((Math.max(reason.members, 0) / most) * 100));
@@ -118,31 +153,25 @@ function Reason({ reason, side, most }) {
           <span className={`bill-reason__bar bill-stance--${side}`} style={{ width: `${width}%` }} aria-hidden="true" />
         </summary>
         <ul className="bill-reason__quotes">
-          {reason.quotes.map((q, i) => (
-            <li key={`${q.speech_id}-${i}`} className="bill-quote">
-              <q className="bill-quote__text">{q.quote}</q>
-              <span className="bill-meta">
-                {q.member_id ? <Link to={`/member/${q.member_id}`}>{q.member}</Link> : "A member who is not identified"}
-                {q.party ? ` · ${q.party}` : ""} · <Link to={`/speech/${q.speech_id}`}>Read the speech</Link>
-              </span>
-            </li>
-          ))}
+          {reason.quotes.map((q, i) => <Quote key={`${q.speech_id}-${i}`} q={q} />)}
         </ul>
       </details>
     </li>
   );
 }
 
-function ReasonSide({ side, list, top, most }) {
+function ReasonSide({ side, list, others, top, most }) {
   const [all, setAll] = useState(false);
   if (!list.length) return null;
   const shown = all ? list : list.slice(0, top);
+  const showOthers = others.length > 0 && shown.length === list.length;
   const title = side === "for" ? "Reasons for the bill" : "Reasons against the bill";
   return (
     <div className="bill-reason-side">
       <h3 className="bill-sample-group__title"><span className={`bill-key bill-stance--${side}`} />{title}</h3>
       <ol className="bill-reasons">
         {shown.map((r) => <Reason key={r.id} reason={r} side={side} most={most} />)}
+        {showOthers && <OtherPoints list={others} />}
       </ol>
       {list.length > top && (
         <button type="button" className="bill-readall" onClick={() => setAll(!all)} aria-expanded={all}>
@@ -159,11 +188,12 @@ export function BillReasons({ bill }) {
   if (!sides.length) return null;
   const most = Math.max(1, ...sides.flatMap((s) => reasons[s].map((r) => r.members)));
   const top = bill.top_reasons || 5;
+  const others = bill.reason_others || {};
   return (
     <Section title="The reasons members gave" id="reasons">
       <p className="bill-meta">{bill.reason_rule} Open a reason to read the quotes.</p>
       <div className="bill-sample-groups">
-        {sides.map((s) => <ReasonSide key={s} side={s} list={reasons[s]} top={top} most={most} />)}
+        {sides.map((s) => <ReasonSide key={s} side={s} list={reasons[s]} others={others[s] || []} top={top} most={most} />)}
       </div>
     </Section>
   );

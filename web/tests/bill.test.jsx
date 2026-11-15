@@ -79,6 +79,19 @@ describe("Bill page parts", () => {
     expect(screen.getAllByRole("link", { name: "Read the speech" })[0].getAttribute("href")).toBe("/speech/11");
   });
 
+  it("shows the points of one member in one last row, after all the reasons", () => {
+    const quote = (id) => [{ member_id: 5, member: "Member One", party: "BJP", speech_id: 11, quote: `Quote ${id}` }];
+    const reasons = { for: [1, 2, 3].map((i) => ({ id: i, label: `Reason ${i}`, members: 5 - i, points: 5 - i, quotes: quote(i) })) };
+    const reason_others = { for: [7, 8].map((i) => ({ id: i, label: `Point ${i}`, members: 1, points: 1, quotes: quote(i) })) };
+    wrap(<BillReasons bill={{ reasons, reason_others, top_reasons: 2, reason_rule: "Rule." }} />);
+    expect(screen.queryByText("Points supported by a single member")).toBeNull();
+    fireEvent.click(screen.getByRole("button", { name: "Show all 3 reasons" }));
+    expect(screen.getByText("Points supported by a single member")).toBeTruthy();
+    expect(screen.getByText("2 points")).toBeTruthy();
+    expect(screen.getByText("Point 7")).toBeTruthy();
+    expect(screen.getByText("Quote 8")).toBeTruthy();
+  });
+
   it("shows no reasons section when the bill has no reasons", () => {
     const { container } = wrap(<BillReasons bill={{ reasons: { for: [], against: [] } }} />);
     expect(container.textContent).toBe("");

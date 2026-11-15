@@ -16,6 +16,8 @@ SAMPLES_PER_STANCE = 3
 OTHERS = "Others"
 REASON_SIDES = ["for", "against"]
 TOP_REASONS = 5
+MIN_REASON_MEMBERS = 2
+OTHERS_ROW_MIN_SHARED = 4  # A side needs this many reasons of 2 or more members before its one-member points go to one row.
 
 MEMBER_RULE = (
     "Each member counts one time. A member with a for speech and an against speech is mixed. "
@@ -97,7 +99,10 @@ REASON_RULE = (
     "of the words of the member. A second model call put the points of one side into reasons, each with a short label. "
     "When a side had 5 reasons or more, a third call joined the reasons that gave the same reason in other words. "
     "The reasons are in order of the number of identified members who gave the reason, then the number of points. "
-    "Each member shows one time in a reason, with the first quote."
+    "Each member shows one time in a reason, with the first quote. "
+    "A reason that only one member gave is a point of that member, not a reason of the House. "
+    f"When a side has {OTHERS_ROW_MIN_SHARED} or more reasons that 2 or more members gave, such points are in one last row of that side. "
+    "Otherwise, the side shows each such point as a reason of its own, after the other reasons."
 )
 
 
@@ -125,6 +130,23 @@ def reason_rows(rows):
     for side in out:
         out[side].sort(key=lambda group: (-group["members"], -group["points"], group["label"]))
     return out
+
+
+def split_one_member(reasons):
+    """Moves the reasons of one member to a last row of their side, by the rule in REASON_RULE.
+
+    Returns (reasons, others), each {side: [reason]}. A side with fewer than OTHERS_ROW_MIN_SHARED reasons of
+    MIN_REASON_MEMBERS members keeps all its reasons, and its others list is empty. A reason that only unidentified
+    members gave counts as one member.
+    """
+    kept, others = {}, {}
+    for side, rows in reasons.items():
+        shared = [r for r in rows if r["members"] >= MIN_REASON_MEMBERS]
+        if len(shared) >= OTHERS_ROW_MIN_SHARED:
+            kept[side], others[side] = shared, [r for r in rows if r["members"] < MIN_REASON_MEMBERS]
+        else:
+            kept[side], others[side] = rows, []
+    return kept, others
 
 
 def canonical_id(conn, bill_id):
@@ -196,6 +218,7 @@ def bill_page(conn, bill_id, args=None):
     parties = party_rows(members)
     for party in parties:
         party["colour"] = colours.get(party["party"])
+    reasons, reason_others = split_one_member(reason_rows(points))
     return {
         "id": kept, "asked_id": bill_id, "name": bill["name"], "year": bill["year"], "summary": bill["summary"],
         "summary_note": "A model wrote this summary from the text of the debates on the bill. It uses no other source.",
@@ -216,7 +239,8 @@ def bill_page(conn, bill_id, args=None):
         "party_rule": PARTY_RULE,
         "samples": [{**sample_rows[sid], "stance": stance} for stance, sid in samples if sid in sample_rows],
         "sample_rule": SAMPLE_RULE,
-        "reasons": reason_rows(points),
+        "reasons": reasons,
+        "reason_others": reason_others,
         "reason_rule": REASON_RULE,
         "top_reasons": TOP_REASONS,
         "together": [{"id": joint["id"], "name": joint["name"], "year": joint["year"]} for joint in together],

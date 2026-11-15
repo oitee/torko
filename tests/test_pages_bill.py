@@ -1,6 +1,6 @@
 import pytest
 
-from pages.bill import OTHERS, TOP_PARTIES, bill_page, reason_rows, member_stance, members_of, party_rows, sample_ids
+from pages.bill import OTHERS, TOP_PARTIES, bill_page, reason_rows, split_one_member, member_stance, members_of, party_rows, sample_ids
 from pages.speeches import conditions, parse_args
 from tests.pages_db import page_conn  # noqa: F401
 
@@ -101,7 +101,35 @@ def test_reasons_on_real_data(page_conn):
         return
     n = page_conn.exec_driver_sql(
         "SELECT count(*) FROM speech_arguments WHERE bill_id = 4145 AND bill_argument_id IS NOT NULL").scalar()
-    assert sum(g["points"] for side in b["reasons"].values() for g in side) == n
+    every = [g for part in ("reasons", "reason_others") for side in b[part].values() for g in side]
+    assert sum(g["points"] for g in every) == n
     for side in b["reasons"].values():
         keys = [(-g["members"], -g["points"]) for g in side]
         assert keys == sorted(keys)
+    for side, rows in b["reason_others"].items():
+        assert all(g["members"] <= 1 for g in rows)
+        assert not rows or (len(b["reasons"][side]) >= 4 and all(g["members"] >= 2 for g in b["reasons"][side]))
+
+
+def _r(members, label="R"):
+    return {"id": label, "label": label, "members": members, "points": max(members, 1), "quotes": []}
+
+
+def test_reasons_of_one_member_go_to_the_last_row_when_a_side_has_4_shared_reasons():
+    shared = [_r(5, "a"), _r(4, "b"), _r(3, "c"), _r(2, "d")]
+    kept, others = split_one_member({"for": shared + [_r(1, "e"), _r(0, "f")], "against": [_r(3, "g")]})
+    assert [g["label"] for g in kept["for"]] == ["a", "b", "c", "d"]
+    assert [g["label"] for g in others["for"]] == ["e", "f"]
+    assert [g["label"] for g in kept["against"]] == ["g"] and others["against"] == []
+
+
+def test_a_side_where_every_reason_has_one_member_keeps_all_its_reasons():
+    kept, others = split_one_member({"for": [_r(1, "a"), _r(1, "b"), _r(0, "c")], "against": []})
+    assert [g["label"] for g in kept["for"]] == ["a", "b", "c"] and others["for"] == []
+    assert kept["against"] == [] and others["against"] == []
+
+
+def test_a_side_with_3_shared_reasons_shows_each_point_of_one_member_as_a_reason():
+    # The Banning of Unregulated Deposit Schemes Bill, 2018 has 1 shared reason on each side.
+    kept, others = split_one_member({"for": [_r(4, "a"), _r(3, "b"), _r(2, "c"), _r(1, "d")]})
+    assert [g["label"] for g in kept["for"]] == ["a", "b", "c", "d"] and others["for"] == []
