@@ -42,6 +42,7 @@ tags/subject_groups/results/*
 # bills: the review files and the lists for a manual look. The database holds the answers.
 tags/bills/results/
 tags/stance/results/
+tags/arguments/results/
 # labels and ratings of the blind reviews that chose the settings
 tags/subject_groups/eval/
 

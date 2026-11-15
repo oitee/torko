@@ -230,9 +230,9 @@ def estimate(words: int, n: int) -> dict:
 
 
 def model_id(conn, name: str) -> int:
-    """Adds the model name to the table models if it is new."""
-    conn.execute(text("INSERT INTO models (name) VALUES (:n) ON CONFLICT (name) DO NOTHING"), {"n": name})
-    return conn.execute(text("SELECT id FROM models WHERE name = :n"), {"n": name}).scalar()
+    """The id of the model name. bill_extract.model_id reads first, so a known name uses no sequence number."""
+    from bill_extract import model_id as known_model_id
+    return known_model_id(conn, name)
 
 
 def store(conn, s: dict, model: str, version: str, clean: dict, warnings: list[str], answer: dict, tokens: dict) -> None:

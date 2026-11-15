@@ -228,3 +228,34 @@ def test_the_stored_key_ends_with_the_term():
     assert be.key_term(key) == 16
     assert be.base_key(key) == "citizenshipamendmentbill-2019"
     assert be.key_term("citizenshipamendmentbill-2019") is None
+
+
+class _Conn:
+    """A fake connection that counts the INSERT statements."""
+    def __init__(self, known):
+        self.known, self.inserts = dict(known), 0
+
+    def execute(self, stmt, params):
+        sql = str(stmt)
+        name = params["n"]
+
+        class R:
+            def __init__(self, v):
+                self.v = v
+
+            def scalar(self):
+                return self.v
+        if sql.startswith("INSERT"):
+            self.inserts += 1
+            self.known.setdefault(name, len(self.known) + 1)
+            return R(None)
+        return R(self.known.get(name))
+
+
+def test_a_known_model_uses_no_sequence_number():
+    # A real case: two dry runs of a loader with 19,279 pairs used up the SMALLINT sequence of models.
+    conn = _Conn({"gemini-3.8-flash": 3})
+    assert be.model_id(conn, "gemini-3.8-flash") == 3
+    assert conn.inserts == 0
+    assert be.model_id(conn, "new-model") == 2
+    assert conn.inserts == 1
