@@ -31,3 +31,39 @@ def test_keep_needs_the_checks_and_moved_at_the_limit(checks, p, kept):
 
 def test_question_key_matches_the_row_id():
     assert question_key(42) == "role_42"
+
+
+class FakeResult:
+    def __init__(self, value):
+        self.value = value
+
+    def scalar(self):
+        return self.value
+
+
+class FakeConn:
+    """Answers the two reads of store: no bill row yet, and the raw answer of the extraction."""
+
+    def __init__(self):
+        self.updates = []
+
+    def execute(self, statement, params=None):
+        sql = str(statement)
+        if sql.strip().startswith("UPDATE"):
+            self.updates.append(params)
+            return FakeResult(None)
+        return FakeResult(None if "SELECT bill_id" in sql else "raw answer")
+
+
+def test_a_kept_name_with_no_bill_row_gets_a_bill_of_the_debate_term(monkeypatch):
+    import scripts.judge_bills as jb
+    calls = []
+    monkeypatch.setattr(jb.be, "check_answer", lambda raw, body: ([{"printed": "Citizenship (Amendment) Bill, 2019",
+                                                                     "bill_key": "citizenship-amendment-2019"}], []))
+    monkeypatch.setattr(jb.be, "bill_id", lambda conn, bill, loksabha: calls.append(loksabha) or 4145)
+    conn = FakeConn()
+    names = [{"id": 1, "printed": "Citizenship (Amendment) Bill, 2019"}]
+    answers = {question_key(1): {"probabilities": {"moved": 0.95, "mentioned": 0.03, "unsure": 0.02}}}
+    kept, warnings = jb.store(conn, {"loksabha": 17, "input": "text"}, names, answers, KEEP_P)
+    assert (kept, warnings, calls) == (1, [], [17])
+    assert conn.updates[0]["bid"] == 4145

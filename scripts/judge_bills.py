@@ -122,7 +122,7 @@ def store(conn, debate: dict, names: list[dict], answers: dict, keep_p: float) -
                     checked, _ = be.check_answer(raw, debate["input"])
                 match = [bill for bill in checked if bill["printed"] == name["printed"] and bill["bill_key"]]
                 if match:
-                    bid = be.bill_id(conn, match[0])
+                    bid = be.bill_id(conn, match[0], debate["loksabha"])
                 else:
                     kept = False
                     warnings.append(f"{name['printed']!r}: no bill key, not kept")
