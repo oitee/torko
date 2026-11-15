@@ -72,17 +72,6 @@ def pick_stance(stance_p: dict[str, float], limit: float = STANCE_P) -> str:
     return best if stance_p[best] >= limit else "unclear"
 
 
-def join_stances(stances: list[str]) -> str:
-    """The stance of one member on one bill, from all their speeches on it, in one or more debates."""
-    found = set(stances) - {"unclear"}
-    if {"for", "against"} <= found:
-        return "mixed"
-    for s in ("for", "against", "mixed"):
-        if s in found:
-            return s
-    return "unclear"
-
-
 PAIRS_SQL = """
     SELECT DISTINCT s.id AS speech_id, COALESCE(b.merged_into, b.id) AS bill_id, s.word_count
     FROM debate_bills db JOIN bills b ON b.id = db.bill_id

@@ -18,9 +18,9 @@ REASON_SIDES = ["for", "against"]
 TOP_REASONS = 5
 
 MEMBER_RULE = (
-    "Each member counts one time. A member with only one clear stance (for or against) in all speeches has that stance. "
-    "A member with a mixed speech, or with both for and against speeches, is mixed. "
-    "A member with only unclear speeches is unclear. A speech with no identified member is not in these counts."
+    "Each member counts one time. A member with a for speech and an against speech is mixed. "
+    "Otherwise, a member with a for or an against speech has that stance, also when another speech is mixed. "
+    "A member with only mixed and unclear speeches is mixed. A member with only unclear speeches is unclear. A speech with no identified member is not in these counts."
 )
 PARTY_RULE = (
     "Each member counts one time, in the party of the member on the date of the first speech on the bill. "
@@ -34,13 +34,17 @@ SAMPLE_RULE = (
 
 
 def member_stance(stances):
-    """The stance of one member from the stances of all the speeches of the member on the bill."""
-    clear = {s for s in stances if s != "unclear"}
-    if not clear:
-        return "unclear"
-    if "mixed" in clear or clear == {"for", "against"}:
+    """The stance of one member from the stances of all the speeches of the member on the bill.
+
+    A clear speech (for or against) wins over a mixed speech. A for speech and an against speech give mixed.
+    """
+    found = set(stances)
+    clear = found & {"for", "against"}
+    if len(clear) == 2:
         return "mixed"
-    return clear.pop()
+    if clear:
+        return clear.pop()
+    return "mixed" if "mixed" in found else "unclear"
 
 
 def stance_counts(values):

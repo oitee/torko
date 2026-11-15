@@ -1,3 +1,5 @@
+import pytest
+
 from pages.bill import OTHERS, TOP_PARTIES, bill_page, reason_rows, member_stance, members_of, party_rows, sample_ids
 from pages.speeches import conditions, parse_args
 from tests.pages_db import page_conn  # noqa: F401
@@ -7,12 +9,18 @@ def row(sid, pid, party, stance, words=100):
     return {"speech_id": sid, "person_id": pid, "party": party, "stance": stance, "words": words}
 
 
-def test_member_stance_rule():
-    assert member_stance(["for", "unclear"]) == "for"
-    assert member_stance(["against", "against"]) == "against"
-    assert member_stance(["for", "against"]) == "mixed"
-    assert member_stance(["for", "mixed"]) == "mixed"
-    assert member_stance(["unclear", "unclear"]) == "unclear"
+@pytest.mark.parametrize("stances,expected", [
+    (["for", "unclear"], "for"),
+    (["against", "against"], "against"),
+    (["for", "against"], "mixed"),
+    (["for", "mixed"], "for"),
+    (["against", "mixed"], "against"),
+    (["for", "against", "mixed"], "mixed"),
+    (["mixed", "unclear"], "mixed"),
+    (["unclear", "unclear"], "unclear"),
+])
+def test_member_stance_rule(stances, expected):
+    assert member_stance(stances) == expected
 
 
 def test_members_count_once_and_skip_unidentified():

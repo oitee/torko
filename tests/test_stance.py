@@ -53,16 +53,3 @@ def test_parse_reads_the_three_answers():
 ])
 def test_pick_stance_needs_the_limit(probs, expected):
     assert st.pick_stance(probs, 0.6) == expected
-
-
-@pytest.mark.parametrize("stances,expected", [
-    (["for", "against"], "mixed"),
-    (["for", "mixed"], "for"),
-    (["against", "mixed"], "against"),
-    (["unclear", "against"], "against"),
-    (["unclear", "unclear"], "unclear"),
-    (["mixed"], "mixed"),
-    (["for", "against", "mixed"], "mixed"),
-])
-def test_join_stances_of_one_member(stances, expected):
-    assert st.join_stances(stances) == expected
