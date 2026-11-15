@@ -43,3 +43,63 @@ def test_the_input_numbers_the_points_from_one():
     assert "Bill: Citizenship (Amendment) Bill, 2019" in body
     assert "\n1. Religion as a test\n2. Faith-based citizenship\n" in body
     assert "against the bill" in body
+
+
+# The join call: the groups of one answer, with the point ids 11 to 16 in the order of the list.
+GROUPS = [{"label": "Delays women's reservation by linking it to delimitation", "points": [1, 2, 3]},
+          {"label": "Reduces the seats of southern states", "points": [4]},
+          {"label": "Holds women's reservation hostage to delimitation", "points": [5, 6]}]
+ORDER = [16, 12, 14, 11, 15, 13]
+POINTS = {11: "South loses seats", 12: "Linked to delimitation", 13: "Hostage to the census",
+          14: "No date for the quota", 15: "Hostage to delimitation", 16: "Delimitation first"}
+
+
+def test_the_merge_input_puts_the_largest_group_first_and_shows_its_points_by_id():
+    body, merge_order = ag.build_merge_input("Constitution Bill", 2026, "against", GROUPS, ORDER, POINTS)
+    assert merge_order == [0, 2, 1]
+    assert body.splitlines()[:4] == ["Bill: Constitution Bill, 2026", "Side: the points that members made against the bill.",
+                                     "Groups (3):", ""]
+    assert "1. Delays women's reservation by linking it to delimitation (3 points)\n   - Linked to delimitation\n" \
+           "   - No date for the quota\n   - Delimitation first" in body
+    assert body.endswith("3. Reduces the seats of southern states (1 points)\n   - South loses seats")
+
+
+def test_the_merge_input_shows_at_most_four_points_of_a_group():
+    big = [{"label": "A", "points": [1, 2, 3, 4, 5, 6]}]
+    body, _ = ag.build_merge_input("B", 2020, "for", big, ORDER, POINTS)
+    assert body.count("   - ") == ag.MERGE_POINTS_SHOWN
+
+
+def test_a_good_join_answer_and_an_empty_one_pass():
+    joins, problems = ag.check_joins({"joins": [{"groups": [1, 2], "label": "Delays women's reservation"}]}, 3)
+    assert problems == [] and joins == [{"label": "Delays women's reservation", "groups": [1, 2]}]
+    assert ag.check_joins({"joins": []}, 3) == ([], [])
+
+
+def test_a_broken_join_answer_is_refused():
+    _, p = ag.check_joins({"joins": [{"groups": [1, 2], "label": "A"}, {"groups": [2, 9], "label": ""},
+                                     {"groups": [3], "label": "C"}]}, 3)
+    text = " | ".join(p)
+    assert "group 2 is in join 1 and in join 2" in text
+    assert "join 2: group 9 is not in the list" in text
+    assert "join 2: has no label" in text
+    assert "join 3 has fewer than 2 groups" in text
+    assert ag.check_joins({}, 3)[1] == ["joins is not a list"]
+
+
+def test_a_join_makes_one_group_with_its_label_and_the_order_follows_size():
+    _, merge_order = ag.build_merge_input("B", 2026, "against", GROUPS, ORDER, POINTS)
+    final = ag.apply_joins(GROUPS, merge_order, [{"label": "Delays women's reservation by linking it to delimitation",
+                                                  "groups": [1, 2]}])
+    assert final == [{"label": "Delays women's reservation by linking it to delimitation", "points": [1, 2, 3, 5, 6]},
+                     {"label": "Reduces the seats of southern states", "points": [4]}]
+
+
+def test_no_join_keeps_the_groups():
+    _, merge_order = ag.build_merge_input("B", 2026, "against", GROUPS, ORDER, POINTS)
+    assert ag.apply_joins(GROUPS, merge_order, []) == [GROUPS[0], GROUPS[2], GROUPS[1]]
+
+
+def test_the_latest_prompts_of_each_kind():
+    assert ag.latest_prompt_version("group").startswith("group_v")
+    assert ag.latest_prompt_version("merge").startswith("merge_v")

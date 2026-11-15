@@ -95,6 +95,7 @@ def sample_ids(rows, per_stance=SAMPLES_PER_STANCE):
 REASON_RULE = (
     "A model read each speech and wrote down each point that the speech made for or against the bill, with a quote "
     "of the words of the member. A second model call put the points of one side into reasons, each with a short label. "
+    "When a side had 5 reasons or more, a third call joined the reasons that gave the same reason in other words. "
     "The reasons are in order of the number of identified members who gave the reason, then the number of points. "
     "Each member shows one time in a reason, with the first quote."
 )
