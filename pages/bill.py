@@ -1,4 +1,5 @@
-"""The bill page: what one bill does, where the members stood on it, by party, and sample speeches.
+"""The bill page: what one bill does, where the members stood on it, by party, the reasons for and against, and
+sample speeches.
 
 The stance of a speech comes from the table speech_stances: one row for each speech and each kept bill of its debate.
 A stance is what a member said in a speech. It is not a vote.
@@ -13,6 +14,8 @@ SAMPLE_STANCES = ["for", "against", "mixed"]
 TOP_PARTIES = 7
 SAMPLES_PER_STANCE = 3
 OTHERS = "Others"
+REASON_SIDES = ["for", "against"]
+TOP_REASONS = 5
 
 MEMBER_RULE = (
     "Each member counts one time. A member with only one clear stance (for or against) in all speeches has that stance. "
@@ -85,6 +88,39 @@ def sample_ids(rows, per_stance=SAMPLES_PER_STANCE):
             out.append((stance, best["speech_id"]))
     return out
 
+REASON_RULE = (
+    "A model read each speech and wrote down each point that the speech made for or against the bill, with a quote "
+    "of the words of the member. A second model call put the points of one side into reasons, each with a short label. "
+    "The reasons are in order of the number of identified members who gave the reason, then the number of points. "
+    "Each member shows one time in a reason, with the first quote."
+)
+
+
+def reason_rows(rows):
+    """Turn the points of one bill into the reasons of each side, in the order of REASON_RULE.
+
+    Each row is one point: group (bill_arguments.id), side, label, person_id, member, party, speech_id, quote.
+    The rows come in the order of the debate, so the first quote of a member is the first row of the member.
+    """
+    groups = {}
+    for row in rows:
+        group = groups.setdefault(row["group"], {"side": row["side"], "label": row["label"], "points": 0, "who": {}, "anon": []})
+        group["points"] += 1
+        quote = {"member_id": row["person_id"], "member": row["member"], "party": row["party"],
+                 "speech_id": row["speech_id"], "quote": row["quote"]}
+        if row["person_id"] is None:
+            group["anon"].append(quote)
+        else:
+            group["who"].setdefault(row["person_id"], quote)
+    out = {side: [] for side in REASON_SIDES}
+    for gid, group in groups.items():
+        if group["side"] in out:
+            out[group["side"]].append({"id": gid, "label": group["label"], "members": len(group["who"]), "points": group["points"],
+                                   "quotes": list(group["who"].values()) + group["anon"]})
+    for side in out:
+        out[side].sort(key=lambda group: (-group["members"], -group["points"], group["label"]))
+    return out
+
 
 def canonical_id(conn, bill_id):
     """The id of the kept bill. A bill that the merge step folded into another bill gives the id of that bill."""
@@ -141,6 +177,15 @@ def bill_page(conn, bill_id, args=None):
         SELECT id, name, year, bill_key, 'previous' FROM bills WHERE next_id = :b AND merged_into IS NULL
         ORDER BY bill_key"""), {"b": kept}).mappings().all()
 
+    points = conn.execute(text(f"""
+        SELECT ba.id AS "group", ba.side, ba.label, s.person_id, pe.name AS member, pa.party, a.speech_id, a.quote
+        FROM bill_arguments ba
+        JOIN speech_arguments a ON a.bill_argument_id = ba.id
+        JOIN speeches s ON s.id = a.speech_id JOIN debates d ON d.id = s.debate_id
+        LEFT JOIN persons pe ON pe.id = s.person_id
+        {PARTY_AT_DATE}
+        WHERE ba.bill_id = :b ORDER BY d.debate_date, s.seq_start, a.position"""), {"b": kept}).mappings().all()
+
     dates = sorted({debate["debate_date"] for debate in debates if debate["debate_date"]})
     colours = party_colours(conn)
     parties = party_rows(members)
@@ -166,6 +211,9 @@ def bill_page(conn, bill_id, args=None):
         "party_rule": PARTY_RULE,
         "samples": [{**sample_rows[sid], "stance": stance} for stance, sid in samples if sid in sample_rows],
         "sample_rule": SAMPLE_RULE,
+        "reasons": reason_rows(points),
+        "reason_rule": REASON_RULE,
+        "top_reasons": TOP_REASONS,
         "together": [{"id": joint["id"], "name": joint["name"], "year": joint["year"]} for joint in together],
         "same_name": [{"id": other["id"], "name": other["name"], "year": other["year"], "term": key_term(other["bill_key"]),
                        "side": other["side"]} for other in same_name],

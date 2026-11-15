@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import { Link, useNavigate, useParams } from "react-router-dom";
 import { useAnswer } from "../assets/js/useApi.js";
 import { formatDateLong, formatNumber, termLong } from "../assets/js/format.js";
@@ -99,6 +99,76 @@ export function BillParties({ bill }) {
   );
 }
 
+// "9 members, 12 points", or "1 point" for a reason that only an unidentified member gave.
+export function reasonCount(r) {
+  const pts = `${formatNumber(r.points)} ${r.points === 1 ? "point" : "points"}`;
+  if (!r.members) return pts;
+  return `${formatNumber(r.members)} ${r.members === 1 ? "member" : "members"}, ${pts}`;
+}
+
+// One reason: the label, a bar of the members who gave it, and the quotes, which open on a click.
+function Reason({ reason, side, most }) {
+  const width = Math.max(2, Math.round((Math.max(reason.members, 0) / most) * 100));
+  return (
+    <li className="bill-reason">
+      <details>
+        <summary className="bill-reason__head">
+          <span className="bill-reason__label">{reason.label}</span>
+          <span className="bill-reason__count">{reasonCount(reason)}</span>
+          <span className={`bill-reason__bar bill-stance--${side}`} style={{ width: `${width}%` }} aria-hidden="true" />
+        </summary>
+        <ul className="bill-reason__quotes">
+          {reason.quotes.map((q, i) => (
+            <li key={`${q.speech_id}-${i}`} className="bill-quote">
+              <q className="bill-quote__text">{q.quote}</q>
+              <span className="bill-meta">
+                {q.member_id ? <Link to={`/member/${q.member_id}`}>{q.member}</Link> : "A member who is not identified"}
+                {q.party ? ` · ${q.party}` : ""} · <Link to={`/speech/${q.speech_id}`}>Read the speech</Link>
+              </span>
+            </li>
+          ))}
+        </ul>
+      </details>
+    </li>
+  );
+}
+
+function ReasonSide({ side, list, top, most }) {
+  const [all, setAll] = useState(false);
+  if (!list.length) return null;
+  const shown = all ? list : list.slice(0, top);
+  const title = side === "for" ? "Reasons for the bill" : "Reasons against the bill";
+  return (
+    <div className="bill-reason-side">
+      <h3 className="bill-sample-group__title"><span className={`bill-key bill-stance--${side}`} />{title}</h3>
+      <ol className="bill-reasons">
+        {shown.map((r) => <Reason key={r.id} reason={r} side={side} most={most} />)}
+      </ol>
+      {list.length > top && (
+        <button type="button" className="bill-readall" onClick={() => setAll(!all)} aria-expanded={all}>
+          {all ? `Show the first ${top} reasons` : `Show all ${formatNumber(list.length)} reasons`}
+        </button>
+      )}
+    </div>
+  );
+}
+
+export function BillReasons({ bill }) {
+  const reasons = bill.reasons || {};
+  const sides = ["for", "against"].filter((s) => (reasons[s] || []).length);
+  if (!sides.length) return null;
+  const most = Math.max(1, ...sides.flatMap((s) => reasons[s].map((r) => r.members)));
+  const top = bill.top_reasons || 5;
+  return (
+    <Section title="The reasons members gave" id="reasons">
+      <p className="bill-meta">{bill.reason_rule} Open a reason to read the quotes.</p>
+      <div className="bill-sample-groups">
+        {sides.map((s) => <ReasonSide key={s} side={s} list={reasons[s]} top={top} most={most} />)}
+      </div>
+    </Section>
+  );
+}
+
 // The sample speeches in one group for each stance, in the order of SAMPLE_ORDER.
 const SAMPLE_ORDER = ["for", "against", "mixed"];
 
@@ -187,6 +257,7 @@ export default function Bill() {
           )}
           {bill.members > 0 && <BillMembers bill={bill} />}
           <BillParties bill={bill} />
+          <BillReasons bill={bill} />
           <BillSamples bill={bill} />
           <Section title="The debates">
             <ul className="bill-debates">
@@ -205,7 +276,7 @@ export default function Bill() {
             </Section>
           )}
           <p className="bill-meta bill-method">
-            How Torko reads a stance: a model reads each speech with the summary of the bill and answers for, against, mixed, or not clear. <Link to="/method">Read the method</Link>
+            How Torko reads a stance: a model reads each speech with the summary of the bill and answers for, against, mixed, or not clear. The reasons come from the points of each speech, with a quote that Torko finds in the speech text. <Link to="/method">Read the method</Link>
           </p>
         </div>
       </PageLayout>

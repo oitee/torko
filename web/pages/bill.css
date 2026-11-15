@@ -191,3 +191,101 @@
   background: var(--sheet);
   color: var(--ink);
 }
+
+/* The reasons for and against: one row for each reason, with the quotes inside. */
+.bill-reasons {
+  list-style: none;
+  margin: var(--space-3) 0;
+  padding: 0;
+  display: grid;
+  gap: var(--space-2);
+}
+
+.bill-reason details {
+  border-bottom: 1px solid var(--hairline);
+  padding-bottom: var(--space-2);
+}
+
+.bill-reason__head {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: var(--space-1) var(--space-3);
+  cursor: pointer;
+  list-style: none;
+}
+
+.bill-reason__head::-webkit-details-marker {
+  display: none;
+}
+
+.bill-reason__label {
+  position: relative;
+  padding-left: 1.1em;
+}
+
+.bill-reason__label::before {
+  content: "\25B8";
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 1.1em;
+  color: var(--meta);
+  transition: transform 0.15s;
+}
+
+.bill-reason details[open] .bill-reason__label::before {
+  transform: rotate(90deg);
+}
+
+.bill-reason__count {
+  font-family: var(--font-mono);
+  font-size: var(--size-count);
+  color: var(--meta);
+  white-space: nowrap;
+}
+
+.bill-reason__bar {
+  grid-column: 1 / -1;
+  display: block;
+  height: 4px;
+  min-width: 4px;
+  max-width: calc(100% - 1.1em);
+  margin-left: 1.1em;
+}
+
+@media (max-width: 600px) {
+  .bill-reason__head {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .bill-reason__count {
+    padding-left: 1.1em;
+  }
+}
+
+.bill-reason__quotes {
+  list-style: none;
+  margin: var(--space-2) 0 0 1.1em;
+  padding: 0;
+  display: grid;
+  gap: var(--space-3);
+}
+
+.bill-quote {
+  border-left: 2px solid var(--hairline);
+  padding-left: var(--space-3);
+}
+
+.bill-quote__text {
+  display: block;
+  font-size: var(--size-speech);
+  line-height: var(--lh-speech);
+}
+
+.bill-quote .bill-meta {
+  display: block;
+  margin: var(--space-1) 0 0;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .bill-reason__label::before { transition: none; }
+}

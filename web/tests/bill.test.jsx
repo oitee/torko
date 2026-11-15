@@ -2,7 +2,8 @@ import React from "react";
 import { MemoryRouter } from "react-router-dom";
 import { cleanup, render, screen } from "@testing-library/react";
 import { afterEach, describe, expect, it } from "vitest";
-import { BillMembers, BillParties, BillSamples, SameNameCallout, countText, dateRange } from "../pages/bill.jsx";
+import { fireEvent } from "@testing-library/react";
+import { BillMembers, BillParties, BillReasons, BillSamples, reasonCount, SameNameCallout, countText, dateRange } from "../pages/bill.jsx";
 
 afterEach(cleanup);
 
@@ -57,6 +58,29 @@ describe("Bill page parts", () => {
 
   it("shows no callout when no bill shares the name", () => {
     const { container } = wrap(<SameNameCallout bill={{ same_name: [] }} />);
+    expect(container.textContent).toBe("");
+  });
+
+  it("writes the count of a reason", () => {
+    expect(reasonCount({ members: 9, points: 12 })).toBe("9 members, 12 points");
+    expect(reasonCount({ members: 0, points: 1 })).toBe("1 point");
+  });
+
+  it("shows the first reasons of each side and the rest on a click", () => {
+    const reason = (id, members) => ({ id, label: `Reason ${id}`, members, points: members,
+      quotes: [{ member_id: 5, member: "Member One", party: "BJP", speech_id: 11, quote: `Quote ${id}` }] });
+    const reasons = { for: [1, 2, 3].map((i) => reason(i, 4 - i)), against: [reason(9, 2)] };
+    wrap(<BillReasons bill={{ reasons, top_reasons: 2, reason_rule: "Rule." }} />);
+    expect(screen.getByRole("heading", { name: "Reasons for the bill" })).toBeTruthy();
+    expect(screen.queryByText("Reason 3")).toBeNull();
+    fireEvent.click(screen.getByRole("button", { name: "Show all 3 reasons" }));
+    expect(screen.getByText("Reason 3")).toBeTruthy();
+    expect(screen.getByText("Quote 9")).toBeTruthy();
+    expect(screen.getAllByRole("link", { name: "Read the speech" })[0].getAttribute("href")).toBe("/speech/11");
+  });
+
+  it("shows no reasons section when the bill has no reasons", () => {
+    const { container } = wrap(<BillReasons bill={{ reasons: { for: [], against: [] } }} />);
     expect(container.textContent).toBe("");
   });
 });
