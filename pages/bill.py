@@ -243,7 +243,7 @@ def bill_page(conn, bill_id, args=None):
     reasons, reason_others = split_one_member(reason_rows(points))
     return {
         "id": kept, "asked_id": bill_id, "name": bill["name"], "year": bill["year"], "summary": bill["summary"],
-        "summary_note": "A model wrote this summary from the text of the debates on the bill. It uses no other source.",
+        "summary_note": "Summary generated solely from the text of the debates. No external source used",
         "terms": sorted({debate["loksabha"] for debate in debates}),
         "first_date": dates[0].isoformat() if dates else None,
         "last_date": dates[-1].isoformat() if dates else None,
