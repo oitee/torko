@@ -163,10 +163,15 @@ def resolve_tag(conn, key, tag_type=None):
     return dict(row) if row else None
 
 
-# The party, seat and state of a member at the date of a debate, as pa.party, pa.seat and pa.state.
-# The lateral part runs once for each row, so it finds only the speakers period in force.
-# The join to parties runs once after it, not once for each row.
+# The party, seat and state of the member of speech s at the date of the debate, as pa.party, pa.seat and pa.state.
+# The view speech_party_mv stores one row for each speech. scripts/refresh_speech_tags.py fills it again.
 PARTY_AT_DATE = """
+LEFT JOIN speech_party_mv pa ON pa.speech_id = s.id
+"""
+
+# The same rule, computed now from speakers, for a person other than the member of a speech (for example t.person_id).
+# The lateral part runs once for each row. Use it only for a few rows.
+PARTY_AT_DATE_LIVE = """
 LEFT JOIN LATERAL (
     SELECT sp.party_id, sp.constituency AS seat, st.name AS state
     FROM speakers sp LEFT JOIN states st ON st.id = sp.state_id

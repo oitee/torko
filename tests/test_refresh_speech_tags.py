@@ -16,5 +16,5 @@ class FakeConn:
 def test_refresh_keeps_old_rows_readable_and_updates_statistics():
     conn = FakeConn()
     assert refresh(conn) == 7
-    assert conn.sql[0] == "REFRESH MATERIALIZED VIEW CONCURRENTLY speech_tags_mv"
-    assert conn.sql[1] == "ANALYZE speech_tags_mv"
+    assert conn.sql[:4] == ["REFRESH MATERIALIZED VIEW CONCURRENTLY speech_tags_mv", "ANALYZE speech_tags_mv",
+                            "REFRESH MATERIALIZED VIEW CONCURRENTLY speech_party_mv", "ANALYZE speech_party_mv"]

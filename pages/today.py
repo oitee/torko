@@ -25,7 +25,7 @@ import re
 
 from sqlalchemy import text
 
-from pages.common import PARTY_AT_DATE, cached, slug, speech_tags_cte, tidy_title, tidy_type
+from pages.common import PARTY_AT_DATE_LIVE, cached, slug, speech_tags_cte, tidy_title, tidy_type
 from pages.quotes import clean, good, good_hi, score, sentences
 
 # The tags of the speeches in :ids only.
@@ -123,7 +123,7 @@ def best_quote(conn, day):
                pa.party, pa.seat, pa.state
         FROM turns t JOIN debates d ON d.id = t.debate_id JOIN speeches s ON s.id = t.speech_id
         JOIN persons pe ON pe.id = t.person_id
-        {PARTY_AT_DATE.replace('s.person_id', 't.person_id')}
+        {PARTY_AT_DATE_LIVE.replace('s.person_id', 't.person_id')}
         WHERE d.debate_date = :d AND t.role_kind IS NULL AND t.person_id IS NOT NULL AND t.word_count >= 30
           AND coalesce(t.speaker_label, '') !~* '(अध्यक्ष|सभापति|speaker|chair|presiding)'
         ORDER BY t.id"""), {"d": day}).mappings().all()
