@@ -27,8 +27,8 @@ def _view(fn):
     if getattr(fn, "prebuilt", None):  # a prebuilt answer is sent from its file, so it opens no connection
         def view(**kw):
             return fn(args=request.args)
-        view.__name__ = f"{fn.__module__}.{fn.__name__}".replace(".", "_")
-        view.page_module = fn.__module__
+        view.__name__ = f"{fn.page_module}.{fn.__name__}".replace(".", "_")
+        view.page_module = fn.page_module
         return view
 
     def view(**kw):

@@ -44,7 +44,36 @@ def test_send_uses_no_connection_when_the_file_exists(tmp_path):
 
 def test_route_carries_its_page_module_for_the_api_docs():
     r = pb.prebuilt_route("home_featured")
-    assert r.prebuilt == "home_featured" and r.__module__ == "pages.home_featured"
+    assert r.prebuilt == "home_featured" and r.page_module == "pages.home_featured"
+
+
+def test_to_bytes_is_the_same_as_jsonify():
+    import datetime
+    import decimal
+
+    from flask import Flask, jsonify
+    answer = {"b": [1, 2.5, None], "a": "é", "d": datetime.date(2024, 8, 8), "n": decimal.Decimal("1.50")}
+    with Flask(__name__).app_context():
+        assert pb.to_bytes(answer) == jsonify(answer).get_data()
+
+
+def test_two_first_requests_at_the_same_time_build_one_time(tmp_path, monkeypatch):
+    import threading
+    import time
+    calls = []
+
+    def slow(conn):
+        calls.append(conn)
+        time.sleep(0.05)
+        return {"x": 1}
+    monkeypatch.setattr(pb, "builders", lambda: {"home": slow})
+    connect = lambda: contextlib.nullcontext("conn")  # noqa: E731
+    threads = [threading.Thread(target=pb.send, args=("home", connect, tmp_path)) for _ in range(4)]
+    for t in threads:
+        t.start()
+    for t in threads:
+        t.join()
+    assert calls == ["conn"]
 
 
 def test_build_all_builds_the_named_answers(tmp_path, monkeypatch):
