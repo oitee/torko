@@ -9,19 +9,18 @@ import HomeQuote from "./home/HomeQuote.jsx";
 import HomeTrend from "./home/HomeTrend.jsx";
 import "./home.css";
 
-// The Home page. The top band holds the search and the site figures from /api/home.
-// The parts below show what Torko can do, with the hand-checked sample from /api/home/featured.
-// The three answers load apart, so a failed answer hides only its own parts.
+// The Home page. It reads one answer, /api/home. The server sends it from a file that the rebuild writes.
+// The top band holds the search and the site figures (corpus).
+// The parts below show what Torko can do: the hand-checked sample (featured) and the counts of each step (method).
+// The search box shows also when the answer fails.
 export default function Home() {
   const home = useAnswer("/api/home");
-  const featured = useAnswer("/api/home/featured");
-  const method = useAnswer("/api/method");
 
   useEffect(() => {
     document.title = "Torko · Lok Sabha debates";
   }, []);
 
-  const f = featured.data;
+  const f = home.data?.featured;
 
   return (
     <main className="home-page">
@@ -46,19 +45,19 @@ export default function Home() {
             What you can do
           </h2>
           <div className="home-can-do__list">
-            {featured.loading ? (
+            {home.loading ? (
               <FeaturedSkeleton />
-            ) : featured.error ? (
-              <ErrorState error={featured.error} onRetry={featured.retry} />
-            ) : (
+            ) : home.error ? (
+              <ErrorState error={home.error} onRetry={home.retry} />
+            ) : f ? (
               <>
                 <HomeMember member={f.member} />
                 <HomeQuote quote={f.quote} />
                 <HomeTrend trend={f.trend} />
               </>
-            )}
+            ) : null}
 
-            <HomeMethod method={method.data} loading={method.loading} />
+            <HomeMethod method={home.data?.method} loading={home.loading} />
           </div>
         </section>
       </section>

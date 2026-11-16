@@ -4,15 +4,23 @@ import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { MemoryRouter, Route, Routes } from "react-router-dom";
 import Home from "../pages/home.jsx";
 import * as api from "../assets/js/api.js";
-import homeAnswer from "./fixtures/home/home.json";
+import homeFields from "./fixtures/home/home.json";
 import featuredAnswer from "./fixtures/home/home_featured.json";
 import methodAnswer from "./fixtures/method/method.json";
 
 afterEach(cleanup);
 
+// The whole /api/home answer: the saved home fields, the featured sample, and the turn and speech figures of the method.
+const homeAnswer = {
+  ...homeFields,
+  featured: featuredAnswer,
+  method: { turns: methodAnswer.turns, speeches: methodAnswer.speeches },
+};
+const failure = { status: 500, message: "The server could not answer. Try again." };
+
 // Answer each API address with its saved real answer.
 function mockAnswers(overrides = {}) {
-  const answers = { "/api/home": homeAnswer, "/api/home/featured": featuredAnswer, "/api/method": methodAnswer, ...overrides };
+  const answers = { "/api/home": homeAnswer, ...overrides };
   return vi.spyOn(api, "getJSON").mockImplementation((path) => {
     const answer = answers[path];
     if (answer instanceof Error || (answer && answer.status)) return Promise.reject(answer);
@@ -44,13 +52,11 @@ describe("Home page", () => {
     expect(screen.getAllByRole("status").length).toBeGreaterThan(0);
   });
 
-  it("reads both answers of the Home page", async () => {
+  it("reads only one answer, /api/home", async () => {
     const spy = mockAnswers();
     renderHome();
-    await screen.findByText("64,921");
-    const paths = spy.mock.calls.map((c) => c[0]);
-    expect(paths).toContain("/api/home");
-    expect(paths).toContain("/api/home/featured");
+    await screen.findByText("SUSHRI MAHUA MOITRA (KRISHNANAGAR)");
+    expect([...new Set(spy.mock.calls.map((c) => c[0]))]).toEqual(["/api/home"]);
   });
 
   it("shows every site figure from corpus, with the error rate and no source line", async () => {
@@ -92,8 +98,8 @@ describe("Home page", () => {
     expect(link.getAttribute("href")).toBe("/method");
   });
 
-  it("keeps the text of the Method part when the Method answer fails", async () => {
-    mockAnswers({ "/api/method": { status: 500, message: "The server could not answer. Try again." } });
+  it("keeps the text of the Method part when the answer has no method figures", async () => {
+    mockAnswers({ "/api/home": { ...homeAnswer, method: undefined } });
     renderHome();
     await screen.findByText("SUSHRI MAHUA MOITRA (KRISHNANAGAR)");
     expect(screen.getByRole("link", { name: "Read how Torko works" })).toBeTruthy();
@@ -106,31 +112,21 @@ describe("Home page", () => {
     expect(container.querySelectorAll(".home-skeleton__block")).toHaveLength(3);
   });
 
-  it("keeps the search and the figures when the featured answer fails, and can retry it", async () => {
-    const spy = mockAnswers({ "/api/home/featured": { status: 500, message: "The server could not answer. Try again." } });
+  it("keeps the search when the answer fails, and can retry it", async () => {
+    const spy = mockAnswers({ "/api/home": failure });
     renderHome();
-    expect(await screen.findByText("The server could not answer. Try again.")).toBeTruthy();
-    expect(screen.getByText("64,921")).toBeTruthy();
-    expect(screen.getByRole("search")).toBeTruthy();
-
-    spy.mockImplementation((path) =>
-      Promise.resolve(path === "/api/home" ? homeAnswer : featuredAnswer)
-    );
-    fireEvent.click(screen.getByRole("button", { name: "Try again" }));
-    expect(await screen.findByText("SUSHRI MAHUA MOITRA (KRISHNANAGAR)")).toBeTruthy();
-  });
-
-  it("keeps the search and the featured parts when the site figures fail", async () => {
-    mockAnswers({ "/api/home": { status: 500, message: "The server could not answer. Try again." } });
-    renderHome();
-    expect(await screen.findByText("SUSHRI MAHUA MOITRA (KRISHNANAGAR)")).toBeTruthy();
-    expect(screen.getByRole("alert")).toBeTruthy();
+    expect((await screen.findAllByText("The server could not answer. Try again.")).length).toBeGreaterThan(0);
     expect(screen.queryByText("64,921")).toBeNull();
     expect(screen.getByRole("search")).toBeTruthy();
+
+    spy.mockImplementation(() => Promise.resolve(homeAnswer));
+    fireEvent.click(screen.getAllByRole("button", { name: "Try again" })[0]);
+    expect(await screen.findByText("SUSHRI MAHUA MOITRA (KRISHNANAGAR)")).toBeTruthy();
+    expect(screen.getByText("64,921")).toBeTruthy();
   });
 
   it("leaves out a featured part that the API omits", async () => {
-    mockAnswers({ "/api/home/featured": { ...featuredAnswer, member: null, quote: null } });
+    mockAnswers({ "/api/home": { ...homeAnswer, featured: { ...featuredAnswer, member: null, quote: null } } });
     renderHome();
     expect(await screen.findByText("205 speeches carry the tag Arrears in all years.")).toBeTruthy();
     expect(screen.queryByText("Read every speech by one member.")).toBeNull();
@@ -149,10 +145,10 @@ describe("Home page", () => {
     }
   });
 
-  it("links to the Method page, also when the featured answer fails", async () => {
-    mockAnswers({ "/api/home/featured": { status: 500, message: "The server could not answer. Try again." } });
+  it("links to the Method page, also when the answer fails", async () => {
+    mockAnswers({ "/api/home": failure });
     renderHome();
-    await screen.findByText("The server could not answer. Try again.");
+    await screen.findAllByText("The server could not answer. Try again.");
     expect(screen.getByRole("link", { name: "Read how Torko works" }).getAttribute("href")).toBe("/method");
   });
 
