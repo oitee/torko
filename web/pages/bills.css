@@ -1,10 +1,6 @@
 /* Bills landing page. The shared stance colours, bars and figures come from bill.css. */
 
 .bills-page {
-  --stance-for: #1d9e75;
-  --stance-against: #d85a30;
-  --stance-mixed: #888780;
-  --stance-unclear: var(--hairline);
   max-width: var(--page-max);
   margin: 0 auto;
   padding: var(--space-8) var(--page-pad) var(--space-14);

@@ -2,10 +2,6 @@
 
 .bill-page {
   width: 100%;
-  --stance-for: #1d9e75;
-  --stance-against: #d85a30;
-  --stance-mixed: #888780;
-  --stance-unclear: var(--hairline);
 }
 
 .bill-main {
@@ -220,6 +216,7 @@
 
 .bill-reason__label {
   position: relative;
+  font-weight: 500;
   padding-left: 1.1em;
 }
 
@@ -277,7 +274,7 @@
 
 .bill-quote__text {
   display: block;
-  font-size: var(--size-speech);
+  font-size: var(--size-body);
   line-height: var(--lh-speech);
 }
 
