@@ -225,9 +225,6 @@ def test_a_name_with_no_amendment_number_gives_none(printed):
 def test_the_stored_key_ends_with_the_term():
     key = be.term_key(be.bill_key("Citizenship (Amendment) Bill", 2019), 16)
     assert key == "citizenshipamendmentbill-2019-ls16"
-    assert be.key_term(key) == 16
-    assert be.base_key(key) == "citizenshipamendmentbill-2019"
-    assert be.key_term("citizenshipamendmentbill-2019") is None
 
 
 class _Conn:
@@ -259,3 +256,18 @@ def test_a_known_model_uses_no_sequence_number():
     assert conn.inserts == 0
     assert be.model_id(conn, "new-model") == 2
     assert conn.inserts == 1
+
+
+def test_a_new_bill_row_stores_its_term_in_its_own_column():
+    class Conn:
+        def __init__(self):
+            self.params = []
+
+        def execute(self, statement, params=None):
+            self.params.append(params)
+            return type("R", (), {"scalar": lambda self: 7})()
+    conn = Conn()
+    bill = {"name": "Citizenship (Amendment) Bill", "year": 2019, "amendment_ordinal": None,
+            "bill_key": "citizenshipamendmentbill-2019"}
+    assert be.bill_id(conn, bill, 16) == 7
+    assert conn.params[0]["ls"] == 16 and conn.params[0]["k"] == "citizenshipamendmentbill-2019-ls16"

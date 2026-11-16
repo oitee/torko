@@ -6,7 +6,6 @@ A stance is what a member said in a speech. It is not a vote.
 """
 from sqlalchemy import text
 
-from bill_extract import key_term
 from pages.common import PARTY_AT_DATE, party_colours, speech_rows, tidy_title
 
 STANCES = ["for", "against", "mixed", "unclear"]
@@ -195,9 +194,9 @@ def load_same_name(conn, kept):
     a different bill with its own page. bills.next_id links the two.
     """
     return conn.execute(text("""
-        SELECT id, name, year, bill_key, 'next' AS side FROM bills WHERE id = (SELECT next_id FROM bills WHERE id = :b)
+        SELECT id, name, year, bill_key, loksabha, 'next' AS side FROM bills WHERE id = (SELECT next_id FROM bills WHERE id = :b)
         UNION ALL
-        SELECT id, name, year, bill_key, 'previous' FROM bills WHERE next_id = :b AND merged_into IS NULL
+        SELECT id, name, year, bill_key, loksabha, 'previous' FROM bills WHERE next_id = :b AND merged_into IS NULL
         ORDER BY bill_key"""), {"b": kept}).mappings().all()
 
 
@@ -259,7 +258,7 @@ def bill_page(conn, bill_id, args=None):
         "reason_others": reason_others,
         "top_reasons": TOP_REASONS,
         "together": [{"id": joint["id"], "name": joint["name"], "year": joint["year"]} for joint in together],
-        "same_name": [{"id": other["id"], "name": other["name"], "year": other["year"], "term": key_term(other["bill_key"]),
+        "same_name": [{"id": other["id"], "name": other["name"], "year": other["year"], "term": other["loksabha"],
                        "side": other["side"]} for other in same_name],
         "counts_note": "speeches counts the speeches with a stance on this bill. speech_counts splits them by stance. "
                        "members and member_counts count identified members. A stance is what a member said, not a vote.",

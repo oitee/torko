@@ -221,10 +221,9 @@ def bill_matches(query: str, bills: list, limit: int = MAX_BILLS) -> list:
 
 def load_bills(conn) -> list:
     """Read the kept bills that have at least one speech with a stance, for bill_matches()."""
-    from bill_extract import key_term
-    return [{"id": i, "name": n, "year": y, "term": key_term(k), "members": m, "n_speeches": c}
-            for i, n, y, k, m, c in conn.execute(text("""
-        SELECT b.id, b.name, b.year, b.bill_key, count(DISTINCT s.person_id), count(DISTINCT ss.speech_id)
+    return [{"id": i, "name": n, "year": y, "term": term, "members": m, "n_speeches": c}
+            for i, n, y, term, m, c in conn.execute(text("""
+        SELECT b.id, b.name, b.year, b.loksabha, count(DISTINCT s.person_id), count(DISTINCT ss.speech_id)
         FROM bills b JOIN speech_stances ss ON ss.bill_id = b.id JOIN speeches s ON s.id = ss.speech_id
         WHERE b.merged_into IS NULL GROUP BY b.id"""))]
 

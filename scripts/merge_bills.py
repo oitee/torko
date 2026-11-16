@@ -38,7 +38,7 @@ sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 
 from sqlalchemy import text
 
-from bill_extract import base_key, key_term
+from bill_extract import bill_key
 from db import get_engine
 from llm import api_key, generate, model_id
 
@@ -74,11 +74,11 @@ def number_marks(name: str) -> tuple[tuple[str, ...], tuple[str, ...]]:
 
 
 def blocked(a: dict, b: dict) -> str | None:
-    """Why the pair can never merge, or None. a and b hold bill_key, name, year, and amendment_ordinal.
+    """Why the pair can never merge, or None. a and b hold loksabha, name, year, and amendment_ordinal.
 
-    A bill does not continue into a new Lok Sabha, so two keys of different terms are two bills.
+    A bill does not continue into a new Lok Sabha, so two bills of different terms are two bills.
     """
-    if key_term(a.get("bill_key")) != key_term(b.get("bill_key")):
+    if a["loksabha"] != b["loksabha"]:
         return "term"
     if a["year"] != b["year"]:
         return "year"
@@ -94,7 +94,7 @@ def blocked(a: dict, b: dict) -> str | None:
 def kept_bills(conn) -> dict[int, dict]:
     """Every bill that a kept debate_bills row uses, with its debate titles and summaries."""
     rows = conn.execute(text("""
-        SELECT b.id, b.name, b.year, b.bill_key, b.amendment_ordinal,
+        SELECT b.id, b.name, b.year, b.loksabha, b.bill_key, b.amendment_ordinal,
                array_agg(DISTINCT regexp_replace(coalesce(g.title, ''), '\\s+', ' ', 'g')) AS titles,
                array_remove(array_agg(DISTINCT d.summary), NULL) AS summaries,
                count(DISTINCT d.id) AS n_debates
@@ -175,15 +175,17 @@ def pick_kept(group: set[str], debates: dict[str, int], ids: dict[str, int]) -> 
 
 
 def apply_merges(conn) -> dict[str, int]:
-    rows = [row for row in read_merges() if row["decision"] == "merge"]
-    crossed = [row for row in rows if key_term(row["key_a"]) != key_term(row["key_b"])]
-    rows = [row for row in rows if row not in crossed]
     info = conn.execute(text("""
-        SELECT b.bill_key, b.id, count(d.id) FILTER (WHERE d.kept) AS n
+        SELECT b.bill_key, b.id, b.loksabha, count(d.id) FILTER (WHERE d.kept) AS n
         FROM bills b LEFT JOIN debate_bills d ON d.bill_id = b.id GROUP BY b.id
     """)).all()
-    ids = {key: i for key, i, _ in info}
-    debates = {key: n_debates for key, _, n_debates in info}
+    ids = {key: i for key, i, _, _ in info}
+    terms = {key: term for key, _, term, _ in info}
+    debates = {key: n_debates for key, _, _, n_debates in info}
+    rows = [row for row in read_merges() if row["decision"] == "merge"]
+    crossed = [row for row in rows if row["key_a"] in terms and row["key_b"] in terms
+               and terms[row["key_a"]] != terms[row["key_b"]]]
+    rows = [row for row in rows if row not in crossed]
     conn.execute(text("UPDATE bills SET merged_into = NULL WHERE merged_into IS NOT NULL"))
     merged = missing = 0
     for group in groups([(row["key_a"], row["key_b"]) for row in rows]):
@@ -203,17 +205,18 @@ def apply_merges(conn) -> dict[str, int]:
 def next_links(bills: list[dict], merge_pairs: list[tuple[str, str]]) -> dict[int, int]:
     """{earlier kept id: later kept id} for two bills of the same name in adjacent terms.
 
-    bills holds one dict for each bills row: id, kept_id, bill_key, year. Two kept bills link when their terms
-    are adjacent, their years are equal, and one of their rows has the same name key as a row of the other,
+    bills holds one dict for each bills row: id, kept_id, bill_key, name, year, loksabha. Two kept bills link when
+    their terms are adjacent, their years are equal, and one of their rows has the same name and year key as a row
+    of the other,
     or the merge file has a "merge" answer for a pair of their rows. A bill with two or more candidates in
     the next term gets no link, because the link would be a guess.
     """
     kept = {}
     for b in bills:
-        key = kept.setdefault(b["kept_id"], {"term": None, "year": b["year"], "keys": set()})
-        key["keys"].add(b["bill_key"])
+        entry = kept.setdefault(b["kept_id"], {"term": None, "year": b["year"], "name_keys": set()})
+        entry["name_keys"].add(bill_key(b["name"], b["year"]))
         if b["id"] == b["kept_id"]:
-            key["term"] = key_term(b["bill_key"])
+            entry["term"] = b["loksabha"]
     owner = {b["bill_key"]: b["kept_id"] for b in bills}
     same = set()
     for a, b in merge_pairs:
@@ -225,7 +228,7 @@ def next_links(bills: list[dict], merge_pairs: list[tuple[str, str]]) -> dict[in
         for later_id, later in kept.items():
             if earlier["term"] is None or later["term"] != earlier["term"] + 1 or earlier["year"] != later["year"]:
                 continue
-            if {base_key(key) for key in earlier["keys"]} & {base_key(key) for key in later["keys"]} or (earlier_id, later_id) in same:
+            if earlier["name_keys"] & later["name_keys"] or (earlier_id, later_id) in same:
                 found.setdefault(earlier_id, set()).add(later_id)
     return {earlier_id: next(iter(later_ids)) for earlier_id, later_ids in found.items() if len(later_ids) == 1}
 
@@ -233,7 +236,7 @@ def next_links(bills: list[dict], merge_pairs: list[tuple[str, str]]) -> dict[in
 def link_terms(conn) -> int:
     """Sets bills.next_id on each kept bill that next_links finds. It calls no model."""
     rows = conn.execute(text("""
-        SELECT b.id, coalesce(b.merged_into, b.id) AS kept_id, b.bill_key, b.year
+        SELECT b.id, coalesce(b.merged_into, b.id) AS kept_id, b.bill_key, b.name, b.year, b.loksabha
         FROM bills b WHERE EXISTS (SELECT 1 FROM debate_bills d WHERE d.bill_id = b.id AND d.kept)
     """)).mappings().all()
     pairs = [(r["key_a"], r["key_b"]) for r in read_merges() if r["decision"] == "merge"]

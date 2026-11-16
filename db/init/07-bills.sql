@@ -9,6 +9,8 @@
 -- then the year, then '-ls' and the Lok Sabha number. Two bills with a different
 -- year or a different term never share a key. A bill does not continue into a
 -- new Lok Sabha.
+-- loksabha is the Lok Sabha term of the bill. The key repeats it only to keep
+-- the key unique. Code reads the term from this column, not from the key.
 -- next_id links a kept bill to the kept bill of the same name in the next term.
 -- amendment_ordinal is the number of a Constitution amendment bill, as words in
 -- lower case, for example 'one hundred and thirty-first'.
@@ -22,6 +24,7 @@ CREATE TABLE IF NOT EXISTS bills (
     id                SERIAL   PRIMARY KEY,
     name              TEXT     NOT NULL,
     year              SMALLINT NOT NULL,
+    loksabha          SMALLINT NOT NULL,
     bill_key          TEXT     NOT NULL UNIQUE,
     amendment_ordinal TEXT,
     summary           TEXT,

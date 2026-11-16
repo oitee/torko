@@ -172,17 +172,6 @@ def term_key(key: str, loksabha: int) -> str:
     return f"{key}-ls{loksabha}"
 
 
-def key_term(key: str) -> int | None:
-    """The Lok Sabha number at the end of a stored key, or None for a key with no term."""
-    m = re.search(r"-ls(\d+)$", key or "")
-    return int(m.group(1)) if m else None
-
-
-def base_key(key: str) -> str:
-    """The stored key with no term: the name and the year only."""
-    return re.sub(r"-ls\d+$", "", key or "")
-
-
 def year_near(year, printed: str, body: str) -> bool:
     """True when the year is inside the printed name, or in the YEAR_WINDOW characters after one copy of it."""
     if not isinstance(year, int) or not 1800 <= year <= 2100:
@@ -318,9 +307,9 @@ def bill_id(conn, bill: dict, loksabha: int) -> int:
     """The id of the bills row of this bill in this Lok Sabha. A new row is made when there is none."""
     key = term_key(bill["bill_key"], loksabha)
     conn.execute(text("""
-        INSERT INTO bills (name, year, bill_key, amendment_ordinal) VALUES (:n, :y, :k, :o)
+        INSERT INTO bills (name, year, loksabha, bill_key, amendment_ordinal) VALUES (:n, :y, :ls, :k, :o)
         ON CONFLICT (bill_key) DO NOTHING
-    """), {"n": bill["name"], "y": bill["year"], "k": key, "o": bill["amendment_ordinal"]})
+    """), {"n": bill["name"], "y": bill["year"], "ls": loksabha, "k": key, "o": bill["amendment_ordinal"]})
     return conn.execute(text("SELECT id FROM bills WHERE bill_key = :k"), {"k": key}).scalar()
 
 

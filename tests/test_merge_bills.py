@@ -3,8 +3,8 @@ import pytest
 from scripts.merge_bills import blocked, groups, join_input, next_links, number_marks, pick_kept
 
 
-def b(name, year=2009, ordinal=None):
-    return {"name": name, "year": year, "amendment_ordinal": ordinal}
+def b(name, year=2009, ordinal=None, loksabha=15):
+    return {"name": name, "year": year, "amendment_ordinal": ordinal, "loksabha": loksabha}
 
 
 @pytest.mark.parametrize("x, y, reason", [
@@ -18,10 +18,8 @@ def b(name, year=2009, ordinal=None):
      b("Constitution (One Hundred and Thirty-First Amendment) Bill", 2026, "one hundred and thirty-first"), "year"),
     (b("Finance (No. 2) Bill"), b("Finance Bill (No. 2)"), None),
     # A real case: the merge step joined the 14th and the 15th Lok Sabha bills of this name.
-    ({**b("Indian Trusts (Amendment)"), "bill_key": "indiantrustsamendment-2009-ls14"},
-     {**b("Indian Trusts (Amendment) Bill"), "bill_key": "indiantrustsamendmentbill-2009-ls15"}, "term"),
-    ({**b("Indian Trusts (Amendment)"), "bill_key": "indiantrustsamendment-2009-ls15"},
-     {**b("Indian Trusts (Amendment) Bill"), "bill_key": "indiantrustsamendmentbill-2009-ls15"}, None),
+    (b("Indian Trusts (Amendment)", loksabha=14), b("Indian Trusts (Amendment) Bill", loksabha=15), "term"),
+    (b("Indian Trusts (Amendment)", loksabha=15), b("Indian Trusts (Amendment) Bill", loksabha=15), None),
     (b("Streeet Vendors (Protection of Livelihood) Bill"), b("Street Vendors (Protection of Livelihood) Bill"), None),
 ])
 def test_hard_rules(x, y, reason):
@@ -47,7 +45,9 @@ def test_join_input_numbers_each_summary():
 
 
 def row(i, key, kept=None, year=2019):
-    return {"id": i, "kept_id": kept or i, "bill_key": key, "year": year}
+    """A bills row from its stored key, for example "x-2019-ls16": name x, year 2019, Lok Sabha 16."""
+    name, _, term = key.rsplit("-", 2)
+    return {"id": i, "kept_id": kept or i, "bill_key": key, "name": name, "year": year, "loksabha": int(term[2:])}
 
 
 def test_the_same_name_in_the_next_term_links_the_two_bills():
