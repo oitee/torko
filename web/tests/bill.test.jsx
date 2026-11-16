@@ -95,14 +95,15 @@ describe("Bill page parts", () => {
 
   it("lists every speech of a small bill with its stance", () => {
     const samples = [{ ...bill.samples[0] }, { ...bill.samples[0], id: 12, stance: "unclear", member: "Member Two", member_id: 6 }];
-    wrap(<BillAllSpeeches bill={{ samples, sample_rule: "Every speech." }} />);
+    wrap(<BillAllSpeeches bill={{ samples, small_bill_members: 5 }} />);
     expect(screen.getByRole("heading", { name: "The speeches" })).toBeTruthy();
+    expect(screen.getByText(/Fewer than 5 members spoke on this bill/)).toBeTruthy();
     expect(screen.getByText(/For · BJP/)).toBeTruthy();
     expect(screen.getByText(/Not clear · BJP/)).toBeTruthy();
   });
 
   it("names one speech in the singular", () => {
-    wrap(<BillAllSpeeches bill={{ samples: bill.samples, sample_rule: "Every speech." }} />);
+    wrap(<BillAllSpeeches bill={{ samples: bill.samples, small_bill_members: 5 }} />);
     expect(screen.getByRole("heading", { name: "The speech" })).toBeTruthy();
     expect(readAllText(1)).toBe("Read the speech on this bill");
     expect(readAllText(1200)).toBe("Read all 1,200 speeches on this bill");

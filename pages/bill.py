@@ -20,34 +20,11 @@ MIN_REASON_MEMBERS = 2
 OTHERS_ROW_MIN_SHARED = 4  # A side needs this many reasons of 2 or more members before its one-member points go to one row.
 SMALL_BILL_MEMBERS = 5  # The chart of the bills list uses the same limit.
 
-MEMBER_RULE = (
-    "Each member counts one time. A member with a for speech and an against speech is mixed. "
-    "Otherwise, a member with a for or an against speech has that stance, also when another speech is mixed. "
-    "A member with only mixed and unclear speeches is mixed. A member with only unclear speeches is unclear. A speech with no identified member is not in these counts."
-)
-PARTY_RULE = (
-    "Each member counts one time, in the party of the member on the date of the first speech on the bill. "
-    f"The {TOP_PARTIES} parties with the most members who spoke have their own row. "
-    "The other parties, and the members with no known party, are in Others."
-)
-SAMPLE_RULE = (
-    f"Up to {SAMPLES_PER_STANCE} speeches for each stance, one for each member, by the members whose stance on the bill "
-    "is the same as the stance of the speech. A for or against speech must make no point on the other side. "
-    "The speeches with the most points on their side come first, then the longest. "
-    "Mixed speeches have no points, so the longest come first."
-)
-
-
-SMALL_BILL_RULE = (
-    f"Fewer than {SMALL_BILL_MEMBERS} members spoke on this bill, so the page shows no charts. "
-    "It shows every speech with a stance on the bill, in the order of the debate."
-)
-
-
 def member_stance(stances):
     """The stance of one member from the stances of all the speeches of the member on the bill.
 
     A clear speech (for or against) wins over a mixed speech. A for speech and an against speech give mixed.
+    Only mixed and unclear speeches give mixed. Only unclear speeches give unclear.
     """
     found = set(stances)
     clear = found & {"for", "against"}
@@ -90,7 +67,11 @@ def party_rows(members):
 
 
 def sample_ids(rows, members, per_stance=SAMPLES_PER_STANCE):
-    """[(stance, speech id)]: for each stance in SAMPLE_STANCES, the clearest speeches, by the rule in SAMPLE_RULE.
+    """[(stance, speech id)]: for each stance in SAMPLE_STANCES, the clearest speeches.
+
+    Up to per_stance speeches for each stance, one for each member, by the members whose stance on the bill is the
+    stance of the speech. A for or against speech must make no point on the other side. The speeches with the most
+    points on their side come first, then the longest.
 
     Each row is one speech: speech_id, stance, person_id, words, and own, the count of its points on the side of
     its stance, and other, the count of its points on the other side. members is the result of members_of().
@@ -109,20 +90,11 @@ def sample_ids(rows, members, per_stance=SAMPLES_PER_STANCE):
     return out
 
 
-REASON_RULE = (
-    "A model read each speech and wrote down each point that the speech made for or against the bill, with a quote "
-    "of the words of the member. A second model call put the points of one side into reasons, each with a short label. "
-    "When a side had 5 reasons or more, a third call joined the reasons that gave the same reason in other words. "
-    "The reasons are in order of the number of identified members who gave the reason, then the number of points. "
-    "Each member shows one time in a reason, with the first quote. "
-    "A reason that only one member gave is a point of that member, not a reason of the House. "
-    f"When a side has {OTHERS_ROW_MIN_SHARED} or more reasons that 2 or more members gave, such points are in one last row of that side. "
-    "Otherwise, the side shows each such point as a reason of its own, after the other reasons."
-)
-
-
 def reason_rows(rows):
-    """Turn the points of one bill into the reasons of each side, in the order of REASON_RULE.
+    """Turn the points of one bill into the reasons of each side.
+
+    The reasons are in order of the number of identified members who gave the reason, then the number of points.
+    Each member shows one time in a reason, with the first quote.
 
     Each row is one point: group (bill_arguments.id), side, label, person_id, member, party, speech_id, quote.
     The rows come in the order of the debate, so the first quote of a member is the first row of the member.
@@ -148,7 +120,7 @@ def reason_rows(rows):
 
 
 def split_one_member(reasons):
-    """Moves the reasons of one member to a last row of their side, by the rule in REASON_RULE.
+    """Moves the reasons of one member to a last row of their side.
 
     Returns (reasons, others), each {side: [reason]}. A side with fewer than OTHERS_ROW_MIN_SHARED reasons of
     MIN_REASON_MEMBERS members keeps all its reasons, and its others list is empty. A reason that only unidentified
@@ -269,7 +241,6 @@ def bill_page(conn, bill_id, args=None):
         party["colour"] = colours.get(party["party"])
     return {
         "id": kept, "asked_id": bill_id, "name": bill["name"], "year": bill["year"], "summary": bill["summary"],
-        "summary_note": "Summary generated solely from the text of the debates. No external source used",
         "terms": sorted({debate["loksabha"] for debate in debates}),
         "first_date": dates[0].isoformat() if dates else None,
         "last_date": dates[-1].isoformat() if dates else None,
@@ -279,21 +250,17 @@ def bill_page(conn, bill_id, args=None):
         "speech_counts": stance_counts(row["stance"] for row in rows),
         "members": len(members),
         "member_counts": stance_counts(member["stance"] for member in members.values()),
-        "member_rule": MEMBER_RULE,
         "unidentified_speeches": sum(1 for row in rows if row["person_id"] is None),
         "parties": parties,
-        "party_rule": PARTY_RULE,
         "samples": [{**sample_rows[sid], "stance": stance} for stance, sid in samples if sid in sample_rows],
-        "sample_rule": SMALL_BILL_RULE if small else SAMPLE_RULE,
         "small": small,
+        "small_bill_members": SMALL_BILL_MEMBERS,
         "reasons": reasons,
         "reason_others": reason_others,
-        "reason_rule": REASON_RULE,
         "top_reasons": TOP_REASONS,
         "together": [{"id": joint["id"], "name": joint["name"], "year": joint["year"]} for joint in together],
         "same_name": [{"id": other["id"], "name": other["name"], "year": other["year"], "term": key_term(other["bill_key"]),
                        "side": other["side"]} for other in same_name],
-        "same_name_note": "A different bill with the same name in the Lok Sabha term before or after this one.",
         "counts_note": "speeches counts the speeches with a stance on this bill. speech_counts splits them by stance. "
                        "members and member_counts count identified members. A stance is what a member said, not a vote.",
     }

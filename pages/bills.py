@@ -16,22 +16,6 @@ SHORT_LIST = 5
 TAGS_PER_BILL = 5
 TAG_CHOICES = 40
 
-RULES = {
-    "latest": "By the last day of debate on the bill.",
-    "most_members": "By the number of members who spoke on the bill, in all terms.",
-    "most_opposed": f"By the share of members who spoke against the bill. Only bills with {OPPOSED_MIN_MEMBERS} or more members who spoke.",
-    "chart": f"Each dot is one bill with {CHART_MIN_MEMBERS} or more members who spoke. "
-             "The height is the share of these members who spoke against the bill. The size is the number of members. "
-             "The label in each term names the bill with the most members who spoke.",
-    "member": "Each member counts one time for each bill. A member with only one clear stance (for or against) has that stance. "
-              "A member with a mixed speech, or with both for and against speeches, is mixed. "
-              "A member with only unclear speeches is unclear. A speech with no identified member is not in the member counts.",
-    "tags": f"The tags of a bill are the {TAGS_PER_BILL} tags with most speeches on the bill. "
-            "Tags of places, persons, roles and parliamentary procedure are left out. "
-            f"The filter offers the {TAG_CHOICES} tags that most bills have.",
-}
-
-
 def bill_rows(stance_rows):
     """Fold rows of (bill_id, speech_id, person_id, stance) into {bill_id: {speeches, members, counts}}."""
     speeches = defaultdict(set)
@@ -132,7 +116,7 @@ def load(conn):
                    "first_year": min(years) if years else None, "last_year": max(years) if years else None},
         "chart_min_members": CHART_MIN_MEMBERS,
         "stances": STANCES,
-        "rules": RULES,
+        "opposed_min_members": OPPOSED_MIN_MEMBERS,
         "tags_note": "tags of a bill are positions in tag_choices.",
         "counts_note": "members counts identified members who spoke on the bill. counts splits them by stance. "
                        "speeches counts the speeches with a stance on the bill. A stance is what a member said, not a vote.",

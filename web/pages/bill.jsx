@@ -226,7 +226,10 @@ export function BillAllSpeeches({ bill }) {
   if (!list.length) return null;
   return (
     <Section title={list.length === 1 ? "The speech" : "The speeches"} id="speeches">
-      <p className="bill-meta">{bill.sample_rule}</p>
+      <p className="bill-meta">
+        Fewer than {bill.small_bill_members} members spoke on this bill, so the page shows no charts. It shows every
+        speech with a stance on the bill, in the order of the debate.
+      </p>
       <div className="bill-samples">
         {list.map((s) => <SpeechCard key={s.id} s={s} stanceLabel />)}
       </div>
@@ -305,7 +308,7 @@ export default function Bill() {
           {bill.summary && (
             <Section title="What the bill does">
               <p className="bill-summary">{bill.summary}</p>
-              <p className="bill-meta">{bill.summary_note}</p>
+              <p className="bill-meta">Summary generated solely from the text of the debates. No external source used</p>
             </Section>
           )}
           {bill.small ? (

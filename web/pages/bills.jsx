@@ -290,7 +290,12 @@ export default function Bills() {
 
       <section className="bill-sec">
         <h2 className="bill-sec__title">Bills by opposition in the debate</h2>
-        <p className="bill-meta">{data.rules.chart} Stance of a member is derived from the text of their speech and not from voting records.</p>
+        <p className="bill-meta">
+          Each dot is one bill with {data.chart_min_members} or more members who spoke. The height is the share of these
+          members who spoke against the bill. The size is the number of members. The label in each term names the bill
+          with the most members who spoke. Stance of a member is derived from the text of their speech and not from
+          voting records.
+        </p>
         <div className="bills-chips">
           <Chip on={!amendment && tag === null} onClick={() => { setAmendment(false); setTag(null); }}>All bills</Chip>
           <Chip on={amendment} onClick={() => setAmendment(!amendment)}>Constitution amendments</Chip>
@@ -314,16 +319,18 @@ export default function Bills() {
 
       <section className="bill-sec">
         <div className="bills-shorts">
-          <ShortList title="Latest" rule={data.rules.latest} ids={data.lists.latest} byId={byId} />
-          <ShortList title="Most members" rule={data.rules.most_members} ids={data.lists.most_members} byId={byId} />
-          <ShortList title="Most opposed" rule={data.rules.most_opposed} ids={data.lists.most_opposed} byId={byId} />
+          <ShortList title="Latest" rule="By the last day of debate on the bill." ids={data.lists.latest} byId={byId} />
+          <ShortList title="Most members" rule="By the number of members who spoke on the bill, in all terms." ids={data.lists.most_members} byId={byId} />
+          <ShortList title="Most opposed" rule={`By the share of members who spoke against the bill. Only bills with ${data.opposed_min_members} or more members who spoke.`} ids={data.lists.most_opposed} byId={byId} />
         </div>
       </section>
 
       <AllBills bills={data.bills} />
 
       <p className="bill-meta bill-method">
-        {data.rules.member} <Link to="/method">Read the method</Link>
+        Each member counts one time for each bill. A member with only one clear stance (for or against) has that stance.
+        A member with a mixed speech, or with both for and against speeches, is mixed. A member with only unclear speeches
+        is unclear. A speech with no identified member is not in the member counts. <Link to="/method">Read the method</Link>
       </p>
     </main>
   );
