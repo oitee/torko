@@ -39,8 +39,8 @@ LEGACY_EXAMPLE = {
 SPEECH_EXAMPLE = 340542     # speeches.id of a short speech with a few short interruptions
 # Fishermen of Kancheepuram: the check keeps most subjects and drops two, so the example shows both results.
 SUBJECTS_EXAMPLE = 296815  # speeches.id of a short speech with subjects that the check kept and dropped
-# Wage and salary arrears: 23 names under the tag Arrears, the example that the text of step 5 gives.
-SUBJECT_GROUP_EXAMPLE = 23204  # subjects.id of a specific subject with several names
+# A specific subject with several names, joined under one tag, for the example of step 5.
+SUBJECT_GROUP_EXAMPLE = 43562  # subjects.id of a specific subject with several names
 SPEECH_TEXT_WORDS = 60      # the words of each turn that the speech example sends
 GROUP_NAMES = 8             # the names of the subject group that the example sends
 

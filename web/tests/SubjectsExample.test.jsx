@@ -36,6 +36,14 @@ describe("markMentions", () => {
     expect(parts.map((p) => p.text).join("")).toBe(EXAMPLE.text);
   });
 
+  it("gives each mark the index of its subject, so the mark can follow the chip", () => {
+    const parts = markMentions("pension and wage arrears", [
+      { mention: "wage arrears", kept: false },
+      { mention: "pension", kept: true },
+    ]);
+    expect(parts.filter((p) => p.mark).map((p) => [p.text, p.item])).toEqual([["pension", 1], ["wage arrears", 0]]);
+  });
+
   it("skips a mention that is not in the text, and a mention that overlaps another", () => {
     const parts = markMentions("wage arrears are due", [
       { mention: "wage arrears", kept: true },

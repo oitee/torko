@@ -30,12 +30,12 @@ function renderSpeech(example) {
 }
 
 describe("SpeechExample", () => {
-  it("shows every turn with its speaker and its words, and sets the interruptions in", () => {
+  it("shows every turn with its speaker, and sets the interruptions in", () => {
     const { container } = renderSpeech(EXAMPLE);
     expect(screen.getAllByRole("listitem")).toHaveLength(4);
     expect(container.querySelectorAll(".speech-example__turn--other")).toHaveLength(2);
-    expect(screen.getByText("That is not correct.")).toBeTruthy();
-    expect(screen.getByText("· 6 words")).toBeTruthy();
+    expect(container.querySelectorAll(".speech-example__turn--other")[0].textContent).toContain("That is not correct.");
+    expect(container.querySelector(".speech-example__stitch").className).toContain("is-p3");
   });
 
   it("states the result: the turns and interruptions that become one speech", () => {

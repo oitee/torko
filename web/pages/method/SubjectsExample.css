@@ -1,54 +1,52 @@
-/* One speech with its subjects marked, and the list of subjects with the result of the check. */
-
-.subjects-example {
-  display: flex;
-  flex-direction: column;
-  gap: var(--space-2);
-}
+/* One speech with its subjects underlined, the TLDR, and the chips of the subjects with the result of the check. */
 
 .subjects-example__text {
   margin: 0;
-  font-size: var(--size-body);
-  line-height: 1.9;
-  color: var(--ink);
+  font-size: 0.875rem;
+  line-height: 1.6;
+  color: var(--ink-2);
 }
 
-/* A mention: a box in ink, not a colour. A subject that the check dropped has a dashed box. */
 .subjects-example__mark {
-  background: transparent;
-  color: inherit;
-  border: 1px solid var(--ink);
-  padding: 1px 3px;
-  box-decoration-break: clone;
-  -webkit-box-decoration-break: clone;
+  background: none;
+  color: var(--ink);
+  border-bottom: 2px solid transparent;
+  transition: border-color 0.4s;
 }
 
-.subjects-example__mark--dropped {
-  border-style: dashed;
-  border-color: var(--control);
+.subjects-example__mark.is-read {
+  border-bottom-color: var(--action);
 }
 
-.subjects-example__tldr {
-  display: flex;
-  flex-direction: column;
-  gap: var(--space-1);
-  border-bottom: 1px solid var(--hairline);
-  padding-bottom: var(--space-3);
-  margin-bottom: var(--space-1);
+.subjects-example__mark--dropped.is-read {
+  border-bottom-style: dashed;
+  border-bottom-color: var(--stance-against);
 }
 
-.subjects-example__tldr p {
-  margin: 0;
+.subjects-example .subjects-example__tldr {
+  margin: 24px 0 20px;
+  font-size: 1rem;
+  line-height: 1.5;
+  min-height: 3em;
+  color: var(--ink);
 }
 
 .subjects-example__tldr-label {
-  font-size: var(--size-label);
+  font-size: 0.75rem;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--source-model);
   font-weight: 600;
-  color: var(--ink);
+  margin-right: 8px;
 }
 
-.subjects-example__tldr-text {
-  color: var(--ink);
+.subjects-example__label {
+  margin-top: 14px;
+  transition: opacity 0.4s;
+}
+
+.subjects-example__label.is-hidden {
+  opacity: 0;
 }
 
 .subjects-example__items {
@@ -56,29 +54,52 @@
   margin: 0;
   padding: 0;
   display: flex;
-  flex-direction: column;
-  gap: var(--space-1);
+  flex-wrap: wrap;
+  gap: 6px;
+  min-height: 5.5em;
+  align-content: flex-start;
 }
 
 .subjects-example__item {
-  display: grid;
-  grid-template-columns: 1.25rem minmax(0, 1fr) auto;
-  gap: var(--space-2);
-  align-items: baseline;
-  font-size: var(--size-body);
-  color: var(--ink);
+  font-size: 0.8125rem;
+  padding: 3px 10px;
+  background: var(--tag-bg);
+  border: 1px solid transparent;
+  opacity: 0;
+  transform: translateY(6px);
+  transition: all 0.4s ease;
 }
 
-.subjects-example__item--dropped {
-  color: var(--meta);
+.subjects-example__item.is-in {
+  opacity: 1;
+  transform: none;
 }
 
-.subjects-example__item--dropped .subjects-example__name {
-  text-decoration: line-through;
-}
-
-.subjects-example__state {
+.subjects-example__item::before {
   font-family: var(--font-mono);
-  font-size: var(--size-count);
+  margin-right: 6px;
   color: var(--meta);
+  content: "·";
+}
+
+.subjects-example__item.is-kept {
+  border-color: var(--action);
+  background: color-mix(in srgb, var(--action) 14%, var(--sheet));
+}
+
+.subjects-example__item.is-kept::before {
+  content: "✓";
+  color: var(--action);
+}
+
+.subjects-example__item.is-dropped {
+  border-color: var(--stance-against);
+  background: color-mix(in srgb, var(--stance-against) 12%, var(--sheet));
+  text-decoration: line-through;
+  color: var(--meta);
+}
+
+.subjects-example__item.is-dropped::before {
+  content: "✕";
+  color: var(--stance-against);
 }

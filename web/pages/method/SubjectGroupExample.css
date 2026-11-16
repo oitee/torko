@@ -1,35 +1,60 @@
-/* Several names, one subject, one tag. */
+/* The diagram of step 5: names join into one subject, and the subject links to a tag. */
 
-.group-example {
-  display: flex;
-  flex-direction: column;
-  gap: var(--space-2);
+.method-demo svg .group-example__box {
+  fill: var(--sheet);
+  stroke: var(--control);
 }
 
-.group-example__names {
-  list-style: none;
-  margin: 0;
-  padding: 0;
-  display: flex;
-  flex-wrap: wrap;
-  gap: var(--space-2);
+.method-demo svg .group-example__box.is-subj {
+  stroke: var(--source-model);
 }
 
-.group-example__names .chip {
-  max-width: 100%;
+.method-demo svg .group-example__box.is-tag {
+  stroke: var(--ink);
+  stroke-width: 1.5;
 }
 
-.group-example__subject {
-  margin: 0;
-  font-size: var(--size-heading);
-  line-height: var(--lh-heading);
+.method-demo svg .group-example__t {
+  font-family: var(--font-sans);
+  font-size: 12px;
+  fill: var(--ink);
+}
+
+.method-demo svg .group-example__t.is-sm {
+  font-size: 11px;
+  fill: var(--ink-2);
+}
+
+.method-demo svg .group-example__t.is-meta {
+  fill: var(--meta);
+}
+
+.method-demo svg .group-example__t.is-bold {
   font-weight: 600;
-  color: var(--ink);
 }
 
-.group-example__count {
-  font-family: var(--font-mono);
-  font-size: var(--size-count);
-  font-weight: 400;
-  color: var(--meta);
+.group-example__edge {
+  stroke: var(--control);
+  stroke-width: 1.2;
+  fill: none;
+  stroke-dasharray: 300;
+  stroke-dashoffset: 300;
+  animation: method-draw 1s ease forwards;
+}
+
+.group-example__edge.is-late {
+  animation-delay: 0.9s;
+}
+
+.group-example__fade {
+  opacity: 0;
+  animation: method-pop 0.5s ease forwards;
+}
+
+.group-example__fade.is-d1 {
+  animation-delay: 0.8s;
+}
+
+.group-example__fade.is-d2 {
+  animation-delay: 1.6s;
 }

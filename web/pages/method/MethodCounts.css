@@ -1,0 +1,29 @@
+/* The totals at the foot of the Method page. */
+
+.method-counts {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 28px 40px;
+  border-top: 1px solid var(--ink);
+  padding-top: var(--space-6);
+}
+
+.method-counts__count {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.method-counts__count b {
+  font-family: var(--font-mono);
+  font-size: 1.5rem;
+  font-weight: 500;
+  line-height: 1.1;
+  font-variant-numeric: tabular-nums;
+  color: var(--ink);
+}
+
+.method-counts__count span {
+  font-size: 0.8125rem;
+  color: var(--meta);
+}

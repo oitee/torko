@@ -1,74 +1,64 @@
-/* The turns of one speech, with the bracket of the speech on the left. */
+/* The turns of one speech. Four phases: plain text, a box round each turn, the interruptions dotted and set in,
+   and one outer box round the speech with the result. */
 
-.speech-example {
-  display: flex;
-  flex-direction: column;
-  gap: var(--space-2);
+.speech-example__stitch {
+  border: 1px solid transparent;
+  padding: 0;
+  transition: border-color 0.6s, padding 0.6s;
 }
 
 .speech-example__turns {
   list-style: none;
   margin: 0;
-  padding: 0 0 0 var(--space-5);
-  position: relative;
+  padding: 0;
   display: flex;
   flex-direction: column;
-  gap: var(--space-3);
+  gap: var(--space-2);
 }
 
-.speech-example__turns::before {
-  content: "";
-  position: absolute;
-  left: 0;
-  top: 0.25rem;
-  bottom: 0.25rem;
-  width: 0.625rem;
-  border: 2px solid var(--ink);
-  border-right: 0;
-  pointer-events: none;
-}
-
-.speech-example__turn p {
-  margin: 0;
-}
-
-/* An interruption sits further in, in a quieter colour. */
-.speech-example__turn--other {
-  margin-left: var(--space-6);
-  padding-left: var(--space-3);
-  border-left: 1px solid var(--control);
-}
-
-.speech-example__who {
-  font-size: var(--size-label);
-  line-height: var(--lh-label);
-  font-weight: 600;
-  color: var(--ink);
-}
-
-.speech-example__turn--other .speech-example__who {
-  font-weight: 500;
+.speech-example__turn {
+  border: 1px solid transparent;
+  padding: 2px 0;
+  font-size: 0.8125rem;
   color: var(--ink-2);
+  transition: border-color 0.6s, padding 0.6s, margin-left 0.6s, border-style 0s 0.3s;
 }
 
-.speech-example__words {
-  font-family: var(--font-mono);
-  font-size: var(--size-count);
-  font-weight: 400;
+.speech-example__turn b {
+  color: var(--ink);
+  font-weight: 600;
+}
+
+.is-p1 .speech-example__turn,
+.is-p2 .speech-example__turn,
+.is-p3 .speech-example__turn {
+  border-color: var(--control);
+  padding: 8px 10px;
+}
+
+.is-p2 .speech-example__turn--other,
+.is-p3 .speech-example__turn--other {
+  border-style: dotted;
+  margin-left: 28px;
   color: var(--meta);
 }
 
-.speech-example__text {
-  font-size: var(--size-body);
-  line-height: var(--lh-body);
-  color: var(--ink);
-}
-
-.speech-example__turn--other .speech-example__text {
-  color: var(--ink-2);
+.speech-example__stitch.is-p3 {
+  border-color: var(--ink);
+  padding: 12px;
 }
 
 .speech-example__result {
-  margin: 0;
-  color: var(--ink);
+  margin: 12px 0 0;
+  font-size: 0.8125rem;
+  color: var(--ink-2);
+  max-height: 0;
+  opacity: 0;
+  overflow: hidden;
+  transition: max-height 0.6s, opacity 0.6s 0.2s;
+}
+
+.is-p3 .speech-example__result {
+  max-height: 4em;
+  opacity: 1;
 }

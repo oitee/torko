@@ -26,18 +26,26 @@ function renderGroup(example) {
 }
 
 describe("SubjectGroupExample", () => {
-  it("shows the names, the one subject with its speeches, and the tag as a link", () => {
+  it("draws the names, the one subject with its speeches, and the tag as a link", () => {
     renderGroup(EXAMPLE);
-    for (const n of EXAMPLE.names) expect(screen.getByText(n)).toBeTruthy();
+    for (const n of EXAMPLE.names) expect(screen.getByText(`“${n}”`)).toBeTruthy();
     expect(screen.getByText("Names in different speeches · 3 of 12")).toBeTruthy();
-    expect(screen.getByText(/Sugarcane farmers' arrears/)).toBeTruthy();
-    expect(screen.getByText("· 236 speeches")).toBeTruthy();
+    expect(screen.getByRole("img").getAttribute("aria-label")).toBe(
+      "3 names join into the subject Sugarcane farmers' arrears, which links to the tag Arrears."
+    );
+    expect(screen.getByText("236 speeches")).toBeTruthy();
     expect(screen.getByRole("link", { name: "Arrears" }).getAttribute("href")).toBe("/tag/arrears");
   });
 
-  it("leaves out the tag box when the subject has no tag", () => {
+  it("leaves out the tag when the subject has no tag", () => {
     renderGroup({ ...EXAMPLE, tag: null, tag_slug: null });
-    expect(screen.queryByText("Under the tag")).toBeNull();
+    expect(screen.queryByText(/Under the tag/)).toBeNull();
+  });
+
+  it("draws at most three names, and cuts a long name to fit its box", () => {
+    renderGroup({ ...EXAMPLE, names: [...EXAMPLE.names, "A fourth name", "Employee dues and unpaid salaries of all kinds"] });
+    expect(screen.queryByText("“A fourth name”")).toBeNull();
+    expect(screen.getByText("Names in different speeches · 3 of 12")).toBeTruthy();
   });
 
   it("shows nothing without names", () => {

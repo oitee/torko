@@ -14,13 +14,14 @@ describe("MethodLimits", () => {
     expect(text).toContain("106,168 of 526,701 turns have no member name.");
     expect(text).toContain("Torko does not read about 13.6% of the source text.");
     expect(text).toContain("The share is 32.5% in the 13th Lok Sabha and about 3% in recent terms.");
-    expect(text).toContain("Cite the speech, not the TLDR.");
+    expect(text).not.toContain("machine text");
+    expect(text).not.toContain("formal event");
   });
 
   it("hides a line when its figure is missing", () => {
     const { container } = render(<MethodLimits data={{ ...methodAnswer, unread_text: null, turns: null }} />);
     expect(container.textContent).not.toContain("source text");
     expect(container.textContent).not.toContain("no member name");
-    expect(screen.getAllByRole("listitem").length).toBe(3);
+    expect(screen.getAllByRole("listitem").length).toBe(1);
   });
 });

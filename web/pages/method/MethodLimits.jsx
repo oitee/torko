@@ -47,11 +47,6 @@ export default function MethodLimits({ data }) {
             )}
           </li>
         )}
-        <li>The TLDR and the tags are machine text. Cite the speech, not the TLDR.</li>
-        <li>
-          The party of a member changes on a date only after a formal event, for example a by-election, a split that
-          the House recognises, or an expulsion.
-        </li>
       </ul>
     </section>
   );

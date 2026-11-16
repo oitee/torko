@@ -3,7 +3,7 @@ import useReveal from "./useReveal.js";
 import "./MethodStep.css";
 
 // MethodStep is one node of the flow on the Method page: a numbered node on the line that joins the steps,
-// a heading, a short text, the figure of the step, and an example.
+// a heading, a short text, a looping example from real data, and the figure of the step.
 // The figure is one line of counts. Each count states its denominator.
 export default function MethodStep({ n, title, children, figure, example, last = false }) {
   const [ref, seen] = useReveal();
@@ -22,8 +22,8 @@ export default function MethodStep({ n, title, children, figure, example, last =
           {title}
         </h2>
         {children}
-        {figure && <p className="method-step__figure">{figure}</p>}
         {example && <div className="method-step__example">{example}</div>}
+        {figure && <p className="method-step__figure">{figure}</p>}
       </div>
     </li>
   );

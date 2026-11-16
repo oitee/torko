@@ -54,28 +54,16 @@ describe("Method page", () => {
     ]);
   });
 
-  it("states each figure with its denominator, from the API", async () => {
+  it("shows no figure under steps 1 to 4, and the count of tags under step 5", async () => {
     vi.spyOn(api, "getJSON").mockResolvedValue(methodAnswer);
     const { container } = renderMethod();
     await screen.findByText("Read the debates");
-    const text = container.textContent;
-    expect(text).toContain("64,921 debates, 20 Oct 1999 to 18 Apr 2026 · 526,701 turns");
-    // 526,701 turns less 172,482 turns of the chair and of many members at once.
-    expect(text).toContain("248,051 of 354,219 turns of one speaker have a member name");
-    expect(text).toContain("137,781 of 173,225 have a member");
-    expect(text).toContain(
-      "Of the 116,387 speeches of a member with 50 words or more, 109,726 have a TLDR and 107,481 have at least one tag"
-    );
-  });
-
-  it("follows the API, not a number written into the page", async () => {
-    vi.spyOn(api, "getJSON").mockResolvedValue({
-      ...methodAnswer,
-      speeches: { ...methodAnswer.speeches, eligible: 200000 },
-    });
-    const { container } = renderMethod();
-    await screen.findByText("Read the debates");
-    expect(container.textContent).toContain("Of the 200,000 speeches");
+    const steps = container.querySelector(".method-page__steps").textContent;
+    expect(steps).not.toContain("526,701 turns");
+    expect(steps).not.toContain("turns of one speaker have a member name");
+    expect(steps).not.toContain("have a member");
+    expect(steps).not.toContain("have a TLDR");
+    expect(steps).toContain("7,027 tags");
   });
 
   it("keeps the three verbs of the answer apart from the rest of the sentence", async () => {
