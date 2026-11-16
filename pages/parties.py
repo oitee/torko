@@ -109,14 +109,16 @@ def load_term_tags(conn):
             SELECT s.id AS sp, s.person_id AS pid, d.loksabha AS term, pa.party, st.tag_id, t.domain
             FROM speech_tags st JOIN speeches s ON s.id = st.speech_id JOIN debates d ON d.id = s.debate_id
             JOIN tags t ON t.id = st.tag_id {PARTY_AT_DATE}
-            WHERE s.person_id IS NOT NULL AND pa.party IS NOT NULL)
+            WHERE s.person_id IS NOT NULL AND pa.party IS NOT NULL),
+        -- pr has one row for each (speech, tag), so a speech with 3 tags is there 3 times.
+        -- The two lists below remove the copies once, so the speech counts need no count(DISTINCT) of their own.
+        per_speech AS MATERIALIZED (SELECT DISTINCT sp, term, party FROM pr),
+        per_area AS MATERIALIZED (SELECT DISTINCT sp, term, party, domain FROM pr WHERE domain IS NOT NULL)
         SELECT 'tag' AS k, party, term, tag_id, NULL AS area, count(*) AS n, count(DISTINCT pid) AS m FROM pr GROUP BY 2, 3, 4
-        UNION ALL SELECT 'tagged', party, term, NULL, NULL, count(DISTINCT sp), NULL FROM pr GROUP BY 2, 3
-        UNION ALL SELECT 'area', party, term, NULL, domain, count(DISTINCT sp), NULL FROM pr
-                  WHERE domain IS NOT NULL GROUP BY 2, 3, 5
-        UNION ALL SELECT 'house_area', NULL, term, NULL, domain, count(DISTINCT sp), NULL FROM pr
-                  WHERE domain IS NOT NULL GROUP BY 3, 5
-        UNION ALL SELECT 'house_tagged', NULL, term, NULL, NULL, count(DISTINCT sp), NULL FROM pr GROUP BY 3""")).all()
+        UNION ALL SELECT 'tagged', party, term, NULL, NULL, count(*), NULL FROM per_speech GROUP BY 2, 3
+        UNION ALL SELECT 'area', party, term, NULL, domain, count(*), NULL FROM per_area GROUP BY 2, 3, 5
+        UNION ALL SELECT 'house_area', NULL, term, NULL, domain, count(*), NULL FROM per_area GROUP BY 3, 5
+        UNION ALL SELECT 'house_tagged', NULL, term, NULL, NULL, count(*), NULL FROM per_speech GROUP BY 3""")).all()
     tag_n, tag_members, area_n, house_area = defaultdict(Counter), defaultdict(Counter), defaultdict(Counter), defaultdict(Counter)
     tagged, house_tagged = {}, {}
     for k, party, term, tid, area, n, m in rows:
