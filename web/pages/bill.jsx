@@ -80,7 +80,6 @@ export function BillParties({ bill }) {
   const others = rows.find((p) => p.party === "Others");
   return (
     <Section title="By party">
-      <p className="bill-meta">Members who spoke, by their party on the day. Parties in order of members who spoke.</p>
       <div className="bill-parties">
         {rows.map((p) => (
           <div className="bill-party" key={p.party}>
@@ -191,7 +190,6 @@ export function BillReasons({ bill }) {
   const others = bill.reason_others || {};
   return (
     <Section title="The reasons members gave" id="reasons">
-      <p className="bill-meta">{bill.reason_rule} Open a reason to read the quotes.</p>
       <div className="bill-sample-groups">
         {sides.map((s) => <ReasonSide key={s} side={s} list={reasons[s]} others={others[s] || []} top={top} most={most} />)}
       </div>
@@ -244,7 +242,6 @@ export function BillSamples({ bill }) {
   const groups = SAMPLE_ORDER.map((st) => [st, (bill.samples || []).filter((s) => s.stance === st)]).filter(([, l]) => l.length);
   return (
     <Section title="Speeches" id="speeches">
-      <p className="bill-meta">{bill.sample_rule}</p>
       <div className="bill-sample-groups">
         {groups.map(([stance, list]) => (
           <div key={stance} className="bill-sample-group">
@@ -338,9 +335,6 @@ export default function Bill() {
               </ul>
             </Section>
           )}
-          <p className="bill-meta bill-method">
-            How Torko reads a stance: a model reads each speech with the summary of the bill and answers for, against, mixed, or not clear. The reasons come from the points of each speech, with a quote that Torko finds in the speech text. <Link to="/method">Read the method</Link>
-          </p>
         </div>
       </PageLayout>
     </div>
