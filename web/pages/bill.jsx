@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { Link, useNavigate, useParams } from "react-router-dom";
 import { useAnswer } from "../assets/js/useApi.js";
-import { formatDateLong, formatNumber, termLong } from "../assets/js/format.js";
+import { formatDateLong, formatNumber, memberCount, SPEAKER_NOT_IDENTIFIED, termLong } from "../assets/js/format.js";
 import Breadcrumb from "../components/Breadcrumb.jsx";
 import PageLayout from "../components/PageLayout.jsx";
 import PartyLink from "../components/PartyLink.jsx";
@@ -100,9 +100,8 @@ export function BillParties({ bill }) {
 
 // "9 members, 12 points", or "1 point" for a reason that only an unidentified member gave.
 export function reasonCount(r) {
-  const pts = `${formatNumber(r.points)} ${r.points === 1 ? "point" : "points"}`;
-  if (!r.members) return pts;
-  return `${formatNumber(r.members)} ${r.members === 1 ? "member" : "members"}, ${pts}`;
+  if (!r.members) return SPEAKER_NOT_IDENTIFIED;
+  return memberCount(r.members);
 }
 
 // One quote, with the member, the party, and a link to the speech. A heading names the point, when it has one.
@@ -120,8 +119,8 @@ function Quote({ q, heading }) {
 }
 
 // The last row of a side: the points that a single member supported. Each point shows its label and its first quote.
-export function otherPointsCount(n) {
-  return `${formatNumber(n)} ${n === 1 ? "point" : "points"}`;
+export function otherReasonsCount(n) {
+  return `${formatNumber(n)} ${n === 1 ? "reason" : "reasons"}`;
 }
 
 function OtherPoints({ list }) {
@@ -130,7 +129,7 @@ function OtherPoints({ list }) {
       <details>
         <summary className="bill-reason__head">
           <span className="bill-reason__label">Points supported by a single member</span>
-          <span className="bill-reason__count">{otherPointsCount(list.length)}</span>
+          <span className="bill-reason__count">{otherReasonsCount(list.length)}</span>
         </summary>
         <ul className="bill-reason__quotes">
           {list.map((r) => <Quote key={r.id} q={r.quotes[0]} heading={r.label} />)}

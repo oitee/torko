@@ -62,8 +62,9 @@ describe("Bill page parts", () => {
   });
 
   it("writes the count of a reason", () => {
-    expect(reasonCount({ members: 9, points: 12 })).toBe("9 members, 12 points");
-    expect(reasonCount({ members: 0, points: 1 })).toBe("1 point");
+    expect(reasonCount({ members: 9, points: 12 })).toBe("9 members");
+    expect(reasonCount({ members: 1, points: 3 })).toBe("1 member");
+    expect(reasonCount({ members: 0, points: 1 })).toBe("Speaker not identified");
   });
 
   it("shows the first reasons of each side and the rest on a click", () => {
@@ -87,7 +88,7 @@ describe("Bill page parts", () => {
     expect(screen.queryByText("Points supported by a single member")).toBeNull();
     fireEvent.click(screen.getByRole("button", { name: "Show all 3 reasons" }));
     expect(screen.getByText("Points supported by a single member")).toBeTruthy();
-    expect(screen.getByText("2 points")).toBeTruthy();
+    expect(screen.getByText("2 reasons")).toBeTruthy();
     expect(screen.getByText("Point 7")).toBeTruthy();
     expect(screen.getByText("Quote 8")).toBeTruthy();
   });
