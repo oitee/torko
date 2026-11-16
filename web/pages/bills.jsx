@@ -291,10 +291,8 @@ export default function Bills() {
       <section className="bill-sec">
         <h2 className="bill-sec__title">Bills by opposition in the debate</h2>
         <p className="bill-meta">
-          Each dot is one bill with {data.chart_min_members} or more members who spoke. The height is the share of these
-          members who spoke against the bill. The size is the number of members. The label in each term names the bill
-          with the most members who spoke. Stance of a member is derived from the text of their speech and not from
-          voting records.
+          Each dot is one bill with {data.chart_min_members} or more speakers. The larger the share of the speakers
+          opposing the bill, the higher the dot. The larger the no. of members, larger the size of the dot.
         </p>
         <div className="bills-chips">
           <Chip on={!amendment && tag === null} onClick={() => { setAmendment(false); setTag(null); }}>All bills</Chip>
@@ -326,12 +324,6 @@ export default function Bills() {
       </section>
 
       <AllBills bills={data.bills} />
-
-      <p className="bill-meta bill-method">
-        Each member counts one time for each bill. A member with only one clear stance (for or against) has that stance.
-        A member with a mixed speech, or with both for and against speeches, is mixed. A member with only unclear speeches
-        is unclear. A speech with no identified member is not in the member counts. <Link to="/method">Read the method</Link>
-      </p>
     </main>
   );
 }
