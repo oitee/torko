@@ -290,7 +290,7 @@ export default function Bills() {
 
       <section className="bill-sec">
         <h2 className="bill-sec__title">Bills by opposition in the debate</h2>
-        <p className="bill-meta">{data.rules.chart} A spoken stance is not a vote.</p>
+        <p className="bill-meta">{data.rules.chart} Stance of a member is derived from the text of their speech and not from voting records.</p>
         <div className="bills-chips">
           <Chip on={!amendment && tag === null} onClick={() => { setAmendment(false); setTag(null); }}>All bills</Chip>
           <Chip on={amendment} onClick={() => setAmendment(!amendment)}>Constitution amendments</Chip>

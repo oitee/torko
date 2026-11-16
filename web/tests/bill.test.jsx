@@ -32,7 +32,7 @@ describe("Bill page parts", () => {
 
   it("shows the member counts", () => {
     wrap(<BillMembers bill={bill} />);
-    expect(screen.getByText(/6 members spoke on this bill/)).toBeTruthy();
+    expect(screen.getByText(/Stance of a member is derived from the text of their speech/)).toBeTruthy();
     expect(screen.getByText("not clear")).toBeTruthy();
   });
 
@@ -105,11 +105,6 @@ describe("Bill page parts", () => {
     expect(screen.getByRole("heading", { name: "The speech" })).toBeTruthy();
     expect(readAllText(1)).toBe("Read the speech on this bill");
     expect(readAllText(1200)).toBe("Read all 1,200 speeches on this bill");
-  });
-
-  it("writes one member in the singular", () => {
-    wrap(<BillMembers bill={{ ...bill, members: 1 }} />);
-    expect(screen.getByText(/^1 member spoke on this bill/)).toBeTruthy();
   });
 
   it("shows no reasons section when the bill has no reasons", () => {

@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { Link, useNavigate, useParams } from "react-router-dom";
 import { useAnswer } from "../assets/js/useApi.js";
-import { formatDateLong, formatNumber, memberCount, termLong } from "../assets/js/format.js";
+import { formatDateLong, formatNumber, termLong } from "../assets/js/format.js";
 import Breadcrumb from "../components/Breadcrumb.jsx";
 import PageLayout from "../components/PageLayout.jsx";
 import PartyLink from "../components/PartyLink.jsx";
@@ -58,7 +58,7 @@ export function BillMembers({ bill }) {
   return (
     <Section title="Where the members stood">
       <p className="bill-meta">
-        {memberCount(bill.members)} spoke on this bill. Each member counts one time. A spoken stance is not a vote.
+        Stance of a member is derived from the text of their speech and not from voting records.
       </p>
       <StanceBar counts={c} />
       <div className="bill-figures bill-figures--four">
