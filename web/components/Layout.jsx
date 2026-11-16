@@ -41,7 +41,7 @@ export default function Layout() {
             <Link to="/search">Search</Link>
             <Link to="/trends">Trends</Link>
             <Link to="/parties">Parties</Link>
-            <Link to="/method">Method</Link>
+            <Link to="/method">How Torko Works</Link>
           </nav>
           <p className="site-footer__source">
             Source: Lok Sabha debates on{" "}

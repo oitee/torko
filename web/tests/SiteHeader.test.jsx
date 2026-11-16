@@ -18,7 +18,7 @@ describe("SiteHeader", () => {
     const searchLink = screen.getByRole("link", { name: "Search" });
     expect(searchLink.getAttribute("href")).toBe("/search");
     expect(searchLink.getAttribute("aria-current")).toBeNull();
-    expect(screen.getByRole("link", { name: "Method" }).getAttribute("href")).toBe("/method");
+    expect(screen.getByRole("link", { name: "How Torko Works" }).getAttribute("href")).toBe("/method");
     expect(screen.queryByRole("link", { name: "Your MP" })).toBeNull();
     expect(screen.getByRole("link", { name: "Skip to the content" }).getAttribute("href")).toBe("#main");
   });
@@ -46,7 +46,7 @@ describe("SiteHeader", () => {
       </MemoryRouter>
     );
 
-    expect(screen.getByRole("link", { name: "Method" }).getAttribute("aria-current")).toBe("page");
+    expect(screen.getByRole("link", { name: "How Torko Works" }).getAttribute("aria-current")).toBe("page");
     expect(screen.getByRole("link", { name: "Search" }).getAttribute("aria-current")).toBeNull();
   });
 

@@ -10,7 +10,7 @@ export const NAV_ITEMS = [
   { to: "/bills", label: "Bills" },
   { to: "/trends", label: "Trends" },
   { to: "/parties", label: "Parties" },
-  { to: "/method", label: "Method" },
+  { to: "/method", label: "How Torko Works" },
 ];
 
 function NavLinks({ pathname, onPick }) {
