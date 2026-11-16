@@ -27,7 +27,7 @@ sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 from sqlalchemy import text
 
 import argument_group as ag
-from llm import model_id
+from llm import api_key, generate, model_id
 from db import get_engine
 
 DEFAULT_MODEL = "gemini-3.8-flash"
@@ -53,10 +53,9 @@ def pick_sample(lists: dict, n: int, seed: int) -> list[str]:
 
 def ask(model: str, system: str, body: str, schema: dict, check, key: str, tries: int, name: str):
     """One call, asked again while check() refuses the answer. Returns (checked answer, problems, tokens)."""
-    from scripts.extract_entities import generate
     problems: list[str] = []
     for _ in range(tries):
-        answer, tokens = generate(model, system, body, key, schema=schema)
+        answer, tokens = generate(model, system, body, key, schema)
         out, problems = check(answer)
         if not problems:
             return out, [], tokens
@@ -119,7 +118,6 @@ def main() -> None:
         return
     if args.sample > 15:
         raise SystemExit("A sample has at most 15 lists. Use the batch folder for a full run.")
-    from tag_embed import api_key
     prompts = {list_name: (ag.PROMPTS / f"{entry}.md").read_text(encoding="utf-8")
                for list_name, entry in (("group", version), ("merge", merge_version))}
     key = api_key()

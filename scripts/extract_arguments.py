@@ -26,7 +26,7 @@ from sqlalchemy import text
 
 import argument_extract as ae
 from db import get_engine
-from scripts.extract_entities import ApiError, api_key, generate
+from llm import ApiError, api_key, generate
 
 RESULTS = Path(__file__).resolve().parent.parent / "tags" / "arguments" / "results"
 MAX_SAMPLE = 20
@@ -69,7 +69,7 @@ def main() -> None:
 
     def one(item):
         try:
-            answer, tokens = generate(args.model, system, item["input"], key, schema=ae.SCHEMA)
+            answer, tokens = generate(args.model, system, item["input"], key, ae.SCHEMA)
         except (ApiError, json.JSONDecodeError, KeyError, IndexError) as exc:
             return {"item": item, "error": str(exc)}
         speech = item["input"].split("\nSpeech:\n", 1)[-1]

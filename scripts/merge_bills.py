@@ -40,7 +40,7 @@ from sqlalchemy import text
 
 from bill_extract import base_key, key_term
 from db import get_engine
-from llm import model_id
+from llm import api_key, generate, model_id
 
 ROOT = Path(__file__).resolve().parent.parent
 MERGES = ROOT / "data" / "bill_merges.tsv"
@@ -245,14 +245,14 @@ def link_terms(conn) -> int:
 
 
 def judge(conn, workers: int) -> dict[str, int]:
-    from decision_model import MODEL, DecisionError, api_key, choice_probabilities, choice_q, decide
+    from decision_model import MODEL, DecisionError, api_key as decision_api_key, choice_probabilities, choice_q, decide
 
     bills = kept_bills(conn)
     pairs, why = candidate_pairs(conn, bills)
     old = read_merges()
     done = {(row["key_a"], row["key_b"]) for row in old if row["judged_by"] == f"{MODEL} {QUESTIONS_VERSION}"}
     todo = [(id_a, id_b, similarity) for id_a, id_b, similarity in pairs if (bills[id_a]["bill_key"], bills[id_b]["bill_key"]) not in done]
-    key = api_key()
+    key = decision_api_key()
     question = {"same": choice_q("Are Name A and Name B one bill?", SAME)}
 
     def ask(pair):
@@ -317,8 +317,6 @@ JOIN_SCHEMA = {"type": "object", "properties": {"summary": {"type": "string"}}, 
 
 
 def join_sample(conn, n: int, model: str) -> list[dict]:
-    from scripts.extract_entities import generate
-    from tag_embed import api_key
 
     found = {i: s for i, s in bill_summaries(conn).items() if len(s) > 1}
     todo = conn.execute(text("SELECT id, name, year FROM bills WHERE id = ANY(:ids) AND summary_model_id IS NULL "
@@ -327,7 +325,7 @@ def join_sample(conn, n: int, model: str) -> list[dict]:
     key = api_key()
     out = []
     for bid, name, year in todo:
-        answer, _ = generate(model, system, join_input(name, year, found[bid]), key, schema=JOIN_SCHEMA)
+        answer, _ = generate(model, system, join_input(name, year, found[bid]), key, JOIN_SCHEMA)
         summary = (answer.get("summary") or "").strip() or None
         conn.execute(text("UPDATE bills SET summary = :s, summary_model_id = :m WHERE id = :i"),
                      {"s": summary, "m": model_id(conn, model), "i": bid})

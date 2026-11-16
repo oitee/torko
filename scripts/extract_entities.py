@@ -32,8 +32,8 @@ import requests
 from sqlalchemy import text
 
 from db import get_engine
-from llm import model_id
-from tag_embed import api_key
+import llm
+from llm import ApiError, api_key, model_id
 
 FOLDER = Path(__file__).resolve().parent.parent / "tags" / "extraction_v1"
 PROMPTS = FOLDER / "prompts"
@@ -149,35 +149,9 @@ def add_mention_checks(clean: dict, speech_text: str, warnings: list[str]) -> No
             warnings.append(f"mention of {e['name']!r} has {len(e['mention'].split())} words, the limit is {MAX_MENTION_WORDS}")
 
 
-class ApiError(Exception):
-    pass
-
-
 def generate(model: str, system: str, body_text: str, key: str, retries: int = 8, schema: dict | None = None) -> tuple[dict, dict]:
-    """Returns the parsed answer and the token counts."""
-    url = f"https://generativelanguage.googleapis.com/v1beta/models/{model}:generateContent"
-    body = {
-        "systemInstruction": {"parts": [{"text": system}]},
-        "contents": [{"role": "user", "parts": [{"text": body_text}]}],
-        "generationConfig": {"responseMimeType": "application/json", "responseJsonSchema": schema or SCHEMA},
-    }
-    for attempt in range(retries):
-        resp = requests.post(url, json=body, headers={"x-goog-api-key": key}, timeout=300)
-        if resp.status_code == 429 or resp.status_code >= 500:
-            wait = min(60, 5 * 2 ** attempt)
-            print(f"  HTTP {resp.status_code}, wait {wait}s", flush=True)
-            time.sleep(wait)
-            continue
-        if resp.status_code != 200:
-            raise ApiError(f"HTTP {resp.status_code}: {resp.text[:300]}")
-        data = resp.json()
-        parts = data["candidates"][0].get("content", {}).get("parts", [])
-        raw = "".join(p.get("text", "") for p in parts if not p.get("thought"))
-        usage = data.get("usageMetadata", {})
-        tokens = {"input": usage.get("promptTokenCount"), "output": usage.get("candidatesTokenCount"),
-                  "thinking": usage.get("thoughtsTokenCount")}
-        return json.loads(raw), tokens
-    raise ApiError(f"still rate-limited after {retries} attempts")
+    """llm.generate with the schema of this step as the default."""
+    return llm.generate(model, system, body_text, key, schema or SCHEMA, retries)
 
 
 def scope_filter(year: int | None, term: int | None) -> tuple[str, dict]:

@@ -7,6 +7,8 @@ import time
 
 import requests
 
+from llm import api_key
+
 MODEL = "gemini-embedding-001"
 DIMS = 1536
 BATCH_SIZE = 100
@@ -59,11 +61,6 @@ def to_pgvector(values: list[float]) -> str:
     return "[" + ",".join(repr(v) for v in values) + "]"
 
 
-def api_key() -> str:
-    key = os.environ.get("GEMINI_API_KEY", "")
-    if not key:
-        raise SystemExit("GEMINI_API_KEY is not set. Add it to .env, then run: set -a && source .env && set +a")
-    return key
 
 
 def embed_batch(texts: list[str], task_type: str, key: str, retries: int = 8) -> list[list[float]]:

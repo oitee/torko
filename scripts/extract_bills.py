@@ -38,8 +38,7 @@ from sqlalchemy import text
 
 import bill_extract as be
 from db import get_engine
-from scripts.extract_entities import ApiError, generate
-from tag_embed import api_key
+from llm import ApiError, api_key, generate
 
 FOLDER = Path(__file__).resolve().parent.parent / "tags" / "bills"
 PROMPTS = FOLDER / "prompts"
@@ -179,7 +178,7 @@ def main() -> None:
     records: list[dict] = []
     totals = {"input": 0, "output": 0, "thinking": 0}
     with ThreadPoolExecutor(max_workers=args.workers) as pool:
-        futures = {pool.submit(generate, args.model, system, debate["input"], key, schema=be.SCHEMA): debate for debate in inputs}
+        futures = {pool.submit(generate, args.model, system, debate["input"], key, be.SCHEMA): debate for debate in inputs}
         for fut in as_completed(futures):
             debate = futures[fut]
             try:
