@@ -58,7 +58,6 @@ def expected_level(probs: list[float], levels: list[str]) -> str:
 
 
 def store(conn, pair: dict, a: dict, limit: float) -> None:
-    ls, se, no = (int(x) for x in pair["debate"][2:].split("-"))
     conn.execute(text("""
         INSERT INTO speech_stances (speech_id, bill_id, loksabha, session, dbslno, question_version, model,
                                     state_source, stance_p, stance, reasons_p, on_bill_p, tokens)
@@ -67,7 +66,7 @@ def store(conn, pair: dict, a: dict, limit: float) -> None:
             model = EXCLUDED.model, state_source = EXCLUDED.state_source, stance_p = EXCLUDED.stance_p,
             stance = EXCLUDED.stance, reasons_p = EXCLUDED.reasons_p, on_bill_p = EXCLUDED.on_bill_p,
             tokens = EXCLUDED.tokens, judged_at = now()"""),
-        {"sid": pair["speech_id"], "bid": pair["bill_id"], "ls": ls, "se": se, "no": no,
+        {"sid": pair["speech_id"], "bid": pair["bill_id"], "ls": pair["loksabha"], "se": pair["session"], "no": pair["dbslno"],
          "v": st.QUESTIONS_VERSION, "m": MODEL, "src": a["state_source"],
          "sp": [a["stance_p"][s] for s in st.STANCES], "st": st.pick_stance(a["stance_p"], limit),
          "rp": a["reasons_p"], "op": a["on_bill_p"], "tok": a["tokens"]})

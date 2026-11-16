@@ -101,7 +101,9 @@ def load_pair(conn, speech_id: int, bill_id: int) -> dict:
                            {"s": speech_id}).scalar()
     return {"speech_id": speech_id, "bill_id": bill_id, "member": speech["member"],
             "title": " ".join((speech["title"] or "(no title)").split()), "debate_date": speech["debate_date"],
-            "debate": f"LS{speech['loksabha']}-{speech['session']}-{speech['dbslno']}", "words": speech["word_count"],
+            "debate": f"LS{speech['loksabha']}-{speech['session']}-{speech['dbslno']}",
+            "loksabha": speech["loksabha"], "session": speech["session"], "dbslno": speech["dbslno"],
+            "words": speech["word_count"],
             "bill": bill_label(bill["name"], bill["year"]), "bill_summary": bill["summary"],
             "other_bills": sorted(bill_label(other["name"], other["year"]) for other in bills if other["id"] != bill_id),
             "text": body, "speech_summary": summary}

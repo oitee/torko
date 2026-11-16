@@ -53,3 +53,21 @@ def test_parse_reads_the_three_answers():
 ])
 def test_pick_stance_needs_the_limit(probs, expected):
     assert st.pick_stance(probs, 0.6) == expected
+
+
+class _RecordingConn:
+    def __init__(self):
+        self.params = []
+
+    def execute(self, _sql, params=None):
+        self.params.append(params)
+
+
+def test_store_takes_the_debate_key_from_the_pair_fields():
+    import scripts.judge_stances as js
+    conn = _RecordingConn()
+    answer = {"stance_p": {"for": 0.9, "against": 0.05, "mixed": 0.03, "unclear": 0.02},
+              "reasons_p": [0, 1, 0, 0], "on_bill_p": [0, 0, 0, 1, 0], "state_source": "speech", "tokens": 10}
+    js.store(conn, pair(speech_id=1, bill_id=2, debate="(not read)", loksabha=18, session=7, dbslno=5667), answer, 0.5)
+    assert (conn.params[0]["ls"], conn.params[0]["se"], conn.params[0]["no"]) == (18, 7, 5667)
+    assert conn.params[0]["st"] == "for"
