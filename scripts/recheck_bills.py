@@ -28,7 +28,7 @@ def main() -> None:
         tx = conn.begin()
         counts = be.recheck_stored(conn)
         tx.commit() if args.commit else tx.rollback()
-    print(", ".join(f"{k}: {v}" for k, v in counts.items()))
+    print(", ".join(f"{name.replace('_', ' ')}: {v}" for name, v in counts.items()))
     print("Committed." if args.commit else "Dry run: rolled back. Use --commit to keep the changes.")
 
 

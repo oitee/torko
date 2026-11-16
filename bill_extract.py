@@ -394,17 +394,17 @@ def recheck_stored(conn) -> dict[str, int]:
         FROM bill_extractions e JOIN models m ON m.id = e.model_id
         ORDER BY e.loksabha, e.session, e.dbslno
     """)).mappings().all()
-    counts = {"rechecked": 0, "input changed, skipped": 0, "kept before": 0, "kept after": 0}
-    counts["kept before"] = conn.execute(text("SELECT count(*) FROM debate_bills WHERE kept")).scalar()
+    counts = {"rechecked": 0, "skipped_input_changed": 0,
+              "kept_before": conn.execute(text("SELECT count(*) FROM debate_bills WHERE kept")).scalar()}
     for row in rows:
         debate = build_input(conn, (row["loksabha"], row["session"], row["dbslno"]))
         if debate is None or debate["input_sha256"] != row["input_sha256"]:
-            counts["input changed, skipped"] += 1
+            counts["skipped_input_changed"] += 1
             continue
         check_and_store(conn, debate, row["raw"], row["model"], row["prompt_version"], row["tokens"], replace=True)
         counts["rechecked"] += 1
-    counts["kept after"] = conn.execute(text("SELECT count(*) FROM debate_bills WHERE kept")).scalar()
-    counts["unused bills deleted"] = conn.execute(text("""
+    counts["kept_after"] = conn.execute(text("SELECT count(*) FROM debate_bills WHERE kept")).scalar()
+    counts["unused_bills_deleted"] = conn.execute(text("""
         DELETE FROM bills b
         WHERE NOT EXISTS (SELECT 1 FROM debate_bills d WHERE d.bill_id = b.id)
           AND NOT EXISTS (SELECT 1 FROM bills x WHERE x.merged_into = b.id)

@@ -194,9 +194,9 @@ def apply_merges(conn) -> dict[str, int]:
             conn.execute(text("UPDATE bills SET merged_into = :t WHERE id = :id"), {"t": ids[target], "id": ids[key]})
             merged += 1
     linked = link_terms(conn)
-    return {"merge rows": len(rows), "merge rows of two terms (skipped)": len(crossed),
-            "bills merged into another": merged, "groups with a missing key": missing,
-            "bills linked to a bill of the next term": linked}
+    return {"merge_rows": len(rows), "skipped_merge_rows_of_two_terms": len(crossed),
+            "bills_merged_into_another": merged, "groups_with_a_missing_key": missing,
+            "bills_linked_to_the_next_term": linked}
 
 
 def next_links(bills: list[dict], merge_pairs: list[tuple[str, str]]) -> dict[int, int]:
@@ -275,7 +275,7 @@ def judge(conn, workers: int) -> dict[str, int]:
     keys = {(row["key_a"], row["key_b"]) for row in new}
     write_merges([row for row in old if (row["key_a"], row["key_b"]) not in keys] + new)
     return {"candidates": len(pairs), "asked": len(todo), "failed": failed,
-            "merge": sum(row["decision"] == "merge" for row in new), **{f"blocked by {k}": v for k, v in why.items()}}
+            "merge": sum(row["decision"] == "merge" for row in new), **{f"blocked_by_{reason.replace(' ', '_')}": v for reason, v in why.items()}}
 
 
 def bill_summaries(conn) -> dict[int, list[str]]:
@@ -302,9 +302,9 @@ def copy_single_summaries(conn) -> dict[str, int]:
     for i, s in single.items():
         conn.execute(text("UPDATE bills SET summary = :s, summary_model_id = NULL WHERE id = :i"), {"s": s, "i": i})
     joined = conn.execute(text("SELECT count(*) FROM bills WHERE summary_model_id IS NOT NULL")).scalar()
-    return {"bills with one summary (copied)": len(single),
-            "bills with 2 or more summaries": sum(len(s) > 1 for s in found.values()),
-            "of them already joined by a model": joined}
+    return {"bills_with_one_summary_copied": len(single),
+            "bills_with_two_or_more_summaries": sum(len(s) > 1 for s in found.values()),
+            "of_them_joined_by_a_model": joined}
 
 
 def join_input(name: str, year: int, summaries: list[str]) -> str:
@@ -369,7 +369,7 @@ def main() -> None:
             for joined_row in result["joined"]:
                 print(json.dumps(joined_row, ensure_ascii=False, indent=1))
             result = {"joined": len(result["joined"])}
-    print(", ".join(f"{k}: {v}" for k, v in result.items()))
+    print(", ".join(f"{name.replace('_', ' ')}: {v}" for name, v in result.items()))
 
 
 if __name__ == "__main__":

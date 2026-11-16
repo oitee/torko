@@ -200,8 +200,8 @@ def main() -> None:
     if args.rethreshold:
         with engine.begin() as conn:
             counts = rethreshold(conn, args.keep_p)
-            counts["unused bills deleted"] = delete_unused_bills(conn)
-        print(", ".join(f"{debate_key}: {v}" for debate_key, v in counts.items()))
+            counts["unused_bills_deleted"] = delete_unused_bills(conn)
+        print(", ".join(f"{name.replace('_', ' ')}: {v}" for name, v in counts.items()))
         return
 
     with engine.connect() as conn:
