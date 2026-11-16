@@ -76,6 +76,10 @@ def main() -> None:
     ap.add_argument("--dry-run", action="store_true", help="count the rows and write nothing")
     args = ap.parse_args()
     engine = get_engine()
+    if not args.dry_run:
+        from scripts.refresh_speech_tags import refresh
+        with engine.begin() as conn:
+            print(f"speech_tags_mv refreshed: {refresh(conn)} rows", flush=True)
     cte = SPEECH_TAGS_CTE.strip()
     with engine.connect() as conn:
         total = conn.execute(text(TOTAL_SQL.format(cte=cte))).scalar()

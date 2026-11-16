@@ -66,7 +66,7 @@ def test_pick_seat_tag_uses_name_and_state():
 
 
 def test_restricted_cte_adds_condition():
-    assert "AND si.speech_id = 1" in speech_tags_cte("si.speech_id = 1")
+    assert "WHERE si.speech_id = 1" in speech_tags_cte("si.speech_id = 1")
 
 
 def test_member_page_real(page_conn):

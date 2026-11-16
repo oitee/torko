@@ -45,7 +45,7 @@ def test_resolve_slug_type_filter_skips_other_types():
 def test_speech_tags_cte_adds_one_condition():
     assert speech_tags_cte() == common.SPEECH_TAGS_CTE
     out = speech_tags_cte("si.speech_id = ANY(:ids)")
-    assert "kt.id IS NOT NULL AND si.speech_id = ANY(:ids)" in out
+    assert "FROM speech_tags_mv si WHERE si.speech_id = ANY(:ids)" in out
 
 
 def test_cached_keeps_value_until_ttl_ends(monkeypatch):

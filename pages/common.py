@@ -66,30 +66,22 @@ def slug(name: str) -> str:
 
 # A tag of a speech: a kept item whose name links to a tag, or a kept summary tag.
 # Merged tags resolve to their kept tag. Each (speech, tag) counts once.
+# The view speech_tags_mv stores these rows. scripts/refresh_speech_tags.py fills it again after a data change.
 SPEECH_TAGS_CTE = """
 speech_tags AS (
-    SELECT DISTINCT ON (si.speech_id, COALESCE(km.id, kt.id))
-           si.speech_id, COALESCE(km.id, kt.id) AS tag_id, si.source
-    FROM speech_items si
-    LEFT JOIN entity_names en ON en.id = si.entity_name_id AND en.link_status = 'linked'
-    LEFT JOIN tags kt ON kt.id = COALESCE(si.tag_id, en.tag_id)
-    LEFT JOIN tags km ON km.id = kt.merged_into
-    WHERE si.kept AND kt.id IS NOT NULL
-    ORDER BY si.speech_id, COALESCE(km.id, kt.id),
-             CASE si.source WHEN 'llm' THEN 0 WHEN 'dictionary' THEN 1 ELSE 2 END
+    SELECT si.speech_id, si.tag_id, si.source FROM speech_tags_mv si
 )
 """
 
 def speech_tags_cte(filter_sql=None):
-    """Return SPEECH_TAGS_CTE, with one more condition on the speech_items row when filter_sql is given.
+    """Return SPEECH_TAGS_CTE, with a condition on the stored row when filter_sql is given.
 
-    The condition keeps the scan small when a page needs the tags of a few speeches only.
-    Use the table alias si in the condition. Bind the parameters of the condition in the query.
+    The condition keeps the read small when a page needs the tags of a few speeches only.
+    Use the alias si in the condition. Only si.speech_id, si.tag_id and si.source exist. Bind the parameters in the query.
     """
     if not filter_sql:
         return SPEECH_TAGS_CTE
-    out = SPEECH_TAGS_CTE.replace("WHERE si.kept AND kt.id IS NOT NULL",
-                                  f"WHERE si.kept AND kt.id IS NOT NULL AND {filter_sql}")
+    out = SPEECH_TAGS_CTE.replace("FROM speech_tags_mv si", f"FROM speech_tags_mv si WHERE {filter_sql}")
     assert out != SPEECH_TAGS_CTE
     return out
 
