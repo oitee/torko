@@ -217,27 +217,33 @@ def year_near(year, printed: str, body: str) -> bool:
 # "Constitution (Scheduled Castes) Order (Amendment) Bill" does not match: it amends an order, not the Constitution.
 _AMENDMENT = re.compile(r"constitution\w*\s*\(\s*([^()]*?)\s*\)?\s*amendment\b", re.IGNORECASE)
 
-_NUMBER_WORDS = {}
-for _i, (_card, _ord) in enumerate(zip(
-        "one two three four five six seven eight nine ten eleven twelve thirteen fourteen fifteen sixteen "
-        "seventeen eighteen nineteen".split(),
-        "first second third fourth fifth sixth seventh eighth ninth tenth eleventh twelfth thirteenth fourteenth "
-        "fifteenth sixteenth seventeenth eighteenth nineteenth".split()), 1):
-    _NUMBER_WORDS[_card] = _NUMBER_WORDS[_ord] = _i
-for _i, (_card, _ord) in enumerate(zip("twenty thirty forty fifty sixty seventy eighty ninety".split(),
-                                       "twentieth thirtieth fortieth fiftieth sixtieth seventieth eightieth "
-                                       "ninetieth".split()), 2):
-    _NUMBER_WORDS[_card] = _NUMBER_WORDS[_ord] = _i * 10
+def _number_words() -> dict[str, int]:
+    """The value of each cardinal and ordinal number word below one hundred, for example 'four' and 'fourth' give 4."""
+    units = zip("one two three four five six seven eight nine ten eleven twelve thirteen fourteen fifteen sixteen "
+                "seventeen eighteen nineteen".split(),
+                "first second third fourth fifth sixth seventh eighth ninth tenth eleventh twelfth thirteenth "
+                "fourteenth fifteenth sixteenth seventeenth eighteenth nineteenth".split())
+    tens = zip("twenty thirty forty fifty sixty seventy eighty ninety".split(),
+               "twentieth thirtieth fortieth fiftieth sixtieth seventieth eightieth ninetieth".split())
+    out = {}
+    for value, (cardinal, ordinal) in enumerate(units, 1):
+        out[cardinal] = out[ordinal] = value
+    for value, (cardinal, ordinal) in enumerate(tens, 2):
+        out[cardinal] = out[ordinal] = value * 10
+    return out
+
+
+_NUMBER_WORDS = _number_words()
 
 
 def ordinal_number(value: str | None) -> int | None:
     """The number of an ordinal in words or digits: 'one hundred and fourth' and '104 th' give 104."""
-    text_ = norm(value).replace("-", " ")
-    digits = re.fullmatch(r"(\d+)\s*(st|nd|rd|th)?", text_)
+    cleaned = norm(value).replace("-", " ")
+    digits = re.fullmatch(r"(\d+)\s*(st|nd|rd|th)?", cleaned)
     if digits:
         return int(digits.group(1))
     total = 0
-    for word in text_.split():
+    for word in cleaned.split():
         if word == "and":
             continue
         if word in ("hundred", "hundredth"):
@@ -276,7 +282,7 @@ def check_bill(bill: dict, body: str) -> tuple[dict, list[str]]:
     number_text = amendment_number_text(printed)
     if number_text is None:
         ordinal = None
-    elif ordinal is None or ordinal_number(ordinal) is None or ordinal_number(ordinal) != ordinal_number(number_text):
+    elif ordinal is None or (answered := ordinal_number(ordinal)) is None or answered != ordinal_number(number_text):
         failed.append("ordinal")
     if not quote or norm(quote) not in body_norm or norm(printed) not in norm(quote):
         failed.append("quote")

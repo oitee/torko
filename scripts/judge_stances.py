@@ -132,7 +132,8 @@ def main() -> None:
         run_all(args)
         return
 
-    rows = list(csv.DictReader(open(args.test_set), delimiter="\t"))
+    with open(args.test_set, encoding="utf-8", newline="") as f:
+        rows = list(csv.DictReader(f, delimiter="\t"))
     with get_engine().connect() as conn:
         pairs = [st.load_pair(conn, int(row["speech_id"]), int(row["bill_id"])) | {"expected": row["expected"],
                  "case": row.get("case", "")} for row in rows]

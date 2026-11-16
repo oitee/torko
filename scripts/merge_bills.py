@@ -248,8 +248,8 @@ def judge(conn, workers: int) -> dict[str, int]:
 
     bills = kept_bills(conn)
     pairs, why = candidate_pairs(conn, bills)
-    done = {(row["key_a"], row["key_b"]) for row in read_merges() if row["judged_by"] == f"{MODEL} {QUESTIONS_VERSION}"}
     old = read_merges()
+    done = {(row["key_a"], row["key_b"]) for row in old if row["judged_by"] == f"{MODEL} {QUESTIONS_VERSION}"}
     todo = [(id_a, id_b, similarity) for id_a, id_b, similarity in pairs if (bills[id_a]["bill_key"], bills[id_b]["bill_key"]) not in done]
     key = api_key()
     question = {"same": choice_q("Are Name A and Name B one bill?", SAME)}

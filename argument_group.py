@@ -78,9 +78,8 @@ def order_points(ids: list[int], vectors: dict[int, list[float]]) -> list[int]:
 
 def build_input(bill: str, year: int, side: str, points: list[str]) -> str:
     """The text of one list. The points are numbered from 1 in the given order."""
-    word = "for" if side == "for" else "against"
     lines = "\n".join(f"{n}. {p.strip()}" for n, p in enumerate(points, 1))
-    return (f"Bill: {bill}, {year}\nSide: the points that members of the Lok Sabha made {word} the bill.\n"
+    return (f"Bill: {bill}, {year}\nSide: the points that members of the Lok Sabha made {side} the bill.\n"
             f"Points ({len(points)}). Points with a close meaning sit near each other:\n{lines}\n")
 
 
