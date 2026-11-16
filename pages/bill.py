@@ -174,55 +174,64 @@ def canonical_id(conn, bill_id):
         WHERE b.id = :b AND k.merged_into IS NULL"""), {"b": bill_id}).scalar()
 
 
-def bill_page(conn, bill_id, args=None):
-    kept = canonical_id(conn, bill_id)
-    if kept is None:
-        return None
-    bill = conn.execute(text("SELECT id, name, year, summary FROM bills WHERE id = :b"), {"b": kept}).mappings().first()
-
-    debates = conn.execute(text("""
+def load_debates(conn, kept):
+    """The debates of the kept bill and of the bills merged into it, in date order."""
+    return conn.execute(text("""
         SELECT DISTINCT d.id, d.loksabha, d.session, d.dbslno, d.debate_date, d.title, d.source_url
         FROM debate_bills db JOIN bills x ON x.id = db.bill_id
         JOIN debates d ON (d.loksabha, d.session, d.dbslno) = (db.loksabha, db.session, db.dbslno)
         WHERE db.kept AND COALESCE(x.merged_into, x.id) = :b
         ORDER BY d.debate_date, d.dbslno"""), {"b": kept}).mappings().all()
-    debate_ids = [debate["id"] for debate in debates]
 
+
+def load_stance_rows(conn, kept):
+    """One row for each speech with a stance on the bill, in the order of the debate.
+
+    own counts the points of the speech on the side of its stance, and other counts its points on the other side.
+    """
     rows = conn.execute(text(f"""
         SELECT ss.speech_id, ss.stance, s.person_id, s.word_count AS words, pa.party, d.debate_date,
-               COALESCE(pt.n_for, 0) AS n_for, COALESCE(pt.n_against, 0) AS n_against
+               COALESCE(point_counts.n_for, 0) AS n_for, COALESCE(point_counts.n_against, 0) AS n_against
         FROM speech_stances ss JOIN speeches s ON s.id = ss.speech_id JOIN debates d ON d.id = s.debate_id
         LEFT JOIN (SELECT speech_id, count(*) FILTER (WHERE side = 'for') AS n_for,
                           count(*) FILTER (WHERE side = 'against') AS n_against
-                   FROM speech_arguments WHERE bill_id = :b AND quote_found GROUP BY speech_id) pt
-          ON pt.speech_id = ss.speech_id
+                   FROM speech_arguments WHERE bill_id = :b AND quote_found GROUP BY speech_id) point_counts
+          ON point_counts.speech_id = ss.speech_id
         {PARTY_AT_DATE}
         WHERE ss.bill_id = :b ORDER BY d.debate_date, s.seq_start"""), {"b": kept}).mappings().all()
-    rows = [dict(row, own=row["n_against"] if row["stance"] == "against" else row["n_for"],
+    return [dict(row, own=row["n_against"] if row["stance"] == "against" else row["n_for"],
                  other=row["n_for"] if row["stance"] == "against" else row["n_against"]) for row in rows]
 
-    members = members_of(rows)
-    small = len(members) < SMALL_BILL_MEMBERS
-    samples = [(row["stance"], row["speech_id"]) for row in rows] if small else sample_ids(rows, members)
-    sample_rows = {row["id"]: row for row in speech_rows(conn, [sid for _, sid in samples], with_tags=False)}
 
-    together = conn.execute(text("""
+def load_together(conn, kept, debate_ids):
+    """The other kept bills of the same debates."""
+    if not debate_ids:
+        return []
+    return conn.execute(text("""
         SELECT DISTINCT k.id, k.name, k.year
         FROM debate_bills db JOIN bills x ON x.id = db.bill_id
         JOIN bills k ON k.id = COALESCE(x.merged_into, x.id)
         JOIN debates d ON (d.loksabha, d.session, d.dbslno) = (db.loksabha, db.session, db.dbslno)
         WHERE db.kept AND d.id = ANY(:ids) AND k.id <> :b ORDER BY k.year, k.name"""),
-        {"ids": debate_ids, "b": kept}).mappings().all() if debate_ids else []
+        {"ids": debate_ids, "b": kept}).mappings().all()
 
-    # A bill does not continue into a new Lok Sabha. A bill of the same name in the term before or after is
-    # a different bill with its own page. bills.next_id links the two.
-    same_name = conn.execute(text("""
+
+def load_same_name(conn, kept):
+    """The bill of the same name in the term before or after.
+
+    A bill does not continue into a new Lok Sabha. A bill of the same name in the term before or after is
+    a different bill with its own page. bills.next_id links the two.
+    """
+    return conn.execute(text("""
         SELECT id, name, year, bill_key, 'next' AS side FROM bills WHERE id = (SELECT next_id FROM bills WHERE id = :b)
         UNION ALL
         SELECT id, name, year, bill_key, 'previous' FROM bills WHERE next_id = :b AND merged_into IS NULL
         ORDER BY bill_key"""), {"b": kept}).mappings().all()
 
-    points = conn.execute(text(f"""
+
+def load_points(conn, kept):
+    """The grouped points of the bill, in the order of the debate: the input of reason_rows."""
+    return conn.execute(text(f"""
         SELECT ba.id AS "group", ba.side, ba.label, s.person_id, pe.name AS member, pa.party, a.speech_id, a.quote
         FROM bill_arguments ba
         JOIN speech_arguments a ON a.bill_argument_id = ba.id
@@ -231,12 +240,33 @@ def bill_page(conn, bill_id, args=None):
         {PARTY_AT_DATE}
         WHERE ba.bill_id = :b ORDER BY d.debate_date, s.seq_start, a.position"""), {"b": kept}).mappings().all()
 
+
+def debate_entry(debate):
+    return {"id": debate["id"], "title": tidy_title(" ".join((debate["title"] or "").split())),
+            "date": debate["debate_date"].isoformat() if debate["debate_date"] else None,
+            "term": debate["loksabha"], "session": debate["session"], "source_url": debate["source_url"]}
+
+
+def bill_page(conn, bill_id, args=None):
+    kept = canonical_id(conn, bill_id)
+    if kept is None:
+        return None
+    bill = conn.execute(text("SELECT id, name, year, summary FROM bills WHERE id = :b"), {"b": kept}).mappings().first()
+    debates = load_debates(conn, kept)
+    rows = load_stance_rows(conn, kept)
+    together = load_together(conn, kept, [debate["id"] for debate in debates])
+    same_name = load_same_name(conn, kept)
+    reasons, reason_others = split_one_member(reason_rows(load_points(conn, kept)))
+
+    members = members_of(rows)
+    small = len(members) < SMALL_BILL_MEMBERS
+    samples = [(row["stance"], row["speech_id"]) for row in rows] if small else sample_ids(rows, members)
+    sample_rows = {row["id"]: row for row in speech_rows(conn, [sid for _, sid in samples], with_tags=False)}
     dates = sorted({debate["debate_date"] for debate in debates if debate["debate_date"]})
     colours = party_colours(conn)
     parties = party_rows(members)
     for party in parties:
         party["colour"] = colours.get(party["party"])
-    reasons, reason_others = split_one_member(reason_rows(points))
     return {
         "id": kept, "asked_id": bill_id, "name": bill["name"], "year": bill["year"], "summary": bill["summary"],
         "summary_note": "Summary generated solely from the text of the debates. No external source used",
@@ -244,9 +274,7 @@ def bill_page(conn, bill_id, args=None):
         "first_date": dates[0].isoformat() if dates else None,
         "last_date": dates[-1].isoformat() if dates else None,
         "days": len(dates),
-        "debates": [{"id": debate["id"], "title": tidy_title(" ".join((debate["title"] or "").split())),
-                     "date": debate["debate_date"].isoformat() if debate["debate_date"] else None,
-                     "term": debate["loksabha"], "session": debate["session"], "source_url": debate["source_url"]} for debate in debates],
+        "debates": [debate_entry(debate) for debate in debates],
         "speeches": len(rows),
         "speech_counts": stance_counts(row["stance"] for row in rows),
         "members": len(members),
