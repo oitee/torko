@@ -26,7 +26,7 @@ def test_shape_tag_keeps_keys_and_adds_named_counts():
 
 def test_routes():
     assert ("/tag/<slug>", tag.tag_page) in tag.ROUTES
-    assert ("/tags", tag.tags_list) in tag.ROUTES
+    assert all(rule != "/tags" for rule, _ in tag.ROUTES)
 
 
 def test_tag_page_on_database(page_conn):  # noqa: F811
@@ -34,13 +34,6 @@ def test_tag_page_on_database(page_conn):  # noqa: F811
     assert out["name"] == "Jal Jeevan Mission" and out["total"] > 0
     assert out["recent"] and out["members"]
     assert tag.tag_page(page_conn, "no-such-tag-xyz", {}) is None
-
-
-def test_tags_list_on_database(page_conn):  # noqa: F811
-    out = tag.tags_list(page_conn, {})
-    names = [t["name"] for t in out["tags"]]
-    assert "Jal Jeevan Mission" in names
-    assert names == sorted(names, key=str.lower)
 
 
 def test_peak_year_tie_goes_to_earlier_year():

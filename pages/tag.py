@@ -194,19 +194,4 @@ def tag_page(conn, slug, args):
     return tag_data(conn, tag_id, term)
 
 
-def tags_list(conn, args):
-    """All live tags, A to Z by name. speeches_tagged counts the speeches that carry the tag."""
-    rows = conn.execute(text(f"""
-        WITH {SPEECH_TAGS_CTE},
-        n AS (SELECT tag_id, count(*) AS c FROM speech_tags GROUP BY 1)
-        SELECT t.tag, t.type, t.domain, COALESCE(n.c, 0) AS c
-        FROM tags t LEFT JOIN n ON n.tag_id = t.id
-        WHERE t.status NOT IN ('rejected', 'merged')""")).all()
-    rows = sorted(rows, key=lambda r: (r[0].lower(), r[0]))
-    return {
-        "counts_note": "speeches_tagged counts the speeches that carry the tag, each speech once. Order: name A to Z.",
-        "tags": [{"name": r[0], "slug": slug(r[0]), "type": r[1], "domain": r[2], "speeches_tagged": r[3]} for r in rows],
-    }
-
-
-ROUTES = [("/tag/<slug>", tag_page), ("/tags", tags_list)]
+ROUTES = [("/tag/<slug>", tag_page)]
