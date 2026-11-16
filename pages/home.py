@@ -6,6 +6,7 @@ than its share across the whole term. A general tag has a high count in every se
 from sqlalchemy import text
 
 from pages.common import cached, slug, speech_tags_cte
+from pages.prebuilt import prebuilt_route
 from pages.sessions import session_labels
 
 # The shared CTE, limited to the speeches of one term (:t). It reads far fewer items than the whole table.
@@ -58,6 +59,7 @@ def shape_typical(rows):
 
 
 def home_page(conn, args):
+    """The answer of the site figures and the newest session, with no featured part. home_answer adds the rest."""
     term, session = conn.execute(text("""
         SELECT loksabha, session FROM debates WHERE debate_date IS NOT NULL
         ORDER BY debate_date DESC LIMIT 1""")).one()
@@ -108,4 +110,17 @@ def home_page(conn, args):
     }
 
 
-ROUTES = [("/home", home_page)]
+def home_answer(conn):
+    """The whole answer of /api/home: home_page, the featured sample, and the turn and speech figures of the method strip.
+
+    The Home page needs only this one answer. The prebuilt file holds it, so a request makes no database call.
+    """
+    from pages.home_featured import home_featured
+    from pages.method import speech_figures, turn_figures
+    out = home_page(conn, None)
+    out["featured"] = home_featured(conn)
+    out["method"] = {"turns": turn_figures(conn), "speeches": speech_figures(conn)}
+    return out
+
+
+ROUTES = [("/home", prebuilt_route("home"))]

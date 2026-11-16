@@ -10,7 +10,8 @@ def test_shape_typical_keeps_old_keys_and_adds_named_counts():
 
 
 def test_routes():
-    assert home.ROUTES == [("/home", home.home_page)]
+    (rule, fn), = home.ROUTES
+    assert rule == "/home" and fn.prebuilt == "home"  # the route sends the prebuilt file
 
 
 def test_home_page_on_database(page_conn):  # noqa: F811
@@ -34,3 +35,11 @@ def test_corpus_block_matches_direct_counts(page_conn):  # noqa: F811
     assert c["terms"] == [r[0] for r in page_conn.execute(text("SELECT DISTINCT loksabha FROM debates ORDER BY 1"))]
     assert (c["first"], c["last"]) == (str(q("SELECT min(debate_date) FROM debates")), str(q("SELECT max(debate_date) FROM debates")))
     assert "No query computes it" in c["error_rate"]["source"]
+
+
+def test_home_answer_adds_featured_and_the_method_figures(page_conn):  # noqa: F811
+    d = home.home_answer(page_conn)
+    assert {"corpus", "typical", "chamber", "lit"} <= set(d)
+    assert {"member", "quote", "trend", "search_ideas"} <= set(d["featured"])
+    assert {"total", "member", "chair_or_crowd"} <= set(d["method"]["turns"])
+    assert {"total", "eligible", "with_tag", "min_words"} <= set(d["method"]["speeches"])

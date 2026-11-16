@@ -99,6 +99,9 @@ def main() -> None:
                           "VALUES (:a, :b, :s, :e, :l)"),
                      [{"a": a, "b": b, "s": s, "e": e, "l": l} for a, b, s, e, l in rows])
     print("loaded", flush=True)
+    from scripts.build_snapshots import build_all
+    with engine.connect() as conn:
+        print(f"prebuilt answers: {build_all(conn)}", flush=True)
 
 
 if __name__ == "__main__":

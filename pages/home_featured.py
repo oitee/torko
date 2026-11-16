@@ -12,6 +12,7 @@ import re
 from sqlalchemy import text
 
 from pages.common import resolve_tag, slug, tidy_title
+from pages.prebuilt import prebuilt_route
 from pages.member import seat_tags
 from pages.speech import speech_page
 from pages.trends import trends_page
@@ -152,4 +153,4 @@ def home_featured(conn, args=None, path=None):
     return out
 
 
-ROUTES = [("/home/featured", home_featured)]
+ROUTES = [("/home/featured", prebuilt_route("home_featured"))]

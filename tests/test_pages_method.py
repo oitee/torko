@@ -3,7 +3,8 @@ from tests.pages_db import page_conn  # noqa: F401
 
 
 def test_routes():
-    assert method.ROUTES == [("/method", method.method_page)]
+    (rule, fn), = method.ROUTES
+    assert rule == "/method" and fn.prebuilt == "method"  # the route sends the prebuilt file
 
 
 def test_unread_text_is_fixed_text_with_a_source():

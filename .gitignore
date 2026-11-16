@@ -58,3 +58,6 @@ web/.vite/
 tags/search_eval/results/
 scripts/refresh_cache.py
 tests/test_refresh_cache.py
+
+# prebuilt API answers: scripts/build_snapshots.py builds them from the database of each machine
+/data/built/

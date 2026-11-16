@@ -7,6 +7,7 @@ from sqlalchemy import text
 
 from legacy_hindi import decode_legacy_hindi
 from pages.common import cached, slug, speech_tags_cte, tidy_title
+from pages.prebuilt import prebuilt_route
 from pages.home import corpus_figures
 
 # A speech of this many words or more gets a TLDR and tags. The same threshold as on every other page.
@@ -203,4 +204,4 @@ def method_page(conn, args):
     }
 
 
-ROUTES = [("/method", method_page)]
+ROUTES = [("/method", prebuilt_route("method"))]
