@@ -106,7 +106,6 @@ def main() -> None:
         print(f"{len(lists)} lists, {sum(sizes)} points, {sum(s == 1 for s in sizes)} with one point, largest {sizes[-1]}")
         return
     if args.singles:
-        import bill_extract as be  # noqa: F401
         with eng.begin() as conn:
             n = 0
             for entry in lists.values():
