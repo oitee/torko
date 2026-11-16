@@ -347,14 +347,16 @@ def check_and_store(conn, debate: dict, answer: dict, model: str, prompt_version
     """), {**key, "m": model_id(conn, model), "v": prompt_version, "h": debate["input_sha256"],
            "raw": json.dumps(answer, ensure_ascii=False), "w": warnings,
            "t": json.dumps(tokens or {})}).scalar()
-    for pos, bill in enumerate(bills, 1):
+    rows = [{**key, "e": ext, "pos": pos, "bid": bill_id(conn, bill, debate["loksabha"]) if bill["kept"] else None,
+             "printed": bill["printed"], "quote": bill["quote"], "role": bill["role"], "summary": bill["summary"],
+             "failed": bill["checks_failed"], "found": bill["name_found"], "kept": bill["kept"]}
+            for pos, bill in enumerate(bills, 1)]
+    if rows:
         conn.execute(text("""
             INSERT INTO debate_bills (extraction_id, loksabha, session, dbslno, position, bill_id, printed, quote,
                                       extracted_role, summary, checks_failed, name_found, kept)
             VALUES (:e, :ls, :s, :d, :pos, :bid, :printed, :quote, :role, :summary, :failed, :found, :kept)
-        """), {**key, "e": ext, "pos": pos, "bid": bill_id(conn, bill, debate["loksabha"]) if bill["kept"] else None,
-               "printed": bill["printed"], "quote": bill["quote"], "role": bill["role"], "summary": bill["summary"],
-               "failed": bill["checks_failed"], "found": bill["name_found"], "kept": bill["kept"]})
+        """), rows)
     return bills, warnings
 
 

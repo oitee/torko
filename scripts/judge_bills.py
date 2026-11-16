@@ -81,7 +81,7 @@ def keep(checks_failed: list[str], p: list[float] | None, keep_p: float = KEEP_P
 def scope_rows(conn, keys: list[tuple[int, int, int]] | None, force: bool) -> dict[tuple, list[dict]]:
     """The names to judge, grouped by debate. Only the names that passed the script checks."""
     rows = conn.execute(text("""
-        SELECT d.id, d.loksabha, d.session, d.dbslno, d.printed, d.extracted_role, d.judged_by
+        SELECT d.id, d.loksabha, d.session, d.dbslno, d.printed, d.extracted_role, d.judged_by, d.bill_id
         FROM debate_bills d
         WHERE d.checks_failed = '{}'
         ORDER BY d.loksabha, d.session, d.dbslno, d.position
@@ -113,7 +113,7 @@ def store(conn, debate: dict, names: list[dict], answers: dict, keep_p: float) -
             warnings.append(f"{name['printed']!r}: probabilities sum to {sum(probs):.3f}")
         kept = keep([], probs, keep_p)
         # A name that is not kept keeps its bill row, so that --rethreshold can keep it again with no call.
-        bid = conn.execute(text("SELECT bill_id FROM debate_bills WHERE id = :id"), {"id": name["id"]}).scalar()
+        bid = name["bill_id"]
         if kept:
             if bid is None:
                 if checked is None:
@@ -142,14 +142,14 @@ def delete_unused_bills(conn) -> int:
 
 
 def rethreshold(conn, keep_p: float) -> dict[str, int]:
-    rows = conn.execute(text("SELECT id, checks_failed, judge_role_p, kept FROM debate_bills "
+    rows = conn.execute(text("SELECT id, checks_failed, judge_role_p, kept, bill_id FROM debate_bills "
                              "WHERE judge_role_p IS NOT NULL")).mappings().all()
     changed = 0
     for row in rows:
         kept = keep(list(row["checks_failed"]), list(row["judge_role_p"]), keep_p)
         if kept != row["kept"]:
             changed += 1
-            if kept and conn.execute(text("SELECT bill_id FROM debate_bills WHERE id = :id"), {"id": row["id"]}).scalar() is None:
+            if kept and row["bill_id"] is None:
                 print(f"  row {row['id']}: now kept, but it has no bill row. Judge it again with --force.")
                 continue
             conn.execute(text("UPDATE debate_bills SET kept = :k WHERE id = :id"), {"k": kept, "id": row["id"]})

@@ -42,7 +42,7 @@ class FakeResult:
 
 
 class FakeConn:
-    """Answers the two reads of store: no bill row yet, and the raw answer of the extraction."""
+    """Answers the one read of store: the raw answer of the extraction."""
 
     def __init__(self):
         self.updates = []
@@ -52,7 +52,8 @@ class FakeConn:
         if sql.strip().startswith("UPDATE"):
             self.updates.append(params)
             return FakeResult(None)
-        return FakeResult(None if "SELECT bill_id" in sql else "raw answer")
+        assert "SELECT bill_id" not in sql  # the bill row comes with the name, not from one more query
+        return FakeResult("raw answer")
 
 
 def test_a_kept_name_with_no_bill_row_gets_a_bill_of_the_debate_term(monkeypatch):
@@ -62,7 +63,7 @@ def test_a_kept_name_with_no_bill_row_gets_a_bill_of_the_debate_term(monkeypatch
                                                                      "bill_key": "citizenship-amendment-2019"}], []))
     monkeypatch.setattr(jb.be, "bill_id", lambda conn, bill, loksabha: calls.append(loksabha) or 4145)
     conn = FakeConn()
-    names = [{"id": 1, "printed": "Citizenship (Amendment) Bill, 2019"}]
+    names = [{"id": 1, "printed": "Citizenship (Amendment) Bill, 2019", "bill_id": None}]
     answers = {question_key(1): {"probabilities": {"moved": 0.95, "mentioned": 0.03, "unsure": 0.02}}}
     kept, warnings = jb.store(conn, {"loksabha": 17, "input": "text"}, names, answers, KEEP_P)
     assert (kept, warnings, calls) == (1, [], [17])

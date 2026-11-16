@@ -103,11 +103,11 @@ def store(conn, speech_id: int, bill_id: int, answer: dict, model: str, prompt_v
         VALUES (:s, :b, :m, :v, :h, CAST(:raw AS jsonb), :w) RETURNING id"""),
         {"s": speech_id, "b": bill_id, "m": model_id(conn, model), "v": prompt_version, "h": input_sha256,
          "raw": json.dumps(answer, ensure_ascii=False), "w": warnings}).scalar()
-    for pos, point in enumerate(points, 1):
+    if points:
         conn.execute(text("""
             INSERT INTO speech_arguments (extraction_id, speech_id, bill_id, position, side, point, quote, quote_found)
             VALUES (:e, :s, :b, :pos, :side, :point, :quote, :found)"""),
-            {"e": ext, "s": speech_id, "b": bill_id, "pos": pos, "side": point["side"], "point": point["point"],
-             "quote": point["quote"], "found": point["quote_found"]})
+            [{"e": ext, "s": speech_id, "b": bill_id, "pos": pos, "side": point["side"], "point": point["point"],
+              "quote": point["quote"], "found": point["quote_found"]} for pos, point in enumerate(points, 1)])
     return {"points": len(points), "quote_missing": sum(not point["quote_found"] for point in points),
             "warnings": len(warnings)}

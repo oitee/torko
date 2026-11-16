@@ -165,17 +165,13 @@ def split_one_member(reasons):
 
 
 def canonical_id(conn, bill_id):
-    """The id of the kept bill. A bill that the merge step folded into another bill gives the id of that bill."""
-    seen = set()
-    while bill_id not in seen:
-        seen.add(bill_id)
-        row = conn.execute(text("SELECT merged_into FROM bills WHERE id = :b"), {"b": bill_id}).first()
-        if row is None:
-            return None
-        if row[0] is None:
-            return bill_id
-        bill_id = row[0]
-    return None
+    """The id of the kept bill, or None. A bill that the merge step folded into another bill gives the id of that bill.
+
+    The merge step points each folded bill straight at its kept bill, so one step is enough.
+    """
+    return conn.execute(text("""
+        SELECT k.id FROM bills b JOIN bills k ON k.id = COALESCE(b.merged_into, b.id)
+        WHERE b.id = :b AND k.merged_into IS NULL"""), {"b": bill_id}).scalar()
 
 
 def bill_page(conn, bill_id, args=None):

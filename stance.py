@@ -83,7 +83,10 @@ PAIRS_SQL = """
 def load_pair(conn, speech_id: int, bill_id: int) -> dict:
     """bill_id is the kept bill after the merge of spellings."""
     speech = conn.execute(text("""
-        SELECT s.id, s.word_count, p.name AS member, d.title, d.debate_date, d.loksabha, d.session, d.dbslno
+        SELECT s.id, s.word_count, p.name AS member, d.title, d.debate_date, d.loksabha, d.session, d.dbslno,
+               COALESCE((SELECT string_agg(t.text, E'\n' ORDER BY t.seq) FROM turns t WHERE t.speech_id = s.id), '')
+                   AS body,
+               (SELECT x.summary FROM speech_extractions x WHERE x.speech_id = s.id) AS speech_summary
         FROM speeches s JOIN debates d ON d.id = s.debate_id LEFT JOIN persons p ON p.id = s.person_id
         WHERE s.id = :s"""), {"s": speech_id}).mappings().one()
     bills = conn.execute(text("""
@@ -95,10 +98,6 @@ def load_pair(conn, speech_id: int, bill_id: int) -> dict:
     if not mine:
         raise ValueError(f"bill {bill_id} is not a kept bill of the debate of speech {speech_id}")
     bill = mine[0]
-    body = "\n".join(conn.execute(text("SELECT text FROM turns WHERE speech_id = :s ORDER BY seq"),
-                                  {"s": speech_id}).scalars())
-    summary = conn.execute(text("SELECT summary FROM speech_extractions WHERE speech_id = :s"),
-                           {"s": speech_id}).scalar()
     return {"speech_id": speech_id, "bill_id": bill_id, "member": speech["member"],
             "title": " ".join((speech["title"] or "(no title)").split()), "debate_date": speech["debate_date"],
             "debate": f"LS{speech['loksabha']}-{speech['session']}-{speech['dbslno']}",
@@ -106,4 +105,4 @@ def load_pair(conn, speech_id: int, bill_id: int) -> dict:
             "words": speech["word_count"],
             "bill": bill_label(bill["name"], bill["year"]), "bill_summary": bill["summary"],
             "other_bills": sorted(bill_label(other["name"], other["year"]) for other in bills if other["id"] != bill_id),
-            "text": body, "speech_summary": summary}
+            "text": speech["body"], "speech_summary": speech["speech_summary"]}
