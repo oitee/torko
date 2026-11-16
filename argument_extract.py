@@ -13,8 +13,9 @@ from pathlib import Path
 
 from sqlalchemy import text
 
-import bill_extract as be
 import stance as st
+from llm import model_id
+from text_match import norm
 
 PROMPTS = Path(__file__).resolve().parent / "tags" / "arguments" / "prompts"
 SIDES = {"for", "against"}
@@ -69,7 +70,7 @@ def check_answer(answer: dict, speech_text: str) -> tuple[list[dict], list[str]]
         return [], ["points is not a list"]
     if len(raw) > MAX_POINTS:
         warnings.append(f"{len(raw)} points, only the first {MAX_POINTS} kept")
-    body = be.norm(speech_text)
+    body = norm(speech_text)
     for i, raw_point in enumerate(raw[:MAX_POINTS], 1):
         if not isinstance(raw_point, dict):
             warnings.append(f"point {i} is not an object")
@@ -84,7 +85,7 @@ def check_answer(answer: dict, speech_text: str) -> tuple[list[dict], list[str]]
         if not isinstance(quote, str) or not quote.strip():
             warnings.append(f"point {i}: no quote")
             continue
-        found = be.norm(quote) in body
+        found = norm(quote) in body
         if not found:
             warnings.append(f"point {i}: quote not in the speech")
         points.append({"side": side, "point": point.strip(), "quote": quote.strip(), "quote_found": found})
@@ -100,7 +101,7 @@ def store(conn, speech_id: int, bill_id: int, answer: dict, model: str, prompt_v
     ext = conn.execute(text("""
         INSERT INTO argument_extractions (speech_id, bill_id, model_id, prompt_version, input_sha256, raw, warnings)
         VALUES (:s, :b, :m, :v, :h, CAST(:raw AS jsonb), :w) RETURNING id"""),
-        {"s": speech_id, "b": bill_id, "m": be.model_id(conn, model), "v": prompt_version, "h": input_sha256,
+        {"s": speech_id, "b": bill_id, "m": model_id(conn, model), "v": prompt_version, "h": input_sha256,
          "raw": json.dumps(answer, ensure_ascii=False), "w": warnings}).scalar()
     for pos, point in enumerate(points, 1):
         conn.execute(text("""

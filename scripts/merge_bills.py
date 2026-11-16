@@ -40,6 +40,7 @@ from sqlalchemy import text
 
 from bill_extract import base_key, key_term
 from db import get_engine
+from llm import model_id
 
 ROOT = Path(__file__).resolve().parent.parent
 MERGES = ROOT / "data" / "bill_merges.tsv"
@@ -318,7 +319,6 @@ JOIN_SCHEMA = {"type": "object", "properties": {"summary": {"type": "string"}}, 
 def join_sample(conn, n: int, model: str) -> list[dict]:
     from scripts.extract_entities import generate
     from tag_embed import api_key
-    import bill_extract as be
 
     found = {i: s for i, s in bill_summaries(conn).items() if len(s) > 1}
     todo = conn.execute(text("SELECT id, name, year FROM bills WHERE id = ANY(:ids) AND summary_model_id IS NULL "
@@ -330,7 +330,7 @@ def join_sample(conn, n: int, model: str) -> list[dict]:
         answer, _ = generate(model, system, join_input(name, year, found[bid]), key, schema=JOIN_SCHEMA)
         summary = (answer.get("summary") or "").strip() or None
         conn.execute(text("UPDATE bills SET summary = :s, summary_model_id = :m WHERE id = :i"),
-                     {"s": summary, "m": be.model_id(conn, model), "i": bid})
+                     {"s": summary, "m": model_id(conn, model), "i": bid})
         out.append({"bill": f"{name}, {year}", "inputs": found[bid], "joined": summary})
     return out
 

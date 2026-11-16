@@ -16,9 +16,11 @@ from __future__ import annotations
 import hashlib
 import json
 import re
-import unicodedata
 
 from sqlalchemy import text
+
+from llm import model_id
+from text_match import norm
 
 BILL_TYPES = ("GOVERNMENT BILLS", "STATUTORY RESOLUTION AND GOVERNMENT BILL")
 
@@ -158,18 +160,6 @@ def sha256(value: str) -> str:
 
 
 # ---------------------------------------------------------------- the checks
-
-_INVISIBLE = re.compile(r"[​‌‍⁠﻿]")
-_FOLD = str.maketrans({"‘": "'", "’": "'", "“": '"', "”": '"',
-                       "–": "-", "—": "-", "‑": "-", " ": " "})
-
-
-def norm(value: str | None) -> str:
-    """Lower case, one space for each run of white space, typographic quotes and dashes made plain."""
-    value = unicodedata.normalize("NFC", value or "")
-    value = _INVISIBLE.sub("", value).translate(_FOLD)
-    return " ".join(value.split()).casefold()
-
 
 def bill_key(name: str, year: int) -> str:
     """The name in lower case with only letters and digits, then '-', then the year. A leading 'The' goes."""
@@ -323,19 +313,6 @@ def check_answer(answer: dict, body: str) -> tuple[list[dict], list[str]]:
 
 
 # ---------------------------------------------------------------- the store
-
-def model_id(conn, name: str) -> int:
-    """The id of the model name. A new name is added to the table models.
-
-    The function reads first. An INSERT with ON CONFLICT uses one number of the SMALLINT sequence on each call,
-    also when the name exists, so many calls would use up the sequence.
-    """
-    found = conn.execute(text("SELECT id FROM models WHERE name = :n"), {"n": name}).scalar()
-    if found is not None:
-        return found
-    conn.execute(text("INSERT INTO models (name) VALUES (:n) ON CONFLICT (name) DO NOTHING"), {"n": name})
-    return conn.execute(text("SELECT id FROM models WHERE name = :n"), {"n": name}).scalar()
-
 
 def bill_id(conn, bill: dict, loksabha: int) -> int:
     """The id of the bills row of this bill in this Lok Sabha. A new row is made when there is none."""

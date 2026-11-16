@@ -27,6 +27,7 @@ sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 from sqlalchemy import text
 
 import argument_group as ag
+from llm import model_id
 from db import get_engine
 
 DEFAULT_MODEL = "gemini-3.8-flash"
@@ -119,7 +120,6 @@ def main() -> None:
     if args.sample > 15:
         raise SystemExit("A sample has at most 15 lists. Use the batch folder for a full run.")
     from tag_embed import api_key
-    import bill_extract as be
     prompts = {list_name: (ag.PROMPTS / f"{entry}.md").read_text(encoding="utf-8")
                for list_name, entry in (("group", version), ("merge", merge_version))}
     key = api_key()
@@ -140,7 +140,7 @@ def main() -> None:
                                       for group in groups]})
             if args.store and not problems:
                 with eng.begin() as write_conn:
-                    ag.store(write_conn, entry["bill_id"], entry["side"], item["order"], groups, be.model_id(write_conn, args.model),
+                    ag.store(write_conn, entry["bill_id"], entry["side"], item["order"], groups, model_id(write_conn, args.model),
                              stored_version(version, merge_version, joins is not None), item["input_sha256"])
     RESULTS.mkdir(parents=True, exist_ok=True)
     out = RESULTS / f"groups_{version}_{merge_version}_{args.model}_s{args.seed}.json"

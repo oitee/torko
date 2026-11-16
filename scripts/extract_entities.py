@@ -32,6 +32,7 @@ import requests
 from sqlalchemy import text
 
 from db import get_engine
+from llm import model_id
 from tag_embed import api_key
 
 FOLDER = Path(__file__).resolve().parent.parent / "tags" / "extraction_v1"
@@ -227,12 +228,6 @@ def plan(ids: list[int], existing: dict[int, str], version: str, redo_stale: boo
 
 def estimate(words: int, n: int) -> dict:
     return {"input": int(words * 1.5 + n * 1000), "output": n * 470}
-
-
-def model_id(conn, name: str) -> int:
-    """The id of the model name. bill_extract.model_id reads first, so a known name uses no sequence number."""
-    from bill_extract import model_id as known_model_id
-    return known_model_id(conn, name)
 
 
 def store(conn, s: dict, model: str, version: str, clean: dict, warnings: list[str], answer: dict, tokens: dict) -> None:
