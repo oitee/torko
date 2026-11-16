@@ -70,3 +70,9 @@ def test_area_cell():
     # 30 of 100 speeches of the party against 150 of 1,000 of the House: the party gives the area twice the share.
     assert parties.area_cell(30, 100, 150, 1000) == {"n": 30, "lift": 2.0}
     assert parties.area_cell(19, 100, 150, 1000) == {"n": 19, "lift": None}
+
+
+def test_speech_tags_cte_puts_the_condition_on_the_stored_rows():
+    from pages.common import SPEECH_TAGS_CTE, speech_tags_cte
+    assert "WHERE" not in SPEECH_TAGS_CTE
+    assert "FROM speech_tags_mv si WHERE si.speech_id = :s\n" in speech_tags_cte("si.speech_id = :s")

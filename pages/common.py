@@ -67,23 +67,20 @@ def slug(name: str) -> str:
 # A tag of a speech: a kept item whose name links to a tag, or a kept summary tag.
 # Merged tags resolve to their kept tag. Each (speech, tag) counts once.
 # The view speech_tags_mv stores these rows. scripts/refresh_speech_tags.py fills it again after a data change.
-SPEECH_TAGS_CTE = """
-speech_tags AS (
-    SELECT si.speech_id, si.tag_id, si.source FROM speech_tags_mv si
-)
-"""
+_SPEECH_TAGS_SELECT = "SELECT si.speech_id, si.tag_id, si.source FROM speech_tags_mv si"
+
 
 def speech_tags_cte(filter_sql=None):
-    """Return SPEECH_TAGS_CTE, with a condition on the stored row when filter_sql is given.
+    """Return the CTE speech_tags, with a condition on the stored row when filter_sql is given.
 
     The condition keeps the read small when a page needs the tags of a few speeches only.
     Use the alias si in the condition. Only si.speech_id, si.tag_id and si.source exist. Bind the parameters in the query.
     """
-    if not filter_sql:
-        return SPEECH_TAGS_CTE
-    out = SPEECH_TAGS_CTE.replace("FROM speech_tags_mv si", f"FROM speech_tags_mv si WHERE {filter_sql}")
-    assert out != SPEECH_TAGS_CTE
-    return out
+    where = f" WHERE {filter_sql}" if filter_sql else ""
+    return f"\nspeech_tags AS (\n    {_SPEECH_TAGS_SELECT}{where}\n)\n"
+
+
+SPEECH_TAGS_CTE = speech_tags_cte()
 
 
 CACHE_SECONDS = 3600
